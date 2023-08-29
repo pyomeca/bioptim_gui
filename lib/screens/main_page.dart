@@ -10,6 +10,7 @@ import 'package:bioptim_gui/models/python_interface.dart';
 import 'package:bioptim_gui/widgets/bio_model_chooser.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
 import 'package:bioptim_gui/widgets/optimal_control_program_type_chooser.dart';
+import 'package:bioptim_gui/widgets/phase_information.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -29,10 +30,39 @@ class _MainPageState extends State<MainPage> {
   Stream<String>? _outputError;
   final _scrollController = ScrollController();
 
+  final _nbShootingPointControllers = <TextEditingController>[];
+  final _phaseTimeControllers = <TextEditingController>[];
+
   @override
   void dispose() {
     _scrollController.dispose();
+
+    for (final controller in _nbShootingPointControllers) {
+      controller.dispose();
+    }
+
     super.dispose();
+  }
+
+  void _reinitializeControllers() {
+    if (_nbShootingPointControllers.length == _currentOcp.nbPhases) return;
+
+    // TODO fix for when phases are removed or added
+    for (int phase = 0; phase < _currentOcp.nbPhases; phase++) {
+      if (phase < _nbShootingPointControllers.length) continue;
+
+      _nbShootingPointControllers.add(TextEditingController());
+      _nbShootingPointControllers[phase].text =
+          _currentOcp.nbShootingPoints.toString();
+      _nbShootingPointControllers[phase].addListener(() =>
+          _onSettingNbShootingPoints(
+              int.tryParse(_nbShootingPointControllers[phase].text)));
+
+      _phaseTimeControllers.add(TextEditingController());
+      _phaseTimeControllers[phase].text = _currentOcp.phaseTime.toString();
+      _phaseTimeControllers[phase].addListener(() => _onSettingPhaseTime(
+          double.tryParse(_phaseTimeControllers[phase].text)));
+    }
   }
 
   @override
@@ -43,8 +73,9 @@ class _MainPageState extends State<MainPage> {
     });
     PythonInterface.instance.initialize(environment: 'bioptim_gui');
 
+    _reinitializeControllers();
+
     // TODO remove this prefilling, which is only for debug purpose
-    _currentOcp.modelPath = 'models/pendulum.bioMod';
     _currentOcp.addVariable(
         OptimizationVariable(
           name: 'q',
@@ -103,6 +134,14 @@ class _MainPageState extends State<MainPage> {
   void _onSelectedModelPath(String value) =>
       setState(() => _currentOcp.modelPath = value);
 
+  void _onSettingNbShootingPoints(int? value) =>
+      setState(() => _currentOcp.nbShootingPoints = value ?? -1);
+
+  void _onSettingPhaseTime(double? value) {
+    debugPrint(value.toString());
+    setState(() => _currentOcp.phaseTime = value ?? -1);
+  }
+
   void _onExportFile() async {
     _scriptPath = await FilePicker.platform.saveFile(
       allowedExtensions: ['py'],
@@ -130,7 +169,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    const columnWidth = 350.0;
+    const columnWidth = 400.0;
 
     return Scaffold(
       appBar: AppBar(
@@ -167,27 +206,42 @@ class _MainPageState extends State<MainPage> {
                         modelPath: _currentOcp.modelPath,
                       ),
                       const SizedBox(height: 12),
+                      PhaseInformation(
+                        columnWidth: columnWidth,
+                        nbShootingPointController:
+                            _nbShootingPointControllers[0],
+                        phaseTimeController: _phaseTimeControllers[0],
+                      ),
+                      const SizedBox(height: 12),
                       Center(child: _buildExportOrRunScriptButton()),
                     ],
                   ),
                 ),
-                if (_output != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12.0),
-                    child: ConsoleOut(output: _output!),
-                  ),
-                if (_outputError != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 12.0),
-                    child: ConsoleOut(
-                        output: _outputError!, textColor: Colors.red),
-                  ),
+                _buildOutputScreens(),
                 const SizedBox(height: 50),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildOutputScreens() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        if (_output != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: ConsoleOut(output: _output!),
+          ),
+        if (_outputError != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: ConsoleOut(output: _outputError!, textColor: Colors.red),
+          ),
+      ],
     );
   }
 

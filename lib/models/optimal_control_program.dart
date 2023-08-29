@@ -58,6 +58,10 @@ class OptimalControlProgram {
     _hasPendingChanges = true;
   }
 
+  // TODO Changing [nbPhases] to greater than 1 will require to move
+  // some of the variable down below into a deeper class and have them in a list
+  final int nbPhases = 1;
+
   int _nbShootingPoints;
   int get nbShootingPoints => _nbShootingPoints;
   set nbShootingPoints(int value) {
