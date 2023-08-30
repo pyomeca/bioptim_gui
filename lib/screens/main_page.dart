@@ -10,6 +10,7 @@ import 'package:bioptim_gui/models/phase_text_editing_controllers.dart';
 import 'package:bioptim_gui/models/python_interface.dart';
 import 'package:bioptim_gui/widgets/bio_model_chooser.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
+import 'package:bioptim_gui/widgets/number_of_phases_chooser.dart';
 import 'package:bioptim_gui/widgets/optimal_control_program_type_chooser.dart';
 import 'package:bioptim_gui/widgets/phase_information.dart';
 import 'package:file_picker/file_picker.dart';
@@ -111,6 +112,9 @@ class _MainPageState extends State<MainPage> {
   void _onSelectedOcp(OptimalControlProgramType value) =>
       setState(() => _currentOcp.ocpType = value);
 
+  void _onNumberOfPhaseChanged(int value) =>
+      setState(() => _currentOcp.nbPhases = value);
+
   void _onSelectedBioModel(BioModel value, {required int phaseIndex}) =>
       setState(() => _currentOcp.setBioModel(value, phaseIndex: phaseIndex));
 
@@ -185,6 +189,10 @@ class _MainPageState extends State<MainPage> {
                         value: _currentOcp.ocpType,
                         onSelected: _onSelectedOcp,
                       ),
+                      const SizedBox(height: 12),
+                      NumberOfPhasesChooser(
+                          phaseController: _phaseControllers.phaseController,
+                          onChanged: _onNumberOfPhaseChanged),
                       const SizedBox(height: 12),
                       BioModelChooser(
                         onSelectedBioModel: (value) =>

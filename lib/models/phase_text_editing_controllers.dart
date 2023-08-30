@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 class PhaseTextEditingControllers {
   int _nbPhases = 1;
+  final phaseController = TextEditingController(text: '1');
 
   // This is to keep track of how many controllers we have because we don't
   // delete them if we reduce _nbPhases
