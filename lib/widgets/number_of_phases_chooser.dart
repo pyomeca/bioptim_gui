@@ -8,12 +8,12 @@ class NumberOfPhasesChooser extends StatefulWidget {
     required this.onChangedNumberOfPhases,
     required this.onSelectPhase,
     required this.numberOfPhases,
-    required this.columnWidth,
+    required this.width,
   });
 
   final Function(int value) onChangedNumberOfPhases;
   final Function(int value) onSelectPhase;
-  final double columnWidth;
+  final double width;
   final int numberOfPhases;
 
   @override
@@ -27,7 +27,7 @@ class _NumberOfPhasesChooserState extends State<NumberOfPhasesChooser> {
 
   @override
   Widget build(BuildContext context) {
-    final width = widget.columnWidth * 1 / 2 - 6;
+    final width = widget.width * 1 / 2 - 6;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +53,7 @@ class _NumberOfPhasesChooserState extends State<NumberOfPhasesChooser> {
               decoration: const InputDecoration(
                   labelText: 'Number of phases', border: OutlineInputBorder()),
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              enabled: true,
+              enabled: false, // TODO when exporter is ready turn this to true
             ),
           ),
         ),

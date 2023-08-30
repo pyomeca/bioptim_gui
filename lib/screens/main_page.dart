@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:bioptim_gui/models/bio_model.dart';
+import 'package:bioptim_gui/models/dynamics.dart';
 import 'package:bioptim_gui/models/optimal_control_program.dart';
 import 'package:bioptim_gui/models/optimal_control_program_type.dart';
 import 'package:bioptim_gui/models/optimization_variable.dart';
@@ -10,6 +11,7 @@ import 'package:bioptim_gui/models/phase_text_editing_controllers.dart';
 import 'package:bioptim_gui/models/python_interface.dart';
 import 'package:bioptim_gui/widgets/bio_model_chooser.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
+import 'package:bioptim_gui/widgets/dynamics_chooser.dart';
 import 'package:bioptim_gui/widgets/number_of_phases_chooser.dart';
 import 'package:bioptim_gui/widgets/optimal_control_program_type_chooser.dart';
 import 'package:bioptim_gui/widgets/phase_information.dart';
@@ -138,6 +140,12 @@ class _MainPageState extends State<MainPage> {
     setState(() => _currentOcp.setPhaseTime(value, phaseIndex: phaseIndex));
   }
 
+  void _onSelectedDynamics(Dynamics value, {required int phaseIndex}) {
+    setState(() {
+      _currentOcp.setDynamic(value, phaseIndex: phaseIndex);
+    });
+  }
+
   void _onExportFile() async {
     _scriptPath = await FilePicker.platform.saveFile(
       allowedExtensions: ['py'],
@@ -197,7 +205,7 @@ class _MainPageState extends State<MainPage> {
                         onChangedNumberOfPhases: _onNumberOfPhaseChanged,
                         onSelectPhase: _onSelectPhase,
                         numberOfPhases: _currentOcp.nbPhases,
-                        columnWidth: widget.columnWidth,
+                        width: widget.columnWidth,
                       ),
                       const SizedBox(height: 12),
                       _buildPhase(phaseIndex: _phaseIndex),
@@ -230,11 +238,18 @@ class _MainPageState extends State<MainPage> {
         ),
         const SizedBox(height: 12),
         PhaseInformation(
-          columnWidth: widget.columnWidth,
+          width: widget.columnWidth,
           nbShootingPointController:
               _phaseControllers.nbShootingPointsControllers[phaseIndex],
           phaseTimeController:
               _phaseControllers.phaseTimeControllers[phaseIndex],
+        ),
+        const SizedBox(height: 12),
+        DynamicsChooser(
+          dynamics: _currentOcp.getDynamics(phaseIndex: phaseIndex),
+          onChanged: (value) =>
+              _onSelectedDynamics(value, phaseIndex: phaseIndex),
+          width: widget.columnWidth,
         ),
       ],
     );

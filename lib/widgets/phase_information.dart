@@ -4,12 +4,12 @@ import 'package:flutter/services.dart';
 class PhaseInformation extends StatelessWidget {
   const PhaseInformation({
     super.key,
-    required this.columnWidth,
+    required this.width,
     required this.nbShootingPointController,
     required this.phaseTimeController,
   });
 
-  final double columnWidth;
+  final double width;
   final TextEditingController nbShootingPointController;
   final TextEditingController phaseTimeController;
 
@@ -18,7 +18,7 @@ class PhaseInformation extends StatelessWidget {
     return Row(
       children: [
         SizedBox(
-          width: columnWidth / 2 - 6,
+          width: width / 2 - 6,
           child: TextField(
             controller: nbShootingPointController,
             decoration: const InputDecoration(
