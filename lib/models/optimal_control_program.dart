@@ -77,6 +77,7 @@ class OptimalControlProgram {
             nbShootingPoints: 50,
             dynamics: const Dynamics(
                 type: DynamicsType.torqueDriven, isExpanded: true)));
+        setDynamic(_phases.last.dynamics, phaseIndex: i);
       }
     } else {
       // Do not change anything if we already have the right number of phases
@@ -118,6 +119,37 @@ class OptimalControlProgram {
       _phases[phaseIndex].dynamics;
   void setDynamic(Dynamics value, {required int phaseIndex}) {
     _phases[phaseIndex].dynamics = value;
+
+    _phases[phaseIndex].stateVariables.clearVariables();
+    for (final name in _phases[phaseIndex].dynamics.type.states) {
+      addVariable(
+          OptimizationVariable(
+            name: name,
+            bounds: Bound(
+              nbElements: 1,
+              interpolation: Interpolation.constantWithFirstAndLastDifferent,
+            ),
+            initialGuess: InitialGuess(
+                nbElements: 1, interpolation: Interpolation.constant),
+          ),
+          from: OptimizationVariableType.state,
+          phaseIndex: phaseIndex);
+    }
+    for (final name in _phases[phaseIndex].dynamics.type.controls) {
+      addVariable(
+          OptimizationVariable(
+            name: name,
+            bounds: Bound(
+              nbElements: 1,
+              interpolation: Interpolation.constantWithFirstAndLastDifferent,
+            ),
+            initialGuess: InitialGuess(
+                nbElements: 1, interpolation: Interpolation.constant),
+          ),
+          from: OptimizationVariableType.control,
+          phaseIndex: phaseIndex);
+    }
+
     _hasPendingChanges = true;
   }
 
@@ -138,6 +170,15 @@ class OptimalControlProgram {
   void addVariable(OptimizationVariable value,
       {required OptimizationVariableType from, required int phaseIndex}) {
     variableMap(from: from, phaseIndex: phaseIndex).addVariable(value);
+    _hasPendingChanges = true;
+  }
+
+  void changeVariableDimension(int value,
+      {required String name,
+      required OptimizationVariableType from,
+      required int phaseIndex}) {
+    variableMap(from: from, phaseIndex: phaseIndex)
+        .changeVariableDimension(value, name: name);
     _hasPendingChanges = true;
   }
 

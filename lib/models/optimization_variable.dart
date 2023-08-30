@@ -10,7 +10,7 @@ enum Interpolation {
       case constant:
         return 'Constant';
       case constantWithFirstAndLastDifferent:
-        return 'Start, Constant intermediates, End';
+        return 'Constant except for first and last points';
     }
   }
 
@@ -38,6 +38,11 @@ class Bound {
   final Matrix max;
   final Interpolation interpolation;
 
+  void changeDimension(int value) {
+    min.changeNbRows(value);
+    max.changeNbRows(value);
+  }
+
   Bound({required int nbElements, required this.interpolation})
       : min = Matrix.zeros(nbRows: nbElements, nbCols: interpolation.nbCols),
         max = Matrix.zeros(nbRows: nbElements, nbCols: interpolation.nbCols);
@@ -46,6 +51,11 @@ class Bound {
 class InitialGuess {
   final Matrix guess;
   final Interpolation interpolation;
+
+  void changeDimension(int value) {
+    guess.changeNbRows(value);
+  }
+
   InitialGuess({required int nbElements, required this.interpolation})
       : guess = Matrix.zeros(nbRows: nbElements, nbCols: interpolation.nbCols);
 }
@@ -54,6 +64,11 @@ class OptimizationVariable {
   final String name;
   final Bound bounds;
   final InitialGuess initialGuess;
+
+  void changeDimension(int value) {
+    bounds.changeDimension(value);
+    initialGuess.changeDimension(value);
+  }
 
   const OptimizationVariable({
     required this.name,
@@ -99,9 +114,14 @@ class OptimizationVariableMap {
     return _elements[name]!;
   }
 
-  Iterable<String> get names => _elements.keys;
+  List<String> get names => _elements.keys.toList();
 
   void addVariable(OptimizationVariable value) => _elements[value.name] = value;
+
+  void changeVariableDimension(int value, {required String name}) =>
+      _elements[name]!.changeDimension(value);
+
+  void clearVariables() => _elements.clear();
 
   void fillBound(
     String name, {

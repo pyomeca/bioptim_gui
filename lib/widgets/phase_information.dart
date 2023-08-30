@@ -1,3 +1,4 @@
+import 'package:bioptim_gui/widgets/positive_integer_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -19,12 +20,9 @@ class PhaseInformation extends StatelessWidget {
       children: [
         SizedBox(
           width: width / 2 - 6,
-          child: TextField(
+          child: PositiveIntegerTextField(
+            label: 'Number of shooting points',
             controller: nbShootingPointController,
-            decoration: const InputDecoration(
-                labelText: 'Number of shooting points',
-                border: OutlineInputBorder()),
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
           ),
         ),
         const SizedBox(width: 12),

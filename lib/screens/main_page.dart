@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:bioptim_gui/models/bio_model.dart';
 import 'package:bioptim_gui/models/dynamics.dart';
@@ -14,6 +13,7 @@ import 'package:bioptim_gui/widgets/console_out.dart';
 import 'package:bioptim_gui/widgets/dynamics_chooser.dart';
 import 'package:bioptim_gui/widgets/number_of_phases_chooser.dart';
 import 'package:bioptim_gui/widgets/optimal_control_program_type_chooser.dart';
+import 'package:bioptim_gui/widgets/optimization_variable_chooser.dart';
 import 'package:bioptim_gui/widgets/phase_information.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -40,8 +40,17 @@ class _MainPageState extends State<MainPage> {
   late final _phaseControllers = PhaseTextEditingControllers(
     getNbShootingPoints: _currentOcp.getNbShootingPoints,
     onChangedNbShootingPoints: _onSettingNbShootingPoints,
-    getPhaseTime: _currentOcp.getPhaseTime,
-    onChangedPhaseTime: _onSettingPhaseTime,
+    getPhaseDuration: _currentOcp.getPhaseTime,
+    onChangedPhaseDuration: _onSettingPhaseTime,
+    getVariableNames: ({required from, required phaseIndex}) =>
+        _currentOcp.variableMap(from: from, phaseIndex: phaseIndex).names,
+    getVariableNumberOfColumns:
+        ({required name, required from, required phaseIndex}) => _currentOcp
+            .variable(name, from: from, phaseIndex: phaseIndex)
+            .bounds
+            .interpolation
+            .nbCols,
+    setVariableDimension: _onSettingVariableDimension,
   );
 
   @override
@@ -60,55 +69,55 @@ class _MainPageState extends State<MainPage> {
     PythonInterface.instance.initialize(environment: 'bioptim_gui');
 
     // TODO remove this prefilling, which is only for debug purpose
-    _currentOcp.addVariable(
-        OptimizationVariable(
-          name: 'q',
-          bounds: Bound(
-            nbElements: 2,
-            interpolation: Interpolation.constantWithFirstAndLastDifferent,
-          ),
-          initialGuess: InitialGuess(
-              nbElements: 2, interpolation: Interpolation.constant),
-        ),
-        from: OptimizationVariableType.state,
-        phaseIndex: 0);
-    _currentOcp.addVariable(
-        OptimizationVariable(
-          name: 'qdot',
-          bounds: Bound(
-            nbElements: 2,
-            interpolation: Interpolation.constantWithFirstAndLastDifferent,
-          ),
-          initialGuess: InitialGuess(
-              nbElements: 2, interpolation: Interpolation.constant),
-        ),
-        from: OptimizationVariableType.state,
-        phaseIndex: 0);
-    _currentOcp.fillBound('q',
-        min: [0, -2, 0, 0, -2 * pi, pi],
-        max: [0, 2, 0, 0, 2 * pi, pi],
-        from: OptimizationVariableType.state,
-        phaseIndex: 0);
-    _currentOcp.fillBound('qdot',
-        min: [0, -10, 0, 0, -10 * pi, 0],
-        max: [0, 10, 0, 0, 10 * pi, 0],
-        from: OptimizationVariableType.state,
-        phaseIndex: 0);
+    // _currentOcp.addVariable(
+    //     OptimizationVariable(
+    //       name: 'q',
+    //       bounds: Bound(
+    //         nbElements: 2,
+    //         interpolation: Interpolation.constantWithFirstAndLastDifferent,
+    //       ),
+    //       initialGuess: InitialGuess(
+    //           nbElements: 2, interpolation: Interpolation.constant),
+    //     ),
+    //     from: OptimizationVariableType.state,
+    //     phaseIndex: 0);
+    // _currentOcp.addVariable(
+    //     OptimizationVariable(
+    //       name: 'qdot',
+    //       bounds: Bound(
+    //         nbElements: 2,
+    //         interpolation: Interpolation.constantWithFirstAndLastDifferent,
+    //       ),
+    //       initialGuess: InitialGuess(
+    //           nbElements: 2, interpolation: Interpolation.constant),
+    //     ),
+    //     from: OptimizationVariableType.state,
+    //     phaseIndex: 0);
+    // _currentOcp.fillBound('q',
+    //     min: [0, -2, 0, 0, -2 * pi, pi],
+    //     max: [0, 2, 0, 0, 2 * pi, pi],
+    //     from: OptimizationVariableType.state,
+    //     phaseIndex: 0);
+    // _currentOcp.fillBound('qdot',
+    //     min: [0, -10, 0, 0, -10 * pi, 0],
+    //     max: [0, 10, 0, 0, 10 * pi, 0],
+    //     from: OptimizationVariableType.state,
+    //     phaseIndex: 0);
 
-    _currentOcp.addVariable(
-        OptimizationVariable(
-          name: 'tau',
-          bounds: Bound(nbElements: 2, interpolation: Interpolation.constant),
-          initialGuess: InitialGuess(
-              nbElements: 2, interpolation: Interpolation.constant),
-        ),
-        from: OptimizationVariableType.control,
-        phaseIndex: 0);
-    _currentOcp.fillBound('tau',
-        min: [-100, 0],
-        max: [100, 0],
-        from: OptimizationVariableType.control,
-        phaseIndex: 0);
+    // _currentOcp.addVariable(
+    //     OptimizationVariable(
+    //       name: 'tau',
+    //       bounds: Bound(nbElements: 2, interpolation: Interpolation.constant),
+    //       initialGuess: InitialGuess(
+    //           nbElements: 2, interpolation: Interpolation.constant),
+    //     ),
+    //     from: OptimizationVariableType.control,
+    //     phaseIndex: 0);
+    // _currentOcp.fillBound('tau',
+    //     min: [-100, 0],
+    //     max: [100, 0],
+    //     from: OptimizationVariableType.control,
+    //     phaseIndex: 0);
 
     _currentOcp.addObjective(
         Objective(LagrangeFcn.minimizeControls, arguments: {'key': 'tau'}));
@@ -135,15 +144,20 @@ class _MainPageState extends State<MainPage> {
       setState(
           () => _currentOcp.setNbShootingPoints(value, phaseIndex: phaseIndex));
 
-  void _onSettingPhaseTime(double value, {required int phaseIndex}) {
-    debugPrint(value.toString());
-    setState(() => _currentOcp.setPhaseTime(value, phaseIndex: phaseIndex));
-  }
+  void _onSettingPhaseTime(double value, {required int phaseIndex}) =>
+      setState(() => _currentOcp.setPhaseTime(value, phaseIndex: phaseIndex));
 
   void _onSelectedDynamics(Dynamics value, {required int phaseIndex}) {
+    _phaseControllers.setVariables(value, phaseIndex: phaseIndex);
     setState(() {
       _currentOcp.setDynamic(value, phaseIndex: phaseIndex);
     });
+  }
+
+  void _onSettingVariableDimension(dimension,
+      {required name, required from, required phaseIndex}) {
+    _currentOcp.changeVariableDimension(dimension,
+        name: name, from: from, phaseIndex: phaseIndex);
   }
 
   void _onExportFile() async {
@@ -228,6 +242,11 @@ class _MainPageState extends State<MainPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const Text(
+          'Information on the phase',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
         BioModelChooser(
           onSelectedBioModel: (value) =>
               _onSelectedBioModel(value, phaseIndex: phaseIndex),
@@ -240,9 +259,8 @@ class _MainPageState extends State<MainPage> {
         PhaseInformation(
           width: widget.columnWidth,
           nbShootingPointController:
-              _phaseControllers.nbShootingPointsControllers[phaseIndex],
-          phaseTimeController:
-              _phaseControllers.phaseTimeControllers[phaseIndex],
+              _phaseControllers.nbShootingPoints[phaseIndex],
+          phaseTimeController: _phaseControllers.phaseDuration[phaseIndex],
         ),
         const SizedBox(height: 12),
         DynamicsChooser(
@@ -251,6 +269,52 @@ class _MainPageState extends State<MainPage> {
               _onSelectedDynamics(value, phaseIndex: phaseIndex),
           width: widget.columnWidth,
         ),
+        const SizedBox(height: 12),
+        const Divider(),
+        _buildVariableType(
+            from: OptimizationVariableType.state, phaseIndex: phaseIndex),
+        const SizedBox(height: 12),
+        const Divider(),
+        _buildVariableType(
+            from: OptimizationVariableType.control, phaseIndex: phaseIndex),
+      ],
+    );
+  }
+
+  Widget _buildVariableType(
+      {required OptimizationVariableType from, required int phaseIndex}) {
+    final variables =
+        _currentOcp.variableMap(from: from, phaseIndex: phaseIndex);
+
+    late List<Map<String, VariableTextEditingControllers>> controllers;
+    switch (from) {
+      case OptimizationVariableType.state:
+        controllers = _phaseControllers.states;
+      case OptimizationVariableType.control:
+        controllers = _phaseControllers.controls;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${from.name} variables',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        ...variables.names.map((name) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 24.0),
+            child: SizedBox(
+              width: widget.columnWidth,
+              child: OptimizationVariableChooser(
+                controllers: controllers[phaseIndex][name]!,
+                variable: variables[name],
+                isMandatory: true,
+                width: widget.columnWidth,
+              ),
+            ),
+          );
+        }),
       ],
     );
   }

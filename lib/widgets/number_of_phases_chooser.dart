@@ -1,6 +1,6 @@
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
+import 'package:bioptim_gui/widgets/positive_integer_text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class NumberOfPhasesChooser extends StatefulWidget {
   const NumberOfPhasesChooser({
@@ -22,8 +22,13 @@ class NumberOfPhasesChooser extends StatefulWidget {
 
 class _NumberOfPhasesChooserState extends State<NumberOfPhasesChooser> {
   int _currentPhase = 0;
-  late final phaseController =
-      TextEditingController(text: (_currentPhase + 1).toString());
+  late final phaseController = TextEditingController(text: '1');
+
+  @override
+  void dispose() {
+    phaseController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,27 +39,12 @@ class _NumberOfPhasesChooserState extends State<NumberOfPhasesChooser> {
       children: [
         SizedBox(
           width: width,
-          child: Focus(
-            onFocusChange: (hasFocus) {
-              if (!hasFocus) {
-                if (phaseController.text == '' ||
-                    int.tryParse(phaseController.text) == 0) {
-                  phaseController.text = '1';
-                }
-                final nbPhases = int.parse(phaseController.text);
-                widget.onChangedNumberOfPhases(nbPhases);
-                setState(() {
-                  if (_currentPhase >= nbPhases) _currentPhase = nbPhases - 1;
-                });
-              }
-            },
-            child: TextField(
-              controller: phaseController,
-              decoration: const InputDecoration(
-                  labelText: 'Number of phases', border: OutlineInputBorder()),
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              enabled: false, // TODO when exporter is ready turn this to true
-            ),
+          child: PositiveIntegerTextField(
+            label: 'Number of phases',
+            controller: phaseController,
+            onChanged: widget.onChangedNumberOfPhases,
+            enabled:
+                false, // TODO remove this line when python exporter is ready
           ),
         ),
         if (widget.numberOfPhases > 1)

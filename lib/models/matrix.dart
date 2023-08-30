@@ -1,7 +1,7 @@
 class Matrix {
-  final int nbRows;
-  final int nbCols;
-  final List<double> values;
+  int nbRows;
+  int nbCols;
+  List<double> values;
   Matrix.zeros({required this.nbRows, required this.nbCols})
       : values = List<double>.filled(nbRows * nbCols, 0, growable: false);
 
@@ -10,6 +10,13 @@ class Matrix {
     required this.nbRows,
     required this.nbCols,
   }) : values = List.from(values, growable: false);
+
+  void changeNbRows(int value) {
+    if (nbRows == value) return;
+    // If we are changing the number of rows, we must reset the values,
+    nbRows = value;
+    values = List<double>.filled(nbRows * nbCols, 0, growable: false);
+  }
 
   void fill(List<double> values, {int? rowIndex, int? colIndex}) {
     if (colIndex != null && rowIndex != null) {

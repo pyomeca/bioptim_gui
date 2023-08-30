@@ -28,16 +28,23 @@ class DynamicsChooser extends StatelessWidget {
                   Dynamics(type: type, isExpanded: dynamics.isExpanded))),
         ),
         const SizedBox(width: 12),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Checkbox(
-              value: dynamics.isExpanded,
-              onChanged: (value) =>
-                  onChanged(Dynamics(type: dynamics.type, isExpanded: value!)),
-            ),
-            const Text('Expand'),
-          ],
+        InkWell(
+          onTap: () {
+            final value = !dynamics.isExpanded;
+            onChanged(Dynamics(type: dynamics.type, isExpanded: value));
+          },
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Checkbox(
+                value: dynamics.isExpanded,
+                onChanged: (value) => onChanged(
+                    Dynamics(type: dynamics.type, isExpanded: value!)),
+              ),
+              const Text('Expand\ndynamics'),
+              const SizedBox(width: 12),
+            ],
+          ),
         ),
       ],
     );
