@@ -54,13 +54,11 @@ class OptimizationVariable {
   final String name;
   final Bound bounds;
   final InitialGuess initialGuess;
-  final int phase;
 
   const OptimizationVariable({
     required this.name,
     required this.bounds,
     required this.initialGuess,
-    required this.phase,
   });
 }
 

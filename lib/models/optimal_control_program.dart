@@ -8,28 +8,42 @@ import 'package:bioptim_gui/models/optimization_variable.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/models/solver.dart';
 
+class _Phase {
+  int phaseIndex;
+  BioModel bioModel;
+  String modelPath;
+  int nbShootingPoints;
+  double duration;
+  Dynamics dynamics;
+
+  OptimizationVariableMap stateVariables =
+      OptimizationVariableMap(OptimizationVariableType.state);
+  OptimizationVariableMap controlVariables =
+      OptimizationVariableMap(OptimizationVariableType.control);
+
+  _Phase({
+    required this.phaseIndex,
+    required this.bioModel,
+    required this.modelPath,
+    required this.nbShootingPoints,
+    required this.duration,
+    required this.dynamics,
+  });
+}
+
 class OptimalControlProgram {
   ///
   /// Constructor
 
   OptimalControlProgram({
     OptimalControlProgramType ocpType = OptimalControlProgramType.ocp,
-    BioModel bioModel = BioModel.biorbd,
-    String modelPath = '',
-    int nbShootingPoints = 50,
-    double phaseTime = 1.0,
-    Dynamics dynamics =
-        const Dynamics(type: DynamicsType.torqueDriven, isExpanded: true),
     bool useSx = true,
     Solver solver = const Solver(type: SolverType.ipopt),
   })  : _ocpType = ocpType,
-        _bioModel = bioModel,
-        _modelPath = modelPath,
-        _nbShootingPoints = nbShootingPoints,
-        _phaseTime = phaseTime,
-        _dynamics = dynamics,
         _solver = solver,
-        _useSx = useSx;
+        _useSx = useSx {
+    _updatePhases();
+  }
 
   ///
   /// Setters and Getters
@@ -44,67 +58,86 @@ class OptimalControlProgram {
     _hasPendingChanges = true;
   }
 
-  BioModel _bioModel;
-  BioModel get bioModel => _bioModel;
-  set bioModel(BioModel value) {
-    _bioModel = value;
+  int _nbPhases = 1;
+  int get nbPhases => _nbPhases;
+  set nbPhases(int value) {
+    _nbPhases = value;
+    _updatePhases();
+  }
+
+  final _phases = <_Phase>[];
+  void _updatePhases() {
+    if (_phases.length < _nbPhases) {
+      for (int i = _phases.length; i < _nbPhases; i++) {
+        _phases.add(_Phase(
+            phaseIndex: i,
+            bioModel: BioModel.biorbd,
+            modelPath: '',
+            duration: 1.0,
+            nbShootingPoints: 50,
+            dynamics: const Dynamics(
+                type: DynamicsType.torqueDriven, isExpanded: true)));
+      }
+    } else {
+      // Do not change anything if we already have the right number of phases
+
+      // Do not remove the phases if they are removed from the GUI, so it can
+      // be reinstated prefilled with previous data
+    }
+  }
+
+  BioModel getBioModel({required int phaseIndex}) =>
+      _phases[phaseIndex].bioModel;
+  void setBioModel(BioModel value, {required int phaseIndex}) {
+    _phases[phaseIndex].bioModel = value;
     _hasPendingChanges = true;
   }
 
-  String _modelPath;
-  String get modelPath => _modelPath;
-  set modelPath(String value) {
-    _modelPath = value;
+  String getModelPath({required int phaseIndex}) =>
+      _phases[phaseIndex].modelPath;
+  void setModelPath(String value, {required int phaseIndex}) {
+    _phases[phaseIndex].modelPath = value;
     _hasPendingChanges = true;
   }
 
-  // TODO Changing [nbPhases] to greater than 1 will require to move
-  // some of the variable down below into a deeper class and have them in a list
-  final int nbPhases = 1;
-
-  int _nbShootingPoints;
-  int get nbShootingPoints => _nbShootingPoints;
-  set nbShootingPoints(int value) {
-    _nbShootingPoints = value;
+  int getNbShootingPoints({required int phaseIndex}) =>
+      _phases[phaseIndex].nbShootingPoints;
+  void setNbShootingPoints(int value, {required int phaseIndex}) {
+    _phases[phaseIndex].nbShootingPoints = value;
     _hasPendingChanges = true;
   }
 
-  double _phaseTime;
-  double get phaseTime => _phaseTime;
-  set phaseTime(double value) {
-    _phaseTime = value;
+  double getPhaseTime({required int phaseIndex}) =>
+      _phases[phaseIndex].duration;
+  void setPhaseTime(double value, {required int phaseIndex}) {
+    _phases[phaseIndex].duration = value;
     _hasPendingChanges = true;
   }
 
-  Dynamics _dynamics;
-  Dynamics get dynamics => _dynamics;
-  set dynamic(Dynamics value) {
-    _dynamics = value;
+  Dynamics getDynamics({required int phaseIndex}) =>
+      _phases[phaseIndex].dynamics;
+  void setDynamic(Dynamics value, {required int phaseIndex}) {
+    _phases[phaseIndex].dynamics = value;
     _hasPendingChanges = true;
   }
-
-  final OptimizationVariableMap _stateVariables =
-      OptimizationVariableMap(OptimizationVariableType.state);
-  final OptimizationVariableMap _controlVariables =
-      OptimizationVariableMap(OptimizationVariableType.control);
 
   OptimizationVariableMap variableMap(
-      {required OptimizationVariableType from}) {
+      {required OptimizationVariableType from, required int phaseIndex}) {
     switch (from) {
       case OptimizationVariableType.state:
-        return _stateVariables;
+        return _phases[phaseIndex].stateVariables;
       case OptimizationVariableType.control:
-        return _controlVariables;
+        return _phases[phaseIndex].controlVariables;
     }
   }
 
   OptimizationVariable variable(String name,
-          {required OptimizationVariableType from}) =>
-      variableMap(from: from)[name];
+          {required OptimizationVariableType from, required int phaseIndex}) =>
+      variableMap(from: from, phaseIndex: phaseIndex)[name];
 
   void addVariable(OptimizationVariable value,
-      {required OptimizationVariableType from}) {
-    variableMap(from: from).addVariable(value);
+      {required OptimizationVariableType from, required int phaseIndex}) {
+    variableMap(from: from, phaseIndex: phaseIndex).addVariable(value);
     _hasPendingChanges = true;
   }
 
@@ -113,28 +146,35 @@ class OptimalControlProgram {
     required List<double> min,
     required List<double> max,
     required OptimizationVariableType from,
+    required int phaseIndex,
     int? rowIndex,
     int? colIndex,
   }) {
-    variableMap(from: from).fillBound(name,
+    variableMap(from: from, phaseIndex: phaseIndex).fillBound(name,
         min: min, max: max, rowIndex: rowIndex, colIndex: colIndex);
     _hasPendingChanges = true;
   }
 
-  void fillInitialGuess(String name,
-      {required List<double> guess, required OptimizationVariableType from}) {
-    variableMap(from: from).fillInitialGuess(name, guess: guess);
+  void fillInitialGuess(
+    String name, {
+    required List<double> guess,
+    required OptimizationVariableType from,
+    required int phaseIndex,
+  }) {
+    variableMap(from: from, phaseIndex: phaseIndex)
+        .fillInitialGuess(name, guess: guess);
     _hasPendingChanges = true;
   }
 
   void replaceVariable(OptimizationVariable value,
-      {required OptimizationVariableType from}) {
-    variableMap(from: from).replaceVariable(value);
+      {required OptimizationVariableType from, required int phaseIndex}) {
+    variableMap(from: from, phaseIndex: phaseIndex).replaceVariable(value);
     _hasPendingChanges = true;
   }
 
-  void removeVariable(String name, {required OptimizationVariableType from}) {
-    variableMap(from: from).removeVariable(name);
+  void removeVariable(String name,
+      {required OptimizationVariableType from, required int phaseIndex}) {
+    variableMap(from: from, phaseIndex: phaseIndex).removeVariable(name);
     _hasPendingChanges = true;
   }
 
@@ -192,6 +232,9 @@ class OptimalControlProgram {
   void exportScript(String path) {
     _hasPendingChanges = false;
 
+    // TODO Do a proper for loop
+    const phaseIndex = 0;
+
     final file = File(path);
 
     // Write the header
@@ -224,17 +267,18 @@ class OptimalControlProgram {
     // Write the Generic section
     file.writeAsStringSync(
         '    # Declaration of generic elements\n'
-        '    bio_model = ${bioModel.toPythonString()}(r"$modelPath")\n'
-        '    n_shooting = $nbShootingPoints\n'
-        '    phase_time = $phaseTime\n'
+        '    bio_model = ${getBioModel(phaseIndex: phaseIndex).toPythonString()}'
+        '(r"${getModelPath(phaseIndex: phaseIndex)}")\n'
+        '    n_shooting = ${getNbShootingPoints(phaseIndex: phaseIndex)}\n'
+        '    phase_time = ${getPhaseTime(phaseIndex: phaseIndex)}\n'
         '\n',
         mode: FileMode.append);
 
     // Write the dynamics section
     file.writeAsStringSync(
         '    # Declaration of the dynamics function used during integration\n'
-        '    dynamics = Dynamics(${dynamics.type.toPythonString()}, '
-        'expand=${dynamics.isExpanded ? 'True' : 'False'})\n'
+        '    dynamics = Dynamics(${getDynamics(phaseIndex: phaseIndex).type.toPythonString()}, '
+        'expand=${getDynamics(phaseIndex: phaseIndex).isExpanded ? 'True' : 'False'})\n'
         '\n',
         mode: FileMode.append);
 
@@ -244,7 +288,8 @@ class OptimalControlProgram {
         mode: FileMode.append);
 
     for (final variableType in OptimizationVariableType.values) {
-      final allVariables = variableMap(from: variableType);
+      final allVariables =
+          variableMap(from: variableType, phaseIndex: phaseIndex);
       final basename = allVariables.type.toPythonString();
 
       file.writeAsStringSync(
@@ -261,14 +306,14 @@ class OptimalControlProgram {
             '        min_bound=${variable.bounds.min},\n'
             '        max_bound=${variable.bounds.max},\n'
             '        interpolation=${variable.bounds.interpolation.toPythonString()},\n'
-            '        phase=${variable.phase},\n'
+            '        phase=$phaseIndex,\n'
             '    )'
             '\n'
             '    ${basename}_initial_guesses.add(\n'
             '        "${variable.name}",\n'
             '        initial_guess=${variable.initialGuess.guess},\n'
             '        interpolation=${variable.initialGuess.interpolation.toPythonString()},\n'
-            '        phase=${variable.phase},\n'
+            '        phase=$phaseIndex,\n'
             '    )\n'
             '\n',
             mode: FileMode.append);

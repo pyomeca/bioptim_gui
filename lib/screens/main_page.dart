@@ -6,6 +6,7 @@ import 'package:bioptim_gui/models/optimal_control_program.dart';
 import 'package:bioptim_gui/models/optimal_control_program_type.dart';
 import 'package:bioptim_gui/models/optimization_variable.dart';
 import 'package:bioptim_gui/models/penalty.dart';
+import 'package:bioptim_gui/models/phase_text_editing_controllers.dart';
 import 'package:bioptim_gui/models/python_interface.dart';
 import 'package:bioptim_gui/widgets/bio_model_chooser.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
@@ -23,46 +24,25 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  final _currentOcp = OptimalControlProgram(bioModel: BioModel.biorbd);
+  final _currentOcp = OptimalControlProgram();
   String? _scriptPath;
 
   Stream<String>? _output;
   Stream<String>? _outputError;
   final _scrollController = ScrollController();
 
-  final _nbShootingPointControllers = <TextEditingController>[];
-  final _phaseTimeControllers = <TextEditingController>[];
+  late final _phaseControllers = PhaseTextEditingControllers(
+    getNbShootingPoints: _currentOcp.getNbShootingPoints,
+    onChangedNbShootingPoints: _onSettingNbShootingPoints,
+    getPhaseTime: _currentOcp.getPhaseTime,
+    onChangedPhaseTime: _onSettingPhaseTime,
+  );
 
   @override
   void dispose() {
     _scrollController.dispose();
-
-    for (final controller in _nbShootingPointControllers) {
-      controller.dispose();
-    }
-
+    _phaseControllers.dispose();
     super.dispose();
-  }
-
-  void _reinitializeControllers() {
-    if (_nbShootingPointControllers.length == _currentOcp.nbPhases) return;
-
-    // TODO fix for when phases are removed or added
-    for (int phase = 0; phase < _currentOcp.nbPhases; phase++) {
-      if (phase < _nbShootingPointControllers.length) continue;
-
-      _nbShootingPointControllers.add(TextEditingController());
-      _nbShootingPointControllers[phase].text =
-          _currentOcp.nbShootingPoints.toString();
-      _nbShootingPointControllers[phase].addListener(() =>
-          _onSettingNbShootingPoints(
-              int.tryParse(_nbShootingPointControllers[phase].text)));
-
-      _phaseTimeControllers.add(TextEditingController());
-      _phaseTimeControllers[phase].text = _currentOcp.phaseTime.toString();
-      _phaseTimeControllers[phase].addListener(() => _onSettingPhaseTime(
-          double.tryParse(_phaseTimeControllers[phase].text)));
-    }
   }
 
   @override
@@ -72,8 +52,6 @@ class _MainPageState extends State<MainPage> {
       setState(() {});
     });
     PythonInterface.instance.initialize(environment: 'bioptim_gui');
-
-    _reinitializeControllers();
 
     // TODO remove this prefilling, which is only for debug purpose
     _currentOcp.addVariable(
@@ -85,9 +63,9 @@ class _MainPageState extends State<MainPage> {
           ),
           initialGuess: InitialGuess(
               nbElements: 2, interpolation: Interpolation.constant),
-          phase: 0,
         ),
-        from: OptimizationVariableType.state);
+        from: OptimizationVariableType.state,
+        phaseIndex: 0);
     _currentOcp.addVariable(
         OptimizationVariable(
           name: 'qdot',
@@ -97,17 +75,19 @@ class _MainPageState extends State<MainPage> {
           ),
           initialGuess: InitialGuess(
               nbElements: 2, interpolation: Interpolation.constant),
-          phase: 0,
         ),
-        from: OptimizationVariableType.state);
+        from: OptimizationVariableType.state,
+        phaseIndex: 0);
     _currentOcp.fillBound('q',
         min: [0, -2, 0, 0, -2 * pi, pi],
         max: [0, 2, 0, 0, 2 * pi, pi],
-        from: OptimizationVariableType.state);
+        from: OptimizationVariableType.state,
+        phaseIndex: 0);
     _currentOcp.fillBound('qdot',
         min: [0, -10, 0, 0, -10 * pi, 0],
         max: [0, 10, 0, 0, 10 * pi, 0],
-        from: OptimizationVariableType.state);
+        from: OptimizationVariableType.state,
+        phaseIndex: 0);
 
     _currentOcp.addVariable(
         OptimizationVariable(
@@ -115,11 +95,14 @@ class _MainPageState extends State<MainPage> {
           bounds: Bound(nbElements: 2, interpolation: Interpolation.constant),
           initialGuess: InitialGuess(
               nbElements: 2, interpolation: Interpolation.constant),
-          phase: 0,
         ),
-        from: OptimizationVariableType.control);
+        from: OptimizationVariableType.control,
+        phaseIndex: 0);
     _currentOcp.fillBound('tau',
-        min: [-100, 0], max: [100, 0], from: OptimizationVariableType.control);
+        min: [-100, 0],
+        max: [100, 0],
+        from: OptimizationVariableType.control,
+        phaseIndex: 0);
 
     _currentOcp.addObjective(
         Objective(LagrangeFcn.minimizeControls, arguments: {'key': 'tau'}));
@@ -128,18 +111,19 @@ class _MainPageState extends State<MainPage> {
   void _onSelectedOcp(OptimalControlProgramType value) =>
       setState(() => _currentOcp.ocpType = value);
 
-  void _onSelectedBioModel(BioModel value) =>
-      setState(() => _currentOcp.bioModel = value);
+  void _onSelectedBioModel(BioModel value, {required int phaseIndex}) =>
+      setState(() => _currentOcp.setBioModel(value, phaseIndex: phaseIndex));
 
-  void _onSelectedModelPath(String value) =>
-      setState(() => _currentOcp.modelPath = value);
+  void _onSelectedModelPath(String value, {required int phaseIndex}) =>
+      setState(() => _currentOcp.setModelPath(value, phaseIndex: phaseIndex));
 
-  void _onSettingNbShootingPoints(int? value) =>
-      setState(() => _currentOcp.nbShootingPoints = value ?? -1);
+  void _onSettingNbShootingPoints(int value, {required int phaseIndex}) =>
+      setState(
+          () => _currentOcp.setNbShootingPoints(value, phaseIndex: phaseIndex));
 
-  void _onSettingPhaseTime(double? value) {
+  void _onSettingPhaseTime(double value, {required int phaseIndex}) {
     debugPrint(value.toString());
-    setState(() => _currentOcp.phaseTime = value ?? -1);
+    setState(() => _currentOcp.setPhaseTime(value, phaseIndex: phaseIndex));
   }
 
   void _onExportFile() async {
@@ -171,6 +155,9 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     const columnWidth = 400.0;
 
+    // TODO Do a proper for loop
+    const phaseIndex = 0;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -200,17 +187,22 @@ class _MainPageState extends State<MainPage> {
                       ),
                       const SizedBox(height: 12),
                       BioModelChooser(
-                        onSelectedBioModel: _onSelectedBioModel,
-                        onSelectedModelPath: _onSelectedModelPath,
-                        bioModel: _currentOcp.bioModel,
-                        modelPath: _currentOcp.modelPath,
+                        onSelectedBioModel: (value) =>
+                            _onSelectedBioModel(value, phaseIndex: phaseIndex),
+                        onSelectedModelPath: (value) =>
+                            _onSelectedModelPath(value, phaseIndex: phaseIndex),
+                        bioModel:
+                            _currentOcp.getBioModel(phaseIndex: phaseIndex),
+                        modelPath:
+                            _currentOcp.getModelPath(phaseIndex: phaseIndex),
                       ),
                       const SizedBox(height: 12),
                       PhaseInformation(
                         columnWidth: columnWidth,
-                        nbShootingPointController:
-                            _nbShootingPointControllers[0],
-                        phaseTimeController: _phaseTimeControllers[0],
+                        nbShootingPointController: _phaseControllers
+                            .nbShootingPointsControllers[phaseIndex],
+                        phaseTimeController:
+                            _phaseControllers.phaseTimeControllers[phaseIndex],
                       ),
                       const SizedBox(height: 12),
                       Center(child: _buildExportOrRunScriptButton()),
