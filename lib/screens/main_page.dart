@@ -18,7 +18,9 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  const MainPage({super.key, this.columnWidth = 400.0});
+
+  final double columnWidth;
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -27,6 +29,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   final _currentOcp = OptimalControlProgram();
   String? _scriptPath;
+  int _phaseIndex = 0;
 
   Stream<String>? _output;
   Stream<String>? _outputError;
@@ -112,8 +115,13 @@ class _MainPageState extends State<MainPage> {
   void _onSelectedOcp(OptimalControlProgramType value) =>
       setState(() => _currentOcp.ocpType = value);
 
-  void _onNumberOfPhaseChanged(int value) =>
-      setState(() => _currentOcp.nbPhases = value);
+  void _onNumberOfPhaseChanged(int value) {
+    _currentOcp.nbPhases = value;
+    _phaseControllers.nbPhase = value;
+    setState(() => _currentOcp.nbPhases = value);
+  }
+
+  void _onSelectPhase(value) => setState(() => _phaseIndex = value);
 
   void _onSelectedBioModel(BioModel value, {required int phaseIndex}) =>
       setState(() => _currentOcp.setBioModel(value, phaseIndex: phaseIndex));
@@ -157,11 +165,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    const columnWidth = 400.0;
-
-    // TODO Do a proper for loop
-    const phaseIndex = 0;
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -180,7 +183,7 @@ class _MainPageState extends State<MainPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: columnWidth,
+                  width: widget.columnWidth,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -191,27 +194,13 @@ class _MainPageState extends State<MainPage> {
                       ),
                       const SizedBox(height: 12),
                       NumberOfPhasesChooser(
-                          phaseController: _phaseControllers.phaseController,
-                          onChanged: _onNumberOfPhaseChanged),
-                      const SizedBox(height: 12),
-                      BioModelChooser(
-                        onSelectedBioModel: (value) =>
-                            _onSelectedBioModel(value, phaseIndex: phaseIndex),
-                        onSelectedModelPath: (value) =>
-                            _onSelectedModelPath(value, phaseIndex: phaseIndex),
-                        bioModel:
-                            _currentOcp.getBioModel(phaseIndex: phaseIndex),
-                        modelPath:
-                            _currentOcp.getModelPath(phaseIndex: phaseIndex),
+                        onChangedNumberOfPhases: _onNumberOfPhaseChanged,
+                        onSelectPhase: _onSelectPhase,
+                        numberOfPhases: _currentOcp.nbPhases,
+                        columnWidth: widget.columnWidth,
                       ),
                       const SizedBox(height: 12),
-                      PhaseInformation(
-                        columnWidth: columnWidth,
-                        nbShootingPointController: _phaseControllers
-                            .nbShootingPointsControllers[phaseIndex],
-                        phaseTimeController:
-                            _phaseControllers.phaseTimeControllers[phaseIndex],
-                      ),
+                      _buildPhase(phaseIndex: _phaseIndex),
                       const SizedBox(height: 12),
                       Center(child: _buildExportOrRunScriptButton()),
                     ],
@@ -224,6 +213,30 @@ class _MainPageState extends State<MainPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPhase({required int phaseIndex}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        BioModelChooser(
+          onSelectedBioModel: (value) =>
+              _onSelectedBioModel(value, phaseIndex: phaseIndex),
+          onSelectedModelPath: (value) =>
+              _onSelectedModelPath(value, phaseIndex: phaseIndex),
+          bioModel: _currentOcp.getBioModel(phaseIndex: phaseIndex),
+          modelPath: _currentOcp.getModelPath(phaseIndex: phaseIndex),
+        ),
+        const SizedBox(height: 12),
+        PhaseInformation(
+          columnWidth: widget.columnWidth,
+          nbShootingPointController:
+              _phaseControllers.nbShootingPointsControllers[phaseIndex],
+          phaseTimeController:
+              _phaseControllers.phaseTimeControllers[phaseIndex],
+        ),
+      ],
     );
   }
 

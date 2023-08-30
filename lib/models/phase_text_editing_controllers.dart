@@ -1,18 +1,16 @@
 import 'dart:math';
 
-import 'package:bioptim_gui/models/optimal_control_program.dart';
 import 'package:flutter/material.dart';
 
 class PhaseTextEditingControllers {
   int _nbPhases = 1;
-  final phaseController = TextEditingController(text: '1');
 
   // This is to keep track of how many controllers we have because we don't
   // delete them if we reduce _nbPhases
   int _nbPhasesMax = 1;
 
-  set nbPhase(OptimalControlProgram ocp) {
-    _nbPhases = ocp.nbPhases;
+  set nbPhase(int value) {
+    _nbPhases = value;
     _nbPhasesMax = max(_nbPhases, _nbPhasesMax);
     _updateAllControllers();
   }

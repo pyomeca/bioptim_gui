@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomDropdownButton<T extends Enum> extends StatelessWidget {
+class CustomDropdownButton<T extends Object> extends StatelessWidget {
   const CustomDropdownButton({
     super.key,
     this.title,
