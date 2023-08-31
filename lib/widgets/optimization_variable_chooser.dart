@@ -58,6 +58,7 @@ class _OptimizationVariableChooserState
           items: Interpolation.values,
           onSelected: (value) => {}, // TODO
         ),
+        // TODO Add a graph that interacts with the matrix. So user can either fill by hand or by graph
       ],
     );
   }

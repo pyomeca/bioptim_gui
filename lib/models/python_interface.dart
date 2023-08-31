@@ -104,6 +104,7 @@ class PythonInterface {
   PythonInterface._internal();
 
   String get _loadEnvironmentCommand =>
+      // TODO if bioptim worked on first try, this command should be '' also
       _environment == null ? '' : 'conda activate $_environment && ';
 
   void _logProcess(String functionName, ProcessResult result) {

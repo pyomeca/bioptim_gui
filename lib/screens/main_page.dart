@@ -38,6 +38,7 @@ class _MainPageState extends State<MainPage> {
   final _scrollController = ScrollController();
 
   late final _phaseControllers = PhaseTextEditingControllers(
+    onChangedNbPhases: _onNumberOfPhaseChanged,
     getNbShootingPoints: _currentOcp.getNbShootingPoints,
     onChangedNbShootingPoints: _onSettingNbShootingPoints,
     getPhaseDuration: _currentOcp.getPhaseTime,
@@ -126,11 +127,8 @@ class _MainPageState extends State<MainPage> {
   void _onSelectedOcp(OptimalControlProgramType value) =>
       setState(() => _currentOcp.ocpType = value);
 
-  void _onNumberOfPhaseChanged(int value) {
-    _currentOcp.nbPhases = value;
-    _phaseControllers.nbPhase = value;
-    setState(() => _currentOcp.nbPhases = value);
-  }
+  void _onNumberOfPhaseChanged(int value) =>
+      setState(() => _currentOcp.nbPhases = value);
 
   void _onSelectPhase(value) => setState(() => _phaseIndex = value);
 
@@ -216,7 +214,7 @@ class _MainPageState extends State<MainPage> {
                       ),
                       const SizedBox(height: 12),
                       NumberOfPhasesChooser(
-                        onChangedNumberOfPhases: _onNumberOfPhaseChanged,
+                        controller: _phaseControllers.phaseController,
                         onSelectPhase: _onSelectPhase,
                         numberOfPhases: _currentOcp.nbPhases,
                         width: widget.columnWidth,
@@ -256,6 +254,7 @@ class _MainPageState extends State<MainPage> {
           modelPath: _currentOcp.getModelPath(phaseIndex: phaseIndex),
         ),
         const SizedBox(height: 12),
+        // TODO Removed the combobox for showing the phases and replace by columns
         PhaseInformation(
           width: widget.columnWidth,
           nbShootingPointController:
@@ -301,6 +300,7 @@ class _MainPageState extends State<MainPage> {
           '${from.name} variables',
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
+        // TODO Add foldable so it takes less space
         ...variables.names.map((name) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 24.0),

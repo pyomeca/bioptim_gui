@@ -1,11 +1,15 @@
 enum DynamicsType {
-  torqueDriven;
+  // TODO Transform this enum into a json reader so when the BioModel is loaded, we automatically retrieve everything that is needed
+  torqueDriven,
+  dummy;
 
   @override
   String toString() {
     switch (this) {
       case torqueDriven:
         return 'Torque driven';
+      case dummy:
+        return 'Dummy';
     }
   }
 
@@ -13,6 +17,8 @@ enum DynamicsType {
     switch (this) {
       case torqueDriven:
         return 'DynamicsFcn.TORQUE_DRIVEN';
+      case dummy:
+        return 'DynamicsFcn.DUMMY';
     }
   }
 
@@ -20,6 +26,18 @@ enum DynamicsType {
     switch (this) {
       case torqueDriven:
         return ['q', 'qdot'];
+      case dummy:
+        return ['tata'];
+    }
+  }
+
+  // TODO Call python so it automatically gets the dimensions of variables
+  List<String> get stateDimensions {
+    switch (this) {
+      case torqueDriven:
+        return ['nb_q', 'nb_qdot'];
+      case dummy:
+        return ['nb_tata'];
     }
   }
 
@@ -27,6 +45,8 @@ enum DynamicsType {
     switch (this) {
       case torqueDriven:
         return ['tau'];
+      case dummy:
+        return ['coucou'];
     }
   }
 }

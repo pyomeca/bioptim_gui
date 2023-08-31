@@ -11,12 +11,6 @@ class PhaseTextEditingControllers {
   // delete them if we reduce _nbPhases
   int _nbPhasesMax = 1;
 
-  set nbPhase(int value) {
-    _nbPhases = value;
-    _nbPhasesMax = max(_nbPhases, _nbPhasesMax);
-    _updateAllControllers();
-  }
-
   final nbShootingPoints = <TextEditingController>[];
   final int Function({required int phaseIndex}) getNbShootingPoints;
   final Function(int value, {required int phaseIndex})
@@ -27,7 +21,8 @@ class PhaseTextEditingControllers {
   final Function(double value, {required int phaseIndex})
       onChangedPhaseDuration;
 
-  // TODO Move number of phases controller here
+  final phaseController = TextEditingController(text: '1');
+  final void Function(int nbPhases) onChangedNbPhases;
 
   final List<Map<String, VariableTextEditingControllers>> states = [];
   final List<Map<String, VariableTextEditingControllers>> controls = [];
@@ -46,6 +41,7 @@ class PhaseTextEditingControllers {
   }) setVariableDimension;
 
   PhaseTextEditingControllers({
+    required this.onChangedNbPhases,
     required this.getNbShootingPoints,
     required this.onChangedNbShootingPoints,
     required this.getPhaseDuration,
@@ -54,10 +50,22 @@ class PhaseTextEditingControllers {
     required this.getVariableNumberOfColumns,
     required this.setVariableDimension,
   }) {
+    phaseController.addListener(() async {
+      final tp = int.tryParse(phaseController.text);
+      if (tp == null || tp < 1) return;
+      _nbPhases = tp;
+      _nbPhasesMax = max(_nbPhases, _nbPhasesMax);
+      onChangedNbPhases(_nbPhases);
+      // Wait for one frame so the the UI is updated
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        _updateAllControllers();
+      });
+    });
     _updateAllControllers();
   }
 
   void dispose() {
+    phaseController.dispose();
     for (int i = 0; i < _nbPhasesMax; i++) {
       nbShootingPoints[i].dispose();
       phaseDuration[i].dispose();
@@ -169,6 +177,7 @@ class PhaseTextEditingControllers {
 }
 
 class VariableTextEditingControllers {
+  // TODO Add the capability to automatically fill end phase continuity with starting of next phase
   final name = TextEditingController();
   final dimension = TextEditingController(text: '1');
   void Function(int value) setDimension;

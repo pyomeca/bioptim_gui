@@ -5,16 +5,16 @@ import 'package:flutter/material.dart';
 class NumberOfPhasesChooser extends StatefulWidget {
   const NumberOfPhasesChooser({
     super.key,
-    required this.onChangedNumberOfPhases,
     required this.onSelectPhase,
     required this.numberOfPhases,
+    required this.controller,
     required this.width,
   });
 
-  final Function(int value) onChangedNumberOfPhases;
   final Function(int value) onSelectPhase;
   final double width;
   final int numberOfPhases;
+  final TextEditingController controller;
 
   @override
   State<NumberOfPhasesChooser> createState() => _NumberOfPhasesChooserState();
@@ -22,13 +22,6 @@ class NumberOfPhasesChooser extends StatefulWidget {
 
 class _NumberOfPhasesChooserState extends State<NumberOfPhasesChooser> {
   int _currentPhase = 0;
-  late final phaseController = TextEditingController(text: '1');
-
-  @override
-  void dispose() {
-    phaseController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +34,9 @@ class _NumberOfPhasesChooserState extends State<NumberOfPhasesChooser> {
           width: width,
           child: PositiveIntegerTextField(
             label: 'Number of phases',
-            controller: phaseController,
-            onChanged: widget.onChangedNumberOfPhases,
+            controller: widget.controller,
             enabled:
-                false, // TODO remove this line when python exporter is ready
+                true, // TODO remove this line when python exporter is ready
           ),
         ),
         if (widget.numberOfPhases > 1)
