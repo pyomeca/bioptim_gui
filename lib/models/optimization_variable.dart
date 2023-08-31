@@ -1,8 +1,20 @@
 import 'package:bioptim_gui/models/matrix.dart';
 
+abstract class Path {
+  Interpolation get interpolation;
+
+  int get length;
+  int get nbRows;
+  int get nbCols;
+
+  void changeDimension(int value);
+}
+
 enum Interpolation {
   constant,
-  constantWithFirstAndLastDifferent;
+  constantWithFirstAndLastDifferent,
+  // TODO add linear
+  ;
 
   @override
   String toString() {
@@ -23,30 +35,38 @@ enum Interpolation {
     }
   }
 
-  int get nbCols {
+  int get nbCols => colNames.length;
+
+  List<String> get colNames {
     switch (this) {
       case constant:
-        return 1;
+        return ['All'];
       case constantWithFirstAndLastDifferent:
-        return 3;
+        return ['Start', 'Intermediates', 'Last'];
     }
   }
 }
 
-class Bound {
+class Bound implements Path {
   final Matrix min;
   final Matrix max;
   Interpolation _interpolation;
+  @override
   Interpolation get interpolation => _interpolation;
   set interpolation(Interpolation value) {
     _interpolation = value;
-    min.changeNbRows(_interpolation.nbCols);
-    max.changeNbRows(_interpolation.nbCols);
+    min.changeNbCols(_interpolation.nbCols);
+    max.changeNbCols(_interpolation.nbCols);
   }
 
+  @override
+  int get length => nbRows * nbCols;
+  @override
   int get nbRows => min.nbRows;
+  @override
   int get nbCols => min.nbCols;
 
+  @override
   void changeDimension(int value) {
     min.changeNbRows(value);
     max.changeNbRows(value);
@@ -58,13 +78,19 @@ class Bound {
         _interpolation = interpolation;
 }
 
-class InitialGuess {
+class InitialGuess implements Path {
   final Matrix guess;
+  @override
   final Interpolation interpolation;
 
+  @override
+  int get length => nbRows * nbCols;
+  @override
   int get nbRows => guess.nbRows;
+  @override
   int get nbCols => guess.nbCols;
 
+  @override
   void changeDimension(int value) {
     guess.changeNbRows(value);
   }

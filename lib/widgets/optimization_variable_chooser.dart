@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:bioptim_gui/models/optimization_variable.dart';
 import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
@@ -21,6 +23,12 @@ class OptimizationVariableChooser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controllers = OptimalControlProgramControllers.instance;
+
+    final bounds = controllers
+        .getVariable(name: name, phaseIndex: phaseIndex, from: from)
+        .bounds;
+    final boundsControllers = controllers.getVariableBoundsControllers(
+        name: name, phaseIndex: phaseIndex, from: from);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,49 +73,77 @@ class OptimizationVariableChooser extends StatelessWidget {
               from: from),
         ),
         const SizedBox(height: 12),
-        Center(
-            child: SizedBox(width: width * 7 / 8, child: const _DataFiller())),
+        _DataFiller(
+            title: 'Max bounds',
+            path: bounds,
+            pathControllers: boundsControllers['maxBounds']!,
+            boxWidth: width * 7 / 8 / 3),
+        const SizedBox(height: 16),
+        _DataFiller(
+            title: 'Min bounds',
+            path: bounds,
+            pathControllers: boundsControllers['minBounds']!,
+            boxWidth: width * 7 / 8 / 3),
       ],
     );
   }
 }
 
 class _DataFiller extends StatelessWidget {
-  const _DataFiller();
+  const _DataFiller({
+    required this.title,
+    required this.path,
+    required this.pathControllers,
+    required this.boxWidth,
+  });
+
+  final String title;
+  final Path path;
+  final List<TextEditingController> pathControllers;
+  final double boxWidth;
 
 // TODO Add a graph that interacts with the matrix. So user can either fill by hand or by graph
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      childAspectRatio: 3.5,
-      shrinkWrap: true,
-      crossAxisCount: 3,
-      children: const [
-        Text(
-          'Start',
-          textAlign: TextAlign.center,
-        ),
-        Text(
-          'Intermediates',
-          textAlign: TextAlign.center,
-        ),
-        Text(
-          'Last',
-          textAlign: TextAlign.center,
-        ),
-        TextField(
-            decoration: InputDecoration(
-                border: OutlineInputBorder(), label: Text('Coucou'))),
-        TextField(
-            decoration: InputDecoration(
-                border: OutlineInputBorder(), label: Text('Coucou'))),
-        TextField(
-            decoration: InputDecoration(
-                border: OutlineInputBorder(), label: Text('Coucou'))),
-        TextField(
-            decoration: InputDecoration(
-                border: OutlineInputBorder(), label: Text('Coucou'))),
-      ],
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ...path.interpolation.colNames.map((name) => SizedBox(
+                  width: boxWidth,
+                  child: Text(name, textAlign: TextAlign.center))),
+            ],
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: boxWidth * min(path.nbCols, 3),
+            // TODO GridView does not work well for unknown nbCol... This should be done using an actual for loop
+            // TODO Manage when there is more than 3 columns (scrolling?)
+            child: GridView.count(
+              childAspectRatio: 2.5,
+              shrinkWrap: true,
+              crossAxisCount: path.nbCols,
+              children: [
+                ...pathControllers.map((controller) => SizedBox(
+                      width: 70,
+                      child: TextField(
+                          controller: controller,
+                          enabled: true,
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder())),
+                    )),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

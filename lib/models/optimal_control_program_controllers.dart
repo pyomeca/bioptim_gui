@@ -192,8 +192,27 @@ class OptimalControlProgramControllers {
   }) {
     _ocp.changeVariableDimension(value,
         name: name, from: from, phaseIndex: phaseIndex);
+    _variableController(name: name, from: from, phaseIndex: phaseIndex)
+        ._updateBounds(_ocp
+            .variable(name, from: from, phaseIndex: phaseIndex)
+            .bounds
+            .length);
     if (_hasChanged != null) _hasChanged!();
   }
+
+  Map<String, List<TextEditingController>> getVariableBoundsControllers({
+    required String name,
+    required int phaseIndex,
+    required OptimizationVariableType from,
+  }) =>
+      {
+        'minBounds':
+            _variableController(name: name, from: from, phaseIndex: phaseIndex)
+                .minBounds,
+        'maxBounds':
+            _variableController(name: name, from: from, phaseIndex: phaseIndex)
+                .maxBounds,
+      };
 
   void setVariableBoundsInterpolation(
     Interpolation value, {
@@ -203,6 +222,11 @@ class OptimalControlProgramControllers {
   }) {
     _ocp.changeVariableBoundsInterpolation(value,
         name: name, from: from, phaseIndex: phaseIndex);
+    _variableController(name: name, from: from, phaseIndex: phaseIndex)
+        ._updateBounds(_ocp
+            .variable(name, from: from, phaseIndex: phaseIndex)
+            .bounds
+            .length);
     if (_hasChanged != null) _hasChanged!();
   }
 
@@ -224,6 +248,11 @@ class OptimalControlProgramControllers {
       _states,
       variableNames: ({required phaseIndex}) => getVariableNames(
           phaseIndex: phaseIndex, from: OptimizationVariableType.state),
+      getDimension: ({required name, required phaseIndex}) => getVariable(
+              name: name,
+              phaseIndex: phaseIndex,
+              from: OptimizationVariableType.state)
+          .dimension,
       setDimension: (value, {required name, required phaseIndex}) =>
           setVariableDimension(value,
               name: name,
@@ -241,6 +270,11 @@ class OptimalControlProgramControllers {
       _controls,
       variableNames: ({required phaseIndex}) => getVariableNames(
           phaseIndex: phaseIndex, from: OptimizationVariableType.control),
+      getDimension: ({required name, required phaseIndex}) => getVariable(
+              name: name,
+              phaseIndex: phaseIndex,
+              from: OptimizationVariableType.control)
+          .dimension,
       setDimension: (value, {required name, required phaseIndex}) =>
           setVariableDimension(value,
               name: name,
@@ -277,6 +311,8 @@ class OptimalControlProgramControllers {
   void _updateVariableController(
       List<Map<String, _VariableTextEditingControllers>> controllers,
       {required List<String> Function({required int phaseIndex}) variableNames,
+      required int Function({required String name, required int phaseIndex})
+          getDimension,
       required Function(int value,
               {required String name, required int phaseIndex})
           setDimension,
@@ -288,6 +324,7 @@ class OptimalControlProgramControllers {
         Map<String, _VariableTextEditingControllers> tp = {};
         for (final name in variableNames(phaseIndex: i)) {
           tp[name] = _VariableTextEditingControllers(name,
+              getDimension: () => getDimension(name: name, phaseIndex: i),
               setDimension: (value) =>
                   setDimension(value, name: name, phaseIndex: i),
               getNumberOfBoundsColumns: () =>
@@ -308,20 +345,24 @@ class _VariableTextEditingControllers {
   // TODO Add the capability to automatically fill end phase continuity with starting of next phase
   final name = TextEditingController();
   final dimension = TextEditingController(text: '1');
+  int Function() getDimension;
   void Function(int value) setDimension;
 
   int Function() getNumberOfBoundsColumns;
-  final bounds = <TextEditingController>[];
+  final minBounds = <TextEditingController>[];
+  final maxBounds = <TextEditingController>[];
 
   _VariableTextEditingControllers(String name,
-      {required this.setDimension, required this.getNumberOfBoundsColumns}) {
+      {required this.getDimension,
+      required this.setDimension,
+      required this.getNumberOfBoundsColumns}) {
     this.name.text = name;
     _updateBounds(getNumberOfBoundsColumns());
 
     dimension.addListener(() {
       // The text field of dimension should only be positive integers
       final value = int.tryParse(dimension.text);
-      if (value == null || value < 1) return;
+      if (value == null || value < 1 || value == getDimension()) return;
 
       setDimension(value);
       _updateBounds(value * getNumberOfBoundsColumns());
@@ -334,15 +375,22 @@ class _VariableTextEditingControllers {
     // randomly.
     _disposeBounds();
     for (int i = 0; i < length; i++) {
-      bounds.add(TextEditingController());
+      // TODO The number don't update the model yet
+      // Retreive actual data from model yet
+      minBounds.add(TextEditingController(text: '0'));
+      maxBounds.add(TextEditingController(text: '0'));
     }
   }
 
   void _disposeBounds() {
-    for (final bound in bounds) {
+    for (final bound in minBounds) {
       bound.dispose();
     }
-    bounds.clear();
+    for (final bound in maxBounds) {
+      bound.dispose();
+    }
+    minBounds.clear();
+    maxBounds.clear();
   }
 
   void dispose() {

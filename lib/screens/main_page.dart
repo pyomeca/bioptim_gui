@@ -189,6 +189,7 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
         controller: _horizontalScroll,
         scrollDirection: Axis.horizontal,
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             for (int i = 0; i < controllers.nbPhases; i++)
