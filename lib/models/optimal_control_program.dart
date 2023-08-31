@@ -153,7 +153,7 @@ class OptimalControlProgram {
     _hasPendingChanges = true;
   }
 
-  OptimizationVariableMap variableMap(
+  OptimizationVariableMap _variableMap(
       {required OptimizationVariableType from, required int phaseIndex}) {
     switch (from) {
       case OptimizationVariableType.state:
@@ -163,13 +163,18 @@ class OptimalControlProgram {
     }
   }
 
+  List<String> variableNames(
+      {required OptimizationVariableType from, required int phaseIndex}) {
+    return _variableMap(from: from, phaseIndex: phaseIndex).names;
+  }
+
   OptimizationVariable variable(String name,
           {required OptimizationVariableType from, required int phaseIndex}) =>
-      variableMap(from: from, phaseIndex: phaseIndex)[name];
+      _variableMap(from: from, phaseIndex: phaseIndex)[name];
 
   void addVariable(OptimizationVariable value,
       {required OptimizationVariableType from, required int phaseIndex}) {
-    variableMap(from: from, phaseIndex: phaseIndex).addVariable(value);
+    _variableMap(from: from, phaseIndex: phaseIndex).addVariable(value);
     _hasPendingChanges = true;
   }
 
@@ -177,8 +182,16 @@ class OptimalControlProgram {
       {required String name,
       required OptimizationVariableType from,
       required int phaseIndex}) {
-    variableMap(from: from, phaseIndex: phaseIndex)
-        .changeVariableDimension(value, name: name);
+    variable(name, from: from, phaseIndex: phaseIndex).changeDimension(value);
+    _hasPendingChanges = true;
+  }
+
+  void changeVariableBoundsInterpolation(Interpolation value,
+      {required String name,
+      required OptimizationVariableType from,
+      required int phaseIndex}) {
+    variable(name, from: from, phaseIndex: phaseIndex).bounds.interpolation =
+        value;
     _hasPendingChanges = true;
   }
 
@@ -191,8 +204,8 @@ class OptimalControlProgram {
     int? rowIndex,
     int? colIndex,
   }) {
-    variableMap(from: from, phaseIndex: phaseIndex).fillBound(name,
-        min: min, max: max, rowIndex: rowIndex, colIndex: colIndex);
+    variable(name, from: from, phaseIndex: phaseIndex)
+        .fillBounds(min: min, max: max, rowIndex: rowIndex, colIndex: colIndex);
     _hasPendingChanges = true;
   }
 
@@ -202,20 +215,20 @@ class OptimalControlProgram {
     required OptimizationVariableType from,
     required int phaseIndex,
   }) {
-    variableMap(from: from, phaseIndex: phaseIndex)
+    variable(name, from: from, phaseIndex: phaseIndex)
         .fillInitialGuess(name, guess: guess);
     _hasPendingChanges = true;
   }
 
   void replaceVariable(OptimizationVariable value,
       {required OptimizationVariableType from, required int phaseIndex}) {
-    variableMap(from: from, phaseIndex: phaseIndex).replaceVariable(value);
+    _variableMap(from: from, phaseIndex: phaseIndex).replaceVariable(value);
     _hasPendingChanges = true;
   }
 
   void removeVariable(String name,
       {required OptimizationVariableType from, required int phaseIndex}) {
-    variableMap(from: from, phaseIndex: phaseIndex).removeVariable(name);
+    _variableMap(from: from, phaseIndex: phaseIndex).removeVariable(name);
     _hasPendingChanges = true;
   }
 
@@ -330,7 +343,7 @@ class OptimalControlProgram {
 
     for (final variableType in OptimizationVariableType.values) {
       final allVariables =
-          variableMap(from: variableType, phaseIndex: phaseIndex);
+          _variableMap(from: variableType, phaseIndex: phaseIndex);
       final basename = allVariables.type.toPythonString();
 
       file.writeAsStringSync(

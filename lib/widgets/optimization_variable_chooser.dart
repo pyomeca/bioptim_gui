@@ -4,7 +4,7 @@ import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:bioptim_gui/widgets/positive_integer_text_field.dart';
 import 'package:flutter/material.dart';
 
-class OptimizationVariableChooser extends StatefulWidget {
+class OptimizationVariableChooser extends StatelessWidget {
   const OptimizationVariableChooser({
     super.key,
     required this.name,
@@ -19,30 +19,9 @@ class OptimizationVariableChooser extends StatefulWidget {
   final double width;
 
   @override
-  State<OptimizationVariableChooser> createState() =>
-      _OptimizationVariableChooserState();
-}
-
-class _OptimizationVariableChooserState
-    extends State<OptimizationVariableChooser> {
-  VariableTextEditingControllers get _controller {
-    switch (widget.from) {
-      case OptimizationVariableType.state:
-        return OptimalControlProgramControllers
-            .instance.states[widget.phaseIndex][widget.name]!;
-      case OptimizationVariableType.control:
-        return OptimalControlProgramControllers
-            .instance.controls[widget.phaseIndex][widget.name]!;
-    }
-  }
-
-  OptimizationVariable get _variable {
-    return OptimalControlProgramControllers.instance.getVariableMap(
-        from: widget.from, phaseIndex: widget.phaseIndex)[widget.name];
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final controllers = OptimalControlProgramControllers.instance;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -51,20 +30,22 @@ class _OptimizationVariableChooserState
         Row(
           children: [
             SizedBox(
-              width: widget.width / 3 - 8,
+              width: width / 3 - 8,
               child: TextField(
                 decoration: const InputDecoration(
                     label: Text('Variable name'), border: OutlineInputBorder()),
-                controller: _controller.name,
-                enabled: true, // TODO get this from the variable
+                controller: controllers.getVariableNameController(
+                    name: name, phaseIndex: phaseIndex, from: from),
+                enabled: false, // TODO get this from the variable
               ),
             ),
             const SizedBox(width: 12),
             SizedBox(
-              width: widget.width / 3 - 8,
+              width: width / 3 - 8,
               child: PositiveIntegerTextField(
                 label: 'Dimension',
-                controller: _controller.dimension,
+                controller: controllers.getVariableDimensionController(
+                    name: name, phaseIndex: phaseIndex, from: from),
               ),
             ),
           ],
@@ -72,13 +53,20 @@ class _OptimizationVariableChooserState
         const SizedBox(height: 12),
         CustomDropdownButton<Interpolation>(
           title: 'Bounds interpolation type',
-          value: _variable.bounds.interpolation,
+          value: controllers
+              .getVariable(name: name, phaseIndex: phaseIndex, from: from)
+              .bounds
+              .interpolation,
           items: Interpolation.values,
-          onSelected: (value) => {}, // TODO
+          onSelected: (value) => controllers.setVariableBoundsInterpolation(
+              value,
+              name: name,
+              phaseIndex: phaseIndex,
+              from: from),
         ),
         const SizedBox(height: 12),
         Center(
-            child: SizedBox(width: widget.width * 7 / 8, child: _DataFiller())),
+            child: SizedBox(width: width * 7 / 8, child: const _DataFiller())),
       ],
     );
   }

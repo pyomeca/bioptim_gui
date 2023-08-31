@@ -25,6 +25,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   final _verticalScroll = ScrollController();
+  final _trailingKey = GlobalKey<_BuildTraillingState>();
 
   @override
   void dispose() {
@@ -35,10 +36,9 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
-    PythonInterface.instance
-        .registerToStatusChanged((status) => setState(() {}));
+    PythonInterface.instance.registerToStatusChanged((status) => forceRedraw());
     OptimalControlProgramControllers.instance
-        .registerToStatusChanged(() => setState(() {}));
+        .registerToStatusChanged(forceRedraw);
 
     // TODO remove this prefilling, which is only for debug purpose
     // _currentOcp.addVariable(
@@ -95,6 +95,11 @@ class _MainPageState extends State<MainPage> {
     //     Objective(LagrangeFcn.minimizeControls, arguments: {'key': 'tau'}));
   }
 
+  void forceRedraw() {
+    _trailingKey.currentState?.setState(() {});
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,7 +127,7 @@ class _MainPageState extends State<MainPage> {
               const SizedBox(height: 12),
               const Divider(),
               const SizedBox(height: 12),
-              const _BuildTrailling(),
+              _BuildTrailling(key: _trailingKey),
               const SizedBox(height: 50),
             ],
           ),
@@ -266,7 +271,7 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
 }
 
 class _BuildTrailling extends StatefulWidget {
-  const _BuildTrailling();
+  const _BuildTrailling({super.key});
 
   @override
   State<_BuildTrailling> createState() => _BuildTraillingState();

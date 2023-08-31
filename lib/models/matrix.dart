@@ -18,6 +18,13 @@ class Matrix {
     values = List<double>.filled(nbRows * nbCols, 0, growable: false);
   }
 
+  void changeNbCols(int value) {
+    if (nbCols == value) return;
+    // If we are changing the number of rows, we must reset the values,
+    nbCols = value;
+    values = List<double>.filled(nbRows * nbCols, 0, growable: false);
+  }
+
   void fill(List<double> values, {int? rowIndex, int? colIndex}) {
     if (colIndex != null && rowIndex != null) {
       throw '[rowIndex] and [colIndex] can\' be simultaneously set when filling the matrix.';

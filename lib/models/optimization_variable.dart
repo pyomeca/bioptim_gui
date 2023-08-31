@@ -36,21 +36,34 @@ enum Interpolation {
 class Bound {
   final Matrix min;
   final Matrix max;
-  final Interpolation interpolation;
+  Interpolation _interpolation;
+  Interpolation get interpolation => _interpolation;
+  set interpolation(Interpolation value) {
+    _interpolation = value;
+    min.changeNbRows(_interpolation.nbCols);
+    max.changeNbRows(_interpolation.nbCols);
+  }
+
+  int get nbRows => min.nbRows;
+  int get nbCols => min.nbCols;
 
   void changeDimension(int value) {
     min.changeNbRows(value);
     max.changeNbRows(value);
   }
 
-  Bound({required int nbElements, required this.interpolation})
+  Bound({required int nbElements, required Interpolation interpolation})
       : min = Matrix.zeros(nbRows: nbElements, nbCols: interpolation.nbCols),
-        max = Matrix.zeros(nbRows: nbElements, nbCols: interpolation.nbCols);
+        max = Matrix.zeros(nbRows: nbElements, nbCols: interpolation.nbCols),
+        _interpolation = interpolation;
 }
 
 class InitialGuess {
   final Matrix guess;
   final Interpolation interpolation;
+
+  int get nbRows => guess.nbRows;
+  int get nbCols => guess.nbCols;
 
   void changeDimension(int value) {
     guess.changeNbRows(value);
@@ -65,11 +78,26 @@ class OptimizationVariable {
   final Bound bounds;
   final InitialGuess initialGuess;
 
-  int get dimension => initialGuess.guess.nbRows;
+  int get dimension => initialGuess.nbRows;
+  int get nbRows => dimension;
 
   void changeDimension(int value) {
     bounds.changeDimension(value);
     initialGuess.changeDimension(value);
+  }
+
+  void fillInitialGuess(String name, {required List<double> guess}) {
+    initialGuess.guess.fill(guess);
+  }
+
+  void fillBounds({
+    required List<double> min,
+    required List<double> max,
+    int? rowIndex,
+    int? colIndex,
+  }) {
+    bounds.min.fill(min, rowIndex: rowIndex, colIndex: colIndex);
+    bounds.max.fill(max, rowIndex: rowIndex, colIndex: colIndex);
   }
 
   const OptimizationVariable({
@@ -120,39 +148,7 @@ class OptimizationVariableMap {
 
   void addVariable(OptimizationVariable value) => _elements[value.name] = value;
 
-  void changeVariableDimension(int value, {required String name}) =>
-      _elements[name]!.changeDimension(value);
-
   void clearVariables() => _elements.clear();
-
-  void fillBound(
-    String name, {
-    required List<double> min,
-    required List<double> max,
-    int? rowIndex,
-    int? colIndex,
-  }) {
-    if (_elements[name] == null) {
-      throw '$type $name not found';
-    }
-
-    _elements[name]!
-        .bounds
-        .min
-        .fill(min, rowIndex: rowIndex, colIndex: colIndex);
-    _elements[name]!
-        .bounds
-        .max
-        .fill(max, rowIndex: rowIndex, colIndex: colIndex);
-  }
-
-  void fillInitialGuess(String name, {required List<double> guess}) {
-    if (_elements[name] == null) {
-      throw '$type $name not found';
-    }
-
-    _elements[name]!.initialGuess.guess.fill(guess);
-  }
 
   void replaceVariable(OptimizationVariable value) =>
       _elements[value.name] = value;

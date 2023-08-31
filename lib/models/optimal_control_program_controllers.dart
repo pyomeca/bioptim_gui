@@ -38,7 +38,11 @@ class OptimalControlProgramControllers {
   ///
   /// This callback can be used so the UI is updated on any change
   void Function()? _hasChanged;
-  void registerToStatusChanged(Function() callback) => _hasChanged = callback;
+  void registerToStatusChanged(Function() callback) {
+    _hasChanged = callback;
+    _updateAllControllers();
+    if (_hasChanged != null) _hasChanged!();
+  }
 
   ///
   /// All methods related to controlling the ocp type
@@ -138,40 +142,72 @@ class OptimalControlProgramControllers {
 
   ///
   /// All methods related to the state and control variables
-  final List<Map<String, VariableTextEditingControllers>> states = [];
-  final List<Map<String, VariableTextEditingControllers>> controls = [];
-  OptimizationVariableMap getVariableMap(
-          {required int phaseIndex, required OptimizationVariableType from}) =>
-      _ocp.variableMap(from: from, phaseIndex: phaseIndex);
-  List<String> getVariableNames(
-          {required int phaseIndex, required OptimizationVariableType from}) =>
-      _ocp.variableMap(from: from, phaseIndex: phaseIndex).names;
-  int getVariableNumberOfColumns(
+  final List<Map<String, _VariableTextEditingControllers>> _states = [];
+  final List<Map<String, _VariableTextEditingControllers>> _controls = [];
+  _VariableTextEditingControllers _variableController(
+      {required String name,
+      required OptimizationVariableType from,
+      required int phaseIndex}) {
+    switch (from) {
+      case OptimizationVariableType.state:
+        return _states[phaseIndex][name]!;
+      case OptimizationVariableType.control:
+        return _controls[phaseIndex][name]!;
+    }
+  }
+
+  /// Warning, even though this allows to modify values, getVariable should
+  /// NOT be used as such. That is because other functions must be called
+  /// each time a variable is updated. Consider this [getVariable] interface
+  /// as a readonly interface.
+  OptimizationVariable getVariable(
           {required String name,
           required int phaseIndex,
           required OptimizationVariableType from}) =>
-      _ocp
-          .variable(name, from: from, phaseIndex: phaseIndex)
-          .bounds
-          .interpolation
-          .nbCols;
-  int getVariableDimension({
+      _ocp.variable(name, from: from, phaseIndex: phaseIndex);
+
+  List<String> getVariableNames(
+          {required int phaseIndex, required OptimizationVariableType from}) =>
+      _ocp.variableNames(from: from, phaseIndex: phaseIndex);
+
+  TextEditingController getVariableNameController(
+          {required String name,
+          required int phaseIndex,
+          required OptimizationVariableType from}) =>
+      _variableController(name: name, from: from, phaseIndex: phaseIndex).name;
+
+  TextEditingController getVariableDimensionController({
     required String name,
     required int phaseIndex,
     required OptimizationVariableType from,
   }) =>
-      _ocp.variable(name, phaseIndex: phaseIndex, from: from).dimension;
+      _variableController(name: name, from: from, phaseIndex: phaseIndex)
+          .dimension;
+
   void setVariableDimension(
-    int dimension, {
+    int value, {
     required String name,
     required int phaseIndex,
     required OptimizationVariableType from,
   }) {
-    _ocp.changeVariableDimension(dimension,
+    _ocp.changeVariableDimension(value,
         name: name, from: from, phaseIndex: phaseIndex);
     if (_hasChanged != null) _hasChanged!();
   }
 
+  void setVariableBoundsInterpolation(
+    Interpolation value, {
+    required String name,
+    required int phaseIndex,
+    required OptimizationVariableType from,
+  }) {
+    _ocp.changeVariableBoundsInterpolation(value,
+        name: name, from: from, phaseIndex: phaseIndex);
+    if (_hasChanged != null) _hasChanged!();
+  }
+
+  ///
+  /// Here are the internal methods that ensures all the controllers are sane
   void _updateAllControllers() {
     _updateController(
       nbShootingPointsControllers,
@@ -185,7 +221,7 @@ class OptimalControlProgramControllers {
     );
 
     _updateVariableController(
-      states,
+      _states,
       variableNames: ({required phaseIndex}) => getVariableNames(
           phaseIndex: phaseIndex, from: OptimizationVariableType.state),
       setDimension: (value, {required name, required phaseIndex}) =>
@@ -194,13 +230,15 @@ class OptimalControlProgramControllers {
               phaseIndex: phaseIndex,
               from: OptimizationVariableType.state),
       getNumberOfBoundsColumns: ({required name, required phaseIndex}) =>
-          getVariableNumberOfColumns(
-              name: name,
-              phaseIndex: phaseIndex,
-              from: OptimizationVariableType.state),
+          getVariable(
+                  name: name,
+                  phaseIndex: phaseIndex,
+                  from: OptimizationVariableType.state)
+              .bounds
+              .nbCols,
     );
     _updateVariableController(
-      controls,
+      _controls,
       variableNames: ({required phaseIndex}) => getVariableNames(
           phaseIndex: phaseIndex, from: OptimizationVariableType.control),
       setDimension: (value, {required name, required phaseIndex}) =>
@@ -209,10 +247,12 @@ class OptimalControlProgramControllers {
               phaseIndex: phaseIndex,
               from: OptimizationVariableType.control),
       getNumberOfBoundsColumns: ({required name, required phaseIndex}) =>
-          getVariableNumberOfColumns(
-              name: name,
-              phaseIndex: phaseIndex,
-              from: OptimizationVariableType.control),
+          getVariable(
+                  name: name,
+                  phaseIndex: phaseIndex,
+                  from: OptimizationVariableType.control)
+              .bounds
+              .nbCols,
     );
   }
 
@@ -235,7 +275,7 @@ class OptimalControlProgramControllers {
   }
 
   void _updateVariableController(
-      List<Map<String, VariableTextEditingControllers>> controllers,
+      List<Map<String, _VariableTextEditingControllers>> controllers,
       {required List<String> Function({required int phaseIndex}) variableNames,
       required Function(int value,
               {required String name, required int phaseIndex})
@@ -245,9 +285,9 @@ class OptimalControlProgramControllers {
     if (controllers.length < nbPhases) {
       // For each of the new phases, declare all the required variables
       for (int i = controllers.length; i < nbPhases; i++) {
-        Map<String, VariableTextEditingControllers> tp = {};
+        Map<String, _VariableTextEditingControllers> tp = {};
         for (final name in variableNames(phaseIndex: i)) {
-          tp[name] = VariableTextEditingControllers(name,
+          tp[name] = _VariableTextEditingControllers(name,
               setDimension: (value) =>
                   setDimension(value, name: name, phaseIndex: i),
               getNumberOfBoundsColumns: () =>
@@ -264,7 +304,7 @@ class OptimalControlProgramControllers {
   }
 }
 
-class VariableTextEditingControllers {
+class _VariableTextEditingControllers {
   // TODO Add the capability to automatically fill end phase continuity with starting of next phase
   final name = TextEditingController();
   final dimension = TextEditingController(text: '1');
@@ -273,7 +313,7 @@ class VariableTextEditingControllers {
   int Function() getNumberOfBoundsColumns;
   final bounds = <TextEditingController>[];
 
-  VariableTextEditingControllers(String name,
+  _VariableTextEditingControllers(String name,
       {required this.setDimension, required this.getNumberOfBoundsColumns}) {
     this.name.text = name;
     _updateBounds(getNumberOfBoundsColumns());
