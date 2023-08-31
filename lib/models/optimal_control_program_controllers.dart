@@ -12,7 +12,10 @@ import 'package:flutter/material.dart';
 /// a UI perspective. It creates all the required Controllers as well as it gets
 /// or updates the values.
 class OptimalControlProgramControllers {
-  OptimalControlProgramControllers({required this.hasChanged}) {
+  static final OptimalControlProgramControllers _instance =
+      OptimalControlProgramControllers._internal();
+  static OptimalControlProgramControllers get instance => _instance;
+  OptimalControlProgramControllers._internal() {
     _updateAllControllers();
   }
 
@@ -34,14 +37,15 @@ class OptimalControlProgramControllers {
 
   ///
   /// This callback can be used so the UI is updated on any change
-  void Function() hasChanged;
+  void Function()? _hasChanged;
+  void registerToStatusChanged(Function() callback) => _hasChanged = callback;
 
   ///
   /// All methods related to controlling the ocp type
   OptimalControlProgramType get ocpType => _ocp.ocpType;
   set ocpType(OptimalControlProgramType value) {
     _ocp.ocpType = value;
-    hasChanged();
+    if (_hasChanged != null) _hasChanged!();
   }
 
   ///
@@ -58,8 +62,8 @@ class OptimalControlProgramControllers {
     }
     // Wait for one frame so the the UI is updated
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      //_updateAllControllers();
-      hasChanged();
+      _updateAllControllers();
+      if (_hasChanged != null) _hasChanged!();
     });
   }
 
@@ -75,7 +79,7 @@ class OptimalControlProgramControllers {
       _ocp.getBioModel(phaseIndex: phaseIndex);
   void setBioModel(BioModel value, {required int phaseIndex}) {
     _ocp.setBioModel(value, phaseIndex: phaseIndex);
-    hasChanged();
+    if (_hasChanged != null) _hasChanged!();
   }
 
   ///
@@ -84,7 +88,7 @@ class OptimalControlProgramControllers {
       _ocp.getModelPath(phaseIndex: phaseIndex);
   void setModelPath(String value, {required int phaseIndex}) {
     _ocp.setModelPath(value, phaseIndex: phaseIndex);
-    hasChanged();
+    if (_hasChanged != null) _hasChanged!();
   }
 
   ///
@@ -94,7 +98,7 @@ class OptimalControlProgramControllers {
       _ocp.getNbShootingPoints(phaseIndex: phaseIndex);
   void setNbShootingPoints(int value, {required int phaseIndex}) {
     _ocp.setNbShootingPoints(value, phaseIndex: phaseIndex);
-    hasChanged();
+    if (_hasChanged != null) _hasChanged!();
   }
 
   List<String> get _nbShootingPointsInitialValues => [
@@ -111,7 +115,7 @@ class OptimalControlProgramControllers {
       _ocp.getPhaseDuration(phaseIndex: phaseIndex);
   void setPhaseDuration(double value, {required int phaseIndex}) {
     _ocp.setPhaseDuration(value, phaseIndex: phaseIndex);
-    hasChanged();
+    if (_hasChanged != null) _hasChanged!();
   }
 
   List<String> get _phaseDurationInitialValues => [
@@ -129,7 +133,7 @@ class OptimalControlProgramControllers {
   void setDynamics(Dynamics value, {required int phaseIndex}) {
     // TODO add?  setVariables(value, phaseIndex: phaseIndex);
     _ocp.setDynamic(value, phaseIndex: phaseIndex);
-    hasChanged();
+    if (_hasChanged != null) _hasChanged!();
   }
 
   ///
@@ -165,7 +169,7 @@ class OptimalControlProgramControllers {
   }) {
     _ocp.changeVariableDimension(dimension,
         name: name, from: from, phaseIndex: phaseIndex);
-    hasChanged();
+    if (_hasChanged != null) _hasChanged!();
   }
 
   void _updateAllControllers() {

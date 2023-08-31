@@ -24,29 +24,21 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  String? _scriptPath;
-  int _phaseIndex = 0;
-
-  Stream<String>? _output;
-  Stream<String>? _outputError;
-  final _scrollController = ScrollController();
-  late final _ocpControllers =
-      OptimalControlProgramControllers(hasChanged: () => setState(() {}));
+  final _verticalScroll = ScrollController();
 
   @override
   void dispose() {
-    _scrollController.dispose();
-    _ocpControllers.dispose();
+    _verticalScroll.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    PythonInterface.instance.registerToStatusChanged((status) {
-      setState(() {});
-    });
-    PythonInterface.instance.initialize(environment: 'bioptim_gui');
+    PythonInterface.instance
+        .registerToStatusChanged((status) => setState(() {}));
+    OptimalControlProgramControllers.instance
+        .registerToStatusChanged(() => setState(() {}));
 
     // TODO remove this prefilling, which is only for debug purpose
     // _currentOcp.addVariable(
@@ -103,30 +95,6 @@ class _MainPageState extends State<MainPage> {
     //     Objective(LagrangeFcn.minimizeControls, arguments: {'key': 'tau'}));
   }
 
-  // Phases index is probably not useful anymore as it should be shown columnwise
-  void _onSelectPhase(value) => setState(() => _phaseIndex = value);
-
-  void _onExportFile() async {
-    _scriptPath = await FilePicker.platform.saveFile(
-      allowedExtensions: ['py'],
-      type: FileType.custom,
-    );
-    if (_scriptPath == null) return;
-
-    _ocpControllers.exportScript(_scriptPath!);
-    setState(() {});
-  }
-
-  void _onRunScript() async {
-    final process = await PythonInterface.instance.runFile(_scriptPath!);
-    if (process == null) return;
-
-    setState(() {
-      _output = process.stdout.transform(utf8.decoder);
-      _outputError = process.stderr.transform(utf8.decoder);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,69 +103,123 @@ class _MainPageState extends State<MainPage> {
         title: const Text('Bioptim code generator'),
       ),
       body: RawScrollbar(
-        controller: _scrollController,
+        controller: _verticalScroll,
         thumbVisibility: true,
         thumbColor: Theme.of(context).colorScheme.secondary,
         thickness: 8,
         radius: const Radius.circular(25),
         child: SingleChildScrollView(
-          controller: _scrollController,
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: widget.columnWidth,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 12),
-                      OptimalControlProgramTypeChooser(
-                          controllers: _ocpControllers),
-                      const SizedBox(height: 12),
-                      NumberOfPhasesChooser(
-                        controllers: _ocpControllers,
-                        width: widget.columnWidth,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildPhase(phaseIndex: _phaseIndex),
-                      const SizedBox(height: 12),
-                      Center(child: _buildExportOrRunScriptButton()),
-                    ],
-                  ),
-                ),
-                _buildOutputScreens(),
-                const SizedBox(height: 50),
-              ],
-            ),
+          controller: _verticalScroll,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 12),
+              _HeaderBuilder(width: widget.columnWidth),
+              const SizedBox(height: 12),
+              const Divider(),
+              const SizedBox(height: 12),
+              _PhaseBuilder(width: widget.columnWidth),
+              const SizedBox(height: 12),
+              const Divider(),
+              const SizedBox(height: 12),
+              const _BuildTrailling(),
+              const SizedBox(height: 50),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HeaderBuilder extends StatelessWidget {
+  const _HeaderBuilder({
+    required this.width,
+  });
+
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OptimalControlProgramTypeChooser(width: width),
+        const SizedBox(height: 12),
+        NumberOfPhasesChooser(width: width),
+      ],
+    );
+  }
+}
+
+class _PhaseBuilder extends StatefulWidget {
+  const _PhaseBuilder({required this.width});
+
+  final double width;
+
+  @override
+  State<_PhaseBuilder> createState() => _PhaseBuilderState();
+}
+
+class _PhaseBuilderState extends State<_PhaseBuilder> {
+  final _horizontalScroll = ScrollController();
+
+  @override
+  void dispose() {
+    _horizontalScroll.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controllers = OptimalControlProgramControllers.instance;
+
+    return RawScrollbar(
+      controller: _horizontalScroll,
+      thumbVisibility: true,
+      thumbColor: Theme.of(context).colorScheme.secondary,
+      thickness: 8,
+      radius: const Radius.circular(25),
+      child: SingleChildScrollView(
+        controller: _horizontalScroll,
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            for (int i = 0; i < controllers.nbPhases; i++)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 36),
+                child: SizedBox(
+                    width: widget.width, child: _buildPhase(phaseIndex: i)),
+              ),
+          ],
         ),
       ),
     );
   }
 
   Widget _buildPhase({required int phaseIndex}) {
+    final controllers = OptimalControlProgramControllers.instance;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Information on the phase',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Center(
+          child: Text(
+            controllers.nbPhases > 1
+                ? 'Information on phase ${phaseIndex + 1}'
+                : 'Information on the phase',
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
         ),
+        const SizedBox(height: 24),
+        BioModelChooser(phaseIndex: phaseIndex),
         const SizedBox(height: 12),
-        BioModelChooser(controllers: _ocpControllers, phaseIndex: phaseIndex),
-        const SizedBox(height: 12),
-        // TODO Removed the combobox for showing the phases and replace by columns
-        PhaseInformation(
-          controllers: _ocpControllers,
-          phaseIndex: phaseIndex,
-          width: widget.columnWidth,
-        ),
+        PhaseInformation(phaseIndex: phaseIndex, width: widget.width),
         const SizedBox(height: 12),
         DynamicsChooser(
-          controllers: _ocpControllers,
           phaseIndex: phaseIndex,
-          width: widget.columnWidth,
+          width: widget.width,
         ),
         const SizedBox(height: 12),
         const Divider(),
@@ -213,16 +235,8 @@ class _MainPageState extends State<MainPage> {
 
   Widget _buildVariableType(
       {required OptimizationVariableType from, required int phaseIndex}) {
-    final variables =
-        _ocpControllers.getVariableMap(from: from, phaseIndex: phaseIndex);
-
-    late List<Map<String, VariableTextEditingControllers>> controllers;
-    switch (from) {
-      case OptimizationVariableType.state:
-        controllers = _ocpControllers.states;
-      case OptimizationVariableType.control:
-        controllers = _ocpControllers.controls;
-    }
+    final names = OptimalControlProgramControllers.instance
+        .getVariableNames(from: from, phaseIndex: phaseIndex);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,16 +246,16 @@ class _MainPageState extends State<MainPage> {
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         // TODO Add foldable so it takes less space
-        ...variables.names.map((name) {
+        ...names.map((name) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 24.0),
             child: SizedBox(
-              width: widget.columnWidth,
+              width: widget.width,
               child: OptimizationVariableChooser(
-                controllers: controllers[phaseIndex][name]!,
-                variable: variables[name],
-                isMandatory: true,
-                width: widget.columnWidth,
+                name: name,
+                phaseIndex: phaseIndex,
+                from: from,
+                width: widget.width,
               ),
             ),
           );
@@ -249,27 +263,35 @@ class _MainPageState extends State<MainPage> {
       ],
     );
   }
+}
 
-  Widget _buildOutputScreens() {
+class _BuildTrailling extends StatefulWidget {
+  const _BuildTrailling();
+
+  @override
+  State<_BuildTrailling> createState() => _BuildTraillingState();
+}
+
+class _BuildTraillingState extends State<_BuildTrailling> {
+  String? _scriptPath;
+  Stream<String>? _output;
+  Stream<String>? _outputError;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        if (_output != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 12.0),
-            child: ConsoleOut(output: _output!),
-          ),
-        if (_outputError != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 12.0),
-            child: ConsoleOut(output: _outputError!, textColor: Colors.red),
-          ),
+        _buildExportOrRunScriptButton(),
+        const SizedBox(height: 12),
+        _buildOutputScreens(),
       ],
     );
   }
 
   Widget _buildExportOrRunScriptButton() {
-    if (_ocpControllers.mustExport || _scriptPath == null) {
+    final controllers = OptimalControlProgramControllers.instance;
+
+    if (controllers.mustExport || _scriptPath == null) {
       return ElevatedButton(
           onPressed: _onExportFile, child: const Text('Export script'));
     }
@@ -310,5 +332,46 @@ class _MainPageState extends State<MainPage> {
               onPressed: null, child: Text('Running $scriptName')),
         );
     }
+  }
+
+  Widget _buildOutputScreens() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        if (_output != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: ConsoleOut(output: _output!),
+          ),
+        if (_outputError != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: ConsoleOut(output: _outputError!, textColor: Colors.red),
+          ),
+      ],
+    );
+  }
+
+  void _onExportFile() async {
+    final controllers = OptimalControlProgramControllers.instance;
+
+    _scriptPath = await FilePicker.platform.saveFile(
+      allowedExtensions: ['py'],
+      type: FileType.custom,
+    );
+    if (_scriptPath == null) return;
+
+    controllers.exportScript(_scriptPath!);
+    setState(() {});
+  }
+
+  void _onRunScript() async {
+    final process = await PythonInterface.instance.runFile(_scriptPath!);
+    if (process == null) return;
+
+    setState(() {
+      _output = process.stdout.transform(utf8.decoder);
+      _outputError = process.stderr.transform(utf8.decoder);
+    });
   }
 }

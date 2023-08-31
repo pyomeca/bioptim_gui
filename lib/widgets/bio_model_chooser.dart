@@ -7,19 +7,15 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class BioModelChooser extends StatelessWidget {
-  const BioModelChooser({
-    super.key,
-    required this.controllers,
-    required this.phaseIndex,
-    this.width,
-  });
+  const BioModelChooser({super.key, required this.phaseIndex, this.width});
 
-  final OptimalControlProgramControllers controllers;
   final int phaseIndex;
   final double? width;
 
   @override
   Widget build(BuildContext context) {
+    final controllers = OptimalControlProgramControllers.instance;
+
     final bioModel = controllers.getBioModel(phaseIndex: phaseIndex);
     final modelPath = controllers.getModelPath(phaseIndex: phaseIndex);
 

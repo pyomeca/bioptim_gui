@@ -6,17 +6,17 @@ import 'package:flutter/services.dart';
 class PhaseInformation extends StatelessWidget {
   const PhaseInformation({
     super.key,
-    required this.controllers,
     required this.phaseIndex,
     required this.width,
   });
 
-  final OptimalControlProgramControllers controllers;
   final int phaseIndex;
   final double width;
 
   @override
   Widget build(BuildContext context) {
+    final controllers = OptimalControlProgramControllers.instance;
+
     return Row(
       children: [
         SizedBox(

@@ -5,16 +5,17 @@ import 'package:bioptim_gui/widgets/positive_integer_text_field.dart';
 import 'package:flutter/material.dart';
 
 class OptimizationVariableChooser extends StatefulWidget {
-  const OptimizationVariableChooser(
-      {super.key,
-      required this.controllers,
-      required this.variable,
-      required this.isMandatory,
-      required this.width});
+  const OptimizationVariableChooser({
+    super.key,
+    required this.name,
+    required this.from,
+    required this.phaseIndex,
+    required this.width,
+  });
 
-  final OptimizationVariable variable;
-  final VariableTextEditingControllers controllers;
-  final bool isMandatory;
+  final String name;
+  final int phaseIndex;
+  final OptimizationVariableType from;
   final double width;
 
   @override
@@ -24,6 +25,22 @@ class OptimizationVariableChooser extends StatefulWidget {
 
 class _OptimizationVariableChooserState
     extends State<OptimizationVariableChooser> {
+  VariableTextEditingControllers get _controller {
+    switch (widget.from) {
+      case OptimizationVariableType.state:
+        return OptimalControlProgramControllers
+            .instance.states[widget.phaseIndex][widget.name]!;
+      case OptimizationVariableType.control:
+        return OptimalControlProgramControllers
+            .instance.controls[widget.phaseIndex][widget.name]!;
+    }
+  }
+
+  OptimizationVariable get _variable {
+    return OptimalControlProgramControllers.instance.getVariableMap(
+        from: widget.from, phaseIndex: widget.phaseIndex)[widget.name];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -38,8 +55,8 @@ class _OptimizationVariableChooserState
               child: TextField(
                 decoration: const InputDecoration(
                     label: Text('Variable name'), border: OutlineInputBorder()),
-                controller: widget.controllers.name,
-                enabled: !widget.isMandatory,
+                controller: _controller.name,
+                enabled: true, // TODO get this from the variable
               ),
             ),
             const SizedBox(width: 12),
@@ -47,7 +64,7 @@ class _OptimizationVariableChooserState
               width: widget.width / 3 - 8,
               child: PositiveIntegerTextField(
                 label: 'Dimension',
-                controller: widget.controllers.dimension,
+                controller: _controller.dimension,
               ),
             ),
           ],
@@ -55,7 +72,7 @@ class _OptimizationVariableChooserState
         const SizedBox(height: 12),
         CustomDropdownButton<Interpolation>(
           title: 'Bounds interpolation type',
-          value: widget.variable.bounds.interpolation,
+          value: _variable.bounds.interpolation,
           items: Interpolation.values,
           onSelected: (value) => {}, // TODO
         ),

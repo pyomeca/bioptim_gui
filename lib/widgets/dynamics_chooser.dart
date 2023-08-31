@@ -4,19 +4,15 @@ import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:flutter/material.dart';
 
 class DynamicsChooser extends StatelessWidget {
-  const DynamicsChooser({
-    super.key,
-    required this.controllers,
-    required this.phaseIndex,
-    required this.width,
-  });
+  const DynamicsChooser(
+      {super.key, required this.phaseIndex, required this.width});
 
-  final OptimalControlProgramControllers controllers;
   final int phaseIndex;
   final double width;
 
   @override
   Widget build(BuildContext context) {
+    final controllers = OptimalControlProgramControllers.instance;
     final dynamics = controllers.getDynamics(phaseIndex: phaseIndex);
 
     return Row(

@@ -4,18 +4,22 @@ import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:flutter/material.dart';
 
 class OptimalControlProgramTypeChooser extends StatelessWidget {
-  const OptimalControlProgramTypeChooser(
-      {super.key, required this.controllers});
+  const OptimalControlProgramTypeChooser({super.key, required this.width});
 
-  final OptimalControlProgramControllers controllers;
+  final double width;
 
   @override
   Widget build(BuildContext context) {
-    return CustomDropdownButton<OptimalControlProgramType>(
-      value: controllers.ocpType,
-      items: OptimalControlProgramType.values,
-      title: 'Optimal control type',
-      onSelected: (value) => controllers.ocpType = value,
+    final controllers = OptimalControlProgramControllers.instance;
+
+    return SizedBox(
+      width: width,
+      child: CustomDropdownButton<OptimalControlProgramType>(
+        value: controllers.ocpType,
+        items: OptimalControlProgramType.values,
+        title: 'Optimal control type',
+        onSelected: (value) => controllers.ocpType = value,
+      ),
     );
   }
 }

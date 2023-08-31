@@ -1,3 +1,4 @@
+import 'package:bioptim_gui/models/python_interface.dart';
 import 'package:bioptim_gui/screens/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
@@ -9,6 +10,8 @@ void main() async {
   await WindowManager.instance.ensureInitialized();
   await windowManager.waitUntilReadyToShow();
   await windowManager.setTitle('Bioptim GUI code generator');
+
+  PythonInterface.instance.initialize(environment: 'bioptim_gui');
 
   runApp(const MyApp());
 }
