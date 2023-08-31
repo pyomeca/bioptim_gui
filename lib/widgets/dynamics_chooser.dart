@@ -1,21 +1,24 @@
 import 'package:bioptim_gui/models/dynamics.dart';
+import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:flutter/material.dart';
 
 class DynamicsChooser extends StatelessWidget {
   const DynamicsChooser({
     super.key,
-    required this.dynamics,
-    required this.onChanged,
+    required this.controllers,
+    required this.phaseIndex,
     required this.width,
   });
 
-  final Dynamics dynamics;
-  final Function(Dynamics value) onChanged;
+  final OptimalControlProgramControllers controllers;
+  final int phaseIndex;
   final double width;
 
   @override
   Widget build(BuildContext context) {
+    final dynamics = controllers.getDynamics(phaseIndex: phaseIndex);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -24,22 +27,26 @@ class DynamicsChooser extends StatelessWidget {
               title: 'Dynamic equations',
               value: dynamics.type,
               items: DynamicsType.values,
-              onSelected: (DynamicsType type) => onChanged(
-                  Dynamics(type: type, isExpanded: dynamics.isExpanded))),
+              onSelected: (DynamicsType type) => controllers.setDynamics(
+                  Dynamics(type: type, isExpanded: dynamics.isExpanded),
+                  phaseIndex: phaseIndex)),
         ),
         const SizedBox(width: 12),
         InkWell(
           onTap: () {
             final value = !dynamics.isExpanded;
-            onChanged(Dynamics(type: dynamics.type, isExpanded: value));
+            controllers.setDynamics(
+                Dynamics(type: dynamics.type, isExpanded: value),
+                phaseIndex: phaseIndex);
           },
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Checkbox(
                 value: dynamics.isExpanded,
-                onChanged: (value) => onChanged(
-                    Dynamics(type: dynamics.type, isExpanded: value!)),
+                onChanged: (value) => controllers.setDynamics(
+                    Dynamics(type: dynamics.type, isExpanded: value!),
+                    phaseIndex: phaseIndex),
               ),
               const Text('Expand\ndynamics'),
               const SizedBox(width: 12),

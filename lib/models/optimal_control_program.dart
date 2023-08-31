@@ -49,7 +49,7 @@ class OptimalControlProgram {
   /// Setters and Getters
 
   bool _hasPendingChanges = true;
-  bool get hasPendingChanges => _hasPendingChanges;
+  bool get mustExport => _hasPendingChanges;
 
   OptimalControlProgramType _ocpType;
   OptimalControlProgramType get ocpType => _ocpType;
@@ -108,9 +108,9 @@ class OptimalControlProgram {
     _hasPendingChanges = true;
   }
 
-  double getPhaseTime({required int phaseIndex}) =>
+  double getPhaseDuration({required int phaseIndex}) =>
       _phases[phaseIndex].duration;
-  void setPhaseTime(double value, {required int phaseIndex}) {
+  void setPhaseDuration(double value, {required int phaseIndex}) {
     _phases[phaseIndex].duration = value;
     _hasPendingChanges = true;
   }
@@ -311,7 +311,7 @@ class OptimalControlProgram {
         '    bio_model = ${getBioModel(phaseIndex: phaseIndex).toPythonString()}'
         '(r"${getModelPath(phaseIndex: phaseIndex)}")\n'
         '    n_shooting = ${getNbShootingPoints(phaseIndex: phaseIndex)}\n'
-        '    phase_time = ${getPhaseTime(phaseIndex: phaseIndex)}\n'
+        '    phase_time = ${getPhaseDuration(phaseIndex: phaseIndex)}\n'
         '\n',
         mode: FileMode.append);
 

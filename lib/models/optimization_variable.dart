@@ -65,6 +65,8 @@ class OptimizationVariable {
   final Bound bounds;
   final InitialGuess initialGuess;
 
+  int get dimension => initialGuess.guess.nbRows;
+
   void changeDimension(int value) {
     bounds.changeDimension(value);
     initialGuess.changeDimension(value);

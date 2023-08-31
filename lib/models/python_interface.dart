@@ -38,6 +38,7 @@ class PythonInterface {
 
   Future<Process?> runFile(String path,
       {String? overrideWorkingDirectory}) async {
+    // TODO Better fail if not ready (popup?)
     if (status != PythonInterfaceStatus.ready) return null;
     status = PythonInterfaceStatus.isRunning;
 

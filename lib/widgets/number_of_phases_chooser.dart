@@ -1,3 +1,4 @@
+import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:bioptim_gui/widgets/positive_integer_text_field.dart';
 import 'package:flutter/material.dart';
@@ -5,16 +6,12 @@ import 'package:flutter/material.dart';
 class NumberOfPhasesChooser extends StatefulWidget {
   const NumberOfPhasesChooser({
     super.key,
-    required this.onSelectPhase,
-    required this.numberOfPhases,
-    required this.controller,
+    required this.controllers,
     required this.width,
   });
 
-  final Function(int value) onSelectPhase;
   final double width;
-  final int numberOfPhases;
-  final TextEditingController controller;
+  final OptimalControlProgramControllers controllers;
 
   @override
   State<NumberOfPhasesChooser> createState() => _NumberOfPhasesChooserState();
@@ -34,12 +31,12 @@ class _NumberOfPhasesChooserState extends State<NumberOfPhasesChooser> {
           width: width,
           child: PositiveIntegerTextField(
             label: 'Number of phases',
-            controller: widget.controller,
+            controller: widget.controllers.nbPhasesController,
             enabled:
                 true, // TODO remove this line when python exporter is ready
           ),
         ),
-        if (widget.numberOfPhases > 1)
+        if (widget.controllers.nbPhases > 1)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -53,10 +50,10 @@ class _NumberOfPhasesChooserState extends State<NumberOfPhasesChooser> {
                   title: 'Showing phase',
                   value: _currentPhase + 1,
                   items: [
-                    for (int i = 0; i < widget.numberOfPhases; i++) i + 1
+                    for (int i = 0; i < widget.controllers.nbPhases; i++) i + 1
                   ],
                   onSelected: (value) {
-                    widget.onSelectPhase(value - 1);
+                    widget.controllers.nbPhases = value - 1;
                     setState(() => _currentPhase = value - 1);
                   },
                   isExpanded: false,

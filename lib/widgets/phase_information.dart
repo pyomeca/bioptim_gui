@@ -1,3 +1,4 @@
+import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/widgets/positive_integer_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,14 +6,14 @@ import 'package:flutter/services.dart';
 class PhaseInformation extends StatelessWidget {
   const PhaseInformation({
     super.key,
+    required this.controllers,
+    required this.phaseIndex,
     required this.width,
-    required this.nbShootingPointController,
-    required this.phaseTimeController,
   });
 
+  final OptimalControlProgramControllers controllers;
+  final int phaseIndex;
   final double width;
-  final TextEditingController nbShootingPointController;
-  final TextEditingController phaseTimeController;
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +23,13 @@ class PhaseInformation extends StatelessWidget {
           width: width / 2 - 6,
           child: PositiveIntegerTextField(
             label: 'Number of shooting points',
-            controller: nbShootingPointController,
+            controller: controllers.nbShootingPointsControllers[phaseIndex],
           ),
         ),
         const SizedBox(width: 12),
         Expanded(
           child: TextField(
-            controller: phaseTimeController,
+            controller: controllers.phaseDurationControllers[phaseIndex],
             decoration: const InputDecoration(
                 labelText: 'Phase time (s)', border: OutlineInputBorder()),
             inputFormatters: [

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bioptim_gui/models/bio_model.dart';
+import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -8,21 +9,20 @@ import 'package:flutter/material.dart';
 class BioModelChooser extends StatelessWidget {
   const BioModelChooser({
     super.key,
-    required this.onSelectedBioModel,
-    required this.onSelectedModelPath,
-    required this.bioModel,
-    required this.modelPath,
+    required this.controllers,
+    required this.phaseIndex,
     this.width,
   });
 
-  final Function(BioModel) onSelectedBioModel;
-  final Function(String) onSelectedModelPath;
-  final BioModel bioModel;
-  final String modelPath;
+  final OptimalControlProgramControllers controllers;
+  final int phaseIndex;
   final double? width;
 
   @override
   Widget build(BuildContext context) {
+    final bioModel = controllers.getBioModel(phaseIndex: phaseIndex);
+    final modelPath = controllers.getModelPath(phaseIndex: phaseIndex);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -30,7 +30,8 @@ class BioModelChooser extends StatelessWidget {
           title: 'Dynamic model',
           value: bioModel,
           items: BioModel.values,
-          onSelected: (value) => onSelectedBioModel(value),
+          onSelected: (value) =>
+              controllers.setBioModel(value, phaseIndex: phaseIndex),
           isExpanded: false,
         ),
         Padding(
@@ -51,8 +52,8 @@ class BioModelChooser extends StatelessWidget {
                       allowedExtensions: [bioModel.extension],
                     );
                     if (results == null) return;
-
-                    onSelectedModelPath(results.files.single.path!);
+                    controllers.setModelPath(results.files.single.path!,
+                        phaseIndex: phaseIndex);
                   },
                   icon: const Icon(Icons.file_upload_outlined),
                 ),

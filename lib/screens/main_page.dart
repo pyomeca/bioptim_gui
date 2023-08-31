@@ -1,12 +1,7 @@
 import 'dart:convert';
 
-import 'package:bioptim_gui/models/bio_model.dart';
-import 'package:bioptim_gui/models/dynamics.dart';
-import 'package:bioptim_gui/models/optimal_control_program.dart';
-import 'package:bioptim_gui/models/optimal_control_program_type.dart';
+import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/models/optimization_variable.dart';
-import 'package:bioptim_gui/models/penalty.dart';
-import 'package:bioptim_gui/models/phase_text_editing_controllers.dart';
 import 'package:bioptim_gui/models/python_interface.dart';
 import 'package:bioptim_gui/widgets/bio_model_chooser.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
@@ -29,35 +24,19 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  final _currentOcp = OptimalControlProgram();
   String? _scriptPath;
   int _phaseIndex = 0;
 
   Stream<String>? _output;
   Stream<String>? _outputError;
   final _scrollController = ScrollController();
-
-  late final _phaseControllers = PhaseTextEditingControllers(
-    onChangedNbPhases: _onNumberOfPhaseChanged,
-    getNbShootingPoints: _currentOcp.getNbShootingPoints,
-    onChangedNbShootingPoints: _onSettingNbShootingPoints,
-    getPhaseDuration: _currentOcp.getPhaseTime,
-    onChangedPhaseDuration: _onSettingPhaseTime,
-    getVariableNames: ({required from, required phaseIndex}) =>
-        _currentOcp.variableMap(from: from, phaseIndex: phaseIndex).names,
-    getVariableNumberOfColumns:
-        ({required name, required from, required phaseIndex}) => _currentOcp
-            .variable(name, from: from, phaseIndex: phaseIndex)
-            .bounds
-            .interpolation
-            .nbCols,
-    setVariableDimension: _onSettingVariableDimension,
-  );
+  late final _ocpControllers =
+      OptimalControlProgramControllers(hasChanged: () => setState(() {}));
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _phaseControllers.dispose();
+    _ocpControllers.dispose();
     super.dispose();
   }
 
@@ -120,43 +99,12 @@ class _MainPageState extends State<MainPage> {
     //     from: OptimizationVariableType.control,
     //     phaseIndex: 0);
 
-    _currentOcp.addObjective(
-        Objective(LagrangeFcn.minimizeControls, arguments: {'key': 'tau'}));
+    // _ocpControllers.ocp.addObjective(
+    //     Objective(LagrangeFcn.minimizeControls, arguments: {'key': 'tau'}));
   }
 
-  void _onSelectedOcp(OptimalControlProgramType value) =>
-      setState(() => _currentOcp.ocpType = value);
-
-  void _onNumberOfPhaseChanged(int value) =>
-      setState(() => _currentOcp.nbPhases = value);
-
+  // Phases index is probably not useful anymore as it should be shown columnwise
   void _onSelectPhase(value) => setState(() => _phaseIndex = value);
-
-  void _onSelectedBioModel(BioModel value, {required int phaseIndex}) =>
-      setState(() => _currentOcp.setBioModel(value, phaseIndex: phaseIndex));
-
-  void _onSelectedModelPath(String value, {required int phaseIndex}) =>
-      setState(() => _currentOcp.setModelPath(value, phaseIndex: phaseIndex));
-
-  void _onSettingNbShootingPoints(int value, {required int phaseIndex}) =>
-      setState(
-          () => _currentOcp.setNbShootingPoints(value, phaseIndex: phaseIndex));
-
-  void _onSettingPhaseTime(double value, {required int phaseIndex}) =>
-      setState(() => _currentOcp.setPhaseTime(value, phaseIndex: phaseIndex));
-
-  void _onSelectedDynamics(Dynamics value, {required int phaseIndex}) {
-    _phaseControllers.setVariables(value, phaseIndex: phaseIndex);
-    setState(() {
-      _currentOcp.setDynamic(value, phaseIndex: phaseIndex);
-    });
-  }
-
-  void _onSettingVariableDimension(dimension,
-      {required name, required from, required phaseIndex}) {
-    _currentOcp.changeVariableDimension(dimension,
-        name: name, from: from, phaseIndex: phaseIndex);
-  }
 
   void _onExportFile() async {
     _scriptPath = await FilePicker.platform.saveFile(
@@ -165,16 +113,12 @@ class _MainPageState extends State<MainPage> {
     );
     if (_scriptPath == null) return;
 
-    _currentOcp.exportScript(_scriptPath!);
+    _ocpControllers.exportScript(_scriptPath!);
     setState(() {});
   }
 
   void _onRunScript() async {
-    final python = PythonInterface.instance;
-    // TODO Better fail if not ready (popup?)
-    if (python.status != PythonInterfaceStatus.ready) return;
-
-    final process = await python.runFile(_scriptPath!);
+    final process = await PythonInterface.instance.runFile(_scriptPath!);
     if (process == null) return;
 
     setState(() {
@@ -209,14 +153,10 @@ class _MainPageState extends State<MainPage> {
                     children: [
                       const SizedBox(height: 12),
                       OptimalControlProgramTypeChooser(
-                        value: _currentOcp.ocpType,
-                        onSelected: _onSelectedOcp,
-                      ),
+                          controllers: _ocpControllers),
                       const SizedBox(height: 12),
                       NumberOfPhasesChooser(
-                        controller: _phaseControllers.phaseController,
-                        onSelectPhase: _onSelectPhase,
-                        numberOfPhases: _currentOcp.nbPhases,
+                        controllers: _ocpControllers,
                         width: widget.columnWidth,
                       ),
                       const SizedBox(height: 12),
@@ -245,27 +185,18 @@ class _MainPageState extends State<MainPage> {
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
-        BioModelChooser(
-          onSelectedBioModel: (value) =>
-              _onSelectedBioModel(value, phaseIndex: phaseIndex),
-          onSelectedModelPath: (value) =>
-              _onSelectedModelPath(value, phaseIndex: phaseIndex),
-          bioModel: _currentOcp.getBioModel(phaseIndex: phaseIndex),
-          modelPath: _currentOcp.getModelPath(phaseIndex: phaseIndex),
-        ),
+        BioModelChooser(controllers: _ocpControllers, phaseIndex: phaseIndex),
         const SizedBox(height: 12),
         // TODO Removed the combobox for showing the phases and replace by columns
         PhaseInformation(
+          controllers: _ocpControllers,
+          phaseIndex: phaseIndex,
           width: widget.columnWidth,
-          nbShootingPointController:
-              _phaseControllers.nbShootingPoints[phaseIndex],
-          phaseTimeController: _phaseControllers.phaseDuration[phaseIndex],
         ),
         const SizedBox(height: 12),
         DynamicsChooser(
-          dynamics: _currentOcp.getDynamics(phaseIndex: phaseIndex),
-          onChanged: (value) =>
-              _onSelectedDynamics(value, phaseIndex: phaseIndex),
+          controllers: _ocpControllers,
+          phaseIndex: phaseIndex,
           width: widget.columnWidth,
         ),
         const SizedBox(height: 12),
@@ -283,14 +214,14 @@ class _MainPageState extends State<MainPage> {
   Widget _buildVariableType(
       {required OptimizationVariableType from, required int phaseIndex}) {
     final variables =
-        _currentOcp.variableMap(from: from, phaseIndex: phaseIndex);
+        _ocpControllers.getVariableMap(from: from, phaseIndex: phaseIndex);
 
     late List<Map<String, VariableTextEditingControllers>> controllers;
     switch (from) {
       case OptimizationVariableType.state:
-        controllers = _phaseControllers.states;
+        controllers = _ocpControllers.states;
       case OptimizationVariableType.control:
-        controllers = _phaseControllers.controls;
+        controllers = _ocpControllers.controls;
     }
 
     return Column(
@@ -338,7 +269,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   Widget _buildExportOrRunScriptButton() {
-    if (_currentOcp.hasPendingChanges || _scriptPath == null) {
+    if (_ocpControllers.mustExport || _scriptPath == null) {
       return ElevatedButton(
           onPressed: _onExportFile, child: const Text('Export script'));
     }
