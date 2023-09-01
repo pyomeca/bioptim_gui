@@ -6,8 +6,71 @@ import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:bioptim_gui/widgets/positive_integer_text_field.dart';
 import 'package:flutter/material.dart';
 
-class OptimizationVariableChooser extends StatelessWidget {
-  const OptimizationVariableChooser({
+class DecisionVariableExpander extends StatefulWidget {
+  const DecisionVariableExpander({
+    super.key,
+    required this.from,
+    required this.phaseIndex,
+    required this.width,
+  });
+
+  final DecisionVariableType from;
+  final int phaseIndex;
+  final double width;
+
+  @override
+  State<DecisionVariableExpander> createState() =>
+      _DecisionVariableExpanderState();
+}
+
+class _DecisionVariableExpanderState extends State<DecisionVariableExpander> {
+  bool _isExpanded = true;
+
+  late final _names = OptimalControlProgramControllers.instance
+      .getVariableNames(from: widget.from, phaseIndex: widget.phaseIndex);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: () => setState(() => _isExpanded = !_isExpanded),
+          child: SizedBox(
+            width: widget.width,
+            height: 50,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '${widget.from.name} variables',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Icon(_isExpanded ? Icons.expand_less : Icons.expand_more),
+              ],
+            ),
+          ),
+        ),
+        if (_isExpanded)
+          ..._names.map((name) {
+            return _DecisionVariableChooser(
+              name: name,
+              phaseIndex: widget.phaseIndex,
+              from: widget.from,
+              width: widget.width,
+            );
+          }),
+      ],
+    );
+  }
+}
+
+class _DecisionVariableChooser extends StatelessWidget {
+  const _DecisionVariableChooser({
     super.key,
     required this.name,
     required this.from,
@@ -41,11 +104,11 @@ class OptimizationVariableChooser extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        const SizedBox(height: 12),
+        const SizedBox(height: 24),
         Row(
           children: [
             SizedBox(
-              width: width / 3 - 8,
+              width: width * 2 / 3 - 8,
               child: TextField(
                 decoration: const InputDecoration(
                     label: Text('Variable name'), border: OutlineInputBorder()),

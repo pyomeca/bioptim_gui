@@ -8,7 +8,7 @@ import 'package:bioptim_gui/widgets/console_out.dart';
 import 'package:bioptim_gui/widgets/dynamics_chooser.dart';
 import 'package:bioptim_gui/widgets/number_of_phases_chooser.dart';
 import 'package:bioptim_gui/widgets/optimal_control_program_type_chooser.dart';
-import 'package:bioptim_gui/widgets/optimization_variable_chooser.dart';
+import 'package:bioptim_gui/widgets/decision_variable_expander.dart';
 import 'package:bioptim_gui/widgets/phase_information.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -178,42 +178,17 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
         ),
         const SizedBox(height: 12),
         const Divider(),
-        _buildVariableType(
-            from: DecisionVariableType.state, phaseIndex: phaseIndex),
+        DecisionVariableExpander(
+            from: DecisionVariableType.state,
+            phaseIndex: phaseIndex,
+            width: widget.width),
         const SizedBox(height: 12),
         const Divider(),
-        _buildVariableType(
-            from: DecisionVariableType.control, phaseIndex: phaseIndex),
-      ],
-    );
-  }
-
-  Widget _buildVariableType(
-      {required DecisionVariableType from, required int phaseIndex}) {
-    final names = OptimalControlProgramControllers.instance
-        .getVariableNames(from: from, phaseIndex: phaseIndex);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '${from.name} variables',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        DecisionVariableExpander(
+          from: DecisionVariableType.control,
+          phaseIndex: phaseIndex,
+          width: widget.width,
         ),
-        ...names.map((name) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 24.0),
-            child: SizedBox(
-              width: widget.width,
-              child: OptimizationVariableChooser(
-                name: name,
-                phaseIndex: phaseIndex,
-                from: from,
-                width: widget.width,
-              ),
-            ),
-          );
-        }),
       ],
     );
   }
