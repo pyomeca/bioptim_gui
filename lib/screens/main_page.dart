@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
-import 'package:bioptim_gui/models/optimization_variable.dart';
+import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/python_interface.dart';
 import 'package:bioptim_gui/widgets/bio_model_chooser.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
@@ -230,17 +230,17 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
         const SizedBox(height: 12),
         const Divider(),
         _buildVariableType(
-            from: OptimizationVariableType.state, phaseIndex: phaseIndex),
+            from: DecisionVariableType.state, phaseIndex: phaseIndex),
         const SizedBox(height: 12),
         const Divider(),
         _buildVariableType(
-            from: OptimizationVariableType.control, phaseIndex: phaseIndex),
+            from: DecisionVariableType.control, phaseIndex: phaseIndex),
       ],
     );
   }
 
   Widget _buildVariableType(
-      {required OptimizationVariableType from, required int phaseIndex}) {
+      {required DecisionVariableType from, required int phaseIndex}) {
     final names = OptimalControlProgramControllers.instance
         .getVariableNames(from: from, phaseIndex: phaseIndex);
 

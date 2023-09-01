@@ -18,7 +18,7 @@ class OptimalControlProgramTypeChooser extends StatelessWidget {
         value: controllers.ocpType,
         items: OptimalControlProgramType.values,
         title: 'Optimal control type',
-        onSelected: (value) => controllers.ocpType = value,
+        onSelected: (value) => controllers.setOcpType(value),
       ),
     );
   }

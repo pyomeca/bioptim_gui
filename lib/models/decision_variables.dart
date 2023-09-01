@@ -3,7 +3,7 @@ import 'package:bioptim_gui/models/matrix.dart';
 abstract class Path {
   Interpolation get interpolation;
 
-  int get length;
+  int get length => nbRows * nbCols;
   int get nbRows;
   int get nbCols;
 
@@ -47,7 +47,7 @@ enum Interpolation {
   }
 }
 
-class Bound implements Path {
+class Bounds extends Path {
   final Matrix min;
   final Matrix max;
   Interpolation _interpolation;
@@ -60,8 +60,6 @@ class Bound implements Path {
   }
 
   @override
-  int get length => nbRows * nbCols;
-  @override
   int get nbRows => min.nbRows;
   @override
   int get nbCols => min.nbCols;
@@ -72,19 +70,17 @@ class Bound implements Path {
     max.changeNbRows(value);
   }
 
-  Bound({required int nbElements, required Interpolation interpolation})
+  Bounds({required int nbElements, required Interpolation interpolation})
       : min = Matrix.zeros(nbRows: nbElements, nbCols: interpolation.nbCols),
         max = Matrix.zeros(nbRows: nbElements, nbCols: interpolation.nbCols),
         _interpolation = interpolation;
 }
 
-class InitialGuess implements Path {
+class InitialGuess extends Path {
   final Matrix guess;
   @override
   final Interpolation interpolation;
 
-  @override
-  int get length => nbRows * nbCols;
   @override
   int get nbRows => guess.nbRows;
   @override
@@ -99,9 +95,9 @@ class InitialGuess implements Path {
       : guess = Matrix.zeros(nbRows: nbElements, nbCols: interpolation.nbCols);
 }
 
-class OptimizationVariable {
+class DecisionVariable {
   final String name;
-  final Bound bounds;
+  final Bounds bounds;
   final InitialGuess initialGuess;
 
   int get dimension => initialGuess.nbRows;
@@ -126,14 +122,14 @@ class OptimizationVariable {
     bounds.max.fill(max, rowIndex: rowIndex, colIndex: colIndex);
   }
 
-  const OptimizationVariable({
+  const DecisionVariable({
     required this.name,
     required this.bounds,
     required this.initialGuess,
   });
 }
 
-enum OptimizationVariableType {
+enum DecisionVariableType {
   state,
   control;
 
@@ -157,13 +153,13 @@ enum OptimizationVariableType {
   }
 }
 
-class OptimizationVariableMap {
-  final Map<String, OptimizationVariable> _elements = {};
+class DecisionVariables {
+  final Map<String, DecisionVariable> _elements = {};
 
-  final OptimizationVariableType type;
-  OptimizationVariableMap(this.type);
+  final DecisionVariableType type;
+  DecisionVariables(this.type);
 
-  OptimizationVariable operator [](String name) {
+  DecisionVariable operator [](String name) {
     if (_elements[name] == null) {
       throw '$type $name not found';
     }
@@ -172,12 +168,11 @@ class OptimizationVariableMap {
 
   List<String> get names => _elements.keys.toList();
 
-  void addVariable(OptimizationVariable value) => _elements[value.name] = value;
+  void addVariable(DecisionVariable value) => _elements[value.name] = value;
 
   void clearVariables() => _elements.clear();
 
-  void replaceVariable(OptimizationVariable value) =>
-      _elements[value.name] = value;
+  void replaceVariable(DecisionVariable value) => _elements[value.name] = value;
 
   void removeVariable(String name) {
     if (_elements[name] == null) return;

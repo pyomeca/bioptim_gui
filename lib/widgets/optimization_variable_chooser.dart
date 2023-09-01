@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:bioptim_gui/models/optimization_variable.dart';
+import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:bioptim_gui/widgets/positive_integer_text_field.dart';
@@ -17,7 +17,7 @@ class OptimizationVariableChooser extends StatelessWidget {
 
   final String name;
   final int phaseIndex;
-  final OptimizationVariableType from;
+  final DecisionVariableType from;
   final double width;
 
   @override
@@ -74,15 +74,15 @@ class OptimizationVariableChooser extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         _DataFiller(
-            title: 'Max bounds',
-            path: bounds,
-            pathControllers: boundsControllers['maxBounds']!,
-            boxWidth: width * 7 / 8 / 3),
-        const SizedBox(height: 16),
-        _DataFiller(
             title: 'Min bounds',
             path: bounds,
             pathControllers: boundsControllers['minBounds']!,
+            boxWidth: width * 7 / 8 / 3),
+        const SizedBox(height: 16),
+        _DataFiller(
+            title: 'Max bounds',
+            path: bounds,
+            pathControllers: boundsControllers['maxBounds']!,
             boxWidth: width * 7 / 8 / 3),
       ],
     );
