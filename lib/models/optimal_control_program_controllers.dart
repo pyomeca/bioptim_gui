@@ -100,6 +100,8 @@ class OptimalControlProgramControllers {
   int getNbShootingPoints({required int phaseIndex}) =>
       _ocp.phases[phaseIndex].nbShootingPoints;
   void setNbShootingPoints(int value, {required int phaseIndex}) {
+    if (value == _ocp.phases[phaseIndex].nbShootingPoints) return;
+
     _ocp.phases[phaseIndex].nbShootingPoints = value;
     _notifyListeners();
   }
@@ -117,6 +119,8 @@ class OptimalControlProgramControllers {
   double getPhaseDuration({required int phaseIndex}) =>
       _ocp.phases[phaseIndex].duration;
   void setPhaseDuration(double value, {required int phaseIndex}) {
+    if (value == _ocp.phases[phaseIndex].duration) return;
+
     _ocp.phases[phaseIndex].duration = value;
     _notifyListeners();
   }
@@ -134,6 +138,8 @@ class OptimalControlProgramControllers {
   Dynamics getDynamics({required int phaseIndex}) =>
       _ocp.phases[phaseIndex].dynamics;
   void setDynamics(Dynamics value, {required int phaseIndex}) {
+    if (value.type == _ocp.phases[phaseIndex].dynamics.type) return;
+
     _ocp.phases[phaseIndex].dynamics = value;
     _ocp.resetVariables(phaseIndex: phaseIndex);
 
@@ -234,10 +240,11 @@ class OptimalControlProgramControllers {
     required int phaseIndex,
     required DecisionVariableType from,
   }) {
-    _ocp
-        .variable(name, from: from, phaseIndex: phaseIndex)
-        .bounds
-        .interpolation = value;
+    final bounds =
+        _ocp.variable(name, from: from, phaseIndex: phaseIndex).bounds;
+    if (value == bounds.interpolation) return;
+
+    bounds.interpolation = value;
     _variableController(name: name, from: from, phaseIndex: phaseIndex)
         ._updateBounds();
     _notifyListeners();
@@ -257,10 +264,11 @@ class OptimalControlProgramControllers {
     required int phaseIndex,
     required DecisionVariableType from,
   }) {
-    _ocp
-        .variable(name, from: from, phaseIndex: phaseIndex)
-        .initialGuess
-        .interpolation = value;
+    final initialGuess =
+        _ocp.variable(name, from: from, phaseIndex: phaseIndex).initialGuess;
+    if (value == initialGuess.interpolation) return;
+
+    initialGuess.interpolation = value;
     _variableController(name: name, from: from, phaseIndex: phaseIndex)
         ._updateInitialGuess();
     _notifyListeners();
@@ -295,7 +303,7 @@ class OptimalControlProgramControllers {
             .addListener(() => onChanged(controllers[i].text, phaseIndex: i));
       }
     } else if (controllers.length > nbPhases) {
-      for (int i = controllers.length - 1; i >= nbPhases; i++) {
+      for (int i = controllers.length - 1; i >= nbPhases; i--) {
         controllers[i].dispose();
         controllers.removeAt(i);
       }
@@ -315,7 +323,7 @@ class OptimalControlProgramControllers {
         _createVariableControllers(controllers[i], from: from, phaseIndex: i);
       }
     } else if (controllers.length > nbPhases) {
-      for (int i = controllers.length - 1; i >= nbPhases; i++) {
+      for (int i = controllers.length - 1; i >= nbPhases; i--) {
         for (final key in controllers[i].keys) {
           controllers[i][key]!.dispose();
         }
