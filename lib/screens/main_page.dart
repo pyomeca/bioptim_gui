@@ -200,7 +200,6 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
           '${from.name} variables',
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
-        // TODO Add foldable so it takes less space
         ...names.map((name) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 24.0),

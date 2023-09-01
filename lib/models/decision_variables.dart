@@ -14,8 +14,7 @@ abstract class Path {
 enum Interpolation {
   constant,
   constantWithFirstAndLastDifferent,
-  // TODO add linear
-  ;
+  linear;
 
   @override
   String toString() {
@@ -24,6 +23,8 @@ enum Interpolation {
         return 'Constant';
       case constantWithFirstAndLastDifferent:
         return 'Constant except for first and last points';
+      case linear:
+        return 'Linear';
     }
   }
 
@@ -33,6 +34,8 @@ enum Interpolation {
         return 'InterpolationType.CONSTANT';
       case constantWithFirstAndLastDifferent:
         return 'InterpolationType.CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT';
+      case linear:
+        return 'InterpolationType.LINEAR';
     }
   }
 
@@ -44,6 +47,8 @@ enum Interpolation {
         return ['All'];
       case constantWithFirstAndLastDifferent:
         return ['Start', 'Intermediates', 'Last'];
+      case linear:
+        return ['Start', 'Last'];
     }
   }
 }

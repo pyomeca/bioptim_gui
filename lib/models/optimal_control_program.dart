@@ -53,7 +53,6 @@ class OptimalControlProgram {
 
   final phases = <_Phase>[];
   void updatePhases() {
-    // TODO protected?
     if (phases.length < generic.nbPhases) {
       for (int i = phases.length; i < generic.nbPhases; i++) {
         phases.add(_Phase(
@@ -76,7 +75,6 @@ class OptimalControlProgram {
   }
 
   void resetVariables({required int phaseIndex}) {
-    // TODO protected?
     phases[phaseIndex].stateVariables.clearVariables();
     for (final name in phases[phaseIndex].dynamics.type.states) {
       variables(from: DecisionVariableType.state, phaseIndex: phaseIndex)
@@ -109,9 +107,7 @@ class OptimalControlProgram {
   }
 
   DecisionVariables variables(
-      // TODO protected?
-      {required DecisionVariableType from,
-      required int phaseIndex}) {
+      {required DecisionVariableType from, required int phaseIndex}) {
     switch (from) {
       case DecisionVariableType.state:
         return phases[phaseIndex].stateVariables;
