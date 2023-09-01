@@ -26,6 +26,7 @@ class PythonInterface {
 
   // TODO add common fix tips for user (such as running the app inside anaconda)
   String _workingDirectory = '.';
+  bool _skipEnvironmentLoading = false;
   String? _environment;
   PythonInterfaceStatus _status = PythonInterfaceStatus.uninitialized;
   PythonInterfaceStatus get status => _status;
@@ -48,7 +49,8 @@ class PythonInterface {
     }
 
     final process = await Process.start(
-        '${_loadEnvironmentCommand}python', [path],
+        '${_skipEnvironmentLoading ? '' : _loadEnvironmentCommand}python',
+        [path],
         runInShell: true,
         workingDirectory: overrideWorkingDirectory ?? _workingDirectory);
 
@@ -69,6 +71,12 @@ class PythonInterface {
     status = PythonInterfaceStatus.initializing;
 
     // If bioptim is already installed there is no need to do anything else
+    if (await _isBioptimInstalled(skipEnvironmentLoading: true)) {
+      _skipEnvironmentLoading = true;
+      status = PythonInterfaceStatus.ready;
+      return status;
+    }
+
     if (await _isBioptimInstalled()) {
       status = PythonInterfaceStatus.ready;
       return status;
@@ -105,7 +113,6 @@ class PythonInterface {
   PythonInterface._internal();
 
   String get _loadEnvironmentCommand =>
-      // TODO if bioptim worked on first try, this command should be '' also
       _environment == null ? '' : 'conda activate $_environment && ';
 
   void _logProcess(String functionName, ProcessResult result) {
@@ -136,7 +143,8 @@ class PythonInterface {
     return result.exitCode == 0;
   }
 
-  Future<bool> _isBioptimInstalled() async {
+  Future<bool> _isBioptimInstalled(
+      {bool skipEnvironmentLoading = false}) async {
     // First we have to get the test file from the assets folder
     const bioptimTesterFileName = 'bioptim_tester.py';
     final newBioptimTester = File('$_workingDirectory/$bioptimTesterFileName');
@@ -145,8 +153,10 @@ class PythonInterface {
 
     // Then we can run the file to test if bioptim is installed
     final result = await Process.run(
-        '${_loadEnvironmentCommand}python', [bioptimTesterFileName],
-        runInShell: true, workingDirectory: _workingDirectory);
+        '${skipEnvironmentLoading ? '' : _loadEnvironmentCommand}python',
+        [bioptimTesterFileName],
+        runInShell: true,
+        workingDirectory: _workingDirectory);
     _logProcess('isBioptimInstalled', result);
 
     // Now clean the mess
