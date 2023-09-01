@@ -23,14 +23,6 @@ class OptimalControlProgramControllers {
   Function(String path) get exportScript => _ocp.exportScript;
   bool get mustExport => _ocp.mustExport;
 
-  void dispose() {
-    nbPhasesController.dispose();
-    for (int i = 0; i < _nbPhasesMax; i++) {
-      nbShootingPointsControllers[i].dispose();
-      phaseDurationControllers[i].dispose();
-    }
-  }
-
   final _ocp = OptimalControlProgram();
   // This is to keep track of how many controllers we have because we don't
   // delete them if we reduce _nbPhases
@@ -142,8 +134,23 @@ class OptimalControlProgramControllers {
   Dynamics getDynamics({required int phaseIndex}) =>
       _ocp.phases[phaseIndex].dynamics;
   void setDynamics(Dynamics value, {required int phaseIndex}) {
-    // TODO add?  setVariables(value, phaseIndex: phaseIndex);
     _ocp.phases[phaseIndex].dynamics = value;
+    _ocp.resetVariables(phaseIndex: phaseIndex);
+
+    for (final key in _states[phaseIndex].keys) {
+      _states[phaseIndex][key]!.dispose();
+    }
+    _states[phaseIndex] = {};
+    _createVariableControllers(_states[phaseIndex],
+        from: DecisionVariableType.state, phaseIndex: phaseIndex);
+
+    for (final key in _controls[phaseIndex].keys) {
+      _controls[phaseIndex][key]!.dispose();
+    }
+    _controls[phaseIndex] = {};
+    _createVariableControllers(_controls[phaseIndex],
+        from: DecisionVariableType.control, phaseIndex: phaseIndex);
+
     _notifyListeners();
   }
 
@@ -287,11 +294,13 @@ class OptimalControlProgramControllers {
         controllers[i]
             .addListener(() => onChanged(controllers[i].text, phaseIndex: i));
       }
+    } else if (controllers.length > nbPhases) {
+      for (int i = controllers.length - 1; i >= nbPhases; i++) {
+        controllers[i].dispose();
+        controllers.removeAt(i);
+      }
     } else {
       // Do not change anything if we already have the right number of phases
-
-      // Also we don't mind having to much controllers declared so keep the
-      // previously declared if we removed controllers
     }
   }
 
@@ -302,26 +311,65 @@ class OptimalControlProgramControllers {
     if (controllers.length < nbPhases) {
       // For each of the new phases, declare all the required variables
       for (int i = controllers.length; i < nbPhases; i++) {
-        Map<String, _VariableTextEditingControllers> tp = {};
-        for (final name in getVariableNames(from: from, phaseIndex: i)) {
-          tp[name] = _VariableTextEditingControllers(
-            getVariable(
-              name: name,
-              phaseIndex: i,
-              from: from,
-            ),
-            setDimensionCallback: (value) => setVariableDimension(value,
-                name: name, from: from, phaseIndex: i),
-          );
+        controllers.add({});
+        _createVariableControllers(controllers[i], from: from, phaseIndex: i);
+      }
+    } else if (controllers.length > nbPhases) {
+      for (int i = controllers.length - 1; i >= nbPhases; i++) {
+        for (final key in controllers[i].keys) {
+          controllers[i][key]!.dispose();
         }
-        controllers.add(tp);
+        controllers.removeAt(i);
       }
     } else {
       // Do not change anything if we already have the right number of phases
-
-      // Also we don't mind having to much controllers declared so keep the
-      // previously declared if we removed controllers
     }
+  }
+
+  void _createVariableControllers(
+    Map<String, _VariableTextEditingControllers> controllers, {
+    required DecisionVariableType from,
+    required int phaseIndex,
+  }) {
+    for (final name in getVariableNames(from: from, phaseIndex: phaseIndex)) {
+      controllers[name] = _VariableTextEditingControllers(
+        getVariable(
+          name: name,
+          phaseIndex: phaseIndex,
+          from: from,
+        ),
+        setDimensionCallback: (value) => setVariableDimension(value,
+            name: name, from: from, phaseIndex: phaseIndex),
+      );
+    }
+  }
+
+  void dispose() {
+    nbPhasesController.dispose();
+    for (final controller in nbShootingPointsControllers) {
+      controller.dispose();
+    }
+    nbShootingPointsControllers.clear();
+    for (final controller in phaseDurationControllers) {
+      controller.dispose();
+    }
+    phaseDurationControllers.clear();
+
+    for (final phaseVariables in _states) {
+      for (final key in phaseVariables.keys) {
+        phaseVariables[key]!.dispose();
+      }
+      phaseVariables.clear();
+    }
+    _states.clear();
+
+    for (final phaseVariables in _controls) {
+      for (final key in phaseVariables.keys) {
+        phaseVariables[key]!.dispose();
+      }
+      phaseVariables.clear();
+    }
+    _controls.clear();
   }
 }
 
