@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/python_interface.dart';
+import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
 import 'package:bioptim_gui/widgets/bio_model_chooser.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
 import 'package:bioptim_gui/widgets/dynamics_chooser.dart';
@@ -156,40 +157,43 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
   Widget _buildPhase({required int phaseIndex}) {
     final controllers = OptimalControlProgramControllers.instance;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Center(
-          child: Text(
-            controllers.nbPhases > 1
-                ? 'Information on phase ${phaseIndex + 1}'
-                : 'Information on the phase',
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
+    return AnimatedExpandingWidget(
+      header: Center(
+        child: Text(
+          controllers.nbPhases > 1
+              ? 'Information on phase ${phaseIndex + 1}'
+              : 'Information on the phase',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 24),
-        BioModelChooser(phaseIndex: phaseIndex),
-        const SizedBox(height: 12),
-        PhaseInformation(phaseIndex: phaseIndex, width: widget.width),
-        const SizedBox(height: 12),
-        DynamicsChooser(
-          phaseIndex: phaseIndex,
-          width: widget.width,
-        ),
-        const SizedBox(height: 12),
-        const Divider(),
-        DecisionVariableExpander(
-            from: DecisionVariableType.state,
+      ),
+      initialExpandedState: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 24),
+          BioModelChooser(phaseIndex: phaseIndex),
+          const SizedBox(height: 12),
+          PhaseInformation(phaseIndex: phaseIndex, width: widget.width),
+          const SizedBox(height: 12),
+          DynamicsChooser(
             phaseIndex: phaseIndex,
-            width: widget.width),
-        const SizedBox(height: 12),
-        const Divider(),
-        DecisionVariableExpander(
-          from: DecisionVariableType.control,
-          phaseIndex: phaseIndex,
-          width: widget.width,
-        ),
-      ],
+            width: widget.width,
+          ),
+          const SizedBox(height: 12),
+          const Divider(),
+          DecisionVariableExpander(
+              from: DecisionVariableType.state,
+              phaseIndex: phaseIndex,
+              width: widget.width),
+          const SizedBox(height: 12),
+          const Divider(),
+          DecisionVariableExpander(
+            from: DecisionVariableType.control,
+            phaseIndex: phaseIndex,
+            width: widget.width,
+          ),
+        ],
+      ),
     );
   }
 }
