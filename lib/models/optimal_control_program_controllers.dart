@@ -47,7 +47,7 @@ class OptimalControlProgramControllers {
   void registerToStatusChanged(Function() callback) {
     _hasChanged = callback;
     _updateAllControllers();
-    if (_hasChanged != null) _hasChanged!();
+    _notifyListeners();
   }
 
   ///
@@ -202,6 +202,8 @@ class OptimalControlProgramControllers {
         .changeDimension(value);
     _variableController(name: name, from: from, phaseIndex: phaseIndex)
         ._updateBounds();
+    _variableController(name: name, from: from, phaseIndex: phaseIndex)
+        ._updateInitialGuess();
     _notifyListeners();
   }
 
@@ -231,7 +233,30 @@ class OptimalControlProgramControllers {
         .interpolation = value;
     _variableController(name: name, from: from, phaseIndex: phaseIndex)
         ._updateBounds();
-    if (_hasChanged != null) _hasChanged!();
+    _notifyListeners();
+  }
+
+  List<TextEditingController> getVariableInitialGuessControllers({
+    required String name,
+    required int phaseIndex,
+    required DecisionVariableType from,
+  }) =>
+      _variableController(name: name, from: from, phaseIndex: phaseIndex)
+          .initialGuess;
+
+  void setVariableInitialGuessInterpolation(
+    Interpolation value, {
+    required String name,
+    required int phaseIndex,
+    required DecisionVariableType from,
+  }) {
+    _ocp
+        .variable(name, from: from, phaseIndex: phaseIndex)
+        .initialGuess
+        .interpolation = value;
+    _variableController(name: name, from: from, phaseIndex: phaseIndex)
+        ._updateInitialGuess();
+    _notifyListeners();
   }
 
   ///
@@ -312,6 +337,8 @@ class _VariableTextEditingControllers {
   final minBounds = <TextEditingController>[];
   final maxBounds = <TextEditingController>[];
   // TODO By adding a boundHasChangedCallback it could be possible to set values accross phases
+  final initialGuess = <TextEditingController>[];
+  // TODO By adding a initialGuessHasChangedCallback it could be possible to set values accross phases
 
   _VariableTextEditingControllers(
     this._variable, {
@@ -320,6 +347,7 @@ class _VariableTextEditingControllers {
     name.text = _variable.name;
 
     _updateBounds();
+    _updateInitialGuess();
 
     dimension.addListener(() {
       // The text field of dimension should only be positive integers
@@ -340,14 +368,25 @@ class _VariableTextEditingControllers {
     final minValues = _variable.bounds.min.values;
     final maxValues = _variable.bounds.max.values;
     for (int i = 0; i < _variable.bounds.length; i++) {
-      // TODO The number don't update the model yet
-      // TODO Retreive actual data from model
       minBounds.add(TextEditingController(text: minValues[i].toString()));
       minBounds[i].addListener(
           () => _updateMatrixValue(_variable.bounds.min, i, minBounds[i].text));
       maxBounds.add(TextEditingController(text: maxValues[i].toString()));
       maxBounds[i].addListener(
           () => _updateMatrixValue(_variable.bounds.max, i, maxBounds[i].text));
+    }
+  }
+
+  void _updateInitialGuess() {
+    // We have to reset all the controllers since we don't know if the number of
+    // dimension or column changed. This would make the textfield bouncing around
+    // randomly.
+    _disposeInitialGuess();
+    final guessValues = _variable.initialGuess.guess.values;
+    for (int i = 0; i < _variable.initialGuess.length; i++) {
+      initialGuess.add(TextEditingController(text: guessValues[i].toString()));
+      initialGuess[i].addListener(() => _updateMatrixValue(
+          _variable.initialGuess.guess, i, initialGuess[i].text));
     }
   }
 
@@ -369,9 +408,17 @@ class _VariableTextEditingControllers {
     maxBounds.clear();
   }
 
+  void _disposeInitialGuess() {
+    for (final guess in initialGuess) {
+      guess.dispose();
+    }
+    initialGuess.clear();
+  }
+
   void dispose() {
     name.dispose();
     dimension.dispose();
     _disposeBounds();
+    _disposeInitialGuess();
   }
 }

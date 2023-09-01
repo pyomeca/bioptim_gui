@@ -27,8 +27,15 @@ class OptimizationVariableChooser extends StatelessWidget {
     final bounds = controllers
         .getVariable(name: name, phaseIndex: phaseIndex, from: from)
         .bounds;
+    final initialGuess = controllers
+        .getVariable(name: name, phaseIndex: phaseIndex, from: from)
+        .initialGuess;
+
     final boundsControllers = controllers.getVariableBoundsControllers(
         name: name, phaseIndex: phaseIndex, from: from);
+    final initialGuessControllers =
+        controllers.getVariableInitialGuessControllers(
+            name: name, phaseIndex: phaseIndex, from: from);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,10 +68,7 @@ class OptimizationVariableChooser extends StatelessWidget {
         const SizedBox(height: 12),
         CustomDropdownButton<Interpolation>(
           title: 'Bounds interpolation type',
-          value: controllers
-              .getVariable(name: name, phaseIndex: phaseIndex, from: from)
-              .bounds
-              .interpolation,
+          value: bounds.interpolation,
           items: Interpolation.values,
           onSelected: (value) => controllers.setVariableBoundsInterpolation(
               value,
@@ -73,17 +77,33 @@ class OptimizationVariableChooser extends StatelessWidget {
               from: from),
         ),
         const SizedBox(height: 12),
+        CustomDropdownButton<Interpolation>(
+          title: 'Initial guess interpolation type',
+          value: initialGuess.interpolation,
+          items: Interpolation.values,
+          onSelected: (value) =>
+              controllers.setVariableInitialGuessInterpolation(value,
+                  name: name, phaseIndex: phaseIndex, from: from),
+        ),
+        const SizedBox(height: 32),
         _DataFiller(
             title: 'Min bounds',
             path: bounds,
             pathControllers: boundsControllers['minBounds']!,
             boxWidth: width * 7 / 8 / 3),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         _DataFiller(
             title: 'Max bounds',
             path: bounds,
             pathControllers: boundsControllers['maxBounds']!,
             boxWidth: width * 7 / 8 / 3),
+        const SizedBox(height: 12),
+        _DataFiller(
+            title: 'Initial guess',
+            path: initialGuess,
+            pathControllers: initialGuessControllers,
+            boxWidth: width * 7 / 8 / 3),
+        const SizedBox(height: 16),
       ],
     );
   }

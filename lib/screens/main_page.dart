@@ -40,57 +40,6 @@ class _MainPageState extends State<MainPage> {
     OptimalControlProgramControllers.instance
         .registerToStatusChanged(forceRedraw);
 
-    // TODO remove this prefilling, which is only for debug purpose
-    // _currentOcp.addVariable(
-    //     OptimizationVariable(
-    //       name: 'q',
-    //       bounds: Bound(
-    //         nbElements: 2,
-    //         interpolation: Interpolation.constantWithFirstAndLastDifferent,
-    //       ),
-    //       initialGuess: InitialGuess(
-    //           nbElements: 2, interpolation: Interpolation.constant),
-    //     ),
-    //     from: OptimizationVariableType.state,
-    //     phaseIndex: 0);
-    // _currentOcp.addVariable(
-    //     OptimizationVariable(
-    //       name: 'qdot',
-    //       bounds: Bound(
-    //         nbElements: 2,
-    //         interpolation: Interpolation.constantWithFirstAndLastDifferent,
-    //       ),
-    //       initialGuess: InitialGuess(
-    //           nbElements: 2, interpolation: Interpolation.constant),
-    //     ),
-    //     from: OptimizationVariableType.state,
-    //     phaseIndex: 0);
-    // _currentOcp.fillBound('q',
-    //     min: [0, -2, 0, 0, -2 * pi, pi],
-    //     max: [0, 2, 0, 0, 2 * pi, pi],
-    //     from: OptimizationVariableType.state,
-    //     phaseIndex: 0);
-    // _currentOcp.fillBound('qdot',
-    //     min: [0, -10, 0, 0, -10 * pi, 0],
-    //     max: [0, 10, 0, 0, 10 * pi, 0],
-    //     from: OptimizationVariableType.state,
-    //     phaseIndex: 0);
-
-    // _currentOcp.addVariable(
-    //     OptimizationVariable(
-    //       name: 'tau',
-    //       bounds: Bound(nbElements: 2, interpolation: Interpolation.constant),
-    //       initialGuess: InitialGuess(
-    //           nbElements: 2, interpolation: Interpolation.constant),
-    //     ),
-    //     from: OptimizationVariableType.control,
-    //     phaseIndex: 0);
-    // _currentOcp.fillBound('tau',
-    //     min: [-100, 0],
-    //     max: [100, 0],
-    //     from: OptimizationVariableType.control,
-    //     phaseIndex: 0);
-
     // _ocpControllers.ocp.addObjective(
     //     Objective(LagrangeFcn.minimizeControls, arguments: {'key': 'tau'}));
   }

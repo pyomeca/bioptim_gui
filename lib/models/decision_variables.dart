@@ -2,6 +2,7 @@ import 'package:bioptim_gui/models/matrix.dart';
 
 abstract class Path {
   Interpolation get interpolation;
+  set interpolation(Interpolation value);
 
   int get length => nbRows * nbCols;
   int get nbRows;
@@ -53,6 +54,7 @@ class Bounds extends Path {
   Interpolation _interpolation;
   @override
   Interpolation get interpolation => _interpolation;
+  @override
   set interpolation(Interpolation value) {
     _interpolation = value;
     min.changeNbCols(_interpolation.nbCols);
@@ -78,8 +80,14 @@ class Bounds extends Path {
 
 class InitialGuess extends Path {
   final Matrix guess;
+  Interpolation _interpolation;
   @override
-  final Interpolation interpolation;
+  Interpolation get interpolation => _interpolation;
+  @override
+  set interpolation(Interpolation value) {
+    _interpolation = value;
+    guess.changeNbCols(_interpolation.nbCols);
+  }
 
   @override
   int get nbRows => guess.nbRows;
@@ -91,8 +99,9 @@ class InitialGuess extends Path {
     guess.changeNbRows(value);
   }
 
-  InitialGuess({required int nbElements, required this.interpolation})
-      : guess = Matrix.zeros(nbRows: nbElements, nbCols: interpolation.nbCols);
+  InitialGuess({required int nbElements, required Interpolation interpolation})
+      : guess = Matrix.zeros(nbRows: nbElements, nbCols: interpolation.nbCols),
+        _interpolation = interpolation;
 }
 
 class DecisionVariable {
