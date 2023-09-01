@@ -71,7 +71,6 @@ class _DecisionVariableExpanderState extends State<DecisionVariableExpander> {
 
 class _DecisionVariableChooser extends StatelessWidget {
   const _DecisionVariableChooser({
-    super.key,
     required this.name,
     required this.from,
     required this.phaseIndex,
@@ -114,7 +113,7 @@ class _DecisionVariableChooser extends StatelessWidget {
                     label: Text('Variable name'), border: OutlineInputBorder()),
                 controller: controllers.getVariableNameController(
                     name: name, phaseIndex: phaseIndex, from: from),
-                enabled: false, // TODO get this from the variable
+                enabled: false,
               ),
             ),
             const SizedBox(width: 12),
