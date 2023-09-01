@@ -15,7 +15,6 @@ class NumberOfPhasesChooser extends StatelessWidget {
       child: PositiveIntegerTextField(
         label: 'Number of phases',
         controller: controllers.nbPhasesController,
-        // TODO Make sure next line is to true when python exporter is ready
         enabled: true,
       ),
     );

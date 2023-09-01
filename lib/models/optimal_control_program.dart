@@ -45,9 +45,9 @@ class OptimalControlProgram {
   ///
   /// Setters and Getters
 
-  bool _hasPendingChanges = true;
-  void notifyThatModelHasChanged() => _hasPendingChanges = true;
-  bool get mustExport => _hasPendingChanges;
+  bool _hasPendingChangesToBeExported = true;
+  void notifyThatModelHasChanged() => _hasPendingChangesToBeExported = true;
+  bool get mustExport => _hasPendingChangesToBeExported;
 
   GenericOptimalControlProgram generic = GenericOptimalControlProgram();
 
@@ -71,7 +71,7 @@ class OptimalControlProgram {
       // Do not remove the phases if they are removed from the GUI, so it can
       // be reinstated prefilled with previous data
     }
-    _hasPendingChanges = true;
+    _hasPendingChangesToBeExported = true;
   }
 
   void resetVariables({required int phaseIndex}) {
@@ -103,7 +103,7 @@ class OptimalControlProgram {
       ));
     }
 
-    _hasPendingChanges = true;
+    _hasPendingChangesToBeExported = true;
   }
 
   DecisionVariables variables(
@@ -127,11 +127,7 @@ class OptimalControlProgram {
   /// Main interface
 
   void exportScript(String path) {
-    _hasPendingChanges = false;
-
-    // TODO Do a proper for loop
-    const phaseIndex = 0;
-
+    _hasPendingChangesToBeExported = false;
     final file = File(path);
 
     // Write the header
@@ -162,87 +158,116 @@ class OptimalControlProgram {
         mode: FileMode.append);
 
     // Write the Generic section
+    final bioModelAsString = generic.nbPhases == 1
+        ? '${phases[0].bioModel.toPythonString()}(r"${phases[0].modelPath}")'
+        : '${[
+            for (int i = 0; i < generic.nbPhases; i++)
+              '${phases[i].bioModel.toPythonString()}(r"${phases[i].modelPath}")'
+          ]}';
+    final nShootingAsString = generic.nbPhases == 1
+        ? phases[0].nbShootingPoints.toString()
+        : '${[
+            for (int i = 0; i < generic.nbPhases; i++)
+              phases[i].nbShootingPoints.toString()
+          ]}';
+    final durationAsString = generic.nbPhases == 1
+        ? phases[0].duration.toString()
+        : '${[
+            for (int i = 0; i < generic.nbPhases; i++)
+              phases[i].duration.toString()
+          ]}';
     file.writeAsStringSync(
         '    # Declaration of generic elements\n'
-        '    bio_model = ${phases[phaseIndex].bioModel.toPythonString()}'
-        '(r"${phases[phaseIndex].modelPath}")\n'
-        '    n_shooting = ${phases[phaseIndex].nbShootingPoints}\n'
-        '    phase_time = ${phases[phaseIndex].duration}\n'
+        '    bio_model = $bioModelAsString\n'
+        '    n_shooting = $nShootingAsString\n'
+        '    phase_time = $durationAsString\n'
         '\n',
         mode: FileMode.append);
 
-    // Write the dynamics section
     file.writeAsStringSync(
         '    # Declaration of the dynamics function used during integration\n'
-        '    dynamics = Dynamics(${phases[phaseIndex].dynamics.type.toPythonString()}, '
-        'expand=${phases[phaseIndex].dynamics.isExpanded ? 'True' : 'False'})\n'
-        '\n',
+        '    dynamics = DynamicsList()\n\n',
         mode: FileMode.append);
+    for (int phaseIndex = 0; phaseIndex < generic.nbPhases; phaseIndex++) {
+      // Write the dynamics section
+      file.writeAsStringSync(
+          '    dynamics.add(\n'
+          '        ${phases[phaseIndex].dynamics.type.toPythonString()},\n'
+          '        expand=${phases[phaseIndex].dynamics.isExpanded ? 'True' : 'False'},\n'
+          '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
+          '    )\n'
+          '\n',
+          mode: FileMode.append);
+    }
+
+    // Write the constraints and objectives functions
+    file.writeAsStringSync(
+        '    # Declaration of the constraints and objectives of the ocp\n'
+        '    constraints = ConstraintList()\n'
+        '    objective_functions = ObjectiveList()\n',
+        mode: FileMode.append);
+    for (int phaseIndex = 0; phaseIndex < generic.nbPhases; phaseIndex++) {
+      for (final objective in objectives) {
+        file.writeAsStringSync(
+            '    objective_functions.add(\n'
+            '        objective=${objective.fcn.toPythonString()},\n'
+            '${objective.argumentKeys.map((key) => '        ${objective.argumentToPythonString(key)},').join('\n')}\n'
+            '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
+            '    )\n',
+            mode: FileMode.append);
+      }
+      for (final constraint in _constraints) {
+        file.writeAsStringSync(
+            '    constraints.add(\n'
+            '        constraint=${constraint.fcn.toPythonString()},\n'
+            '${constraint.argumentKeys.map((key) => '        ${constraint.argumentToPythonString(key)},').join('\n')}\n'
+            '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
+            '    )\n',
+            mode: FileMode.append);
+      }
+    }
+    file.writeAsStringSync('\n', mode: FileMode.append);
 
     // Write the variable section
     file.writeAsStringSync(
         '    # Declaration of optimization variables bounds and initial guesses\n',
         mode: FileMode.append);
-
     for (final variableType in DecisionVariableType.values) {
-      final allVariables =
-          variables(from: variableType, phaseIndex: phaseIndex);
-      final basename = allVariables.type.toPythonString();
-
+      final basename = variableType.toPythonString();
       file.writeAsStringSync(
           '    ${basename}_bounds = BoundsList()\n'
           '    ${basename}_initial_guesses = InitialGuessList()\n'
           '\n',
           mode: FileMode.append);
+    }
 
-      for (final name in allVariables.names) {
-        final variable = allVariables[name];
-        file.writeAsStringSync(
-            '    ${basename}_bounds.add(\n'
-            '        "${variable.name}",\n'
-            '        min_bound=${variable.bounds.min},\n'
-            '        max_bound=${variable.bounds.max},\n'
-            '        interpolation=${variable.bounds.interpolation.toPythonString()},\n'
-            '        phase=$phaseIndex,\n'
-            '    )'
-            '\n'
-            '    ${basename}_initial_guesses.add(\n'
-            '        "${variable.name}",\n'
-            '        initial_guess=${variable.initialGuess.guess},\n'
-            '        interpolation=${variable.initialGuess.interpolation.toPythonString()},\n'
-            '        phase=$phaseIndex,\n'
-            '    )\n'
-            '\n',
-            mode: FileMode.append);
+    for (int phaseIndex = 0; phaseIndex < generic.nbPhases; phaseIndex++) {
+      for (final variableType in DecisionVariableType.values) {
+        final basename = variableType.toPythonString();
+        final allVariables =
+            variables(from: variableType, phaseIndex: phaseIndex);
+
+        for (final name in allVariables.names) {
+          final variable = allVariables[name];
+          file.writeAsStringSync(
+              '    ${basename}_bounds.add(\n'
+              '        "${variable.name}",\n'
+              '        min_bound=${variable.bounds.min},\n'
+              '        max_bound=${variable.bounds.max},\n'
+              '        interpolation=${variable.bounds.interpolation.toPythonString()},\n'
+              '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
+              '    )'
+              '\n'
+              '    ${basename}_initial_guesses.add(\n'
+              '        "${variable.name}",\n'
+              '        initial_guess=${variable.initialGuess.guess},\n'
+              '        interpolation=${variable.initialGuess.interpolation.toPythonString()},\n'
+              '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
+              '    )\n'
+              '\n',
+              mode: FileMode.append);
+        }
       }
-    }
-
-    // Write the constraints
-    file.writeAsStringSync(
-        '    # Declaration of the constraints of the ocp\n'
-        '    constraints = ConstraintList()\n',
-        mode: FileMode.append);
-    for (final constraint in _constraints) {
-      file.writeAsStringSync(
-          '    constraints.add(\n'
-          '        constraint=${constraint.fcn.toPythonString()},\n'
-          '    )\n',
-          mode: FileMode.append);
-    }
-    file.writeAsStringSync('\n', mode: FileMode.append);
-
-    // Write the objective functions
-    file.writeAsStringSync(
-        '    # Declaration of the objectives of the ocp\n'
-        '    objective_functions = ObjectiveList()\n',
-        mode: FileMode.append);
-    for (final objective in objectives) {
-      file.writeAsStringSync(
-          '    objective_functions.add(\n'
-          '        objective=${objective.fcn.toPythonString()},\n'
-          '${objective.argumentKeys.map((key) => '        ${objective.argumentToPythonString(key)},').join('\n')}\n'
-          '    )\n',
-          mode: FileMode.append);
     }
     file.writeAsStringSync('\n', mode: FileMode.append);
 
