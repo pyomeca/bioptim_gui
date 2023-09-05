@@ -6,7 +6,32 @@ import 'package:bioptim_gui/models/matrix.dart';
 import 'package:bioptim_gui/models/optimal_control_program_type.dart';
 import 'package:bioptim_gui/models/optimal_control_program.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
+import 'package:bioptim_gui/models/penalty.dart';
 import 'package:flutter/material.dart';
+
+class PenaltyInterface {
+  const PenaltyInterface({
+    required this.create,
+    required this.fetch,
+    required this.fetchAll,
+    required this.update,
+    required this.remove,
+    this.weightController,
+    required this.argumentController,
+  });
+
+  final Function() create;
+  final Penalty Function({required int penaltyIndex}) fetch;
+  final List<Penalty> Function() fetchAll;
+  final Function(Penalty penalty, {required int penaltyIndex}) update;
+  final Function({required int penaltyIndex}) remove;
+
+  final TextEditingController Function({required int penaltyIndex})?
+      weightController;
+  final TextEditingController Function(
+      {required int penaltyIndex,
+      required int argumentIndex}) argumentController;
+}
 
 ///
 /// This class mimics the strcture of the [OptimalControlProgram] class but in
@@ -275,6 +300,59 @@ class OptimalControlProgramControllers {
   }
 
   ///
+  /// Here are the objective function methods
+  final List<List<_PenaltyTextEditingControllers>> _objectiveControllers = [];
+
+  List<TextEditingController> getObjectiveArgumentsControllers(
+          {required int objectiveIndex, required int phaseIndex}) =>
+      _objectiveControllers[phaseIndex][objectiveIndex].arguments;
+
+  PenaltyInterface objectives({required int phaseIndex}) => PenaltyInterface(
+      create: () => _createObjective(phaseIndex: phaseIndex),
+      fetch: ({required penaltyIndex}) =>
+          _getObjectives(phaseIndex: phaseIndex)[penaltyIndex],
+      fetchAll: () => _getObjectives(phaseIndex: phaseIndex),
+      update: (penalty, {required penaltyIndex}) => _updateObjective(penalty,
+          penaltyIndex: penaltyIndex, phaseIndex: phaseIndex),
+      remove: ({required penaltyIndex}) =>
+          _removeObjective(penaltyIndex: penaltyIndex, phaseIndex: phaseIndex),
+      weightController: ({required penaltyIndex}) =>
+          _objectiveControllers[phaseIndex][penaltyIndex].weight,
+      argumentController: ({required penaltyIndex, required argumentIndex}) =>
+          _objectiveControllers[phaseIndex][penaltyIndex]
+              .arguments[argumentIndex]);
+
+  List<Penalty> _getObjectives({required int phaseIndex}) =>
+      _ocp.phases[phaseIndex].objectives;
+
+  void _createObjective({required int phaseIndex}) {
+    _ocp.phases[phaseIndex].objectives.add(Objective.generic());
+    _objectiveControllers[phaseIndex].add(_PenaltyTextEditingControllers(
+        _ocp.phases[phaseIndex].objectives.last));
+    _objectiveControllers[phaseIndex].last._penalty =
+        _ocp.phases[phaseIndex].objectives.last;
+    _objectiveControllers[phaseIndex].last._updateWeight();
+    _objectiveControllers[phaseIndex].last._updateArguments();
+    _notifyListeners();
+  }
+
+  void _updateObjective(Penalty penalty,
+      {required int penaltyIndex, required int phaseIndex}) {
+    _ocp.phases[phaseIndex].objectives[penaltyIndex] = penalty as Objective;
+    _objectiveControllers[phaseIndex][penaltyIndex]._penalty = penalty;
+    _objectiveControllers[phaseIndex][penaltyIndex]._updateWeight();
+    _objectiveControllers[phaseIndex][penaltyIndex]._updateArguments();
+    _notifyListeners();
+  }
+
+  void _removeObjective({required int penaltyIndex, required int phaseIndex}) {
+    _ocp.phases[phaseIndex].objectives.removeAt(penaltyIndex);
+    _objectiveControllers[phaseIndex][penaltyIndex].dispose();
+    _objectiveControllers[phaseIndex].removeAt(penaltyIndex);
+    _notifyListeners();
+  }
+
+  ///
   /// Here are the internal methods that ensures all the controllers are sane
   void _updateAllControllers() {
     _updateTextControllers(
@@ -290,6 +368,8 @@ class OptimalControlProgramControllers {
 
     _updateVariableController(_states, from: DecisionVariableType.state);
     _updateVariableController(_controls, from: DecisionVariableType.control);
+
+    _updatePenaltyControllers(_objectiveControllers);
   }
 
   void _updateTextControllers(List<TextEditingController> controllers,
@@ -326,6 +406,25 @@ class OptimalControlProgramControllers {
       for (int i = controllers.length - 1; i >= nbPhases; i--) {
         for (final key in controllers[i].keys) {
           controllers[i][key]!.dispose();
+        }
+        controllers.removeAt(i);
+      }
+    } else {
+      // Do not change anything if we already have the right number of phases
+    }
+  }
+
+  void _updatePenaltyControllers(
+      List<List<_PenaltyTextEditingControllers>> controllers) {
+    if (controllers.length < nbPhases) {
+      // For each of the new phases, declare all the required variables
+      for (int i = controllers.length; i < nbPhases; i++) {
+        controllers.add([]);
+      }
+    } else if (controllers.length > nbPhases) {
+      for (int i = controllers.length - 1; i >= nbPhases; i--) {
+        for (final controller in controllers[i]) {
+          controller.dispose();
         }
         controllers.removeAt(i);
       }
@@ -378,6 +477,60 @@ class OptimalControlProgramControllers {
       phaseVariables.clear();
     }
     _controls.clear();
+  }
+}
+
+class _PenaltyTextEditingControllers {
+  final weight = TextEditingController(text: '1.0');
+  Penalty _penalty;
+  final arguments = <TextEditingController>[];
+
+  _PenaltyTextEditingControllers(this._penalty) {
+    weight.addListener(() {
+      if (_penalty.runtimeType != Objective) return;
+      final newWeight = double.tryParse(weight.text);
+      if (newWeight == null || newWeight == (_penalty as Objective).weight) {
+        return;
+      }
+
+      (_penalty as Objective).weight = newWeight;
+      OptimalControlProgramControllers.instance._notifyListeners();
+    });
+    _updateArguments();
+  }
+
+  void _updateWeight() {
+    if (_penalty.runtimeType != Objective) return;
+    weight.text = (_penalty as Objective).weight.toString();
+  }
+
+  void _updateArguments() {
+    _disposeArguments();
+    final names = _penalty.arguments.keys.toList();
+    for (int i = 0; i < _penalty.arguments.length; i++) {
+      final name = names[i];
+
+      arguments.add(TextEditingController(
+          text: _penalty.arguments[name]?.toString() ?? ''));
+      arguments[i].addListener(() {
+        final value = arguments[i].text;
+        if (value == _penalty.arguments[name].toString()) return;
+        _penalty.arguments[name] = value;
+        OptimalControlProgramControllers.instance._notifyListeners();
+      });
+    }
+  }
+
+  void _disposeArguments() {
+    for (final controller in arguments) {
+      controller.dispose();
+    }
+    arguments.clear();
+  }
+
+  void dispose() {
+    weight.dispose();
+    _disposeArguments();
   }
 }
 

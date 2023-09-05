@@ -57,7 +57,19 @@ mixin PenaltyFcn {
   List<PenaltyArgument> get mandatoryArguments;
 }
 
-mixin ObjectiveFcn implements PenaltyFcn {}
+mixin ObjectiveFcn implements PenaltyFcn {
+  @override
+  List<PenaltyFcn> get fcnValues {
+    final out = <ObjectiveFcn>[];
+    for (final obj in LagrangeFcn.values) {
+      out.add(obj);
+    }
+    for (final obj in MayerFcn.values) {
+      out.add(obj);
+    }
+    return out;
+  }
+}
 
 enum LagrangeFcn implements ObjectiveFcn {
   minimizeControls,
@@ -65,7 +77,14 @@ enum LagrangeFcn implements ObjectiveFcn {
 
   @override
   List<PenaltyFcn> get fcnValues {
-    return LagrangeFcn.values;
+    final out = <ObjectiveFcn>[];
+    for (final obj in LagrangeFcn.values) {
+      out.add(obj);
+    }
+    for (final obj in MayerFcn.values) {
+      out.add(obj);
+    }
+    return out;
   }
 
   @override
@@ -116,7 +135,14 @@ enum MayerFcn implements ObjectiveFcn {
 
   @override
   List<PenaltyFcn> get fcnValues {
-    return MayerFcn.values;
+    final out = <ObjectiveFcn>[];
+    for (final obj in LagrangeFcn.values) {
+      out.add(obj);
+    }
+    for (final obj in MayerFcn.values) {
+      out.add(obj);
+    }
+    return out;
   }
 
   @override
@@ -191,14 +217,12 @@ enum ConstraintFcn implements PenaltyFcn {
 
 abstract class Penalty {
   final PenaltyFcn fcn;
-  final Map<String, dynamic> _arguments;
+  final Map<String, dynamic> arguments;
 
   final Nodes nodes;
 
-  Iterable<String> get argumentKeys => _arguments.keys;
-
   String argumentToPythonString(String key) {
-    final argument = _arguments[key];
+    final argument = arguments[key];
     if (argument == null) throw 'The key $key is not in the argument list';
 
     switch (argument.runtimeType) {
@@ -210,14 +234,20 @@ abstract class Penalty {
     }
   }
 
-  Penalty(this.fcn,
-      {required this.nodes, required Map<String, dynamic> arguments})
-      : _arguments = arguments {
+  Penalty(this.fcn, {required this.nodes, required this.arguments}) {
     final argumentNames = fcn.mandatoryArguments.map((e) => e.name);
 
-    for (final argument in _arguments.keys) {
+    // Do not allow non mandatory arguments
+    for (final argument in arguments.keys) {
       if (!argumentNames.contains(argument)) {
         throw 'The ${fcn.penaltyType} $fcn requires $argument';
+      }
+    }
+
+    // Initialize if not all mandatory arguments are present
+    for (final name in argumentNames) {
+      if (!arguments.containsKey(name)) {
+        arguments[name] = null;
       }
     }
   }
@@ -225,14 +255,27 @@ abstract class Penalty {
 
 class Objective extends Penalty {
   double weight;
+  Objective.generic(
+      {ObjectiveFcn fcn = LagrangeFcn.minimizeControls,
+      super.nodes = Nodes.all,
+      this.weight = 1,
+      Map<String, dynamic>? arguments})
+      : super(fcn, arguments: arguments ?? {});
 
-  Objective(ObjectiveFcn fcn,
-      {required super.nodes, required this.weight, required super.arguments})
-      : super(fcn);
+  Objective.lagrange(LagrangeFcn fcn,
+      {super.nodes = Nodes.all,
+      this.weight = 1,
+      Map<String, dynamic>? arguments})
+      : super(fcn, arguments: arguments ?? {});
+  Objective.mayer(MayerFcn fcn,
+      {super.nodes = Nodes.all,
+      this.weight = 1,
+      Map<String, dynamic>? arguments})
+      : super(fcn, arguments: arguments ?? {});
 }
 
 class Constraint extends Penalty {
   Constraint(ConstraintFcn fcn,
-      {required super.nodes, required super.arguments})
-      : super(fcn);
+      {super.nodes = Nodes.end, Map<String, dynamic>? arguments})
+      : super(fcn, arguments: arguments ?? {});
 }

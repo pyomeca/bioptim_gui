@@ -15,6 +15,9 @@ class _Phase {
   double duration;
   Dynamics dynamics;
 
+  final List<Objective> objectives = [];
+  final List<Constraint> constraints = [];
+
   DecisionVariables stateVariables =
       DecisionVariables(DecisionVariableType.state);
   DecisionVariables controlVariables =
@@ -120,9 +123,6 @@ class OptimalControlProgram {
           {required DecisionVariableType from, required int phaseIndex}) =>
       variables(from: from, phaseIndex: phaseIndex)[name];
 
-  final List<Objective> objectives = [];
-  final List<Constraint> _constraints = [];
-
   ///
   /// Main interface
 
@@ -207,20 +207,21 @@ class OptimalControlProgram {
         '    objective_functions = ObjectiveList()\n',
         mode: FileMode.append);
     for (int phaseIndex = 0; phaseIndex < generic.nbPhases; phaseIndex++) {
-      for (final objective in objectives) {
+      for (final objective in phases[phaseIndex].objectives) {
         file.writeAsStringSync(
             '    objective_functions.add(\n'
             '        objective=${objective.fcn.toPythonString()},\n'
-            '${objective.argumentKeys.map((key) => '        ${objective.argumentToPythonString(key)},').join('\n')}\n'
+            '${objective.arguments.keys.isEmpty ? '' : '${objective.arguments.keys.map((key) => '        ${objective.argumentToPythonString(key)},').join('\n')}\n'}'
             '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
+            '        weight=${objective.weight}\n'
             '    )\n',
             mode: FileMode.append);
       }
-      for (final constraint in _constraints) {
+      for (final constraint in phases[phaseIndex].constraints) {
         file.writeAsStringSync(
             '    constraints.add(\n'
             '        constraint=${constraint.fcn.toPythonString()},\n'
-            '${constraint.argumentKeys.map((key) => '        ${constraint.argumentToPythonString(key)},').join('\n')}\n'
+            '${constraint.arguments.keys.map((key) => '        ${constraint.argumentToPythonString(key)},').join('\n')}\n'
             '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
             '    )\n',
             mode: FileMode.append);

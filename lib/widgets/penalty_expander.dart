@@ -1,4 +1,5 @@
 import 'package:bioptim_gui/models/nodes.dart';
+import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
@@ -17,30 +18,60 @@ class PenaltyExpander extends StatelessWidget {
   final int phaseIndex;
   final double width;
 
-  String penaltyTypeToString(Type penaltyType) {
+  String _penaltyTypeToString({required bool plural}) {
     switch (penaltyType) {
       case ObjectiveFcn:
-        return 'Objective functions';
+        return plural ? 'Objective functions' : 'Objective function';
       case ConstraintFcn:
-        return 'Constraints';
+        return plural ? 'Constraints' : 'Constraint';
       default:
         throw 'Wrong penalty type';
     }
   }
 
+  Penalty _penaltyFactory(PenaltyFcn fcn,
+      {required double? weigth,
+      required Nodes? nodes,
+      required Map<String, dynamic>? arguments}) {
+    switch (fcn.runtimeType) {
+      case LagrangeFcn:
+        return Objective.lagrange(fcn as LagrangeFcn,
+            weight: weigth ?? 1,
+            nodes: nodes ?? Nodes.all,
+            arguments: arguments ?? {});
+      case MayerFcn:
+        return Objective.mayer(fcn as MayerFcn,
+            weight: weigth ?? 1,
+            nodes: nodes ?? Nodes.end,
+            arguments: arguments ?? {});
+      case ConstraintFcn:
+        return Constraint(fcn as ConstraintFcn,
+            nodes: nodes ?? Nodes.end, arguments: arguments ?? {});
+      default:
+        throw 'Wrong penalty type';
+    }
+  }
+
+  PenaltyInterface get _getPenaltyInterface {
+    switch (penaltyType) {
+      case ObjectiveFcn:
+        return OptimalControlProgramControllers.instance
+            .objectives(phaseIndex: phaseIndex);
+      case ConstraintFcn:
+        // TODO
+        throw 'Wrong penalty type';
+      default:
+        throw 'Wrong penalty type';
+    }
+  }
+
+  void _createPenalties() {
+    _getPenaltyInterface.create();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final name = penaltyTypeToString(penaltyType);
-
-    // TODO fetch this from the model
-    final penalties = [
-      Objective(LagrangeFcn.minimizeControls,
-          nodes: Nodes.all, weight: 1, arguments: {}),
-      Objective(LagrangeFcn.minimizeStates,
-          nodes: Nodes.all, weight: 1, arguments: {}),
-      Objective(MayerFcn.minimizeTime,
-          nodes: Nodes.end, weight: 1, arguments: {}),
-    ];
+    final penalties = _getPenaltyInterface.fetchAll();
 
     return AnimatedExpandingWidget(
       header: SizedBox(
@@ -49,7 +80,7 @@ class PenaltyExpander extends StatelessWidget {
         child: Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            name,
+            _penaltyTypeToString(plural: true),
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
@@ -57,11 +88,18 @@ class PenaltyExpander extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Align(
+            alignment: Alignment.centerRight,
+            child: _buildAddButton(
+                _penaltyTypeToString(plural: false).toLowerCase()),
+          ),
           const SizedBox(height: 24),
           ...penalties.asMap().keys.map((index) => Padding(
                 padding: const EdgeInsets.only(bottom: 24.0),
                 child: _PathTile(
-                  penalty: penalties[index],
+                  key: ObjectKey(penalties[index]),
+                  penaltyFactory: _penaltyFactory,
+                  penaltyInterface: _getPenaltyInterface,
                   penaltyIndex: index,
                   width: width,
                 ),
@@ -71,21 +109,57 @@ class PenaltyExpander extends StatelessWidget {
       ),
     );
   }
+
+  Padding _buildAddButton(String name) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 18.0, top: 12.0),
+      child: InkWell(
+        onTap: _createPenalties,
+        child: Container(
+            padding:
+                const EdgeInsets.only(left: 12, right: 4, top: 2, bottom: 2),
+            decoration: BoxDecoration(
+                color: Colors.green, borderRadius: BorderRadius.circular(25)),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'New $name',
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+              ],
+            )),
+      ),
+    );
+  }
 }
 
 class _PathTile extends StatelessWidget {
   const _PathTile({
-    required this.penalty,
+    required super.key,
+    required this.penaltyFactory,
+    required this.penaltyInterface,
     required this.penaltyIndex,
     required this.width,
   });
 
-  final Penalty penalty;
+  final Function(PenaltyFcn fcn,
+      {required Map<String, dynamic>? arguments,
+      required Nodes? nodes,
+      required double? weigth}) penaltyFactory;
+  final PenaltyInterface penaltyInterface;
   final int penaltyIndex;
   final double width;
 
   @override
   Widget build(BuildContext context) {
+    final penalty = penaltyInterface.fetch(penaltyIndex: penaltyIndex);
+    final arguments = penalty.fcn.mandatoryArguments;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -96,24 +170,34 @@ class _PathTile extends StatelessWidget {
                 '${penalty.fcn.penaltyType} ${penaltyIndex + 1} (${penalty.fcn.penaltyTypeToString})',
             value: penalty.fcn,
             items: penalty.fcn.fcnValues,
-            onSelected: (value) {}, // TODO
+            onSelected: (value) {
+              if (value.toString() == penalty.fcn.toString()) return;
+
+              // Update to a brand new fresh penalty
+              penaltyInterface.update(
+                  penaltyFactory(value,
+                      weigth: null, nodes: null, arguments: null),
+                  penaltyIndex: penaltyIndex);
+            },
             isExpanded: false,
           ),
         ),
         const SizedBox(height: 12),
-        ...penalty.fcn.mandatoryArguments.map((e) => Padding(
+        ...arguments.asMap().keys.map((index) => Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
               child: Row(
                 children: [
                   SizedBox(
                     width: width * 2 / 3 - 6,
                     child: TextField(
+                        controller: penaltyInterface.argumentController(
+                            penaltyIndex: penaltyIndex, argumentIndex: index),
                         decoration: InputDecoration(
-                            label: Text('Argument: ${e.name}'),
+                            label: Text('Argument: ${arguments[index].name}'),
                             border: const OutlineInputBorder()),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                              e.dataType.regexpValidator)
+                              arguments[index].dataType.regexpValidator)
                         ]),
                   ),
                   const SizedBox(width: 12),
@@ -121,7 +205,7 @@ class _PathTile extends StatelessWidget {
                     width: width * 1 / 3 - 6,
                     child: CustomDropdownButton<PenaltyArgumentType>(
                       title: 'Type',
-                      value: e.dataType,
+                      value: arguments[index].dataType,
                       items: PenaltyArgumentType.values,
                     ),
                   ),
@@ -136,7 +220,19 @@ class _PathTile extends StatelessWidget {
                 title: 'Nodes to apply to the ${penalty.fcn.penaltyType}',
                 value: penalty.nodes,
                 items: Nodes.values,
-                onSelected: (value) {}, // TODO
+                onSelected: (value) {
+                  if (value.toString() == penalty.nodes.toString()) return;
+
+                  final weight = penalty.runtimeType == Objective
+                      ? (penalty as Objective).weight
+                      : null;
+                  penaltyInterface.update(
+                      penaltyFactory(penalty.fcn,
+                          weigth: weight,
+                          nodes: value,
+                          arguments: penalty.arguments),
+                      penaltyIndex: penaltyIndex);
+                },
                 isExpanded: false,
               ),
             ),
@@ -145,15 +241,42 @@ class _PathTile extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 12.0),
                   child: TextField(
-                      onChanged: (value) {}, // TODO
+                      controller: penaltyInterface.weightController!(
+                          penaltyIndex: penaltyIndex),
                       decoration: const InputDecoration(
-                          label: Text('Weigth'), border: OutlineInputBorder()),
+                          label: Text('Weight'), border: OutlineInputBorder()),
                       inputFormatters: [
                         FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))
                       ]),
                 ),
               ),
           ],
+        ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: InkWell(
+            onTap: () {
+              penaltyInterface.remove(penaltyIndex: penaltyIndex);
+            },
+            borderRadius: BorderRadius.circular(25),
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Remove ${penalty.fcn.penaltyType.toLowerCase()}',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
         const SizedBox(height: 14),
       ],
