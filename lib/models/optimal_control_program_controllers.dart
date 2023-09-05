@@ -300,6 +300,44 @@ class OptimalControlProgramControllers {
   }
 
   ///
+  /// Here are some generic methods for penalties (declared later)
+  void _createPenalty(
+    Penalty penalty, {
+    required List<_PenaltyTextEditingControllers> controllers,
+    required List<Penalty> penalties,
+  }) {
+    penalties.add(penalty);
+    controllers.add(_PenaltyTextEditingControllers(penalties.last));
+    controllers.last._updateWeight();
+    controllers.last._updateArguments();
+    _notifyListeners();
+  }
+
+  void _updatePenalty(
+    Penalty penalty, {
+    required List<_PenaltyTextEditingControllers> controllers,
+    required List<Penalty> penalties,
+    required int penaltyIndex,
+  }) {
+    penalties[penaltyIndex] = penalty;
+    controllers[penaltyIndex]._penalty = penalty;
+    controllers[penaltyIndex]._updateWeight();
+    controllers[penaltyIndex]._updateArguments();
+    _notifyListeners();
+  }
+
+  void _removePenalty({
+    required List<_PenaltyTextEditingControllers> controllers,
+    required List<Penalty> penalties,
+    required int penaltyIndex,
+  }) {
+    penalties.removeAt(penaltyIndex);
+    controllers[penaltyIndex].dispose();
+    controllers.removeAt(penaltyIndex);
+    _notifyListeners();
+  }
+
+  ///
   /// Here are the objective function methods
   final List<List<_PenaltyTextEditingControllers>> _objectiveControllers = [];
 
@@ -325,32 +363,23 @@ class OptimalControlProgramControllers {
   List<Penalty> _getObjectives({required int phaseIndex}) =>
       _ocp.phases[phaseIndex].objectives;
 
-  void _createObjective({required int phaseIndex}) {
-    _ocp.phases[phaseIndex].objectives.add(Objective.generic());
-    _objectiveControllers[phaseIndex].add(_PenaltyTextEditingControllers(
-        _ocp.phases[phaseIndex].objectives.last));
-    _objectiveControllers[phaseIndex].last._penalty =
-        _ocp.phases[phaseIndex].objectives.last;
-    _objectiveControllers[phaseIndex].last._updateWeight();
-    _objectiveControllers[phaseIndex].last._updateArguments();
-    _notifyListeners();
-  }
+  void _createObjective({required int phaseIndex}) =>
+      _createPenalty(Objective.generic(),
+          controllers: _objectiveControllers[phaseIndex],
+          penalties: _ocp.phases[phaseIndex].objectives);
 
   void _updateObjective(Penalty penalty,
-      {required int penaltyIndex, required int phaseIndex}) {
-    _ocp.phases[phaseIndex].objectives[penaltyIndex] = penalty as Objective;
-    _objectiveControllers[phaseIndex][penaltyIndex]._penalty = penalty;
-    _objectiveControllers[phaseIndex][penaltyIndex]._updateWeight();
-    _objectiveControllers[phaseIndex][penaltyIndex]._updateArguments();
-    _notifyListeners();
-  }
+          {required int penaltyIndex, required int phaseIndex}) =>
+      _updatePenalty(penalty,
+          controllers: _objectiveControllers[phaseIndex],
+          penalties: _ocp.phases[phaseIndex].objectives,
+          penaltyIndex: penaltyIndex);
 
-  void _removeObjective({required int penaltyIndex, required int phaseIndex}) {
-    _ocp.phases[phaseIndex].objectives.removeAt(penaltyIndex);
-    _objectiveControllers[phaseIndex][penaltyIndex].dispose();
-    _objectiveControllers[phaseIndex].removeAt(penaltyIndex);
-    _notifyListeners();
-  }
+  void _removeObjective({required int penaltyIndex, required int phaseIndex}) =>
+      _removePenalty(
+          controllers: _objectiveControllers[phaseIndex],
+          penalties: _ocp.phases[phaseIndex].objectives,
+          penaltyIndex: penaltyIndex);
 
   ///
   /// Here are all the constraint methods
@@ -376,31 +405,24 @@ class OptimalControlProgramControllers {
   List<Penalty> _getConstraints({required int phaseIndex}) =>
       _ocp.phases[phaseIndex].constraints;
 
-  void _createConstraint({required int phaseIndex}) {
-    _ocp.phases[phaseIndex].constraints.add(Constraint.generic());
-    _constraintControllers[phaseIndex].add(_PenaltyTextEditingControllers(
-        _ocp.phases[phaseIndex].constraints.last));
-    _constraintControllers[phaseIndex].last._penalty =
-        _ocp.phases[phaseIndex].constraints.last;
-    _constraintControllers[phaseIndex].last._updateWeight();
-    _constraintControllers[phaseIndex].last._updateArguments();
-    _notifyListeners();
-  }
+  void _createConstraint({required int phaseIndex}) =>
+      _createPenalty(Constraint.generic(),
+          controllers: _constraintControllers[phaseIndex],
+          penalties: _ocp.phases[phaseIndex].constraints);
 
   void _updateConstraint(Penalty penalty,
-      {required int penaltyIndex, required int phaseIndex}) {
-    _ocp.phases[phaseIndex].constraints[penaltyIndex] = penalty as Constraint;
-    _constraintControllers[phaseIndex][penaltyIndex]._penalty = penalty;
-    _constraintControllers[phaseIndex][penaltyIndex]._updateArguments();
-    _notifyListeners();
-  }
+          {required int penaltyIndex, required int phaseIndex}) =>
+      _updatePenalty(penalty,
+          controllers: _constraintControllers[phaseIndex],
+          penalties: _ocp.phases[phaseIndex].constraints,
+          penaltyIndex: penaltyIndex);
 
-  void _removeConstraint({required int penaltyIndex, required int phaseIndex}) {
-    _ocp.phases[phaseIndex].constraints.removeAt(penaltyIndex);
-    _constraintControllers[phaseIndex][penaltyIndex].dispose();
-    _constraintControllers[phaseIndex].removeAt(penaltyIndex);
-    _notifyListeners();
-  }
+  void _removeConstraint(
+          {required int penaltyIndex, required int phaseIndex}) =>
+      _removePenalty(
+          controllers: _constraintControllers[phaseIndex],
+          penalties: _ocp.phases[phaseIndex].constraints,
+          penaltyIndex: penaltyIndex);
 
   ///
   /// Here are the internal methods that ensures all the controllers are sane

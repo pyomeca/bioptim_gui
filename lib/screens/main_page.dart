@@ -42,9 +42,6 @@ class _MainPageState extends State<MainPage> {
     PythonInterface.instance.registerToStatusChanged((status) => forceRedraw());
     OptimalControlProgramControllers.instance
         .registerToStatusChanged(forceRedraw);
-
-    // _ocpControllers.ocp.addObjective(
-    //     Objective(LagrangeFcn.minimizeControls, arguments: {'key': 'tau'}));
   }
 
   void forceRedraw() {
