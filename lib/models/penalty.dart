@@ -222,9 +222,7 @@ abstract class Penalty {
   final Nodes nodes;
 
   String argumentToPythonString(String key) {
-    final argument = arguments[key];
-    if (argument == null) throw 'The key $key is not in the argument list';
-
+    final argument = arguments[key] ?? 'to_be_specified';
     switch (argument.runtimeType) {
       case String:
         return '$key="$argument"';
@@ -275,7 +273,9 @@ class Objective extends Penalty {
 }
 
 class Constraint extends Penalty {
-  Constraint(ConstraintFcn fcn,
-      {super.nodes = Nodes.end, Map<String, dynamic>? arguments})
+  Constraint.generic(
+      {ConstraintFcn fcn = ConstraintFcn.timeConstraint,
+      super.nodes = Nodes.end,
+      Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
 }

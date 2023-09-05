@@ -45,8 +45,10 @@ class PenaltyExpander extends StatelessWidget {
             nodes: nodes ?? Nodes.end,
             arguments: arguments ?? {});
       case ConstraintFcn:
-        return Constraint(fcn as ConstraintFcn,
-            nodes: nodes ?? Nodes.end, arguments: arguments ?? {});
+        return Constraint.generic(
+            fcn: fcn as ConstraintFcn,
+            nodes: nodes ?? Nodes.end,
+            arguments: arguments ?? {});
       default:
         throw 'Wrong penalty type';
     }
@@ -58,8 +60,8 @@ class PenaltyExpander extends StatelessWidget {
         return OptimalControlProgramControllers.instance
             .objectives(phaseIndex: phaseIndex);
       case ConstraintFcn:
-        // TODO
-        throw 'Wrong penalty type';
+        return OptimalControlProgramControllers.instance
+            .constraints(phaseIndex: phaseIndex);
       default:
         throw 'Wrong penalty type';
     }

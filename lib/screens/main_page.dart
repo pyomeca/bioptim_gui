@@ -201,6 +201,12 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
             phaseIndex: phaseIndex,
             width: widget.width,
           ),
+          const Divider(),
+          PenaltyExpander(
+            penaltyType: ConstraintFcn,
+            phaseIndex: phaseIndex,
+            width: widget.width,
+          ),
         ],
       ),
     );

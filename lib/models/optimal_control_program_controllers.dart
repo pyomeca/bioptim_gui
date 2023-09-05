@@ -304,8 +304,8 @@ class OptimalControlProgramControllers {
   final List<List<_PenaltyTextEditingControllers>> _objectiveControllers = [];
 
   List<TextEditingController> getObjectiveArgumentsControllers(
-          {required int objectiveIndex, required int phaseIndex}) =>
-      _objectiveControllers[phaseIndex][objectiveIndex].arguments;
+          {required int penaltyIndex, required int phaseIndex}) =>
+      _objectiveControllers[phaseIndex][penaltyIndex].arguments;
 
   PenaltyInterface objectives({required int phaseIndex}) => PenaltyInterface(
       create: () => _createObjective(phaseIndex: phaseIndex),
@@ -353,6 +353,56 @@ class OptimalControlProgramControllers {
   }
 
   ///
+  /// Here are all the constraint methods
+  final List<List<_PenaltyTextEditingControllers>> _constraintControllers = [];
+
+  List<TextEditingController> getConstraintArgumentsControllers(
+          {required int penaltyIndex, required int phaseIndex}) =>
+      _constraintControllers[phaseIndex][penaltyIndex].arguments;
+
+  PenaltyInterface constraints({required int phaseIndex}) => PenaltyInterface(
+      create: () => _createConstraint(phaseIndex: phaseIndex),
+      fetch: ({required penaltyIndex}) =>
+          _getConstraints(phaseIndex: phaseIndex)[penaltyIndex],
+      fetchAll: () => _getConstraints(phaseIndex: phaseIndex),
+      update: (penalty, {required penaltyIndex}) => _updateConstraint(penalty,
+          penaltyIndex: penaltyIndex, phaseIndex: phaseIndex),
+      remove: ({required penaltyIndex}) =>
+          _removeConstraint(penaltyIndex: penaltyIndex, phaseIndex: phaseIndex),
+      argumentController: ({required penaltyIndex, required argumentIndex}) =>
+          _constraintControllers[phaseIndex][penaltyIndex]
+              .arguments[argumentIndex]);
+
+  List<Penalty> _getConstraints({required int phaseIndex}) =>
+      _ocp.phases[phaseIndex].constraints;
+
+  void _createConstraint({required int phaseIndex}) {
+    _ocp.phases[phaseIndex].constraints.add(Constraint.generic());
+    _constraintControllers[phaseIndex].add(_PenaltyTextEditingControllers(
+        _ocp.phases[phaseIndex].constraints.last));
+    _constraintControllers[phaseIndex].last._penalty =
+        _ocp.phases[phaseIndex].constraints.last;
+    _constraintControllers[phaseIndex].last._updateWeight();
+    _constraintControllers[phaseIndex].last._updateArguments();
+    _notifyListeners();
+  }
+
+  void _updateConstraint(Penalty penalty,
+      {required int penaltyIndex, required int phaseIndex}) {
+    _ocp.phases[phaseIndex].constraints[penaltyIndex] = penalty as Constraint;
+    _constraintControllers[phaseIndex][penaltyIndex]._penalty = penalty;
+    _constraintControllers[phaseIndex][penaltyIndex]._updateArguments();
+    _notifyListeners();
+  }
+
+  void _removeConstraint({required int penaltyIndex, required int phaseIndex}) {
+    _ocp.phases[phaseIndex].constraints.removeAt(penaltyIndex);
+    _constraintControllers[phaseIndex][penaltyIndex].dispose();
+    _constraintControllers[phaseIndex].removeAt(penaltyIndex);
+    _notifyListeners();
+  }
+
+  ///
   /// Here are the internal methods that ensures all the controllers are sane
   void _updateAllControllers() {
     _updateTextControllers(
@@ -370,6 +420,7 @@ class OptimalControlProgramControllers {
     _updateVariableController(_controls, from: DecisionVariableType.control);
 
     _updatePenaltyControllers(_objectiveControllers);
+    _updatePenaltyControllers(_constraintControllers);
   }
 
   void _updateTextControllers(List<TextEditingController> controllers,
