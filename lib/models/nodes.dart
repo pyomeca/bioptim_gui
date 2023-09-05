@@ -1,7 +1,8 @@
 enum Nodes {
   start,
   end,
-  all;
+  all,
+  allShooting;
 
   String toPythonString() {
     switch (this) {
@@ -11,6 +12,8 @@ enum Nodes {
         return 'Node.END';
       case all:
         return 'Node.ALL';
+      case allShooting:
+        return 'Node.ALL_SHOOTING';
     }
   }
 
@@ -23,6 +26,8 @@ enum Nodes {
         return 'Last node';
       case all:
         return 'All nodes';
+      case allShooting:
+        return 'All shooting nodes';
     }
   }
 }

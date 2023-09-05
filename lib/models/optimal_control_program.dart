@@ -212,9 +212,9 @@ class OptimalControlProgram {
             '    objective_functions.add(\n'
             '        objective=${objective.fcn.toPythonString()},\n'
             '${objective.arguments.keys.isEmpty ? '' : '${objective.arguments.keys.map((key) => '        ${objective.argumentToPythonString(key)},').join('\n')}\n'}'
-            '        node=${objective.nodes.toPythonString()}\n'
+            '        node=${objective.nodes.toPythonString()},\n'
             '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
-            '        weight=${objective.weight}\n'
+            '        weight=${objective.weight},\n'
             '    )\n',
             mode: FileMode.append);
       }
@@ -223,7 +223,7 @@ class OptimalControlProgram {
             '    constraints.add(\n'
             '        constraint=${constraint.fcn.toPythonString()},\n'
             '${constraint.arguments.keys.isEmpty ? '' : '${constraint.arguments.keys.map((key) => '        ${constraint.argumentToPythonString(key)},').join('\n')}\n'}'
-            '        node=${constraint.nodes.toPythonString()}\n'
+            '        node=${constraint.nodes.toPythonString()},\n'
             '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
             '    )\n',
             mode: FileMode.append);
@@ -271,8 +271,8 @@ class OptimalControlProgram {
               mode: FileMode.append);
         }
       }
+      file.writeAsStringSync('\n', mode: FileMode.append);
     }
-    file.writeAsStringSync('\n', mode: FileMode.append);
 
     // Write the return section
     file.writeAsStringSync(

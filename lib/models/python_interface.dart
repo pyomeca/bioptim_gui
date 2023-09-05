@@ -118,6 +118,8 @@ class PythonInterface {
   void _logProcess(String functionName, ProcessResult result) {
     if (result.exitCode != 0) {
       log('$functionName failed with error:\n${result.stderr}');
+    } else {
+      log('$functionName success');
     }
   }
 
