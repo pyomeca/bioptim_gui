@@ -1,15 +1,17 @@
 import 'dart:convert';
 
-import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
+import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
+import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/models/python_interface.dart';
 import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
 import 'package:bioptim_gui/widgets/bio_model_chooser.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
+import 'package:bioptim_gui/widgets/decision_variable_expander.dart';
 import 'package:bioptim_gui/widgets/dynamics_chooser.dart';
 import 'package:bioptim_gui/widgets/number_of_phases_chooser.dart';
 import 'package:bioptim_gui/widgets/optimal_control_program_type_chooser.dart';
-import 'package:bioptim_gui/widgets/decision_variable_expander.dart';
+import 'package:bioptim_gui/widgets/penalty_expander.dart';
 import 'package:bioptim_gui/widgets/phase_information.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -189,6 +191,13 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
           const Divider(),
           DecisionVariableExpander(
             from: DecisionVariableType.control,
+            phaseIndex: phaseIndex,
+            width: widget.width,
+          ),
+          const SizedBox(height: 12),
+          const Divider(),
+          PenaltyExpander(
+            penaltyType: ObjectiveFcn,
             phaseIndex: phaseIndex,
             width: widget.width,
           ),

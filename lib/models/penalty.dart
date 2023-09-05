@@ -1,7 +1,48 @@
-mixin _PenaltyFcn {
+import 'package:bioptim_gui/models/nodes.dart';
+
+enum PenaltyArgumentType {
+  integer,
+  float,
+  string;
+
+  @override
+  String toString() {
+    switch (this) {
+      case integer:
+        return 'Integer';
+      case float:
+        return 'Float';
+      case string:
+        return 'String';
+    }
+  }
+
+  RegExp get regexpValidator {
+    switch (this) {
+      case integer:
+        return RegExp(r'[0-9]');
+      case float:
+        return RegExp(r'[0-9\.]');
+      case string:
+        return RegExp(r'[a-zA-Z]');
+    }
+  }
+}
+
+class PenaltyArgument {
+  final String name;
+  final PenaltyArgumentType dataType;
+  const PenaltyArgument({required this.name, required this.dataType});
+}
+
+mixin PenaltyFcn {
   ///
   /// The objective function as it should be written in Python
   String toPythonString();
+
+  ///
+  /// Interface to [values]
+  List<PenaltyFcn> get fcnValues;
 
   ///
   /// The type of penalty (Mayer, Lagrange or Constraint)
@@ -13,25 +54,33 @@ mixin _PenaltyFcn {
 
   ///
   /// The list of mandatory arguments in this objective function
-  List<String> get mandatoryArguments;
+  List<PenaltyArgument> get mandatoryArguments;
 }
 
-mixin ObjectiveFcn implements _PenaltyFcn {}
+mixin ObjectiveFcn implements PenaltyFcn {}
 
 enum LagrangeFcn implements ObjectiveFcn {
-  minimizeControls;
+  minimizeControls,
+  minimizeStates;
+
+  @override
+  List<PenaltyFcn> get fcnValues {
+    return LagrangeFcn.values;
+  }
 
   @override
   String get penaltyTypeToString => 'Lagrange';
 
   @override
-  String get penaltyType => 'objective';
+  String get penaltyType => 'Objective';
 
   @override
   String toString() {
     switch (this) {
       case minimizeControls:
-        return 'Minimize control';
+        return 'Minimize controls';
+      case minimizeStates:
+        return 'Minimize states';
     }
   }
 
@@ -40,26 +89,41 @@ enum LagrangeFcn implements ObjectiveFcn {
     switch (this) {
       case minimizeControls:
         return 'ObjectiveFcn.Lagrange.MINIMIZE_CONTROL';
+      case minimizeStates:
+        return 'ObjectiveFcn.Lagrange.MINIMIZE_STATE';
     }
   }
 
   @override
-  List<String> get mandatoryArguments {
+  List<PenaltyArgument> get mandatoryArguments {
     switch (this) {
       case minimizeControls:
-        return ['key'];
+        return [
+          const PenaltyArgument(
+              name: 'key', dataType: PenaltyArgumentType.string),
+        ];
+      case minimizeStates:
+        return [
+          const PenaltyArgument(
+              name: 'key', dataType: PenaltyArgumentType.string),
+        ];
     }
   }
 }
 
-enum MayerFcn implements _PenaltyFcn {
+enum MayerFcn implements ObjectiveFcn {
   minimizeTime;
+
+  @override
+  List<PenaltyFcn> get fcnValues {
+    return MayerFcn.values;
+  }
 
   @override
   String get penaltyTypeToString => 'Mayer';
 
   @override
-  String get penaltyType => 'objective';
+  String get penaltyType => 'Objective';
 
   @override
   String toString() {
@@ -78,7 +142,7 @@ enum MayerFcn implements _PenaltyFcn {
   }
 
   @override
-  List<String> get mandatoryArguments {
+  List<PenaltyArgument> get mandatoryArguments {
     switch (this) {
       case minimizeTime:
         return [];
@@ -86,14 +150,19 @@ enum MayerFcn implements _PenaltyFcn {
   }
 }
 
-enum ConstraintFcn implements _PenaltyFcn {
+enum ConstraintFcn implements PenaltyFcn {
   timeConstraint;
+
+  @override
+  List<PenaltyFcn> get fcnValues {
+    return ConstraintFcn.values;
+  }
 
   @override
   String get penaltyTypeToString => 'Constraint';
 
   @override
-  String get penaltyType => 'constraint';
+  String get penaltyType => 'Constraint';
 
   @override
   String toString() {
@@ -112,7 +181,7 @@ enum ConstraintFcn implements _PenaltyFcn {
   }
 
   @override
-  List<String> get mandatoryArguments {
+  List<PenaltyArgument> get mandatoryArguments {
     switch (this) {
       case timeConstraint:
         return [];
@@ -120,9 +189,11 @@ enum ConstraintFcn implements _PenaltyFcn {
   }
 }
 
-class _Penalty {
-  final _PenaltyFcn fcn;
+abstract class Penalty {
+  final PenaltyFcn fcn;
   final Map<String, dynamic> _arguments;
+
+  final Nodes nodes;
 
   Iterable<String> get argumentKeys => _arguments.keys;
 
@@ -139,22 +210,29 @@ class _Penalty {
     }
   }
 
-  _Penalty(this.fcn, {required Map<String, dynamic> arguments})
+  Penalty(this.fcn,
+      {required this.nodes, required Map<String, dynamic> arguments})
       : _arguments = arguments {
+    final argumentNames = fcn.mandatoryArguments.map((e) => e.name);
+
     for (final argument in _arguments.keys) {
-      if (!fcn.mandatoryArguments.contains(argument)) {
+      if (!argumentNames.contains(argument)) {
         throw 'The ${fcn.penaltyType} $fcn requires $argument';
       }
     }
   }
 }
 
-class Objective extends _Penalty {
-  Objective(ObjectiveFcn fcn, {required Map<String, dynamic> arguments})
-      : super(fcn, arguments: arguments);
+class Objective extends Penalty {
+  double weight;
+
+  Objective(ObjectiveFcn fcn,
+      {required super.nodes, required this.weight, required super.arguments})
+      : super(fcn);
 }
 
-class Constraint extends _Penalty {
-  Constraint(ConstraintFcn fcn, {required Map<String, dynamic> arguments})
-      : super(fcn, arguments: arguments);
+class Constraint extends Penalty {
+  Constraint(ConstraintFcn fcn,
+      {required super.nodes, required super.arguments})
+      : super(fcn);
 }

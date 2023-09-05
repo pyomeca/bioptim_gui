@@ -30,7 +30,7 @@ class DecisionVariableExpander extends StatelessWidget {
         child: Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            '${from.name} variables',
+            '$from variables',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),

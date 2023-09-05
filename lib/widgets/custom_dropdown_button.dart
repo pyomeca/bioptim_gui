@@ -6,12 +6,12 @@ class CustomDropdownButton<T extends Object> extends StatelessWidget {
     this.title,
     required this.value,
     required this.items,
-    required this.onSelected,
+    this.onSelected,
     this.isExpanded = false,
   });
 
   final T value;
-  final Function(T) onSelected;
+  final Function(T)? onSelected;
   final String? title;
   final List<T> items;
   final bool isExpanded;
@@ -30,7 +30,7 @@ class CustomDropdownButton<T extends Object> extends StatelessWidget {
       items: items
           .map((e) => DropdownMenuItem(value: e, child: Text(e.toString())))
           .toList(),
-      onChanged: (value) => onSelected(value!),
+      onChanged: onSelected == null ? null : (value) => onSelected!(value!),
       dropdownColor: Colors.white,
     );
   }
