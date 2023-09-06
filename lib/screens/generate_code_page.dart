@@ -23,10 +23,10 @@ class GenerateCode extends StatefulWidget {
   final double columnWidth;
 
   @override
-  State<GenerateCode> createState() => _MainPageState();
+  State<GenerateCode> createState() => _GenerateCodeState();
 }
 
-class _MainPageState extends State<GenerateCode> {
+class _GenerateCodeState extends State<GenerateCode> {
   final _verticalScroll = ScrollController();
   final _trailingKey = GlobalKey<_BuildTraillingState>();
 
