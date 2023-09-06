@@ -17,16 +17,16 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
-class MainPage extends StatefulWidget {
-  const MainPage({super.key, this.columnWidth = 400.0});
+class GenerateCode extends StatefulWidget {
+  const GenerateCode({super.key, this.columnWidth = 400.0});
 
   final double columnWidth;
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<GenerateCode> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<GenerateCode> {
   final _verticalScroll = ScrollController();
   final _trailingKey = GlobalKey<_BuildTraillingState>();
 
@@ -52,10 +52,6 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Bioptim code generator'),
-      ),
       body: RawScrollbar(
         controller: _verticalScroll,
         thumbVisibility: true,
