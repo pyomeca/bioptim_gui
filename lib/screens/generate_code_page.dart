@@ -1,9 +1,10 @@
 import 'dart:convert';
-
 import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
+import 'package:bioptim_gui/models/optimal_control_program_type.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/models/python_interface.dart';
+import 'package:bioptim_gui/widgets/acrobatic_informations.dart';
 import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
 import 'package:bioptim_gui/widgets/bio_model_chooser.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
@@ -91,12 +92,15 @@ class _HeaderBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controllers = OptimalControlProgramControllers.instance;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         OptimalControlProgramTypeChooser(width: width),
         const SizedBox(height: 12),
-        NumberOfPhasesChooser(width: width),
+        if (controllers.ocpType == OptimalControlProgramType.ocp)
+          NumberOfPhasesChooser(width: width),
       ],
     );
   }
@@ -137,14 +141,42 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            for (int i = 0; i < controllers.nbPhases; i++)
+            if (controllers.ocpType == OptimalControlProgramType.ocp)
+              for (int i = 0; i < controllers.nbPhases; i++)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 36),
+                  child: SizedBox(
+                      width: widget.width, child: _buildPhase(phaseIndex: i)),
+                ),
+            if (controllers.ocpType == OptimalControlProgramType.abrobaticsOCP)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 36),
-                child: SizedBox(
-                    width: widget.width, child: _buildPhase(phaseIndex: i)),
+                child:
+                    SizedBox(width: widget.width, child: _buildAcrobaticMenu()),
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAcrobaticMenu() {
+    final controllers = OptimalControlProgramControllers.instance;
+
+    return const AnimatedExpandingWidget(
+      header: Center(
+        child: Text(
+          'Information on the acrobatic',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ),
+      initialExpandedState: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 24),
+          AcrobaticInformation(width: 400),
+        ],
       ),
     );
   }
