@@ -11,6 +11,7 @@ import 'package:bioptim_gui/widgets/console_out.dart';
 import 'package:bioptim_gui/widgets/decision_variable_expander.dart';
 import 'package:bioptim_gui/widgets/dynamics_chooser.dart';
 import 'package:bioptim_gui/widgets/number_of_phases_chooser.dart';
+import 'package:bioptim_gui/widgets/number_of_somersaults_chooser.dart';
 import 'package:bioptim_gui/widgets/optimal_control_program_type_chooser.dart';
 import 'package:bioptim_gui/widgets/penalty_expander.dart';
 import 'package:bioptim_gui/widgets/phase_information.dart';
@@ -101,6 +102,8 @@ class _HeaderBuilder extends StatelessWidget {
         const SizedBox(height: 12),
         if (controllers.ocpType == OptimalControlProgramType.ocp)
           NumberOfPhasesChooser(width: width),
+        if (controllers.ocpType == OptimalControlProgramType.abrobaticsOCP)
+          NumberOfSomersaultsChooser(width: width),
       ],
     );
   }
@@ -149,25 +152,29 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
                       width: widget.width, child: _buildPhase(phaseIndex: i)),
                 ),
             if (controllers.ocpType == OptimalControlProgramType.abrobaticsOCP)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 36),
-                child:
-                    SizedBox(width: widget.width, child: _buildAcrobaticMenu()),
-              ),
+              for (int i = 0; i < controllers.nbPhases; i++)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 36),
+                  child: SizedBox(
+                      width: widget.width,
+                      child: _buildSomersault(somersaultIndex: i)),
+                ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAcrobaticMenu() {
+  Widget _buildSomersault({required int somersaultIndex}) {
     final controllers = OptimalControlProgramControllers.instance;
 
-    return const AnimatedExpandingWidget(
+    return AnimatedExpandingWidget(
       header: Center(
         child: Text(
-          'Information on the acrobatic',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          controllers.nbPhases > 1
+              ? 'Information on somersault ${somersaultIndex + 1}'
+              : 'Information on the somersault',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
       initialExpandedState: true,
@@ -175,7 +182,10 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 24),
-          AcrobaticInformation(width: 400),
+          BioModelChooser(phaseIndex: somersaultIndex),
+          const SizedBox(height: 24),
+          AcrobaticsInformation(
+              somersaultIndex: somersaultIndex, width: widget.width),
         ],
       ),
     );
