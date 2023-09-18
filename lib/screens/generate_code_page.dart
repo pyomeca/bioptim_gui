@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'package:bioptim_gui/models/acrobatics_ocp_controllers.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/models/optimal_control_program_type.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/models/python_interface.dart';
-import 'package:bioptim_gui/widgets/acrobatic_informations.dart';
+import 'package:bioptim_gui/widgets/somersault_informations.dart';
 import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
 import 'package:bioptim_gui/widgets/bio_model_chooser.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
@@ -44,6 +45,7 @@ class _GenerateCodeState extends State<GenerateCode> {
     PythonInterface.instance.registerToStatusChanged((status) => forceRedraw());
     OptimalControlProgramControllers.instance
         .registerToStatusChanged(forceRedraw);
+    AcrobaticsOCPControllers.instance.registerToStatusChanged(forceRedraw);
   }
 
   void forceRedraw() {
@@ -130,6 +132,7 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
   @override
   Widget build(BuildContext context) {
     final controllers = OptimalControlProgramControllers.instance;
+    final acrobaticsControllers = AcrobaticsOCPControllers.instance;
 
     return RawScrollbar(
       controller: _horizontalScroll,
@@ -152,7 +155,7 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
                       width: widget.width, child: _buildPhase(phaseIndex: i)),
                 ),
             if (controllers.ocpType == OptimalControlProgramType.abrobaticsOCP)
-              for (int i = 0; i < controllers.nbPhases; i++)
+              for (int i = 0; i < acrobaticsControllers.nbSomersaults; i++)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 36),
                   child: SizedBox(
@@ -166,12 +169,12 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
   }
 
   Widget _buildSomersault({required int somersaultIndex}) {
-    final controllers = OptimalControlProgramControllers.instance;
+    final controllers = AcrobaticsOCPControllers.instance;
 
     return AnimatedExpandingWidget(
       header: Center(
         child: Text(
-          controllers.nbPhases > 1
+          controllers.nbSomersaults > 1
               ? 'Information on somersault ${somersaultIndex + 1}'
               : 'Information on the somersault',
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -182,9 +185,7 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 24),
-          BioModelChooser(phaseIndex: somersaultIndex),
-          const SizedBox(height: 24),
-          AcrobaticsInformation(
+          SomersaultInformation(
               somersaultIndex: somersaultIndex, width: widget.width),
         ],
       ),
