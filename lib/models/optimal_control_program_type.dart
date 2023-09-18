@@ -18,7 +18,7 @@ enum OptimalControlProgramType {
       case ocp:
         return 'OptimalControlProgram';
       case abrobaticsOCP:
-        return 'AbrobaticsOptimalControlProgram'; // TODO check if right String
+        return 'OptimalControlProgram';
     }
   }
 }
