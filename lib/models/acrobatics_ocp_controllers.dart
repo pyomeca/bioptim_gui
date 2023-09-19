@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:bioptim_gui/models/acrobatics_ocp.dart';
 import 'package:bioptim_gui/models/acrobatics_position.dart';
 import 'package:bioptim_gui/models/acrobatics_sport_type.dart';
+import 'package:bioptim_gui/models/acrobatics_twist_side.dart';
 import 'package:bioptim_gui/models/bio_model.dart';
 import 'package:bioptim_gui/models/dynamics.dart';
 import 'package:bioptim_gui/models/matrix.dart';
@@ -203,10 +204,18 @@ class AcrobaticsOCPControllers {
   }
 
   ///
-  /// All methods related to controlling the acrobatics position
+  /// All methods related to controlling the sport type
   AcrobaticsSportType get sportType => _ocp.generic.sportType;
   void setSportType(AcrobaticsSportType value) {
     _ocp.generic.sportType = value;
+    _notifyListeners();
+  }
+
+  ///
+  /// All methods related to controlling the twist side
+  PreferredTwistSide get preferredTwistSide => _ocp.generic.preferredTwistSide;
+  void setPreferredTwistSide(PreferredTwistSide value) {
+    _ocp.generic.preferredTwistSide = value;
     _notifyListeners();
   }
 

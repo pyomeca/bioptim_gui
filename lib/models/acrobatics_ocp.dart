@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:bioptim_gui/models/acrobatics_ocp_config.dart';
+import 'package:bioptim_gui/models/acrobatics_twist_side.dart';
 import 'package:bioptim_gui/models/dynamics.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/global.dart';
@@ -197,6 +198,8 @@ class AcrobaticsOCPProgram {
               somersaults[i].nbHalfTwists.toString()
           ]}';
 
+    final preferredTwistSide = generic.preferredTwistSide.toPythonString();
+
     final durationAsString = nSomersaults == 1
         ? somersaults[0].duration.toString()
         : '${[
@@ -222,7 +225,7 @@ class AcrobaticsOCPProgram {
         '    final_time_margin = $finalTimeMarginAsString\n'
         '    n_somersault = $nSomersaultsAsString\n'
         '    n_half_twist = $nHalfTwistsAsString\n'
-        '    preferred_twist_side = PreferredTwistSide.LEFT\n'
+        '    preferred_twist_side = $preferredTwistSide\n'
         '    somersault_direction = (\n'
         '        SomersaultDirection.BACKWARD\n'
         '        if n_half_twist % 2 == 0\n'

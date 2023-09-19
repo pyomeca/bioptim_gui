@@ -6,6 +6,7 @@ import 'package:bioptim_gui/models/python_interface.dart';
 import 'package:bioptim_gui/widgets/acrobatic_bio_model_chooser.dart';
 import 'package:bioptim_gui/widgets/acrobatic_position_chooser.dart';
 import 'package:bioptim_gui/widgets/acrobatic_sport_type_chooser.dart';
+import 'package:bioptim_gui/widgets/acrobatic_twist_side_chooser.dart';
 import 'package:bioptim_gui/widgets/generate_phases.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
 import 'package:bioptim_gui/widgets/generate_somersaults.dart';
@@ -150,7 +151,19 @@ class _AcrobaticsHeaderBuilder extends StatelessWidget {
         const SizedBox(height: 12),
         AcrobaticInformation(width: width),
         const SizedBox(height: 12),
-        AcrobaticPositionChooser(width: width),
+        Row(
+          children: [
+            SizedBox(
+              width: width / 2 - 6,
+              child: AcrobaticTwistSideChooser(width: width),
+            ),
+            const SizedBox(width: 12),
+            SizedBox(
+              width: width / 2 - 6,
+              child: AcrobaticPositionChooser(width: width),
+            ),
+          ],
+        ),
       ],
     );
   }

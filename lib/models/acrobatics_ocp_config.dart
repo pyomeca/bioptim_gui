@@ -1,5 +1,6 @@
 import 'package:bioptim_gui/models/acrobatics_position.dart';
 import 'package:bioptim_gui/models/acrobatics_sport_type.dart';
+import 'package:bioptim_gui/models/acrobatics_twist_side.dart';
 import 'package:bioptim_gui/models/bio_model.dart';
 
 class AcrobaticsOptimalControlProgram {
@@ -9,6 +10,7 @@ class AcrobaticsOptimalControlProgram {
   double finalTimeMargin;
   AcrobaticsPosition position;
   AcrobaticsSportType sportType;
+  PreferredTwistSide preferredTwistSide;
 
   AcrobaticsOptimalControlProgram({
     this.nbSomersaults = 1,
@@ -17,5 +19,6 @@ class AcrobaticsOptimalControlProgram {
     this.finalTimeMargin = 0.1,
     this.position = AcrobaticsPosition.straight,
     this.sportType = AcrobaticsSportType.trampoline,
+    this.preferredTwistSide = PreferredTwistSide.left,
   });
 }
