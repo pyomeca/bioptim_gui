@@ -4,6 +4,8 @@ import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/models/optimal_control_program_type.dart';
 import 'package:bioptim_gui/models/python_interface.dart';
 import 'package:bioptim_gui/widgets/acrobatic_bio_model_chooser.dart';
+import 'package:bioptim_gui/widgets/acrobatic_position_chooser.dart';
+import 'package:bioptim_gui/widgets/acrobatic_sport_type_chooser.dart';
 import 'package:bioptim_gui/widgets/generate_phases.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
 import 'package:bioptim_gui/widgets/generate_somersaults.dart';
@@ -142,12 +144,13 @@ class _AcrobaticsHeaderBuilder extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: width,
-          child: AcrobaticBioModelChooser(width: width),
-        ),
+        AcrobaticSportTypeChooser(width: width),
+        const SizedBox(height: 12),
+        AcrobaticBioModelChooser(width: width),
         const SizedBox(height: 12),
         AcrobaticInformation(width: width),
+        const SizedBox(height: 12),
+        AcrobaticPositionChooser(width: width),
       ],
     );
   }
