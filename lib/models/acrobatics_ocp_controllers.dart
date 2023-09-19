@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:bioptim_gui/models/acrobatics_ocp.dart';
+import 'package:bioptim_gui/models/bio_model.dart';
 import 'package:bioptim_gui/models/dynamics.dart';
 import 'package:bioptim_gui/models/matrix.dart';
-import 'package:bioptim_gui/models/optimal_control_program_type.dart';
 import 'package:bioptim_gui/models/optimal_control_program.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/penalty.dart';
@@ -68,14 +68,6 @@ class AcrobaticsOCPControllers {
   }
 
   ///
-  /// All methods related to controlling the ocp type
-  OptimalControlProgramType get ocpType => _ocp.generic.ocpType;
-  void setOcpType(OptimalControlProgramType value) {
-    _ocp.generic.ocpType = value;
-    _notifyListeners();
-  }
-
-  ///
   /// All methods related to controlling the number of somersaults
   late final nbSomersaultsController = TextEditingController(text: '1')
     ..addListener(_nbSomersaultsControllerListener);
@@ -93,6 +85,22 @@ class AcrobaticsOCPControllers {
       _updateAllControllers();
       _notifyListeners();
     });
+  }
+
+  ///
+  /// All the methods related to the dynamic model
+  BioModel getBioModel() => _ocp.generic.bioModel;
+  void setBioModel(BioModel value) {
+    _ocp.generic.bioModel = value;
+    _notifyListeners();
+  }
+
+  ///
+  /// All the methods related to the model path
+  String getModelPath() => _ocp.generic.modelPath;
+  void setModelPath(String value) {
+    _ocp.generic.modelPath = value;
+    _notifyListeners();
   }
 
   void _nbSomersaultsControllerListener() {
