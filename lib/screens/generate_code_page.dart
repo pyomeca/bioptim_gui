@@ -1,21 +1,15 @@
 import 'dart:convert';
 import 'package:bioptim_gui/models/acrobatics_ocp_controllers.dart';
-import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/models/optimal_control_program_type.dart';
-import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/models/python_interface.dart';
-import 'package:bioptim_gui/widgets/somersault_informations.dart';
-import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
-import 'package:bioptim_gui/widgets/bio_model_chooser.dart';
+import 'package:bioptim_gui/widgets/acrobatic_bio_model_chooser.dart';
+import 'package:bioptim_gui/widgets/generate_phases.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
-import 'package:bioptim_gui/widgets/decision_variable_expander.dart';
-import 'package:bioptim_gui/widgets/dynamics_chooser.dart';
+import 'package:bioptim_gui/widgets/generate_somersaults.dart';
 import 'package:bioptim_gui/widgets/number_of_phases_chooser.dart';
 import 'package:bioptim_gui/widgets/number_of_somersaults_chooser.dart';
 import 'package:bioptim_gui/widgets/optimal_control_program_type_chooser.dart';
-import 'package:bioptim_gui/widgets/penalty_expander.dart';
-import 'package:bioptim_gui/widgets/phase_information.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -105,6 +99,11 @@ class _HeaderBuilder extends StatelessWidget {
         if (controllers.ocpType == OptimalControlProgramType.ocp)
           NumberOfPhasesChooser(width: width),
         if (controllers.ocpType == OptimalControlProgramType.abrobaticsOCP)
+          SizedBox(
+            width: width,
+            child: AcrobaticBioModelChooser(width: width),
+          ),
+        if (controllers.ocpType == OptimalControlProgramType.abrobaticsOCP)
           NumberOfSomersaultsChooser(width: width),
       ],
     );
@@ -132,8 +131,6 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
   @override
   Widget build(BuildContext context) {
     final controllers = OptimalControlProgramControllers.instance;
-    final acrobaticsControllers = AcrobaticsOCPControllers.instance;
-
     return RawScrollbar(
       controller: _horizontalScroll,
       thumbVisibility: true,
@@ -144,106 +141,15 @@ class _PhaseBuilderState extends State<_PhaseBuilder> {
         controller: _horizontalScroll,
         scrollDirection: Axis.horizontal,
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (controllers.ocpType == OptimalControlProgramType.ocp)
-              for (int i = 0; i < controllers.nbPhases; i++)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 36),
-                  child: SizedBox(
-                      width: widget.width, child: _buildPhase(phaseIndex: i)),
-                ),
-            if (controllers.ocpType == OptimalControlProgramType.abrobaticsOCP)
-              for (int i = 0; i < acrobaticsControllers.nbSomersaults; i++)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 36),
-                  child: SizedBox(
-                      width: widget.width,
-                      child: _buildSomersault(somersaultIndex: i)),
-                ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSomersault({required int somersaultIndex}) {
-    final controllers = AcrobaticsOCPControllers.instance;
-
-    return AnimatedExpandingWidget(
-      header: Center(
-        child: Text(
-          controllers.nbSomersaults > 1
-              ? 'Information on somersault ${somersaultIndex + 1}'
-              : 'Information on the somersault',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-      ),
-      initialExpandedState: true,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 24),
-          SomersaultInformation(
-              somersaultIndex: somersaultIndex, width: widget.width),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPhase({required int phaseIndex}) {
-    final controllers = OptimalControlProgramControllers.instance;
-
-    return AnimatedExpandingWidget(
-      header: Center(
-        child: Text(
-          controllers.nbPhases > 1
-              ? 'Information on phase ${phaseIndex + 1}'
-              : 'Information on the phase',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-      ),
-      initialExpandedState: true,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 24),
-          BioModelChooser(phaseIndex: phaseIndex),
-          const SizedBox(height: 12),
-          PhaseInformation(phaseIndex: phaseIndex, width: widget.width),
-          const SizedBox(height: 12),
-          DynamicsChooser(
-            phaseIndex: phaseIndex,
-            width: widget.width,
-          ),
-          const SizedBox(height: 12),
-          const Divider(),
-          DecisionVariableExpander(
-              from: DecisionVariableType.state,
-              phaseIndex: phaseIndex,
-              width: widget.width),
-          const SizedBox(height: 12),
-          const Divider(),
-          DecisionVariableExpander(
-            from: DecisionVariableType.control,
-            phaseIndex: phaseIndex,
-            width: widget.width,
-          ),
-          const SizedBox(height: 12),
-          const Divider(),
-          PenaltyExpander(
-            penaltyType: ObjectiveFcn,
-            phaseIndex: phaseIndex,
-            width: widget.width,
-          ),
-          const Divider(),
-          PenaltyExpander(
-            penaltyType: ConstraintFcn,
-            phaseIndex: phaseIndex,
-            width: widget.width,
-          ),
-        ],
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (controllers.ocpType == OptimalControlProgramType.ocp)
+                PhaseGenerationMenu(width: widget.width),
+              if (controllers.ocpType ==
+                  OptimalControlProgramType.abrobaticsOCP)
+                SomersaultGenerationMenu(width: widget.width),
+            ]),
       ),
     );
   }
