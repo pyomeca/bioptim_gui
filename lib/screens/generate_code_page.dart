@@ -8,7 +8,7 @@ import 'package:bioptim_gui/widgets/generate_phases.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
 import 'package:bioptim_gui/widgets/generate_somersaults.dart';
 import 'package:bioptim_gui/widgets/number_of_phases_chooser.dart';
-import 'package:bioptim_gui/widgets/number_of_somersaults_chooser.dart';
+import 'package:bioptim_gui/widgets/acrobatic_information.dart';
 import 'package:bioptim_gui/widgets/optimal_control_program_type_chooser.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -91,20 +91,63 @@ class _HeaderBuilder extends StatelessWidget {
   Widget build(BuildContext context) {
     final controllers = OptimalControlProgramControllers.instance;
 
+    return Center(
+      child: SizedBox(
+        width: width,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            OptimalControlProgramTypeChooser(width: width),
+            const SizedBox(height: 12),
+            if (controllers.ocpType == OptimalControlProgramType.ocp)
+              _GenericOCPHeaderBuilder(width: width)
+            else if (controllers.ocpType ==
+                OptimalControlProgramType.abrobaticsOCP)
+              _AcrobaticsHeaderBuilder(width: width),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GenericOCPHeaderBuilder extends StatelessWidget {
+  const _GenericOCPHeaderBuilder({
+    required this.width,
+  });
+
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        OptimalControlProgramTypeChooser(width: width),
         const SizedBox(height: 12),
-        if (controllers.ocpType == OptimalControlProgramType.ocp)
-          NumberOfPhasesChooser(width: width),
-        if (controllers.ocpType == OptimalControlProgramType.abrobaticsOCP)
-          SizedBox(
-            width: width,
-            child: AcrobaticBioModelChooser(width: width),
-          ),
-        if (controllers.ocpType == OptimalControlProgramType.abrobaticsOCP)
-          NumberOfSomersaultsChooser(width: width),
+        NumberOfPhasesChooser(width: width),
+      ],
+    );
+  }
+}
+
+class _AcrobaticsHeaderBuilder extends StatelessWidget {
+  const _AcrobaticsHeaderBuilder({
+    required this.width,
+  });
+
+  final double width;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: width,
+          child: AcrobaticBioModelChooser(width: width),
+        ),
+        const SizedBox(height: 12),
+        AcrobaticInformation(width: width),
       ],
     );
   }

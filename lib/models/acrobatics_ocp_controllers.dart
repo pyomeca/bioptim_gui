@@ -87,6 +87,12 @@ class AcrobaticsOCPControllers {
     });
   }
 
+  void _nbSomersaultsControllerListener() {
+    final tp = int.tryParse(nbSomersaultsController.text);
+    if (tp == null || tp < 1 || tp == nbSomersaults) return;
+    setNbSomersaults(tp);
+  }
+
   ///
   /// All the methods related to the dynamic model
   BioModel getBioModel() => _ocp.generic.bioModel;
@@ -103,10 +109,24 @@ class AcrobaticsOCPControllers {
     _notifyListeners();
   }
 
-  void _nbSomersaultsControllerListener() {
-    final tp = int.tryParse(nbSomersaultsController.text);
-    if (tp == null || tp < 1 || tp == nbSomersaults) return;
-    setNbSomersaults(tp);
+  ///
+  /// All the methods related to the final time margin
+  late final finalTimeMarginController = TextEditingController(text: '0.1')
+    ..addListener(_finalTimeControllerControllerListener);
+  double get finalTimeMargin => _ocp.generic.finalTimeMargin;
+  void setFinalTimeMargin(double value) {
+    _ocp.generic.finalTimeMargin = value;
+    // Wait for one frame so the the UI is updated
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _updateAllControllers();
+      _notifyListeners();
+    });
+  }
+
+  void _finalTimeControllerControllerListener() {
+    final tp = double.tryParse(finalTimeMarginController.text);
+    if (tp == null) return;
+    setFinalTimeMargin(tp);
   }
 
   ///
