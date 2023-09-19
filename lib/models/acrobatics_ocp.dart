@@ -1,10 +1,13 @@
+import 'dart:io';
+
 import 'package:bioptim_gui/models/acrobatics_ocp_config.dart';
 import 'package:bioptim_gui/models/dynamics.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
+import 'package:bioptim_gui/models/global.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 
 class _Somersault {
-  int phaseIndex;
+  int somersaultIndex;
   int nbShootingPoints;
   int nbHalfTwists;
   double duration;
@@ -19,7 +22,7 @@ class _Somersault {
       DecisionVariables(DecisionVariableType.control);
 
   _Somersault({
-    required this.phaseIndex,
+    required this.somersaultIndex,
     required this.nbShootingPoints,
     required this.nbHalfTwists,
     required this.duration,
@@ -53,7 +56,7 @@ class AcrobaticsOCPProgram {
     if (somersaults.length < generic.nbSomersaults) {
       for (int i = somersaults.length; i < generic.nbSomersaults; i++) {
         somersaults.add(_Somersault(
-            phaseIndex: i,
+            somersaultIndex: i,
             duration: 1.0,
             nbShootingPoints: 50,
             nbHalfTwists: 0,
@@ -123,191 +126,492 @@ class AcrobaticsOCPProgram {
   ///
   /// Main interface
 
-  void exportScript(String path) {}
-  //   _hasPendingChangesToBeExported = false;
-  //   final file = File(path);
+  void exportScript(String path) {
+    _hasPendingChangesToBeExported = false;
+    final file = File(path);
 
-  //   // Write the header
-  //   file.writeAsStringSync('"""\n'
-  //       'This file was automatically generated using BioptimGUI version $biotimGuiVersion\n'
-  //       '"""\n'
-  //       '\n'
-  //       'from bioptim import *  # TODO Pariterre - Do not import "*"\n'
-  //       '\n'
-  //       '\n');
+    // Write the header
+    file.writeAsStringSync('"""\n'
+        'This file was automatically generated using BioptimGUI version $biotimGuiVersion\n'
+        '"""\n'
+        '\n'
+        'import pickle as pkl\n'
+        '\n'
+        'import numpy as np\n'
+        'from bioptim import (\n'
+        '    BiorbdModel,\n'
+        '    OptimalControlProgram,\n'
+        '    DynamicsList,\n'
+        '    DynamicsFcn,\n'
+        '    BoundsList,\n'
+        '    InitialGuessList,\n'
+        '    ObjectiveList,\n'
+        '    ObjectiveFcn,\n'
+        '    ConstraintList,\n'
+        '    InterpolationType,\n'
+        '    BiMappingList,\n'
+        '    Solver,\n'
+        '    Node,\n'
+        ')\n'
+        'from casadi import MX, Function\n'
+        '\n'
+        '\n');
 
-  //   // Write the docstring of the prepare_ocp section
-  //   file.writeAsStringSync(
-  //       'def prepare_ocp():\n'
-  //       '    """\n'
-  //       '    This function build an optimal control program and instantiate it.\n'
-  //       '    It can be seen as a factory for the OptimalControlProgram class.\n'
-  //       '\n'
-  //       '    Parameters\n'
-  //       '    ----------\n'
-  //       '    # TODO fill this section\n'
-  //       '\n'
-  //       '    Returns\n'
-  //       '    -------\n'
-  //       '    The OptimalControlProgram ready to be solved\n'
-  //       '    """\n'
-  //       '\n',
-  //       mode: FileMode.append);
+    // Write the docstring of the prepare_ocp section
+    file.writeAsStringSync(
+        'def prepare_ocp():\n'
+        '    """\n'
+        '    This function build an optimal control program and instantiate it.\n'
+        '    It can be seen as a factory for the OptimalControlProgram class.\n'
+        '\n'
+        '    Parameters\n'
+        '    ----------\n'
+        '    # TODO fill this section\n'
+        '\n'
+        '    Returns\n'
+        '    -------\n'
+        '    The OptimalControlProgram ready to be solved\n'
+        '    """\n'
+        '\n',
+        mode: FileMode.append);
 
-  //   // Write the Generic section
-  //   final bioModelAsString = generic.nbPhases == 1
-  //       ? '${phases[0].bioModel.toPythonString()}(r"${phases[0].modelPath}")'
-  //       : '${[
-  //           for (int i = 0; i < generic.nbPhases; i++)
-  //             '${phases[i].bioModel.toPythonString()}(r"${phases[i].modelPath}")'
-  //         ]}';
-  //   final nShootingAsString = generic.nbPhases == 1
-  //       ? phases[0].nbShootingPoints.toString()
-  //       : '${[
-  //           for (int i = 0; i < generic.nbPhases; i++)
-  //             phases[i].nbShootingPoints.toString()
-  //         ]}';
-  //   final durationAsString = generic.nbPhases == 1
-  //       ? phases[0].duration.toString()
-  //       : '${[
-  //           for (int i = 0; i < generic.nbPhases; i++)
-  //             phases[i].duration.toString()
-  //         ]}';
-  //   file.writeAsStringSync(
-  //       '    # Declaration of generic elements\n'
-  //       '    bio_model = $bioModelAsString\n'
-  //       '    n_shooting = $nShootingAsString\n'
-  //       '    phase_time = $durationAsString\n'
-  //       '\n',
-  //       mode: FileMode.append);
+    // Write the Generic section
+    final nSomersaults = generic.nbSomersaults;
+    final nSomersaultsAsString = nSomersaults.toString();
 
-  //   file.writeAsStringSync(
-  //       '    # Declaration of the dynamics function used during integration\n'
-  //       '    dynamics = DynamicsList()\n\n',
-  //       mode: FileMode.append);
-  //   for (int phaseIndex = 0; phaseIndex < generic.nbPhases; phaseIndex++) {
-  //     // Write the dynamics section
-  //     file.writeAsStringSync(
-  //         '    dynamics.add(\n'
-  //         '        ${phases[phaseIndex].dynamics.type.toPythonString()},\n'
-  //         '        expand=${phases[phaseIndex].dynamics.isExpanded ? 'True' : 'False'},\n'
-  //         '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
-  //         '    )\n'
-  //         '\n',
-  //         mode: FileMode.append);
-  //   }
+    final bioModelAsString =
+        '${generic.bioModel.toPythonString()}(r"${generic.modelPath}")';
 
-  //   // Write the constraints and objectives functions
-  //   file.writeAsStringSync(
-  //       '    # Declaration of the constraints and objectives of the ocp\n'
-  //       '    constraints = ConstraintList()\n'
-  //       '    objective_functions = ObjectiveList()\n',
-  //       mode: FileMode.append);
-  //   for (int phaseIndex = 0; phaseIndex < generic.nbPhases; phaseIndex++) {
-  //     for (final objective in phases[phaseIndex].objectives) {
-  //       file.writeAsStringSync(
-  //           '    objective_functions.add(\n'
-  //           '        objective=${objective.fcn.toPythonString()},\n'
-  //           '${objective.arguments.keys.isEmpty ? '' : '${objective.arguments.keys.map((key) => '        ${objective.argumentToPythonString(key)},').join('\n')}\n'}'
-  //           '        node=${objective.nodes.toPythonString()},\n'
-  //           '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
-  //           '        weight=${objective.weight},\n'
-  //           '    )\n',
-  //           mode: FileMode.append);
-  //     }
-  //     for (final constraint in phases[phaseIndex].constraints) {
-  //       file.writeAsStringSync(
-  //           '    constraints.add(\n'
-  //           '        constraint=${constraint.fcn.toPythonString()},\n'
-  //           '${constraint.arguments.keys.isEmpty ? '' : '${constraint.arguments.keys.map((key) => '        ${constraint.argumentToPythonString(key)},').join('\n')}\n'}'
-  //           '        node=${constraint.nodes.toPythonString()},\n'
-  //           '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
-  //           '    )\n',
-  //           mode: FileMode.append);
-  //     }
-  //   }
-  //   file.writeAsStringSync('\n', mode: FileMode.append);
+    final nShootingAsString = nSomersaults == 1
+        ? somersaults[0].nbShootingPoints.toString()
+        : '${[
+            for (int i = 0; i < nSomersaults; i++)
+              somersaults[i].nbShootingPoints.toString()
+          ]}';
 
-  //   // Write the variable section
-  //   file.writeAsStringSync(
-  //       '    # Declaration of optimization variables bounds and initial guesses\n',
-  //       mode: FileMode.append);
-  //   for (final variableType in DecisionVariableType.values) {
-  //     final basename = variableType.toPythonString();
-  //     file.writeAsStringSync(
-  //         '    ${basename}_bounds = BoundsList()\n'
-  //         '    ${basename}_initial_guesses = InitialGuessList()\n'
-  //         '\n',
-  //         mode: FileMode.append);
-  //   }
+    final nHalfTwistsAsString = nSomersaults == 1
+        ? somersaults[0].nbHalfTwists.toString()
+        : '${[
+            for (int i = 0; i < nSomersaults; i++)
+              somersaults[i].nbHalfTwists.toString()
+          ]}';
 
-  //   for (int phaseIndex = 0; phaseIndex < generic.nbPhases; phaseIndex++) {
-  //     for (final variableType in DecisionVariableType.values) {
-  //       final basename = variableType.toPythonString();
-  //       final allVariables =
-  //           variables(from: variableType, phaseIndex: phaseIndex);
+    final durationAsString = nSomersaults == 1
+        ? somersaults[0].duration.toString()
+        : '${[
+            for (int i = 0; i < nSomersaults; i++)
+              somersaults[i].duration.toString()
+          ]}';
 
-  //       for (final name in allVariables.names) {
-  //         final variable = allVariables[name];
-  //         file.writeAsStringSync(
-  //             '    ${basename}_bounds.add(\n'
-  //             '        "${variable.name}",\n'
-  //             '        min_bound=${variable.bounds.min},\n'
-  //             '        max_bound=${variable.bounds.max},\n'
-  //             '        interpolation=${variable.bounds.interpolation.toPythonString()},\n'
-  //             '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
-  //             '    )'
-  //             '\n'
-  //             '    ${basename}_initial_guesses.add(\n'
-  //             '        "${variable.name}",\n'
-  //             '        initial_guess=${variable.initialGuess.guess},\n'
-  //             '        interpolation=${variable.initialGuess.interpolation.toPythonString()},\n'
-  //             '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
-  //             '    )\n'
-  //             '\n',
-  //             mode: FileMode.append);
-  //       }
-  //     }
-  //     file.writeAsStringSync('\n', mode: FileMode.append);
-  //   }
-
-  //   // Write the return section
-  //   file.writeAsStringSync(
-  //       '    # Construct and return the optimal control program (OCP)\n'
-  //       '    return ${generic.ocpType.toPythonString()}(\n'
-  //       '        bio_model=bio_model,\n'
-  //       '        n_shooting=n_shooting,\n'
-  //       '        phase_time=phase_time,\n'
-  //       '        dynamics=dynamics,\n'
-  //       '        x_bounds=x_bounds,\n'
-  //       '        u_bounds=u_bounds,\n'
-  //       '        x_init=x_initial_guesses,\n'
-  //       '        u_init=u_initial_guesses,\n'
-  //       '        constraints=constraints,\n'
-  //       '        objective_functions=objective_functions,\n'
-  //       '        use_sx=${generic.useSx ? 'True' : 'False'},\n'
-  //       '    )\n'
-  //       '\n'
-  //       '\n',
-  //       mode: FileMode.append);
-
-  //   // Write run as a script section
-  //   file.writeAsStringSync(
-  //       'def main():\n'
-  //       '    """\n'
-  //       '    If this file is run, then it will perform the optimization\n'
-  //       '    """\n'
-  //       '\n'
-  //       '    # --- Prepare the ocp --- #\n'
-  //       '    ocp = prepare_ocp()\n'
-  //       '\n'
-  //       '    # --- Solve the ocp --- #\n'
-  //       '    sol = ocp.solve(solver=${generic.solver.type.toPythonString()}())\n'
-  //       '    sol.animate()\n'
-  //       '\n'
-  //       '\n'
-  //       'if __name__ == "__main__":\n'
-  //       '    main()\n',
-  //       mode: FileMode.append);
-  // }
+    file.writeAsStringSync(
+        '    class SomersaultDirection:\n'
+        '        FORWARD = "forward"\n'
+        '        BACKWARD = "backward"\n'
+        '\n'
+        '    class PreferredTwistSide:\n'
+        '        RIGHT = "right"\n'
+        '        LEFT = "left"\n'
+        '\n'
+        '    # Declaration of generic elements\n'
+        '    bio_model = $bioModelAsString\n'
+        '\n'
+        '    n_shooting = $nShootingAsString\n'
+        '    phase_time = $durationAsString  # TODO user-input to add\n'
+        '    final_time = $durationAsString  # TO CHECK\n'
+        '    n_somersault = $nSomersaultsAsString\n'
+        '    n_half_twist = $nHalfTwistsAsString\n'
+        '    preferred_twist_side = PreferredTwistSide.LEFT\n'
+        '    somersault_direction = (\n'
+        '        SomersaultDirection.BACKWARD\n'
+        '        if n_half_twist % 2 == 0\n'
+        '        else SomersaultDirection.FORWARD\n'
+        '    )\n'
+        '\n'
+        '    # Declaration of the constraints and objectives of the ocp\n'
+        '    constraints = ConstraintList()\n'
+        '    objective_functions = ObjectiveList()\n'
+        '\n'
+        '    objective_functions.add(\n'
+        '        ObjectiveFcn.Lagrange.MINIMIZE_CONTROL,\n'
+        '        key="tau",\n'
+        '        node=Node.ALL_SHOOTING,\n'
+        '        weight=100,\n'
+        '    )\n'
+        '\n'
+        '    objective_functions.add(\n'
+        '        ObjectiveFcn.Mayer.MINIMIZE_TIME, min_bound=0.0, max_bound=final_time, weight=1\n'
+        '    )\n'
+        '\n'
+        '    # Declaration of the dynamics function used during integration\n'
+        '    dynamics = DynamicsList()\n'
+        '\n'
+        '    dynamics.add(DynamicsFcn.TORQUE_DRIVEN, expand=True)\n'
+        '\n'
+        '    # Define control path constraint\n'
+        '    tau_min, tau_max, tau_init = -100, 100, 0\n'
+        '\n'
+        '    n_q = bio_model.nb_q\n'
+        '    n_qdot = bio_model.nb_qdot\n'
+        '    n_tau = bio_model.nb_tau - bio_model.nb_root\n'
+        '\n'
+        '    # Declaration of optimization variables bounds and initial guesses\n'
+        '    # Path constraint\n'
+        '    x_bounds = BoundsList()\n'
+        '    x_bounds["q"] = bio_model.bounds_from_ranges("q")\n'
+        '    x_bounds["qdot"] = bio_model.bounds_from_ranges("qdot")\n'
+        '\n'
+        '    x_initial_guesses = InitialGuessList()\n'
+        '\n'
+        '    u_bounds = BoundsList()\n'
+        '    u_initial_guesses = InitialGuessList()\n'
+        '\n'
+        '    # Initial bounds\n'
+        '    x_bounds["q"].min[:, 0] = [\n'
+        '        -1,  # pelvis translation X\n'
+        '        -1,  # pelvis translation Y\n'
+        '        -0.001,  # pelvis translation Z\n'
+        '        0,  # pelvis rotation X, somersault\n'
+        '        0,  # pelvis rotation Y, tilt\n'
+        '        0,  # pelvis rotation Z, twist\n'
+        '        0,  # right upper arm rotation Z\n'
+        '        2.9,  # right upper arm rotation Y\n'
+        '        0,  # left upper arm rotation Z\n'
+        '        -2.9,  # left upper arm rotation Y\n'
+        '    ]\n'
+        '    x_bounds["q"].max[:, 0] = [\n'
+        '        1,  # pelvis translation X\n'
+        '        1,  # pelvis translation Y\n'
+        '        0.001,  # pelvis translation Z\n'
+        '        0,  # pelvis rotation X, somersault\n'
+        '        0,  # pelvis rotation Y, tilt\n'
+        '        0,  # pelvis rotation Z, twist\n'
+        '        0,  # right upper arm rotation Z\n'
+        '        2.9,  # right upper arm rotation Y\n'
+        '        0,  # left upper arm rotation Z\n'
+        '        -2.9,  # left upper arm rotation Y\n'
+        '    ]\n'
+        '\n'
+        '    # Intermediate bounds\n'
+        '    x_bounds["q"].min[:, 1] = [\n'
+        '        -1,  # transX\n'
+        '        -1,  # transY\n'
+        '        -0.1,  # transZ\n'
+        '        (\n'
+        '            -0.2\n'
+        '            if somersault_direction == SomersaultDirection.FORWARD\n'
+        '            else -(2 * np.pi * n_somersault + 0.2)\n'
+        '        ),  # somersault\n'
+        '        -np.pi / 4,  # tilt\n'
+        '        (\n'
+        '            -0.2\n'
+        '            if preferred_twist_side == PreferredTwistSide.LEFT\n'
+        '            else -(np.pi * n_half_twist + 0.2)\n'
+        '        ),  # twist\n'
+        '        -0.65,  # right upper arm rotation Z\n'
+        '        -0.05,  # right upper arm rotation Y\n'
+        '        -2,  # left upper arm rotation Z\n'
+        '        -3,  # left upper arm rotation Y\n'
+        '    ]\n'
+        '    x_bounds["q"].max[:, 1] = [\n'
+        '        1,  # transX\n'
+        '        1,  # transY\n'
+        '        10,  # transZ\n'
+        '        (\n'
+        '            2 * np.pi * n_somersault + 0.2\n'
+        '            if somersault_direction == SomersaultDirection.FORWARD\n'
+        '            else 0.2\n'
+        '        ),  # somersault\n'
+        '        np.pi / 4,  # tilt\n'
+        '        (\n'
+        '            np.pi * n_half_twist + 0.2\n'
+        '            if preferred_twist_side == PreferredTwistSide.LEFT\n'
+        '            else 0.2\n'
+        '        ),  # twist\n'
+        '        2,  # right upper arm rotation Z\n'
+        '        3,  # right upper arm rotation Y\n'
+        '        0.65,  # left upper arm rotation Z\n'
+        '        0.05,  # left upper arm rotation Y\n'
+        '    ]\n'
+        '\n'
+        '    # Final bounds\n'
+        '    x_bounds["q"].min[:, 2] = [\n'
+        '        -1,  # transX\n'
+        '        -1,  # transY\n'
+        '        -0.1,  # transZ\n'
+        '        (\n'
+        '            2 * np.pi * n_somersault - 0.1\n'
+        '            if somersault_direction == SomersaultDirection.FORWARD\n'
+        '            else -2 * np.pi * n_somersault - 0.1\n'
+        '        ),  # somersault\n'
+        '        -0.1,  # tilt\n'
+        '        (\n'
+        '            np.pi * n_half_twist - 0.1\n'
+        '            if preferred_twist_side == PreferredTwistSide.LEFT\n'
+        '            else -np.pi * n_half_twist - 0.1\n'
+        '        ),  # twist\n'
+        '        -0.1,  # right upper arm rotation Z\n'
+        '        2.9 - 0.1,  # right upper arm rotation Y\n'
+        '        -0.1,  # left upper arm rotation Z\n'
+        '        -2.9 - 0.1,  # left upper arm rotation Y\n'
+        '    ]\n'
+        '    x_bounds["q"].max[:, 2] = [\n'
+        '        1,  # transX\n'
+        '        1,  # transY\n'
+        '        0.1,  # transZ\n'
+        '        (\n'
+        '            2 * np.pi * n_somersault + 0.1\n'
+        '            if somersault_direction == SomersaultDirection.FORWARD\n'
+        '            else -2 * np.pi * n_somersault + 0.1\n'
+        '        ),  # somersault\n'
+        '        0.1,  # tilt\n'
+        '        (\n'
+        '            np.pi * n_half_twist + 0.1\n'
+        '            if preferred_twist_side == PreferredTwistSide.LEFT\n'
+        '            else -np.pi * n_half_twist + 0.1\n'
+        '        ),  # twist\n'
+        '        0.1,  # right upper arm rotation Z\n'
+        '        2.9 + 0.1,  # right upper arm rotation Y\n'
+        '        0.1,  # left upper arm rotation Z\n'
+        '        -2.9 + 0.1,  # left upper arm rotation Y\n'
+        '    ]\n'
+        '\n'
+        '    x_init = np.array(\n'
+        '        [\n'
+        '            [0, 0, 0, 0, 0, 0, 0, 2.9, 0, -2.9],\n'
+        '            [\n'
+        '                0,\n'
+        '                0,\n'
+        '                0,\n'
+        '                (\n'
+        '                    2 * np.pi * n_somersault\n'
+        '                    if somersault_direction == SomersaultDirection.FORWARD\n'
+        '                    else -2 * np.pi * n_somersault\n'
+        '                ),  # somersault\n'
+        '                0,\n'
+        '                (\n'
+        '                    np.pi * n_half_twist\n'
+        '                    if preferred_twist_side == PreferredTwistSide.LEFT\n'
+        '                    else -np.pi * n_half_twist\n'
+        '                ),  # twist\n'
+        '                0,\n'
+        '                2.9,\n'
+        '                0,\n'
+        '                -2.9,\n'
+        '            ],\n'
+        '        ]\n'
+        '    ).T\n'
+        '    x_initial_guesses.add(\n'
+        '        "q",\n'
+        '        initial_guess=x_init,\n'
+        '        interpolation=InterpolationType.LINEAR,\n'
+        '    )\n'
+        '\n'
+        '    # Taken from https://github.com/EveCharbie/AnthropoImpactOnTech/blob/main/TechOpt83.py\n'
+        '    vzinit = (\n'
+        '        9.81 / 2 * final_time\n'
+        '    )  # vitesse initiale en z du CoM pour revenir a terre au temps final\n'
+        '\n'
+        '    # decalage entre le bassin et le CoM\n'
+        '    co_m_q_sym = MX.sym("CoM", n_q)\n'
+        '    co_m_q_init = x_bounds["q"].min[\n'
+        '        :n_q, 0\n'
+        '    ]  # min ou max ne change rien a priori, au DEBUT ils sont egaux normalement\n'
+        '    co_m_q_func = Function(\n'
+        '        "co_m_q_func", [co_m_q_sym], [bio_model.center_of_mass(co_m_q_sym)]\n'
+        '    )\n'
+        '    bassin_q_func = Function(\n'
+        '        "bassin_q_func",\n'
+        '        [co_m_q_sym],\n'
+        '        [bio_model.homogeneous_matrices_in_global(co_m_q_sym, 0).to_mx()],\n'
+        '    )  # retourne la RT du bassin\n'
+        '\n'
+        '    r = (\n'
+        '        np.array(co_m_q_func(co_m_q_init)).reshape(1, 3)\n'
+        '        - np.array(bassin_q_func(co_m_q_init))[-1, :3]\n'
+        '    )  # selectionne seulement la translation de la RT\n'
+        '\n'
+        '    x_bounds["qdot"].min[:, 0] = [\n'
+        '        -0.5,  # pelvis translation X speed\n'
+        '        -0.5,  # pelvis translation Y\n'
+        '        -vzinit - 0.5,  # pelvis translation Z\n'
+        '        (\n'
+        '            0.5 if somersault_direction == SomersaultDirection.FORWARD else -20\n'
+        '        ),  # pelvis rotation X, somersault\n'
+        '        0,  # pelvis rotation Y, tilt\n'
+        '        0,  # pelvis rotation Z, twist\n'
+        '        0,  # right upper arm rotation Z\n'
+        '        0,  # right upper arm rotation Y\n'
+        '        0,  # left upper arm rotation Z\n'
+        '        0,  # left upper arm rotation Y\n'
+        '    ]\n'
+        '    x_bounds["qdot"].max[:, 0] = [\n'
+        '        0.5,  # pelvis translation X\n'
+        '        0.5,  # pelvis translation Y\n'
+        '        vzinit + 0.5,  # pelvis translation Z\n'
+        '        (\n'
+        '            20 if somersault_direction == SomersaultDirection.FORWARD else -0.5\n'
+        '        ),  # pelvis rotation X, somersault\n'
+        '        0,  # pelvis rotation Y, tilt\n'
+        '        0,  # pelvis rotation Z, twist\n'
+        '        0,  # right upper arm rotation Z\n'
+        '        0,  # right upper arm rotation Y\n'
+        '        0,  # left upper arm rotation Z\n'
+        '        0,  # left upper arm rotation Y\n'
+        '    ]\n'
+        '\n'
+        '    if somersault_direction == SomersaultDirection.FORWARD :\n'
+        '        borne_inf = (x_bounds["q"].min[0:3, 0] + np.cross(r, x_bounds["qdot"].min[3:6, 0]))[\n'
+        '            0\n'
+        '        ]\n'
+        '        borne_sup = (x_bounds["q"].min[0:3, 0] + np.cross(r, x_bounds["qdot"].max[3:6, 0]))[\n'
+        '            0\n'
+        '        ]\n'
+        '    else:\n'
+        '        borne_inf = (x_bounds["q"].min[0:3, 0] - np.cross(r, x_bounds["qdot"].min[3:6, 0]))[\n'
+        '            0\n'
+        '        ]\n'
+        '        borne_sup = (x_bounds["q"].min[0:3, 0] - np.cross(r, x_bounds["qdot"].max[3:6, 0]))[\n'
+        '            0\n'
+        '        ]\n'
+        '\n'
+        '    x_bounds["qdot"].min[0:3, 0] = (\n'
+        '        min(borne_sup[0], borne_inf[0]),\n'
+        '        min(borne_sup[1], borne_inf[1]),\n'
+        '        min(borne_sup[2], borne_inf[2]),\n'
+        '    )\n'
+        '\n'
+        '    x_bounds["qdot"].max[0:3, 0] = (\n'
+        '        max(borne_sup[0], borne_inf[0]),\n'
+        '        max(borne_sup[1], borne_inf[1]),\n'
+        '        max(borne_sup[2], borne_inf[2]),\n'
+        '    )\n'
+        '\n'
+        '    # Intermediate bounds\n'
+        '    x_bounds["qdot"].min[:, 1] = [\n'
+        '        -10,\n'
+        '        -10,\n'
+        '        -100,\n'
+        '        (0.5 if somersault_direction == SomersaultDirection.FORWARD else -20),\n'
+        '        -100,\n'
+        '        -100,\n'
+        '        -100,\n'
+        '        -100,\n'
+        '        -100,\n'
+        '        -100,\n'
+        '    ]\n'
+        '    x_bounds["qdot"].max[:, 1] = [\n'
+        '        10,\n'
+        '        10,\n'
+        '        100,\n'
+        '        (20 if somersault_direction == SomersaultDirection.FORWARD else -0.5),\n'
+        '        100,\n'
+        '        100,\n'
+        '        100,\n'
+        '        100,\n'
+        '        100,\n'
+        '        100,\n'
+        '    ]\n'
+        '\n'
+        '    # Final bounds\n'
+        '    x_bounds["qdot"].min[:, 2] = [\n'
+        '        -10,\n'
+        '        -10,\n'
+        '        -100,\n'
+        '        (0.5 if somersault_direction == SomersaultDirection.FORWARD else -20),\n'
+        '        -100,\n'
+        '        -100,\n'
+        '        -100,\n'
+        '        -100,\n'
+        '        -100,\n'
+        '        -100,\n'
+        '    ]\n'
+        '    x_bounds["qdot"].max[:, 2] = [\n'
+        '        10,\n'
+        '        10,\n'
+        '        100,\n'
+        '        (20 if somersault_direction == SomersaultDirection.FORWARD else -0.5),\n'
+        '        100,\n'
+        '        100,\n'
+        '        100,\n'
+        '        100,\n'
+        '        100,\n'
+        '        100,\n'
+        '    ]\n'
+        '\n'
+        '    x_initial_guesses.add(\n'
+        '        "qdot",\n'
+        '        initial_guess=[0.0] * n_qdot,\n'
+        '        interpolation=InterpolationType.CONSTANT,\n'
+        '    )\n'
+        '\n'
+        '    u_bounds.add(\n'
+        '        "tau",\n'
+        '        min_bound=[tau_min] * n_tau,\n'
+        '        max_bound=[tau_max] * n_tau,\n'
+        '        interpolation=InterpolationType.CONSTANT,\n'
+        '    )\n'
+        '    u_initial_guesses.add(\n'
+        '        "tau",\n'
+        '        initial_guess=[tau_init] * n_tau,\n'
+        '        interpolation=InterpolationType.CONSTANT,\n'
+        '    )\n'
+        '\n'
+        '    mapping = BiMappingList()\n'
+        '    mapping.add(\n'
+        '        "tau",\n'
+        '        to_second=[None, None, None, None, None, None, 0, 1, 2, 3],\n'
+        '        to_first=[6, 7, 8, 9],\n'
+        '    )\n'
+        '\n'
+        '    # Construct and return the optimal control program (OCP)\n'
+        '    return OptimalControlProgram(\n'
+        '        bio_model=bio_model,\n'
+        '        n_shooting=n_shooting,\n'
+        '        phase_time=phase_time,\n'
+        '        dynamics=dynamics,\n'
+        '        x_bounds=x_bounds,\n'
+        '        u_bounds=u_bounds,\n'
+        '        x_init=x_initial_guesses,\n'
+        '        u_init=u_initial_guesses,\n'
+        '        constraints=constraints,\n'
+        '        objective_functions=objective_functions,\n'
+        '        variable_mappings=mapping,\n'
+        '        use_sx=False,\n'
+        '        assume_phase_dynamics=True,\n'
+        '    )\n'
+        '\n'
+        '\n'
+        'def main():\n'
+        '    """\n'
+        '    If this file is run, then it will perform the optimization\n'
+        '    """\n'
+        '\n'
+        '    # --- Prepare the ocp --- #\n'
+        '    ocp = prepare_ocp()\n'
+        '\n'
+        '    solver = Solver.IPOPT()\n'
+        '    # solver.set_maximum_iterations(0)\n'
+        '    # --- Solve the ocp --- #\n'
+        '    sol = ocp.solve(solver=solver)\n'
+        '    # sol.graphs(show_bounds=True)\n'
+        '    sol.animate()\n'
+        '\n'
+        '    out = sol.integrate(merge_phases=True)\n'
+        '    state, time_vector = out._states["unscaled"], out._time_vector\n'
+        '\n'
+        '    save = {\n'
+        '        "solution": sol,\n'
+        '        "unscaled_state": state,\n'
+        '        "time_vector": time_vector,\n'
+        '    }\n'
+        '\n'
+        '    del sol.ocp\n'
+        '    with open(f"somersault.pkl", "wb") as f:\n'
+        '        pkl.dump(save, f)\n'
+        '\n'
+        '\n'
+        'if __name__ == "__main__":\n'
+        '    main()\n',
+        mode: FileMode.append);
+  }
 }
