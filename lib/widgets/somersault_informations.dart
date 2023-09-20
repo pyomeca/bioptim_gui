@@ -23,7 +23,7 @@ class SomersaultInformation extends StatelessWidget {
         SizedBox(
           width: width / 2 - 6,
           child: PositiveIntegerTextField(
-            label: 'Number of half twists',
+            label: 'Number of half twists *',
             controller: controllers.nbHalfTwistsControllers[somersaultIndex],
           ),
         ),

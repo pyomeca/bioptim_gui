@@ -17,7 +17,7 @@ class AcrobaticInformation extends StatelessWidget {
         SizedBox(
           width: width / 3 - 6,
           child: PositiveIntegerTextField(
-            label: 'Number of somersaults',
+            label: 'Number of somersaults *',
             controller: controllers.nbSomersaultsController,
             enabled: true,
           ),
@@ -28,7 +28,7 @@ class AcrobaticInformation extends StatelessWidget {
           child: TextField(
             controller: controllers.finalTimeController,
             decoration: const InputDecoration(
-                labelText: 'Final time', border: OutlineInputBorder()),
+                labelText: 'Final time *', border: OutlineInputBorder()),
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))
             ],
@@ -40,8 +40,7 @@ class AcrobaticInformation extends StatelessWidget {
           child: TextField(
             controller: controllers.finalTimeMarginController,
             decoration: const InputDecoration(
-                labelText: 'Final time margin(s)',
-                border: OutlineInputBorder()),
+                labelText: 'Final time margin *', border: OutlineInputBorder()),
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))
             ],

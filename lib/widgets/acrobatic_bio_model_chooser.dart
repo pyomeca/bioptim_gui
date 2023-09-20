@@ -23,7 +23,7 @@ class AcrobaticBioModelChooser extends StatelessWidget {
       width: width,
       child: TextField(
         decoration: InputDecoration(
-          labelText: "Model path",
+          labelText: "Model path *",
           border: const OutlineInputBorder(),
           suffixIcon: IconButton(
             icon: const Icon(Icons.file_upload_outlined),
