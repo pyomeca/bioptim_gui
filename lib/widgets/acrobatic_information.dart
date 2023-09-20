@@ -15,16 +15,28 @@ class AcrobaticInformation extends StatelessWidget {
     return Row(
       children: [
         SizedBox(
-          width: width / 2 - 6,
+          width: width / 3 - 6,
           child: PositiveIntegerTextField(
             label: 'Number of somersaults',
             controller: controllers.nbSomersaultsController,
             enabled: true,
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: 6),
         SizedBox(
-          width: width / 2 - 6,
+          width: width / 3 - 6,
+          child: TextField(
+            controller: controllers.finalTimeController,
+            decoration: const InputDecoration(
+                labelText: 'Final time', border: OutlineInputBorder()),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))
+            ],
+          ),
+        ),
+        const SizedBox(width: 6),
+        SizedBox(
+          width: width / 3 - 6,
           child: TextField(
             controller: controllers.finalTimeMarginController,
             decoration: const InputDecoration(

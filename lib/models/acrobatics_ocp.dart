@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:bioptim_gui/models/acrobatics_ocp_config.dart';
-import 'package:bioptim_gui/models/acrobatics_twist_side.dart';
 import 'package:bioptim_gui/models/dynamics.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/global.dart';
