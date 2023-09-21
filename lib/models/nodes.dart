@@ -6,10 +6,8 @@ enum Nodes {
   end,
   all,
   allShooting,
-  transition,
-  multinode,
-  defaultNode,
   ;
+  // don't need to have transitional, custom and multinode becuase they are for internal use only
 
   String toPythonString() {
     switch (this) {
@@ -27,12 +25,6 @@ enum Nodes {
         return 'Node.ALL';
       case allShooting:
         return 'Node.ALL_SHOOTING';
-      case transition:
-        return 'Node.TRANSITION';
-      case multinode:
-        return 'Node.MULTINODE';
-      case defaultNode:
-        return 'Node.DEFAULT';
     }
   }
 
@@ -53,12 +45,6 @@ enum Nodes {
         return 'All nodes ';
       case allShooting:
         return 'All shooting nodes';
-      case transition:
-        return 'Transition nodes';
-      case multinode:
-        return 'Multinode';
-      case defaultNode:
-        return 'Default node';
     }
   }
 }
