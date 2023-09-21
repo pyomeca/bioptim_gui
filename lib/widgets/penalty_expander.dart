@@ -1,5 +1,7 @@
+import 'package:bioptim_gui/models/acrobatics_ocp_controllers.dart';
 import 'package:bioptim_gui/models/nodes.dart';
 import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
+import 'package:bioptim_gui/models/optimal_control_program_type.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
@@ -55,15 +57,31 @@ class PenaltyExpander extends StatelessWidget {
   }
 
   PenaltyInterface get _getPenaltyInterface {
-    switch (penaltyType) {
-      case ObjectiveFcn:
-        return OptimalControlProgramControllers.instance
-            .objectives(phaseIndex: phaseIndex);
-      case ConstraintFcn:
-        return OptimalControlProgramControllers.instance
-            .constraints(phaseIndex: phaseIndex);
+    switch (OptimalControlProgramControllers.instance.ocpType) {
+      case OptimalControlProgramType.ocp:
+        switch (penaltyType) {
+          case ObjectiveFcn:
+            return OptimalControlProgramControllers.instance
+                .objectives(phaseIndex: phaseIndex);
+          case ConstraintFcn:
+            return OptimalControlProgramControllers.instance
+                .constraints(phaseIndex: phaseIndex);
+          default:
+            throw 'Wrong penalty type';
+        }
+      case OptimalControlProgramType.abrobaticsOCP:
+        switch (penaltyType) {
+          case ObjectiveFcn:
+            return AcrobaticsOCPControllers.instance
+                .objectives(somersaultIndex: phaseIndex);
+          case ConstraintFcn:
+            return AcrobaticsOCPControllers.instance
+                .constraints(somersaultIndex: phaseIndex);
+          default:
+            throw 'Wrong penalty type';
+        }
       default:
-        throw 'Wrong penalty type';
+        throw 'Wrong OCP type';
     }
   }
 
