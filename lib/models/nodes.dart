@@ -2,7 +2,7 @@ enum Nodes {
   start,
   end,
   all,
-  allShooting;
+  allShooting; // TODO add the other node
 
   String toPythonString() {
     switch (this) {

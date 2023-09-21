@@ -12,40 +12,45 @@ class AcrobaticInformation extends StatelessWidget {
   Widget build(BuildContext context) {
     final controllers = AcrobaticsOCPControllers.instance;
 
-    return Row(
+    return Column(
       children: [
         SizedBox(
-          width: width / 3 - 6,
+          width: width,
           child: PositiveIntegerTextField(
             label: 'Number of somersaults *',
             controller: controllers.nbSomersaultsController,
             enabled: true,
           ),
         ),
-        const SizedBox(width: 6),
-        SizedBox(
-          width: width / 3 - 6,
-          child: TextField(
-            controller: controllers.finalTimeController,
-            decoration: const InputDecoration(
-                labelText: 'Final time *', border: OutlineInputBorder()),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))
-            ],
-          ),
-        ),
-        const SizedBox(width: 6),
-        SizedBox(
-          width: width / 3 - 6,
-          child: TextField(
-            controller: controllers.finalTimeMarginController,
-            decoration: const InputDecoration(
-                labelText: 'Final time margin *', border: OutlineInputBorder()),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))
-            ],
-          ),
-        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            SizedBox(
+              width: width / 2 - 6,
+              child: TextField(
+                controller: controllers.finalTimeController,
+                decoration: const InputDecoration(
+                    labelText: 'Final time *', border: OutlineInputBorder()),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            SizedBox(
+              width: width / 2 - 6,
+              child: TextField(
+                controller: controllers.finalTimeMarginController,
+                decoration: const InputDecoration(
+                    labelText: 'Final time margin *',
+                    border: OutlineInputBorder()),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))
+                ],
+              ),
+            ),
+          ],
+        )
       ],
     );
   }
