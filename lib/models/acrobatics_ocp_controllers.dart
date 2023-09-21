@@ -9,32 +9,9 @@ import 'package:bioptim_gui/models/dynamics.dart';
 import 'package:bioptim_gui/models/matrix.dart';
 import 'package:bioptim_gui/models/optimal_control_program.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
+import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:flutter/material.dart';
-
-class PenaltyInterface {
-  const PenaltyInterface({
-    required this.create,
-    required this.fetch,
-    required this.fetchAll,
-    required this.update,
-    required this.remove,
-    this.weightController,
-    required this.argumentController,
-  });
-
-  final Function() create;
-  final Penalty Function({required int penaltyIndex}) fetch;
-  final List<Penalty> Function() fetchAll;
-  final Function(Penalty penalty, {required int penaltyIndex}) update;
-  final Function({required int penaltyIndex}) remove;
-
-  final TextEditingController Function({required int penaltyIndex})?
-      weightController;
-  final TextEditingController Function(
-      {required int penaltyIndex,
-      required int argumentIndex}) argumentController;
-}
 
 ///
 /// This class mimics the strcture of the [OptimalControlProgram] class but in
