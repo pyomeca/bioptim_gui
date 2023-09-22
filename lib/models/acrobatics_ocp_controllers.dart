@@ -577,6 +577,24 @@ class AcrobaticsOCPControllers {
       // For each of the new somersaults, declare all the required variables
       for (int i = controllers.length; i < nbSomersaults; i++) {
         controllers.add([]);
+
+        // adding default penalties, that will be added for each somersault
+        if (_objectiveControllers[i].isEmpty) {
+          _createPenalty(Objective.acrobaticGenericLagrangeMinimizeControls(),
+              controllers: _objectiveControllers[i],
+              penalties: _ocp.somersaults[i].objectives);
+
+          _createPenalty(
+              Objective.acrobaticGenericMayerMinimizeTime(
+                  minBound:
+                      double.parse(somersaultDurationControllers[i].text) -
+                          finalTimeMargin,
+                  maxBound:
+                      double.parse(somersaultDurationControllers[i].text) +
+                          finalTimeMargin),
+              controllers: _objectiveControllers[i],
+              penalties: _ocp.somersaults[i].objectives);
+        }
       }
     } else if (controllers.length > nbSomersaults) {
       for (int i = controllers.length - 1; i >= nbSomersaults; i--) {

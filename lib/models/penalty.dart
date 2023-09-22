@@ -799,6 +799,31 @@ class Objective extends Penalty {
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
 
+  Objective.acrobaticGenericLagrangeMinimizeControls(
+      {ObjectiveFcn fcn = LagrangeFcn.minimizeControls,
+      super.nodes = Nodes.allShooting,
+      this.weight = 100,
+      Map<String, dynamic>? arguments})
+      : super(fcn,
+            arguments: arguments ??
+                {
+                  'key': 'tau',
+                });
+
+  Objective.acrobaticGenericMayerMinimizeTime(
+      {ObjectiveFcn fcn = MayerFcn.minimizeTime,
+      super.nodes = Nodes.allShooting,
+      this.weight = 1,
+      Map<String, dynamic>? arguments,
+      required double minBound,
+      required double maxBound})
+      : super(fcn,
+            arguments: arguments ??
+                {
+                  'min_bound': minBound,
+                  'max_bound': maxBound,
+                });
+
   Objective.lagrange(LagrangeFcn fcn,
       {super.nodes = Nodes.all,
       this.weight = 1,
