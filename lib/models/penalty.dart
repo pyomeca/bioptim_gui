@@ -760,7 +760,13 @@ abstract class Penalty {
   final Map<String, dynamic> arguments;
 
   final Nodes nodes;
+  final bool quadratic;
+  final bool expand;
+  // TODO 'target' argument : np.array(target)
+  final bool derivative;
+  final bool explicitDerivative;
   final QuadratureRules quadratureRules;
+  final bool multiThread;
 
   String argumentToPythonString(String key) {
     final argument = arguments[key] ?? 'to_be_specified';
@@ -769,6 +775,8 @@ abstract class Penalty {
         return '$key="$argument"';
       case double || int:
         return '$key=$argument';
+      case bool:
+        return argument ? '$key=True' : '$key=False';
       default:
         throw 'The type ${argument.runtimeType} is not supported.\n'
             'Please contact the developpers for more assistance';
@@ -777,6 +785,11 @@ abstract class Penalty {
 
   Penalty(this.fcn,
       {required this.nodes,
+      required this.quadratic,
+      required this.expand,
+      required this.derivative,
+      required this.explicitDerivative,
+      required this.multiThread,
       required this.quadratureRules,
       required this.arguments}) {
     final argumentNames = fcn.mandatoryArguments.map((e) => e.name);
@@ -803,6 +816,11 @@ class Objective extends Penalty {
       {ObjectiveFcn fcn = LagrangeFcn.minimizeControls,
       super.nodes = Nodes.all,
       super.quadratureRules = QuadratureRules.defaultQuadraticRule,
+      super.quadratic = false,
+      super.expand = false,
+      super.derivative = false,
+      super.explicitDerivative = false,
+      super.multiThread = false,
       this.weight = 1,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
@@ -811,6 +829,11 @@ class Objective extends Penalty {
       {ObjectiveFcn fcn = LagrangeFcn.minimizeControls,
       super.nodes = Nodes.allShooting,
       super.quadratureRules = QuadratureRules.defaultQuadraticRule,
+      super.quadratic = false,
+      super.expand = false,
+      super.derivative = false,
+      super.explicitDerivative = false,
+      super.multiThread = false,
       this.weight = 100,
       Map<String, dynamic>? arguments})
       : super(fcn,
@@ -823,6 +846,11 @@ class Objective extends Penalty {
       {ObjectiveFcn fcn = MayerFcn.minimizeTime,
       super.nodes = Nodes.allShooting,
       super.quadratureRules = QuadratureRules.defaultQuadraticRule,
+      super.quadratic = false,
+      super.expand = false,
+      super.derivative = false,
+      super.explicitDerivative = false,
+      super.multiThread = false,
       this.weight = 1,
       Map<String, dynamic>? arguments,
       required double minBound,
@@ -837,12 +865,22 @@ class Objective extends Penalty {
   Objective.lagrange(LagrangeFcn fcn,
       {super.nodes = Nodes.all,
       super.quadratureRules = QuadratureRules.defaultQuadraticRule,
+      super.quadratic = false,
+      super.expand = false,
+      super.derivative = false,
+      super.explicitDerivative = false,
+      super.multiThread = false,
       this.weight = 1,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
   Objective.mayer(MayerFcn fcn,
       {super.nodes = Nodes.all,
       super.quadratureRules = QuadratureRules.defaultQuadraticRule,
+      super.quadratic = false,
+      super.expand = false,
+      super.derivative = false,
+      super.explicitDerivative = false,
+      super.multiThread = false,
       this.weight = 1,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
@@ -853,6 +891,11 @@ class Constraint extends Penalty {
       {ConstraintFcn fcn = ConstraintFcn.timeConstraint,
       super.nodes = Nodes.end,
       super.quadratureRules = QuadratureRules.defaultQuadraticRule,
+      super.quadratic = false,
+      super.expand = false,
+      super.derivative = false,
+      super.explicitDerivative = false,
+      super.multiThread = false,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
 }

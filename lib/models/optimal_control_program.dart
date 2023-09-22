@@ -6,6 +6,7 @@ import 'package:bioptim_gui/models/generic_ocp_config.dart';
 import 'package:bioptim_gui/models/global.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/penalty.dart';
+import 'package:bioptim_gui/utils.dart';
 
 class _Phase {
   int phaseIndex;
@@ -213,7 +214,12 @@ class OptimalControlProgram {
             '        objective=${objective.fcn.toPythonString()},\n'
             '${objective.arguments.keys.isEmpty ? '' : '${objective.arguments.keys.map((key) => '        ${objective.argumentToPythonString(key)},').join('\n')}\n'}'
             '        node=${objective.nodes.toPythonString()},\n'
+            '        quadratic=${objective.quadratic.toPythonString()},\n'
+            '        expand=${objective.expand.toPythonString()},\n'
+            '        derivative=${objective.derivative.toPythonString()},\n'
+            '        explicit_derivative=${objective.explicitDerivative.toPythonString()},\n'
             '        integration_rule=${objective.quadratureRules.toPythonString()},\n'
+            '        multi_thread=${objective.multiThread.toPythonString()},\n'
             '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
             '        weight=${objective.weight},\n'
             '    )\n',
@@ -225,7 +231,12 @@ class OptimalControlProgram {
             '        constraint=${constraint.fcn.toPythonString()},\n'
             '${constraint.arguments.keys.isEmpty ? '' : '${constraint.arguments.keys.map((key) => '        ${constraint.argumentToPythonString(key)},').join('\n')}\n'}'
             '        node=${constraint.nodes.toPythonString()},\n'
+            '        quadratic=${constraint.quadratic.toPythonString()},\n'
+            '        expand=${constraint.expand.toPythonString()},\n'
+            '        derivative=${constraint.derivative.toPythonString()},\n'
+            '        explicit_derivative=${constraint.explicitDerivative.toPythonString()},\n'
             '        integration_rule=${constraint.quadratureRules.toPythonString()},\n'
+            '        multi_thread=${constraint.multiThread.toPythonString()},\n'
             '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
             '    )\n',
             mode: FileMode.append);
