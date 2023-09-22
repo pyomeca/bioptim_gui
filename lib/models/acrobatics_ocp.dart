@@ -151,6 +151,7 @@ class AcrobaticsOCPProgram {
         '    BiMappingList,\n'
         '    Solver,\n'
         '    Node,\n'
+        '    QuadratureRule,\n'
         '    ConstraintList,\n'
         ')\n'
         '\n'
@@ -238,6 +239,7 @@ class AcrobaticsOCPProgram {
             '        objective=${objective.fcn.toPythonString()},\n'
             '${objective.arguments.keys.isEmpty ? '' : '${objective.arguments.keys.map((key) => '        ${objective.argumentToPythonString(key)},').join('\n')}\n'}'
             '        node=${objective.nodes.toPythonString()},\n'
+            '        integration_rule=${objective.quadratureRules.toPythonString()},\n'
             '${generic.nbSomersaults == 1 ? '' : '        phase=$phaseIndex,\n'}'
             '        weight=${objective.weight},\n'
             '    )\n',
@@ -249,6 +251,7 @@ class AcrobaticsOCPProgram {
             '        constraint=${constraint.fcn.toPythonString()},\n'
             '${constraint.arguments.keys.isEmpty ? '' : '${constraint.arguments.keys.map((key) => '        ${constraint.argumentToPythonString(key)},').join('\n')}\n'}'
             '        node=${constraint.nodes.toPythonString()},\n'
+            '        integration_rule=${constraint.quadratureRules.toPythonString()},\n'
             '${generic.nbSomersaults == 1 ? '' : '        phase=$phaseIndex,\n'}'
             '    )\n',
             mode: FileMode.append);

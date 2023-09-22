@@ -3,6 +3,7 @@ import 'package:bioptim_gui/models/nodes.dart';
 import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/models/optimal_control_program_type.dart';
 import 'package:bioptim_gui/models/penalty.dart';
+import 'package:bioptim_gui/models/quadrature_rules.dart';
 import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:flutter/material.dart';
@@ -34,22 +35,29 @@ class PenaltyExpander extends StatelessWidget {
   Penalty _penaltyFactory(PenaltyFcn fcn,
       {required double? weigth,
       required Nodes? nodes,
+      required QuadratureRules? quadratureRules,
       required Map<String, dynamic>? arguments}) {
     switch (fcn.runtimeType) {
       case LagrangeFcn:
         return Objective.lagrange(fcn as LagrangeFcn,
             weight: weigth ?? 1,
             nodes: nodes ?? Nodes.all,
+            quadratureRules:
+                quadratureRules ?? QuadratureRules.defaultQuadraticRule,
             arguments: arguments ?? {});
       case MayerFcn:
         return Objective.mayer(fcn as MayerFcn,
             weight: weigth ?? 1,
             nodes: nodes ?? Nodes.end,
+            quadratureRules:
+                quadratureRules ?? QuadratureRules.defaultQuadraticRule,
             arguments: arguments ?? {});
       case ConstraintFcn:
         return Constraint.generic(
             fcn: fcn as ConstraintFcn,
             nodes: nodes ?? Nodes.end,
+            quadratureRules:
+                quadratureRules ?? QuadratureRules.defaultQuadraticRule,
             arguments: arguments ?? {});
       default:
         throw 'Wrong penalty type';
@@ -170,6 +178,7 @@ class _PathTile extends StatelessWidget {
   final Function(PenaltyFcn fcn,
       {required Map<String, dynamic>? arguments,
       required Nodes? nodes,
+      required QuadratureRules? quadratureRules,
       required double? weigth}) penaltyFactory;
   final PenaltyInterface penaltyInterface;
   final int penaltyIndex;
@@ -196,7 +205,10 @@ class _PathTile extends StatelessWidget {
               // Update to a brand new fresh penalty
               penaltyInterface.update(
                   penaltyFactory(value,
-                      weigth: null, nodes: null, arguments: null),
+                      weigth: null,
+                      nodes: null,
+                      quadratureRules: null,
+                      arguments: null),
                   penaltyIndex: penaltyIndex);
             },
             isExpanded: false,
@@ -250,6 +262,7 @@ class _PathTile extends StatelessWidget {
                       penaltyFactory(penalty.fcn,
                           weigth: weight,
                           nodes: value,
+                          quadratureRules: penalty.quadratureRules,
                           arguments: penalty.arguments),
                       penaltyIndex: penaltyIndex);
                 },
@@ -270,6 +283,35 @@ class _PathTile extends StatelessWidget {
                       ]),
                 ),
               ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            SizedBox(
+              width: width * 2 / 3 - 6,
+              child: CustomDropdownButton<QuadratureRules>(
+                title: 'Integration rule for the ${penalty.fcn.penaltyType}',
+                value: penalty.quadratureRules,
+                items: QuadratureRules.values,
+                onSelected: (value) {
+                  if (value.toString() == penalty.quadratureRules.toString())
+                    return;
+
+                  final weight = penalty.runtimeType == Objective
+                      ? (penalty as Objective).weight
+                      : null;
+                  penaltyInterface.update(
+                      penaltyFactory(penalty.fcn,
+                          weigth: weight,
+                          nodes: penalty.nodes,
+                          quadratureRules: value,
+                          arguments: penalty.arguments),
+                      penaltyIndex: penaltyIndex);
+                },
+                isExpanded: false,
+              ),
+            ),
           ],
         ),
         Align(

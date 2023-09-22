@@ -1,4 +1,5 @@
 import 'package:bioptim_gui/models/nodes.dart';
+import 'package:bioptim_gui/models/quadrature_rules.dart';
 
 enum PenaltyArgumentType {
   integer,
@@ -759,6 +760,7 @@ abstract class Penalty {
   final Map<String, dynamic> arguments;
 
   final Nodes nodes;
+  final QuadratureRules quadratureRules;
 
   String argumentToPythonString(String key) {
     final argument = arguments[key] ?? 'to_be_specified';
@@ -773,7 +775,10 @@ abstract class Penalty {
     }
   }
 
-  Penalty(this.fcn, {required this.nodes, required this.arguments}) {
+  Penalty(this.fcn,
+      {required this.nodes,
+      required this.quadratureRules,
+      required this.arguments}) {
     final argumentNames = fcn.mandatoryArguments.map((e) => e.name);
 
     // Do not allow non mandatory arguments
@@ -797,6 +802,7 @@ class Objective extends Penalty {
   Objective.generic(
       {ObjectiveFcn fcn = LagrangeFcn.minimizeControls,
       super.nodes = Nodes.all,
+      super.quadratureRules = QuadratureRules.defaultQuadraticRule,
       this.weight = 1,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
@@ -804,6 +810,7 @@ class Objective extends Penalty {
   Objective.acrobaticGenericLagrangeMinimizeControls(
       {ObjectiveFcn fcn = LagrangeFcn.minimizeControls,
       super.nodes = Nodes.allShooting,
+      super.quadratureRules = QuadratureRules.defaultQuadraticRule,
       this.weight = 100,
       Map<String, dynamic>? arguments})
       : super(fcn,
@@ -815,6 +822,7 @@ class Objective extends Penalty {
   Objective.acrobaticGenericMayerMinimizeTime(
       {ObjectiveFcn fcn = MayerFcn.minimizeTime,
       super.nodes = Nodes.allShooting,
+      super.quadratureRules = QuadratureRules.defaultQuadraticRule,
       this.weight = 1,
       Map<String, dynamic>? arguments,
       required double minBound,
@@ -828,11 +836,13 @@ class Objective extends Penalty {
 
   Objective.lagrange(LagrangeFcn fcn,
       {super.nodes = Nodes.all,
+      super.quadratureRules = QuadratureRules.defaultQuadraticRule,
       this.weight = 1,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
   Objective.mayer(MayerFcn fcn,
       {super.nodes = Nodes.all,
+      super.quadratureRules = QuadratureRules.defaultQuadraticRule,
       this.weight = 1,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
@@ -842,6 +852,7 @@ class Constraint extends Penalty {
   Constraint.generic(
       {ConstraintFcn fcn = ConstraintFcn.timeConstraint,
       super.nodes = Nodes.end,
+      super.quadratureRules = QuadratureRules.defaultQuadraticRule,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
 }
