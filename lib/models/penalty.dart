@@ -209,7 +209,7 @@ enum LagrangeFcn implements ObjectiveFcn {
       case minimizeLinearMomentum:
         return 'ObjectiveFcn.Lagrange.MINIMIZE_LINEAR_MOMENTUM';
       case minimizeControls:
-        return 'ObjectiveFcn.Lagrange.MINIMIZE_CONTROLS';
+        return 'ObjectiveFcn.Lagrange.MINIMIZE_CONTROL';
       case minimizePower:
         return 'ObjectiveFcn.Lagrange.MINIMIZE_POWER';
       case minimizeStates:
@@ -527,7 +527,7 @@ enum MayerFcn implements ObjectiveFcn {
       case minimizeLinearMomentum:
         return 'ObjectiveFcn.Mayer.MINIMIZE_LINEAR_MOMENTUM';
       case minimizeControls:
-        return 'ObjectiveFcn.Mayer.MINIMIZE_CONTROLS';
+        return 'ObjectiveFcn.Mayer.MINIMIZE_CONTROL';
       case minimizePower:
         return 'ObjectiveFcn.Mayer.MINIMIZE_POWER';
       case minimizeStates:
@@ -765,6 +765,8 @@ abstract class Penalty {
     switch (argument.runtimeType) {
       case String:
         return '$key="$argument"';
+      case double || int:
+        return '$key=$argument';
       default:
         throw 'The type ${argument.runtimeType} is not supported.\n'
             'Please contact the developpers for more assistance';

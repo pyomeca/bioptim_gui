@@ -222,29 +222,41 @@ class AcrobaticsOCPProgram {
         '\n'
         '    bio_model = $bioModelAsString\n'
         '    # can\'t use * to have multiple, needs duplication\n'
-        '\n'
-        '    # Declaration of the objectives of the ocp\n'
-        '    constraints = ConstraintList()  # keep empty for now\n'
-        '\n'
-        '    objective_functions = ObjectiveList()\n'
-        '\n'
-        '    for phase in range(n_somersault):\n'
-        '        objective_functions.add(\n'
-        '            ObjectiveFcn.Lagrange.MINIMIZE_CONTROL,\n'
-        '            key="tau",\n'
-        '            node=Node.ALL_SHOOTING,\n'
-        '            weight=100,\n'
-        '            phase=phase,\n'
-        '        )\n'
-        '\n'
-        '        objective_functions.add(\n'
-        '            ObjectiveFcn.Mayer.MINIMIZE_TIME,\n'
-        '            min_bound=phase_time[phase] - final_time_margin,  # use current phase\n'
-        '            max_bound=phase_time[phase] + final_time_margin,\n'
-        '            weight=1,\n'
-        '            phase=phase,\n'
-        '        )\n'
-        '\n'
+        '\n',
+        mode: FileMode.append);
+
+    // Write the constraints and objectives functions
+    file.writeAsStringSync(
+        '    # Declaration of the constraints and objectives of the ocp\n'
+        '    constraints = ConstraintList()\n'
+        '    objective_functions = ObjectiveList()\n',
+        mode: FileMode.append);
+    for (int phaseIndex = 0; phaseIndex < generic.nbSomersaults; phaseIndex++) {
+      for (final objective in somersaults[phaseIndex].objectives) {
+        file.writeAsStringSync(
+            '    objective_functions.add(\n'
+            '        objective=${objective.fcn.toPythonString()},\n'
+            '${objective.arguments.keys.isEmpty ? '' : '${objective.arguments.keys.map((key) => '        ${objective.argumentToPythonString(key)},').join('\n')}\n'}'
+            '        node=${objective.nodes.toPythonString()},\n'
+            '${generic.nbSomersaults == 1 ? '' : '        phase=$phaseIndex,\n'}'
+            '        weight=${objective.weight},\n'
+            '    )\n',
+            mode: FileMode.append);
+      }
+      for (final constraint in somersaults[phaseIndex].constraints) {
+        file.writeAsStringSync(
+            '    constraints.add(\n'
+            '        constraint=${constraint.fcn.toPythonString()},\n'
+            '${constraint.arguments.keys.isEmpty ? '' : '${constraint.arguments.keys.map((key) => '        ${constraint.argumentToPythonString(key)},').join('\n')}\n'}'
+            '        node=${constraint.nodes.toPythonString()},\n'
+            '${generic.nbSomersaults == 1 ? '' : '        phase=$phaseIndex,\n'}'
+            '    )\n',
+            mode: FileMode.append);
+      }
+    }
+    file.writeAsStringSync('\n', mode: FileMode.append);
+
+    file.writeAsStringSync(
         '    # Declaration of the dynamics function used during integration\n'
         '    dynamics = DynamicsList()\n'
         '\n'
