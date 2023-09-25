@@ -856,7 +856,7 @@ class Objective extends Penalty {
 
   Objective.acrobaticGenericMayerMinimizeTime(
       {ObjectiveFcn fcn = MayerFcn.minimizeTime,
-      super.nodes = Nodes.allShooting,
+      super.nodes = Nodes.end,
       super.quadratureRules = QuadratureRules.rectangleLeft,
       super.quadratic = true,
       super.expand = true,
