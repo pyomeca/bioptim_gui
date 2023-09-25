@@ -764,7 +764,7 @@ abstract class Penalty {
   final bool quadratic;
   final bool expand;
   // TODO 'target' argument : np.array(target)
-  final String target;
+  String target;
   final bool derivative;
   final bool explicitDerivative;
   final QuadratureRules quadratureRules;

@@ -377,6 +377,7 @@ class AcrobaticsOCPControllers {
     penalties.add(penalty);
     controllers.add(_PenaltyTextEditingControllers(penalties.last));
     controllers.last._updateWeight();
+    controllers.last._updateTarget();
     controllers.last._updateArguments();
     _notifyListeners();
   }
@@ -390,6 +391,7 @@ class AcrobaticsOCPControllers {
     penalties[penaltyIndex] = penalty;
     controllers[penaltyIndex]._penalty = penalty;
     controllers[penaltyIndex]._updateWeight();
+    controllers[penaltyIndex]._updateTarget();
     controllers[penaltyIndex]._updateArguments();
     _notifyListeners();
   }
@@ -427,6 +429,8 @@ class AcrobaticsOCPControllers {
               penaltyIndex: penaltyIndex, somersaultIndex: somersaultIndex),
           weightController: ({required penaltyIndex}) =>
               _objectiveControllers[somersaultIndex][penaltyIndex].weight,
+          targetController: ({required penaltyIndex}) =>
+              _objectiveControllers[somersaultIndex][penaltyIndex].target,
           argumentController: (
                   {required penaltyIndex, required argumentIndex}) =>
               _objectiveControllers[somersaultIndex][penaltyIndex]
@@ -658,6 +662,7 @@ class AcrobaticsOCPControllers {
 
 class _PenaltyTextEditingControllers {
   final weight = TextEditingController(text: '1.0');
+  final target = TextEditingController(text: 'None');
   Penalty _penalty;
   final arguments = <TextEditingController>[];
 
@@ -672,12 +677,26 @@ class _PenaltyTextEditingControllers {
       (_penalty as Objective).weight = newWeight;
       AcrobaticsOCPControllers.instance._notifyListeners();
     });
+
+    target.addListener(() {
+      final newTarget = target.text;
+      if (newTarget == (_penalty as Objective).target) {
+        return;
+      }
+
+      _penalty.target = newTarget;
+      AcrobaticsOCPControllers.instance._notifyListeners();
+    });
     _updateArguments();
   }
 
   void _updateWeight() {
     if (_penalty.runtimeType != Objective) return;
     weight.text = (_penalty as Objective).weight.toString();
+  }
+
+  void _updateTarget() {
+    target.text = _penalty.target.toString();
   }
 
   void _updateArguments() {
@@ -706,6 +725,7 @@ class _PenaltyTextEditingControllers {
 
   void dispose() {
     weight.dispose();
+    target.dispose();
     _disposeArguments();
   }
 }

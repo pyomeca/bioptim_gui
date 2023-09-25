@@ -32,7 +32,7 @@ class BooleanSwitchState extends State<BooleanSwitch> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: widget.width, // Set the width based on the widget's parameter
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
