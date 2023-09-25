@@ -7,6 +7,7 @@ import 'package:bioptim_gui/models/quadrature_rules.dart';
 import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
 import 'package:bioptim_gui/widgets/boolean_switch.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
+import 'package:bioptim_gui/widgets/maximize_minimize_radio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -282,9 +283,9 @@ class _PathTile extends StatelessWidget {
         Row(
           children: [
             SizedBox(
-              width: width * 2 / 3 - 6,
+              width: width / 2 - 3,
               child: CustomDropdownButton<Nodes>(
-                title: 'Nodes to apply to the ${penalty.fcn.penaltyType}',
+                title: 'Nodes to apply',
                 value: penalty.nodes,
                 items: Nodes.values,
                 onSelected: (value) {
@@ -313,19 +314,21 @@ class _PathTile extends StatelessWidget {
               ),
             ),
             if (penalty.runtimeType == Objective)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 12.0),
-                  child: TextField(
-                      controller: penaltyInterface.weightController!(
-                          penaltyIndex: penaltyIndex),
-                      decoration: const InputDecoration(
-                          label: Text('Weight'), border: OutlineInputBorder()),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))
-                      ]),
-                ),
+              SizedBox(
+                width: width / 4 - 3,
+                child: TextField(
+                    controller: penaltyInterface.weightController!(
+                        penaltyIndex: penaltyIndex),
+                    decoration: const InputDecoration(
+                        label: Text('Weight'), border: OutlineInputBorder()),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))
+                    ]),
               ),
+            SizedBox(
+              width: width / 4 + 6,
+              child: const MinMaxRadio(),
+            )
           ],
         ),
         const SizedBox(height: 12),
@@ -340,6 +343,69 @@ class _PathTile extends StatelessWidget {
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))
                   ]),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            SizedBox(
+              width: width * 2 / 3 - 6,
+              child: CustomDropdownButton<QuadratureRules>(
+                title: 'Integration rule',
+                value: penalty.quadratureRules,
+                items: QuadratureRules.values,
+                onSelected: (value) {
+                  if (value.toString() == penalty.quadratureRules.toString()) {
+                    return;
+                  }
+
+                  final weight = penalty.runtimeType == Objective
+                      ? (penalty as Objective).weight
+                      : null;
+                  penaltyInterface.update(
+                      penaltyFactory(
+                        penalty.fcn,
+                        weight: weight,
+                        nodes: penalty.nodes,
+                        quadratureRules: value,
+                        derivative: penalty.derivative,
+                        quadratic: penalty.quadratic,
+                        expand: penalty.expand,
+                        explicitDerivative: penalty.explicitDerivative,
+                        multiThread: penalty.multiThread,
+                        target: penalty.target,
+                        arguments: penalty.arguments,
+                      ),
+                      penaltyIndex: penaltyIndex);
+                },
+                isExpanded: false,
+              ),
+            ),
+            const SizedBox(width: 12),
+            BooleanSwitch(
+              initialValue: true,
+              customOnChanged: (value) {
+                // penaltyInterface.update(
+                //   penaltyFactory(
+                //     penalty.fcn,
+                //     weight: weight,
+                //     nodes: penalty.nodes,
+                //     quadratureRules: penalty.quadratureRules,
+                //     derivative: penalty.derivative,
+                //     quadratic: penalty.quadratic,
+                //     expand: penalty.expand,
+                //     explicitDerivative: penalty.explicitDerivative,
+                //     multiThread: penalty.multiThread,
+                //     target: penalty.target,
+                //     arguments: penalty.arguments,
+                //   ),
+                //   penaltyIndex: penaltyIndex,
+                // );
+              },
+              leftTextOn: 'Quadratic',
+              leftTextOff: 'Quadratic',
+              width: width / 3 - 6,
             ),
           ],
         ),
@@ -414,73 +480,6 @@ class _PathTile extends StatelessWidget {
                 leftTextOn: 'Explicit derivative',
                 leftTextOff: 'Explicit derivative',
                 width: width * 1 / 2 - 6),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            SizedBox(
-              width: width * 2 / 3 - 6,
-              child: CustomDropdownButton<QuadratureRules>(
-                title: 'Integration rule for the ${penalty.fcn.penaltyType}',
-                value: penalty.quadratureRules,
-                items: QuadratureRules.values,
-                onSelected: (value) {
-                  if (value.toString() == penalty.quadratureRules.toString()) {
-                    return;
-                  }
-
-                  final weight = penalty.runtimeType == Objective
-                      ? (penalty as Objective).weight
-                      : null;
-                  penaltyInterface.update(
-                      penaltyFactory(
-                        penalty.fcn,
-                        weight: weight,
-                        nodes: penalty.nodes,
-                        quadratureRules: value,
-                        derivative: penalty.derivative,
-                        quadratic: penalty.quadratic,
-                        expand: penalty.expand,
-                        explicitDerivative: penalty.explicitDerivative,
-                        multiThread: penalty.multiThread,
-                        target: penalty.target,
-                        arguments: penalty.arguments,
-                      ),
-                      penaltyIndex: penaltyIndex);
-                },
-                isExpanded: false,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Row(
-              children: [
-                BooleanSwitch(
-                  initialValue: true,
-                  customOnChanged: (value) {
-                    // penaltyInterface.update(
-                    //   penaltyFactory(
-                    //     penalty.fcn,
-                    //     weight: weight,
-                    //     nodes: penalty.nodes,
-                    //     quadratureRules: penalty.quadratureRules,
-                    //     derivative: penalty.derivative,
-                    //     quadratic: penalty.quadratic,
-                    //     expand: penalty.expand,
-                    //     explicitDerivative: penalty.explicitDerivative,
-                    //     multiThread: penalty.multiThread,
-                    //     target: penalty.target,
-                    //     arguments: penalty.arguments,
-                    //   ),
-                    //   penaltyIndex: penaltyIndex,
-                    // );
-                  },
-                  leftTextOn: 'Quadratic',
-                  leftTextOff: 'Quadratic',
-                  width: width / 3 - 6,
-                ),
-              ],
-            ),
           ],
         ),
         Align(
