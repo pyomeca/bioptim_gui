@@ -39,7 +39,7 @@ class PenaltyExpander extends StatelessWidget {
       required QuadratureRules? quadratureRules,
       required bool? quadratic,
       required bool? expand,
-      required String target,
+      required String? target,
       required bool? derivative,
       required bool? explicitDerivative,
       required bool? multiThread,
@@ -137,12 +137,12 @@ class PenaltyExpander extends StatelessWidget {
                       {arguments,
                       derivative,
                       expand,
+                      target,
                       explicitDerivative,
                       multiThread,
                       nodes,
                       quadratic,
                       quadratureRules,
-                      target,
                       weight}) {
                     return _penaltyFactory(
                       fcn,
@@ -154,7 +154,7 @@ class PenaltyExpander extends StatelessWidget {
                       nodes: nodes,
                       quadratic: quadratic,
                       quadratureRules: quadratureRules,
-                      target: target!,
+                      target: target,
                       weight: weight,
                     );
                   },
@@ -348,28 +348,7 @@ class _PathTile extends StatelessWidget {
           children: [
             BooleanSwitch(
               initialValue: true,
-              customOnChanged: (value) {
-                final weight = penalty.runtimeType == Objective
-                    ? (penalty as Objective).weight
-                    : null;
-
-                // penaltyInterface.update(
-                //   penaltyFactory(
-                //     penalty.fcn,
-                //     weight: weight,
-                //     nodes: penalty.nodes,
-                //     quadratureRules: penalty.quadratureRules,
-                //     derivative: penalty.derivative,
-                //     quadratic: penalty.quadratic,
-                //     expand: penalty.expand,
-                //     explicitDerivative: penalty.explicitDerivative,
-                //     multiThread: penalty.multiThread,
-                //     target: penalty.target,
-                //     arguments: penalty.arguments,
-                //   ),
-                //   penaltyIndex: penaltyIndex,
-                // );
-              },
+              customOnChanged: (value) {},
               leftTextOn: 'Expand',
               leftTextOff: 'Expand',
               width: width / 2 - 6,
@@ -378,10 +357,6 @@ class _PathTile extends StatelessWidget {
             BooleanSwitch(
               initialValue: false,
               customOnChanged: (value) {
-                final weight = penalty.runtimeType == Objective
-                    ? (penalty as Objective).weight
-                    : null;
-
                 // penaltyInterface.update(
                 //   penaltyFactory(
                 //     penalty.fcn,
@@ -410,28 +385,7 @@ class _PathTile extends StatelessWidget {
           children: [
             BooleanSwitch(
               initialValue: false,
-              customOnChanged: (value) {
-                final weight = penalty.runtimeType == Objective
-                    ? (penalty as Objective).weight
-                    : null;
-
-                // penaltyInterface.update(
-                //   penaltyFactory(
-                //     penalty.fcn,
-                //     weight: weight,
-                //     nodes: penalty.nodes,
-                //     quadratureRules: penalty.quadratureRules,
-                //     derivative: penalty.derivative,
-                //     quadratic: penalty.quadratic,
-                //     expand: penalty.expand,
-                //     explicitDerivative: penalty.explicitDerivative,
-                //     multiThread: penalty.multiThread,
-                //     target: penalty.target,
-                //     arguments: penalty.arguments,
-                //   ),
-                //   penaltyIndex: penaltyIndex,
-                // );
-              },
+              customOnChanged: (value) {},
               leftTextOn: 'Derivative',
               leftTextOff: 'Derivative',
               width: width / 2 - 6,
@@ -440,10 +394,6 @@ class _PathTile extends StatelessWidget {
             BooleanSwitch(
                 initialValue: false,
                 customOnChanged: (value) {
-                  final weight = penalty.runtimeType == Objective
-                      ? (penalty as Objective).weight
-                      : null;
-
                   // penaltyInterface.update(
                   //   penaltyFactory(
                   //     penalty.fcn,
@@ -508,10 +458,6 @@ class _PathTile extends StatelessWidget {
                 BooleanSwitch(
                   initialValue: true,
                   customOnChanged: (value) {
-                    final weight = penalty.runtimeType == Objective
-                        ? (penalty as Objective).weight
-                        : null;
-
                     // penaltyInterface.update(
                     //   penaltyFactory(
                     //     penalty.fcn,
