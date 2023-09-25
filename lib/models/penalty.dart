@@ -764,6 +764,7 @@ abstract class Penalty {
   final bool quadratic;
   final bool expand;
   // TODO 'target' argument : np.array(target)
+  final String target;
   final bool derivative;
   final bool explicitDerivative;
   final QuadratureRules quadratureRules;
@@ -795,6 +796,7 @@ abstract class Penalty {
       {required this.nodes,
       required this.quadratic,
       required this.expand,
+      required this.target,
       required this.derivative,
       required this.explicitDerivative,
       required this.multiThread,
@@ -823,9 +825,10 @@ class Objective extends Penalty {
   Objective.generic(
       {ObjectiveFcn fcn = LagrangeFcn.minimizeControls,
       super.nodes = Nodes.all,
-      super.quadratureRules = QuadratureRules.defaultQuadraticRule,
-      super.quadratic = false,
-      super.expand = false,
+      super.quadratureRules = QuadratureRules.rectangleLeft,
+      super.quadratic = true,
+      super.expand = true,
+      super.target = 'None',
       super.derivative = false,
       super.explicitDerivative = false,
       super.multiThread = false,
@@ -836,9 +839,10 @@ class Objective extends Penalty {
   Objective.acrobaticGenericLagrangeMinimizeControls(
       {ObjectiveFcn fcn = LagrangeFcn.minimizeControls,
       super.nodes = Nodes.allShooting,
-      super.quadratureRules = QuadratureRules.defaultQuadraticRule,
-      super.quadratic = false,
-      super.expand = false,
+      super.quadratureRules = QuadratureRules.rectangleLeft,
+      super.quadratic = true,
+      super.expand = true,
+      super.target = 'None',
       super.derivative = false,
       super.explicitDerivative = false,
       super.multiThread = false,
@@ -853,9 +857,10 @@ class Objective extends Penalty {
   Objective.acrobaticGenericMayerMinimizeTime(
       {ObjectiveFcn fcn = MayerFcn.minimizeTime,
       super.nodes = Nodes.allShooting,
-      super.quadratureRules = QuadratureRules.defaultQuadraticRule,
-      super.quadratic = false,
-      super.expand = false,
+      super.quadratureRules = QuadratureRules.rectangleLeft,
+      super.quadratic = true,
+      super.expand = true,
+      super.target = 'None',
       super.derivative = false,
       super.explicitDerivative = false,
       super.multiThread = false,
@@ -871,21 +876,24 @@ class Objective extends Penalty {
                 });
 
   Objective.lagrange(LagrangeFcn fcn,
-      {super.nodes = Nodes.all,
-      super.quadratureRules = QuadratureRules.defaultQuadraticRule,
-      super.quadratic = false,
-      super.expand = false,
+      {super.nodes = Nodes.allShooting,
+      super.quadratureRules = QuadratureRules.rectangleLeft,
+      super.quadratic = true,
+      super.expand = true,
+      super.target = 'None',
       super.derivative = false,
       super.explicitDerivative = false,
       super.multiThread = false,
       this.weight = 1,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
+
   Objective.mayer(MayerFcn fcn,
-      {super.nodes = Nodes.all,
-      super.quadratureRules = QuadratureRules.defaultQuadraticRule,
-      super.quadratic = false,
-      super.expand = false,
+      {super.nodes = Nodes.end,
+      super.quadratureRules = QuadratureRules.rectangleLeft,
+      super.quadratic = true,
+      super.expand = true,
+      super.target = 'None',
       super.derivative = false,
       super.explicitDerivative = false,
       super.multiThread = false,
@@ -898,9 +906,10 @@ class Constraint extends Penalty {
   Constraint.generic(
       {ConstraintFcn fcn = ConstraintFcn.timeConstraint,
       super.nodes = Nodes.end,
-      super.quadratureRules = QuadratureRules.defaultQuadraticRule,
-      super.quadratic = false,
-      super.expand = false,
+      super.quadratureRules = QuadratureRules.rectangleLeft,
+      super.quadratic = true,
+      super.expand = true,
+      super.target = 'None',
       super.derivative = false,
       super.explicitDerivative = false,
       super.multiThread = false,
