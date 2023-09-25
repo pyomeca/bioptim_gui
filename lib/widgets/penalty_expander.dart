@@ -295,8 +295,9 @@ class _PathTile extends StatelessWidget {
                 value: penalty.quadratureRules,
                 items: QuadratureRules.values,
                 onSelected: (value) {
-                  if (value.toString() == penalty.quadratureRules.toString())
+                  if (value.toString() == penalty.quadratureRules.toString()) {
                     return;
+                  }
 
                   final weight = penalty.runtimeType == Objective
                       ? (penalty as Objective).weight
