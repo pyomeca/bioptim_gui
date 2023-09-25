@@ -5,6 +5,7 @@ enum PenaltyArgumentType {
   integer,
   float,
   string,
+  array,
   ;
 
   @override
@@ -16,6 +17,8 @@ enum PenaltyArgumentType {
         return 'Float';
       case string:
         return 'String';
+      case array:
+        return 'Array';
     }
   }
 
@@ -27,6 +30,8 @@ enum PenaltyArgumentType {
         return RegExp(r'[0-9\.]');
       case string:
         return RegExp(r'[a-zA-Z0-9]');
+      case array:
+        return RegExp(r'[0-9\.,]');
     }
   }
 }
@@ -253,9 +258,8 @@ enum LagrangeFcn implements ObjectiveFcn {
             minimizeComVelocity ||
             minimizeLinearMomentum:
         return [
-          // TODO implement argument
-          // const PenaltyArgument(
-          //    name: 'axes', dataType: PenaltyArgumentType.string),
+          const PenaltyArgument(
+              name: 'axes', dataType: PenaltyArgumentType.array),
         ];
 
       // key:str
@@ -275,9 +279,8 @@ enum LagrangeFcn implements ObjectiveFcn {
           // TODO adapt argument type, set to string for now
           const PenaltyArgument(
               name: 'marker_index', dataType: PenaltyArgumentType.string),
-          // TODO implement argument
-          // const PenaltyArgument(
-          //    name: 'axes', dataType: PenaltyArgumentType.string),
+          const PenaltyArgument(
+              name: 'axes', dataType: PenaltyArgumentType.array),
           // TODO adapt argument str or int
           const PenaltyArgument(
               name: 'reference_jcs', dataType: PenaltyArgumentType.string),
@@ -290,9 +293,8 @@ enum LagrangeFcn implements ObjectiveFcn {
           // TODO typing
           const PenaltyArgument(
               name: 'segment', dataType: PenaltyArgumentType.string),
-          // TODO implement argument
-          // const PenaltyArgument(
-          //    name: 'axes', dataType: PenaltyArgumentType.string),
+          const PenaltyArgument(
+              name: 'axes', dataType: PenaltyArgumentType.array),
         ];
 
       // key:str
@@ -329,9 +331,8 @@ enum LagrangeFcn implements ObjectiveFcn {
           // TODO typing
           const PenaltyArgument(
               name: 'second_marker', dataType: PenaltyArgumentType.string),
-          // TODO implement argument
-          // const PenaltyArgument(
-          //    name: 'axes', dataType: PenaltyArgumentType.string),
+          const PenaltyArgument(
+              name: 'axes', dataType: PenaltyArgumentType.array),
         ];
 
       // marker:int|str
@@ -772,7 +773,14 @@ abstract class Penalty {
     final argument = arguments[key] ?? 'to_be_specified';
     switch (argument.runtimeType) {
       case String:
-        return '$key="$argument"';
+        switch (fcn.mandatoryArguments
+            .firstWhere((element) => element.name == key)
+            .dataType) {
+          case PenaltyArgumentType.array:
+            return '$key=np.array([$argument])';
+          default:
+            return '$key="$argument"';
+        }
       case double || int:
         return '$key=$argument';
       case bool:
