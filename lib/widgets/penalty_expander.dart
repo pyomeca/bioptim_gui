@@ -5,6 +5,7 @@ import 'package:bioptim_gui/models/optimal_control_program_type.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/models/quadrature_rules.dart';
 import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
+import 'package:bioptim_gui/widgets/boolean_switch.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,21 +34,27 @@ class PenaltyExpander extends StatelessWidget {
   }
 
   Penalty _penaltyFactory(PenaltyFcn fcn,
-      {required double? weigth,
+      {required double? weight,
       required Nodes? nodes,
       required QuadratureRules? quadratureRules,
+      required bool? quadratic,
+      required bool? expand,
+      required String target,
+      required bool? derivative,
+      required bool? explicitDerivative,
+      required bool? multiThread,
       required Map<String, dynamic>? arguments}) {
     switch (fcn.runtimeType) {
       case LagrangeFcn:
         return Objective.lagrange(fcn as LagrangeFcn,
-            weight: weigth ?? 1,
+            weight: weight ?? 1,
             nodes: nodes ?? Nodes.all,
             quadratureRules:
                 quadratureRules ?? QuadratureRules.defaultQuadraticRule,
             arguments: arguments ?? {});
       case MayerFcn:
         return Objective.mayer(fcn as MayerFcn,
-            weight: weigth ?? 1,
+            weight: weight ?? 1,
             nodes: nodes ?? Nodes.end,
             quadratureRules:
                 quadratureRules ?? QuadratureRules.defaultQuadraticRule,
@@ -126,7 +133,31 @@ class PenaltyExpander extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 24.0),
                 child: _PathTile(
                   key: ObjectKey(penalties[index]),
-                  penaltyFactory: _penaltyFactory,
+                  penaltyFactory: (fcn,
+                      {arguments,
+                      derivative,
+                      expand,
+                      explicitDerivative,
+                      multiThread,
+                      nodes,
+                      quadratic,
+                      quadratureRules,
+                      target,
+                      weight}) {
+                    return _penaltyFactory(
+                      fcn,
+                      arguments: arguments,
+                      derivative: derivative,
+                      expand: expand,
+                      explicitDerivative: explicitDerivative,
+                      multiThread: multiThread,
+                      nodes: nodes,
+                      quadratic: quadratic,
+                      quadratureRules: quadratureRules,
+                      target: target!,
+                      weight: weight,
+                    );
+                  },
                   penaltyInterface: _getPenaltyInterface,
                   penaltyIndex: index,
                   width: width,
@@ -179,7 +210,13 @@ class _PathTile extends StatelessWidget {
       {required Map<String, dynamic>? arguments,
       required Nodes? nodes,
       required QuadratureRules? quadratureRules,
-      required double? weigth}) penaltyFactory;
+      required bool? quadratic,
+      required bool? expand,
+      required String? target,
+      required bool? derivative,
+      required bool? explicitDerivative,
+      required bool? multiThread,
+      required double? weight}) penaltyFactory;
   final PenaltyInterface penaltyInterface;
   final int penaltyIndex;
   final double width;
@@ -205,9 +242,15 @@ class _PathTile extends StatelessWidget {
               // Update to a brand new fresh penalty
               penaltyInterface.update(
                   penaltyFactory(value,
-                      weigth: null,
+                      weight: null,
                       nodes: null,
                       quadratureRules: null,
+                      derivative: null,
+                      expand: null,
+                      quadratic: null,
+                      explicitDerivative: null,
+                      multiThread: null,
+                      target: null,
                       arguments: null),
                   penaltyIndex: penaltyIndex);
             },
@@ -259,11 +302,19 @@ class _PathTile extends StatelessWidget {
                       ? (penalty as Objective).weight
                       : null;
                   penaltyInterface.update(
-                      penaltyFactory(penalty.fcn,
-                          weigth: weight,
-                          nodes: value,
-                          quadratureRules: penalty.quadratureRules,
-                          arguments: penalty.arguments),
+                      penaltyFactory(
+                        penalty.fcn,
+                        weight: weight,
+                        nodes: value,
+                        quadratureRules: penalty.quadratureRules,
+                        derivative: penalty.derivative,
+                        quadratic: penalty.quadratic,
+                        expand: penalty.expand,
+                        explicitDerivative: penalty.explicitDerivative,
+                        multiThread: penalty.multiThread,
+                        target: penalty.target,
+                        arguments: penalty.arguments,
+                      ),
                       penaltyIndex: penaltyIndex);
                 },
                 isExpanded: false,
@@ -288,6 +339,129 @@ class _PathTile extends StatelessWidget {
         const SizedBox(height: 12),
         Row(
           children: [
+            BooleanSwitch(
+              initialValue: true,
+              customOnChanged: (value) {
+                final weight = penalty.runtimeType == Objective
+                    ? (penalty as Objective).weight
+                    : null;
+
+                // penaltyInterface.update(
+                //   penaltyFactory(
+                //     penalty.fcn,
+                //     weight: weight,
+                //     nodes: penalty.nodes,
+                //     quadratureRules: penalty.quadratureRules,
+                //     derivative: penalty.derivative,
+                //     quadratic: penalty.quadratic,
+                //     expand: penalty.expand,
+                //     explicitDerivative: penalty.explicitDerivative,
+                //     multiThread: penalty.multiThread,
+                //     target: penalty.target,
+                //     arguments: penalty.arguments,
+                //   ),
+                //   penaltyIndex: penaltyIndex,
+                // );
+              },
+              leftTextOn: 'Expand',
+              leftTextOff: 'Expand',
+              width: width / 2 - 6,
+            ),
+            const SizedBox(width: 12),
+            BooleanSwitch(
+              initialValue: false,
+              customOnChanged: (value) {
+                final weight = penalty.runtimeType == Objective
+                    ? (penalty as Objective).weight
+                    : null;
+
+                // penaltyInterface.update(
+                //   penaltyFactory(
+                //     penalty.fcn,
+                //     weight: weight,
+                //     nodes: penalty.nodes,
+                //     quadratureRules: penalty.quadratureRules,
+                //     derivative: penalty.derivative,
+                //     quadratic: penalty.quadratic,
+                //     expand: penalty.expand,
+                //     explicitDerivative: penalty.explicitDerivative,
+                //     multiThread: penalty.multiThread,
+                //     target: penalty.target,
+                //     arguments: penalty.arguments,
+                //   ),
+                //   penaltyIndex: penaltyIndex,
+                // );
+              },
+              leftTextOn: 'MultiThread',
+              leftTextOff: 'MultiThread',
+              width: width / 2 - 6,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            BooleanSwitch(
+              initialValue: false,
+              customOnChanged: (value) {
+                final weight = penalty.runtimeType == Objective
+                    ? (penalty as Objective).weight
+                    : null;
+
+                // penaltyInterface.update(
+                //   penaltyFactory(
+                //     penalty.fcn,
+                //     weight: weight,
+                //     nodes: penalty.nodes,
+                //     quadratureRules: penalty.quadratureRules,
+                //     derivative: penalty.derivative,
+                //     quadratic: penalty.quadratic,
+                //     expand: penalty.expand,
+                //     explicitDerivative: penalty.explicitDerivative,
+                //     multiThread: penalty.multiThread,
+                //     target: penalty.target,
+                //     arguments: penalty.arguments,
+                //   ),
+                //   penaltyIndex: penaltyIndex,
+                // );
+              },
+              leftTextOn: 'Derivative',
+              leftTextOff: 'Derivative',
+              width: width / 2 - 6,
+            ),
+            const SizedBox(width: 12),
+            BooleanSwitch(
+                initialValue: false,
+                customOnChanged: (value) {
+                  final weight = penalty.runtimeType == Objective
+                      ? (penalty as Objective).weight
+                      : null;
+
+                  // penaltyInterface.update(
+                  //   penaltyFactory(
+                  //     penalty.fcn,
+                  //     weight: weight,
+                  //     nodes: penalty.nodes,
+                  //     quadratureRules: penalty.quadratureRules,
+                  //     derivative: penalty.derivative,
+                  //     quadratic: penalty.quadratic,
+                  //     expand: penalty.expand,
+                  //     explicitDerivative: penalty.explicitDerivative,
+                  //     multiThread: penalty.multiThread,
+                  //     target: penalty.target,
+                  //     arguments: penalty.arguments,
+                  //   ),
+                  //   penaltyIndex: penaltyIndex,
+                  // );
+                },
+                leftTextOn: 'Explicit derivative',
+                leftTextOff: 'Explicit derivative',
+                width: width * 1 / 2 - 6),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
             SizedBox(
               width: width * 2 / 3 - 6,
               child: CustomDropdownButton<QuadratureRules>(
@@ -303,15 +477,56 @@ class _PathTile extends StatelessWidget {
                       ? (penalty as Objective).weight
                       : null;
                   penaltyInterface.update(
-                      penaltyFactory(penalty.fcn,
-                          weigth: weight,
-                          nodes: penalty.nodes,
-                          quadratureRules: value,
-                          arguments: penalty.arguments),
+                      penaltyFactory(
+                        penalty.fcn,
+                        weight: weight,
+                        nodes: penalty.nodes,
+                        quadratureRules: value,
+                        derivative: penalty.derivative,
+                        quadratic: penalty.quadratic,
+                        expand: penalty.expand,
+                        explicitDerivative: penalty.explicitDerivative,
+                        multiThread: penalty.multiThread,
+                        target: penalty.target,
+                        arguments: penalty.arguments,
+                      ),
                       penaltyIndex: penaltyIndex);
                 },
                 isExpanded: false,
               ),
+            ),
+            const SizedBox(width: 12),
+            Row(
+              children: [
+                BooleanSwitch(
+                  initialValue: true,
+                  customOnChanged: (value) {
+                    final weight = penalty.runtimeType == Objective
+                        ? (penalty as Objective).weight
+                        : null;
+
+                    // penaltyInterface.update(
+                    //   penaltyFactory(
+                    //     penalty.fcn,
+                    //     weight: weight,
+                    //     nodes: penalty.nodes,
+                    //     quadratureRules: penalty.quadratureRules,
+                    //     derivative: penalty.derivative,
+                    //     quadratic: penalty.quadratic,
+                    //     expand: penalty.expand,
+                    //     explicitDerivative: penalty.explicitDerivative,
+                    //     multiThread: penalty.multiThread,
+                    //     target: penalty.target,
+                    //     arguments: penalty.arguments,
+                    //   ),
+                    //   penaltyIndex: penaltyIndex,
+                    // );
+                  },
+                  leftTextOn: 'Quadratic',
+                  leftTextOff: 'Quadratic',
+                  width: width / 3 - 6,
+                ),
+              ],
             ),
           ],
         ),
