@@ -263,26 +263,18 @@ class _PathTile extends StatelessWidget {
               child: Row(
                 children: [
                   SizedBox(
-                    width: width * 2 / 3 - 6,
+                    width: width,
                     child: TextField(
                         controller: penaltyInterface.argumentController(
                             penaltyIndex: penaltyIndex, argumentIndex: index),
                         decoration: InputDecoration(
-                            label: Text('Argument: ${arguments[index].name}'),
+                            label: Text(
+                                'Argument: ${arguments[index].name} (${arguments[index].dataType.toString()})'),
                             border: const OutlineInputBorder()),
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                               arguments[index].dataType.regexpValidator)
                         ]),
-                  ),
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    width: width * 1 / 3 - 6,
-                    child: CustomDropdownButton<PenaltyArgumentType>(
-                      title: 'Type',
-                      value: arguments[index].dataType,
-                      items: PenaltyArgumentType.values,
-                    ),
                   ),
                 ],
               ),
@@ -334,6 +326,21 @@ class _PathTile extends StatelessWidget {
                       ]),
                 ),
               ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                  controller: penaltyInterface.targetController!(
+                      penaltyIndex: penaltyIndex),
+                  decoration: const InputDecoration(
+                      label: Text('Target'), border: OutlineInputBorder()),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))
+                  ]),
+            ),
           ],
         ),
         const SizedBox(height: 12),

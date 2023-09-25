@@ -17,6 +17,7 @@ class PenaltyInterface {
     required this.update,
     required this.remove,
     this.weightController,
+    this.targetController,
     required this.argumentController,
   });
 
@@ -28,6 +29,10 @@ class PenaltyInterface {
 
   final TextEditingController Function({required int penaltyIndex})?
       weightController;
+
+  final TextEditingController Function({required int penaltyIndex})?
+      targetController;
+
   final TextEditingController Function(
       {required int penaltyIndex,
       required int argumentIndex}) argumentController;
@@ -309,6 +314,7 @@ class OptimalControlProgramControllers {
     penalties.add(penalty);
     controllers.add(_PenaltyTextEditingControllers(penalties.last));
     controllers.last._updateWeight();
+    controllers.last._updateTarget();
     controllers.last._updateArguments();
     _notifyListeners();
   }
@@ -322,6 +328,7 @@ class OptimalControlProgramControllers {
     penalties[penaltyIndex] = penalty;
     controllers[penaltyIndex]._penalty = penalty;
     controllers[penaltyIndex]._updateWeight();
+    controllers[penaltyIndex]._updateTarget();
     controllers[penaltyIndex]._updateArguments();
     _notifyListeners();
   }
@@ -356,6 +363,8 @@ class OptimalControlProgramControllers {
           _removeObjective(penaltyIndex: penaltyIndex, phaseIndex: phaseIndex),
       weightController: ({required penaltyIndex}) =>
           _objectiveControllers[phaseIndex][penaltyIndex].weight,
+      targetController: ({required penaltyIndex}) =>
+          _objectiveControllers[phaseIndex][penaltyIndex].target,
       argumentController: ({required penaltyIndex, required argumentIndex}) =>
           _objectiveControllers[phaseIndex][penaltyIndex]
               .arguments[argumentIndex]);
@@ -555,6 +564,8 @@ class OptimalControlProgramControllers {
 
 class _PenaltyTextEditingControllers {
   final weight = TextEditingController(text: '1.0');
+  final target = TextEditingController(text: 'None');
+
   Penalty _penalty;
   final arguments = <TextEditingController>[];
 
@@ -567,6 +578,18 @@ class _PenaltyTextEditingControllers {
       }
 
       (_penalty as Objective).weight = newWeight;
+
+      OptimalControlProgramControllers.instance._notifyListeners();
+    });
+    target.addListener(() {
+      if (_penalty.runtimeType != Objective) return;
+      final newTarget = target.text;
+      if (newTarget == _penalty.target) {
+        return;
+      }
+
+      _penalty.target = newTarget;
+
       OptimalControlProgramControllers.instance._notifyListeners();
     });
     _updateArguments();
@@ -575,6 +598,10 @@ class _PenaltyTextEditingControllers {
   void _updateWeight() {
     if (_penalty.runtimeType != Objective) return;
     weight.text = (_penalty as Objective).weight.toString();
+  }
+
+  void _updateTarget() {
+    target.text = _penalty.target.toString();
   }
 
   void _updateArguments() {
@@ -603,6 +630,7 @@ class _PenaltyTextEditingControllers {
 
   void dispose() {
     weight.dispose();
+    target.dispose();
     _disposeArguments();
   }
 }
