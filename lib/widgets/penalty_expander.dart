@@ -283,7 +283,7 @@ class _PathTile extends StatelessWidget {
         Row(
           children: [
             SizedBox(
-              width: width / 2 - 3,
+              width: (penalty.runtimeType == Objective) ? width / 2 - 3 : width,
               child: CustomDropdownButton<Nodes>(
                 title: 'Nodes to apply',
                 value: penalty.nodes,
@@ -325,10 +325,11 @@ class _PathTile extends StatelessWidget {
                       FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))
                     ]),
               ),
-            SizedBox(
-              width: width / 4 + 6,
-              child: const MinMaxRadio(),
-            )
+            if (penalty.runtimeType == Objective)
+              SizedBox(
+                width: width / 4 + 6,
+                child: const MinMaxRadio(),
+              )
           ],
         ),
         // const SizedBox(height: 12),
