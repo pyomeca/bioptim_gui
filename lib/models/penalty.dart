@@ -252,6 +252,8 @@ enum LagrangeFcn implements ObjectiveFcn {
   @override
   List<PenaltyArgument> get mandatoryArguments {
     switch (this) {
+      // the arguments that can be multiple are set to string for now
+
       // axes:tuple|list=None
       case minimizeAngularMomentum ||
             minimizeComPosition ||
@@ -276,12 +278,10 @@ enum LagrangeFcn implements ObjectiveFcn {
             minimizeMarkersAcceleration ||
             minimizeMarkersVelocity:
         return [
-          // TODO adapt argument type, set to string for now
           const PenaltyArgument(
               name: 'marker_index', dataType: PenaltyArgumentType.string),
           const PenaltyArgument(
               name: 'axes', dataType: PenaltyArgumentType.array),
-          // TODO adapt argument str or int
           const PenaltyArgument(
               name: 'reference_jcs', dataType: PenaltyArgumentType.string),
         ];
@@ -290,7 +290,6 @@ enum LagrangeFcn implements ObjectiveFcn {
       // axes:tuple|list=None
       case minimizeSegmentRotation || minimizeSegmentVelocity:
         return [
-          // TODO typing
           const PenaltyArgument(
               name: 'segment', dataType: PenaltyArgumentType.string),
           const PenaltyArgument(
@@ -325,10 +324,8 @@ enum LagrangeFcn implements ObjectiveFcn {
       // axes:tuple|list=None
       case superimposeMarkers:
         return [
-          // TODO typing
           const PenaltyArgument(
               name: 'first_marker', dataType: PenaltyArgumentType.string),
-          // TODO typing
           const PenaltyArgument(
               name: 'second_marker', dataType: PenaltyArgumentType.string),
           const PenaltyArgument(
@@ -340,10 +337,8 @@ enum LagrangeFcn implements ObjectiveFcn {
       // axis:Axis
       case trackMarkerWithSegmentAxis:
         return [
-          // TODO typing
           const PenaltyArgument(
               name: 'marker', dataType: PenaltyArgumentType.string),
-          // TODO typing
           const PenaltyArgument(
               name: 'segment', dataType: PenaltyArgumentType.string),
           // TODO implement argument
@@ -355,7 +350,6 @@ enum LagrangeFcn implements ObjectiveFcn {
       // rt:int
       case trackSegmentWithCustomRT:
         return [
-          // TODO typing
           const PenaltyArgument(
               name: 'segment', dataType: PenaltyArgumentType.string),
           const PenaltyArgument(
@@ -368,16 +362,12 @@ enum LagrangeFcn implements ObjectiveFcn {
       // vector_1_marker_1:int|str
       case trackVectorOrientationsFromMarkers:
         return [
-          // TODO typing
           const PenaltyArgument(
               name: 'vector_0_marker_0', dataType: PenaltyArgumentType.string),
-          // TODO typing
           const PenaltyArgument(
               name: 'vector_0_marker_1', dataType: PenaltyArgumentType.string),
-          // TODO typing
           const PenaltyArgument(
               name: 'vector_1_marker_0', dataType: PenaltyArgumentType.string),
-          // TODO typing
           const PenaltyArgument(
               name: 'vector_1_marker_1', dataType: PenaltyArgumentType.string),
         ];
@@ -572,9 +562,8 @@ enum MayerFcn implements ObjectiveFcn {
             minimizeComVelocity ||
             minimizeLinearMomentum:
         return [
-          // TODO implement argument
-          // const PenaltyArgument(
-          //    name: 'axes', dataType: PenaltyArgumentType.string),
+          const PenaltyArgument(
+              name: 'axes', dataType: PenaltyArgumentType.array),
         ];
 
       // key:str
@@ -594,10 +583,8 @@ enum MayerFcn implements ObjectiveFcn {
           // TODO adapt argument type, set to string for now
           const PenaltyArgument(
               name: 'marker_index', dataType: PenaltyArgumentType.string),
-          // TODO implement argument
-          // const PenaltyArgument(
-          //    name: 'axes', dataType: PenaltyArgumentType.string),
-          // TODO adapt argument str or int
+          const PenaltyArgument(
+              name: 'axes', dataType: PenaltyArgumentType.array),
           const PenaltyArgument(
               name: 'reference_jcs', dataType: PenaltyArgumentType.string),
         ];
@@ -606,12 +593,10 @@ enum MayerFcn implements ObjectiveFcn {
       // axes:tuple|list=None
       case minimizeSegmentRotation || minimizeSegmentVelocity:
         return [
-          // TODO typing
           const PenaltyArgument(
               name: 'segment', dataType: PenaltyArgumentType.string),
-          // TODO implement argument
-          // const PenaltyArgument(
-          //    name: 'axes', dataType: PenaltyArgumentType.string),
+          const PenaltyArgument(
+              name: 'axes', dataType: PenaltyArgumentType.array),
         ];
 
       // key:str
@@ -642,15 +627,12 @@ enum MayerFcn implements ObjectiveFcn {
       // axes:tuple|list=None
       case superimposeMarkers:
         return [
-          // TODO typing
           const PenaltyArgument(
               name: 'first_marker', dataType: PenaltyArgumentType.string),
-          // TODO typing
           const PenaltyArgument(
               name: 'second_marker', dataType: PenaltyArgumentType.string),
-          // TODO implement argument
-          // const PenaltyArgument(
-          //    name: 'axes', dataType: PenaltyArgumentType.string),
+          const PenaltyArgument(
+              name: 'axes', dataType: PenaltyArgumentType.array),
         ];
 
       // marker:int|str
@@ -658,10 +640,8 @@ enum MayerFcn implements ObjectiveFcn {
       // axis:Axis
       case trackMarkerWithSegmentAxis:
         return [
-          // TODO typing
           const PenaltyArgument(
               name: 'marker', dataType: PenaltyArgumentType.string),
-          // TODO typing
           const PenaltyArgument(
               name: 'segment', dataType: PenaltyArgumentType.string),
           // TODO implement argument
@@ -673,7 +653,6 @@ enum MayerFcn implements ObjectiveFcn {
       // rt:int
       case trackSegmentWithCustomRT:
         return [
-          // TODO typing
           const PenaltyArgument(
               name: 'segment', dataType: PenaltyArgumentType.string),
           const PenaltyArgument(
@@ -686,16 +665,12 @@ enum MayerFcn implements ObjectiveFcn {
       // vector_1_marker_1:int|str
       case trackVectorOrientationsFromMarkers:
         return [
-          // TODO typing
           const PenaltyArgument(
               name: 'vector_0_marker_0', dataType: PenaltyArgumentType.string),
-          // TODO typing
           const PenaltyArgument(
               name: 'vector_0_marker_1', dataType: PenaltyArgumentType.string),
-          // TODO typing
           const PenaltyArgument(
               name: 'vector_1_marker_0', dataType: PenaltyArgumentType.string),
-          // TODO typing
           const PenaltyArgument(
               name: 'vector_1_marker_1', dataType: PenaltyArgumentType.string),
         ];
