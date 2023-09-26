@@ -331,21 +331,21 @@ class _PathTile extends StatelessWidget {
             )
           ],
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: TextField(
-                  controller: penaltyInterface.targetController!(
-                      penaltyIndex: penaltyIndex),
-                  decoration: const InputDecoration(
-                      label: Text('Target'), border: OutlineInputBorder()),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))
-                  ]),
-            ),
-          ],
-        ),
+        // const SizedBox(height: 12),
+        // Row(
+        //   children: [
+        //     Expanded(
+        //       child: TextField(
+        //           controller: penaltyInterface.targetController!(
+        //               penaltyIndex: penaltyIndex),
+        //           decoration: const InputDecoration(
+        //               label: Text('Target'), border: OutlineInputBorder()),
+        //           inputFormatters: [
+        //             FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,]'))
+        //           ]),
+        //     ),
+        //   ],
+        // ),
         const SizedBox(height: 12),
         Row(
           children: [
