@@ -3,16 +3,14 @@ import 'package:flutter/material.dart';
 class BooleanSwitch extends StatefulWidget {
   final bool initialValue;
   final ValueChanged<bool> customOnChanged;
-  final String leftTextOn;
-  final String leftTextOff;
+  final String leftText;
   final double width;
 
   const BooleanSwitch({
     Key? key,
     required this.customOnChanged,
     required this.initialValue,
-    required this.leftTextOn,
-    required this.leftTextOff,
+    required this.leftText,
     required this.width, // Add width as a parameter
   }) : super(key: key);
 
@@ -22,7 +20,6 @@ class BooleanSwitch extends StatefulWidget {
 
 class BooleanSwitchState extends State<BooleanSwitch> {
   late bool lightValue;
-  late String leftText;
 
   @override
   void initState() {
@@ -37,7 +34,7 @@ class BooleanSwitchState extends State<BooleanSwitch> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(lightValue ? widget.leftTextOn : widget.leftTextOff),
+          Text(widget.leftText),
           Switch(
             value: lightValue,
             onChanged: (bool value) {

@@ -386,26 +386,8 @@ class _PathTile extends StatelessWidget {
             const SizedBox(width: 12),
             BooleanSwitch(
               initialValue: true,
-              customOnChanged: (value) {
-                // penaltyInterface.update(
-                //   penaltyFactory(
-                //     penalty.fcn,
-                //     weight: weight,
-                //     nodes: penalty.nodes,
-                //     quadratureRules: penalty.quadratureRules,
-                //     derivative: penalty.derivative,
-                //     quadratic: penalty.quadratic,
-                //     expand: penalty.expand,
-                //     explicitDerivative: penalty.explicitDerivative,
-                //     multiThread: penalty.multiThread,
-                //     target: penalty.target,
-                //     arguments: penalty.arguments,
-                //   ),
-                //   penaltyIndex: penaltyIndex,
-                // );
-              },
-              leftTextOn: 'Quadratic',
-              leftTextOff: 'Quadratic',
+              customOnChanged: (value) {},
+              leftText: 'Quadratic',
               width: width / 3 - 6,
             ),
           ],
@@ -416,33 +398,14 @@ class _PathTile extends StatelessWidget {
             BooleanSwitch(
               initialValue: true,
               customOnChanged: (value) {},
-              leftTextOn: 'Expand',
-              leftTextOff: 'Expand',
+              leftText: 'Expand',
               width: width / 2 - 6,
             ),
             const SizedBox(width: 12),
             BooleanSwitch(
               initialValue: false,
-              customOnChanged: (value) {
-                // penaltyInterface.update(
-                //   penaltyFactory(
-                //     penalty.fcn,
-                //     weight: weight,
-                //     nodes: penalty.nodes,
-                //     quadratureRules: penalty.quadratureRules,
-                //     derivative: penalty.derivative,
-                //     quadratic: penalty.quadratic,
-                //     expand: penalty.expand,
-                //     explicitDerivative: penalty.explicitDerivative,
-                //     multiThread: penalty.multiThread,
-                //     target: penalty.target,
-                //     arguments: penalty.arguments,
-                //   ),
-                //   penaltyIndex: penaltyIndex,
-                // );
-              },
-              leftTextOn: 'MultiThread',
-              leftTextOff: 'MultiThread',
+              customOnChanged: (value) {},
+              leftText: 'MultiThread',
               width: width / 2 - 6,
             ),
           ],
@@ -453,33 +416,14 @@ class _PathTile extends StatelessWidget {
             BooleanSwitch(
               initialValue: false,
               customOnChanged: (value) {},
-              leftTextOn: 'Derivative',
-              leftTextOff: 'Derivative',
+              leftText: 'Derivative',
               width: width / 2 - 6,
             ),
             const SizedBox(width: 12),
             BooleanSwitch(
                 initialValue: false,
-                customOnChanged: (value) {
-                  // penaltyInterface.update(
-                  //   penaltyFactory(
-                  //     penalty.fcn,
-                  //     weight: weight,
-                  //     nodes: penalty.nodes,
-                  //     quadratureRules: penalty.quadratureRules,
-                  //     derivative: penalty.derivative,
-                  //     quadratic: penalty.quadratic,
-                  //     expand: penalty.expand,
-                  //     explicitDerivative: penalty.explicitDerivative,
-                  //     multiThread: penalty.multiThread,
-                  //     target: penalty.target,
-                  //     arguments: penalty.arguments,
-                  //   ),
-                  //   penaltyIndex: penaltyIndex,
-                  // );
-                },
-                leftTextOn: 'Explicit derivative',
-                leftTextOff: 'Explicit derivative',
+                customOnChanged: (value) {},
+                leftText: 'Explicit derivative',
                 width: width * 1 / 2 - 6),
           ],
         ),
