@@ -738,7 +738,6 @@ abstract class Penalty {
   final Nodes nodes;
   final bool quadratic;
   final bool expand;
-  // TODO 'target' argument : np.array(target)
   String target;
   final bool derivative;
   final bool explicitDerivative;

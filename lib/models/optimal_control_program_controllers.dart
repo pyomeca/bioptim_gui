@@ -17,6 +17,7 @@ class PenaltyInterface {
     required this.update,
     required this.remove,
     this.weightController,
+    required this.targetController,
     required this.argumentController,
   });
 
@@ -28,6 +29,9 @@ class PenaltyInterface {
 
   final TextEditingController Function({required int penaltyIndex})?
       weightController;
+
+  final TextEditingController Function({required int penaltyIndex})
+      targetController;
 
   final TextEditingController Function(
       {required int penaltyIndex,
@@ -310,6 +314,7 @@ class OptimalControlProgramControllers {
     penalties.add(penalty);
     controllers.add(_PenaltyTextEditingControllers(penalties.last));
     controllers.last._updateWeight();
+    controllers.last._updateTarget();
     controllers.last._updateArguments();
     _notifyListeners();
   }
@@ -323,6 +328,7 @@ class OptimalControlProgramControllers {
     penalties[penaltyIndex] = penalty;
     controllers[penaltyIndex]._penalty = penalty;
     controllers[penaltyIndex]._updateWeight();
+    controllers[penaltyIndex]._updateTarget();
     controllers[penaltyIndex]._updateArguments();
     _notifyListeners();
   }
@@ -357,6 +363,8 @@ class OptimalControlProgramControllers {
           _removeObjective(penaltyIndex: penaltyIndex, phaseIndex: phaseIndex),
       weightController: ({required penaltyIndex}) =>
           _objectiveControllers[phaseIndex][penaltyIndex].weight,
+      targetController: ({required penaltyIndex}) =>
+          _objectiveControllers[phaseIndex][penaltyIndex].target,
       argumentController: ({required penaltyIndex, required argumentIndex}) =>
           _objectiveControllers[phaseIndex][penaltyIndex]
               .arguments[argumentIndex]);
@@ -399,6 +407,8 @@ class OptimalControlProgramControllers {
           penaltyIndex: penaltyIndex, phaseIndex: phaseIndex),
       remove: ({required penaltyIndex}) =>
           _removeConstraint(penaltyIndex: penaltyIndex, phaseIndex: phaseIndex),
+      targetController: ({required penaltyIndex}) =>
+          _constraintControllers[phaseIndex][penaltyIndex].target,
       argumentController: ({required penaltyIndex, required argumentIndex}) =>
           _constraintControllers[phaseIndex][penaltyIndex]
               .arguments[argumentIndex]);
@@ -556,6 +566,7 @@ class OptimalControlProgramControllers {
 
 class _PenaltyTextEditingControllers {
   final weight = TextEditingController(text: '1.0');
+  final target = TextEditingController(text: 'None');
 
   Penalty _penalty;
   final arguments = <TextEditingController>[];
@@ -572,12 +583,29 @@ class _PenaltyTextEditingControllers {
 
       OptimalControlProgramControllers.instance._notifyListeners();
     });
+
+    target.addListener(() {
+      if (_penalty.runtimeType != Objective) return;
+      final newTarget = target.text;
+      if (newTarget == (_penalty as Objective).target) {
+        return;
+      }
+      (_penalty as Objective).target = newTarget;
+
+      OptimalControlProgramControllers.instance._notifyListeners();
+    });
+
     _updateArguments();
   }
 
   void _updateWeight() {
     if (_penalty.runtimeType != Objective) return;
     weight.text = (_penalty as Objective).weight.toString();
+  }
+
+  void _updateTarget() {
+    if (_penalty.runtimeType != Objective) return;
+    target.text = (_penalty as Objective).target.toString();
   }
 
   void _updateArguments() {
@@ -606,6 +634,7 @@ class _PenaltyTextEditingControllers {
 
   void dispose() {
     weight.dispose();
+    target.dispose();
     _disposeArguments();
   }
 }
