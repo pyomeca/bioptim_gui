@@ -52,6 +52,12 @@ class PenaltyExpander extends StatelessWidget {
             nodes: nodes ?? Nodes.all,
             quadratureRules:
                 quadratureRules ?? QuadratureRules.defaultQuadraticRule,
+            quadratic: quadratic ?? true,
+            expand: expand ?? true,
+            target: target ?? 'None',
+            derivative: derivative ?? false,
+            explicitDerivative: explicitDerivative ?? false,
+            multiThread: multiThread ?? false,
             arguments: arguments ?? {});
       case MayerFcn:
         return Objective.mayer(fcn as MayerFcn,
@@ -59,6 +65,12 @@ class PenaltyExpander extends StatelessWidget {
             nodes: nodes ?? Nodes.end,
             quadratureRules:
                 quadratureRules ?? QuadratureRules.defaultQuadraticRule,
+            quadratic: quadratic ?? true,
+            expand: expand ?? true,
+            target: target ?? 'None',
+            derivative: derivative ?? false,
+            explicitDerivative: explicitDerivative ?? false,
+            multiThread: multiThread ?? false,
             arguments: arguments ?? {});
       case ConstraintFcn:
         return Constraint.generic(
@@ -66,6 +78,12 @@ class PenaltyExpander extends StatelessWidget {
             nodes: nodes ?? Nodes.end,
             quadratureRules:
                 quadratureRules ?? QuadratureRules.defaultQuadraticRule,
+            quadratic: quadratic ?? true,
+            expand: expand ?? true,
+            target: target ?? 'None',
+            derivative: derivative ?? false,
+            explicitDerivative: explicitDerivative ?? false,
+            multiThread: multiThread ?? false,
             arguments: arguments ?? {});
       default:
         throw 'Wrong penalty type';
