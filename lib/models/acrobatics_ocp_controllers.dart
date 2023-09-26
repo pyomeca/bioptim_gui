@@ -681,13 +681,12 @@ class _PenaltyTextEditingControllers {
     });
 
     target.addListener(() {
-      if (_penalty.runtimeType != Objective) return;
       final newTarget = target.text;
-      if (newTarget == (_penalty as Objective).target) {
+      if (newTarget == _penalty.target) {
         return;
       }
 
-      (_penalty as Objective).target = newTarget;
+      _penalty.target = newTarget;
       AcrobaticsOCPControllers.instance._notifyListeners();
     });
 
@@ -700,8 +699,7 @@ class _PenaltyTextEditingControllers {
   }
 
   void _updateTarget() {
-    if (_penalty.runtimeType != Objective) return;
-    target.text = (_penalty as Objective).target.toString();
+    target.text = _penalty.target.toString();
   }
 
   void _updateArguments() {
