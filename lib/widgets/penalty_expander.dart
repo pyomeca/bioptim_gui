@@ -8,6 +8,7 @@ import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
 import 'package:bioptim_gui/widgets/boolean_switch.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:bioptim_gui/widgets/maximize_minimize_radio.dart';
+import 'package:bioptim_gui/widgets/mayer_lagrande_radio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -265,37 +266,48 @@ class _PathTile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: width,
-          child: CustomDropdownButton<PenaltyFcn>(
-            title:
-                '${penalty.fcn.penaltyType} ${penaltyIndex + 1} (${penalty.fcn.penaltyTypeToString})',
-            value: penalty.fcn,
-            items: penalty.fcn.fcnValues,
-            onSelected: (value) {
-              if (value == penalty.fcn) return;
+        Row(children: [
+          SizedBox(
+            width: width *
+                0.87, // can't get it smaller because of the dropdown's text
+            child: CustomDropdownButton<PenaltyFcn>(
+              title:
+                  '${penalty.fcn.penaltyType} ${penaltyIndex + 1} (${penalty.fcn.penaltyTypeToString})',
+              value: penalty.fcn,
+              items: penalty.fcn.fcnValues,
+              onSelected: (value) {
+                if (value == penalty.fcn) return;
 
-              // Update to a brand new fresh penalty
-              penaltyInterface.update(
-                  penaltyFactory(
-                    value,
-                    weight: null,
-                    minimizeOrMaximize: null,
-                    nodes: null,
-                    quadratureRules: null,
-                    derivative: null,
-                    expand: null,
-                    quadratic: null,
-                    explicitDerivative: null,
-                    multiThread: null,
-                    target: null,
-                    arguments: null,
-                  ),
-                  penaltyIndex: penaltyIndex);
-            },
-            isExpanded: false,
+                // Update to a brand new fresh penalty
+                penaltyInterface.update(
+                    penaltyFactory(
+                      value,
+                      weight: null,
+                      minimizeOrMaximize: null,
+                      nodes: null,
+                      quadratureRules: null,
+                      derivative: null,
+                      expand: null,
+                      quadratic: null,
+                      explicitDerivative: null,
+                      multiThread: null,
+                      target: null,
+                      arguments: null,
+                    ),
+                    penaltyIndex: penaltyIndex);
+              },
+              isExpanded: false,
+            ),
           ),
-        ),
+          if (penalty.runtimeType == Objective)
+            SizedBox(
+              width: width * 0.13,
+              child: MayerLagrangeRadio(
+                value: MayerLagrange.mayer,
+                customOnChanged: (value) {},
+              ),
+            ),
+        ]),
         const SizedBox(height: 12),
         ...arguments.asMap().keys.map((index) => Padding(
               padding: const EdgeInsets.only(bottom: 12.0),
