@@ -9,7 +9,7 @@ enum OptimalControlProgramType {
       case ocp:
         return 'Optimal control program';
       case abrobaticsOCP:
-        return 'Abrobatics optimal control program';
+        return 'Acrobatics optimal control program';
     }
   }
 
