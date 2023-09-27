@@ -40,6 +40,7 @@ class PenaltyExpander extends StatelessWidget {
     required double? weight,
     required MinMax? minimizeOrMaximize,
     required MayerLagrange? mayerOrLagrange,
+    required GenericFcn? genericFcn,
     required Nodes? nodes,
     required QuadratureRules? quadratureRules,
     required bool? quadratic,
@@ -57,6 +58,7 @@ class PenaltyExpander extends StatelessWidget {
           weight: weight ?? 1,
           minimizeOrMaximize: minimizeOrMaximize ?? MinMax.minimize,
           mayerOrLagrange: mayerOrLagrange ?? MayerLagrange.mayer,
+          genericFcn: genericFcn ?? GenericFcn.minimizeControls,
           nodes: nodes ?? Nodes.all,
           quadratureRules:
               quadratureRules ?? QuadratureRules.defaultQuadraticRule,
@@ -74,6 +76,7 @@ class PenaltyExpander extends StatelessWidget {
           weight: weight ?? 1,
           minimizeOrMaximize: minimizeOrMaximize ?? MinMax.minimize,
           mayerOrLagrange: mayerOrLagrange ?? MayerLagrange.mayer,
+          genericFcn: genericFcn ?? GenericFcn.minimizeControls,
           nodes: nodes ?? Nodes.end,
           quadratureRules:
               quadratureRules ?? QuadratureRules.defaultQuadraticRule,
@@ -180,6 +183,7 @@ class PenaltyExpander extends StatelessWidget {
                     weight,
                     minimizeOrMaximize,
                     mayerOrLagrange,
+                    genericFcn,
                   }) {
                     return _penaltyFactory(
                       fcn,
@@ -195,6 +199,7 @@ class PenaltyExpander extends StatelessWidget {
                       weight: weight,
                       minimizeOrMaximize: minimizeOrMaximize,
                       mayerOrLagrange: mayerOrLagrange,
+                      genericFcn: genericFcn,
                     );
                   },
                   penaltyInterface: _getPenaltyInterface,
@@ -259,6 +264,7 @@ class _PathTile extends StatelessWidget {
     required double? weight,
     required MinMax? minimizeOrMaximize,
     required MayerLagrange? mayerOrLagrange,
+    required GenericFcn? genericFcn,
   }) penaltyFactory;
   final PenaltyInterface penaltyInterface;
   final int penaltyIndex;
@@ -281,22 +287,31 @@ class _PathTile extends StatelessWidget {
             child: CustomDropdownButton<PenaltyFcn>(
               title:
                   '${penalty.fcn.penaltyType} ${penaltyIndex + 1} (${penalty.fcn.penaltyTypeToString})',
-              value: penalty.fcn,
-              items: penalty.fcn.fcnValues,
+              value: (penalty.runtimeType == Objective)
+                  ? (penalty as Objective).genericFcn
+                  : penalty.fcn,
+              items: (penalty.runtimeType == Objective)
+                  ? GenericFcn.values
+                  : penalty.fcn.fcnValues,
               onSelected: (value) {
                 if (value == penalty.fcn) return;
+
+                final mayerOrLagrange = (penalty.runtimeType == Objective)
+                    ? ((value.runtimeType == LagrangeFcn)
+                        ? MayerLagrange.lagrange
+                        : MayerLagrange.mayer)
+                    : null;
 
                 // Update to a brand new fresh penalty
                 penaltyInterface.update(
                     penaltyFactory(
-                      value,
+                      getObjectiveCorrepondance(
+                          value as GenericFcn, mayerOrLagrange!),
                       weight: null,
                       minimizeOrMaximize: null,
-                      mayerOrLagrange: (penalty.runtimeType == Objective)
-                          ? ((value.runtimeType == LagrangeFcn)
-                              ? MayerLagrange.lagrange
-                              : MayerLagrange.mayer)
-                          : null,
+                      mayerOrLagrange: mayerOrLagrange,
+                      genericFcn:
+                          MayerLagrange2GenricFcn(value as ObjectiveFcn),
                       nodes: null,
                       quadratureRules: null,
                       derivative: null,
@@ -322,19 +337,23 @@ class _PathTile extends StatelessWidget {
 
                   penaltyInterface.update(
                       penaltyFactory(
-                        penalty.fcn,
-                        weight: penalty.weight,
-                        minimizeOrMaximize: penalty.minimizeOrMaximize,
+                        getObjectiveCorrepondance(
+                          MayerLagrange2GenricFcn(penalty.fcn as ObjectiveFcn),
+                          value!,
+                        ),
+                        weight: null,
+                        minimizeOrMaximize: null,
                         mayerOrLagrange: value,
-                        nodes: penalty.nodes,
-                        quadratureRules: penalty.quadratureRules,
-                        derivative: penalty.derivative,
-                        quadratic: penalty.quadratic,
-                        expand: penalty.expand,
-                        explicitDerivative: penalty.explicitDerivative,
-                        multiThread: penalty.multiThread,
-                        target: penalty.target,
-                        arguments: penalty.arguments,
+                        genericFcn: penalty.genericFcn,
+                        nodes: null,
+                        quadratureRules: null,
+                        derivative: null,
+                        quadratic: null,
+                        expand: null,
+                        explicitDerivative: null,
+                        multiThread: null,
+                        target: null,
+                        arguments: null,
                       ),
                       penaltyIndex: penaltyIndex);
                 },
@@ -386,12 +405,17 @@ class _PathTile extends StatelessWidget {
                       ? (penalty as Objective).mayerOrLagrange
                       : null;
 
+                  final genericFcn = penalty.runtimeType == Objective
+                      ? (penalty as Objective).genericFcn
+                      : null;
+
                   penaltyInterface.update(
                       penaltyFactory(
                         penalty.fcn,
                         weight: weight,
                         minimizeOrMaximize: minimizeOrMaximize,
                         mayerOrLagrange: mayerOrLagrange,
+                        genericFcn: genericFcn,
                         nodes: value,
                         quadratureRules: penalty.quadratureRules,
                         derivative: penalty.derivative,
@@ -433,6 +457,7 @@ class _PathTile extends StatelessWidget {
                               weight: penalty.weight,
                               minimizeOrMaximize: value,
                               mayerOrLagrange: penalty.mayerOrLagrange,
+                              genericFcn: penalty.genericFcn,
                               nodes: penalty.nodes,
                               quadratureRules: penalty.quadratureRules,
                               derivative: penalty.derivative,
@@ -483,6 +508,9 @@ class _PathTile extends StatelessWidget {
                   final mayerOrLagrange = penalty.runtimeType == Objective
                       ? (penalty as Objective).mayerOrLagrange
                       : null;
+                  final genericFcn = penalty.runtimeType == Objective
+                      ? (penalty as Objective).genericFcn
+                      : null;
 
                   penaltyInterface.update(
                       penaltyFactory(
@@ -490,6 +518,7 @@ class _PathTile extends StatelessWidget {
                         weight: weight,
                         minimizeOrMaximize: minimizeOrMaximize,
                         mayerOrLagrange: mayerOrLagrange,
+                        genericFcn: genericFcn,
                         nodes: penalty.nodes,
                         quadratureRules: value,
                         derivative: penalty.derivative,
@@ -523,12 +552,17 @@ class _PathTile extends StatelessWidget {
                     ? (penalty as Objective).mayerOrLagrange
                     : null;
 
+                final genericFcn = penalty.runtimeType == Objective
+                    ? (penalty as Objective).genericFcn
+                    : null;
+
                 penaltyInterface.update(
                     penaltyFactory(
                       penalty.fcn,
                       weight: weight,
                       minimizeOrMaximize: minimizeOrMaximize,
                       mayerOrLagrange: mayerOrLagrange,
+                      genericFcn: genericFcn,
                       nodes: penalty.nodes,
                       quadratureRules: penalty.quadratureRules,
                       derivative: penalty.derivative,
@@ -566,12 +600,17 @@ class _PathTile extends StatelessWidget {
                     ? (penalty as Objective).mayerOrLagrange
                     : null;
 
+                final genericFcn = penalty.runtimeType == Objective
+                    ? (penalty as Objective).genericFcn
+                    : null;
+
                 penaltyInterface.update(
                     penaltyFactory(
                       penalty.fcn,
                       weight: weight,
                       minimizeOrMaximize: minimizeOrMaximize,
                       mayerOrLagrange: mayerOrLagrange,
+                      genericFcn: genericFcn,
                       nodes: penalty.nodes,
                       quadratureRules: penalty.quadratureRules,
                       derivative: penalty.derivative,
@@ -605,12 +644,17 @@ class _PathTile extends StatelessWidget {
                     ? (penalty as Objective).mayerOrLagrange
                     : null;
 
+                final genericFcn = penalty.runtimeType == Objective
+                    ? (penalty as Objective).genericFcn
+                    : null;
+
                 penaltyInterface.update(
                     penaltyFactory(
                       penalty.fcn,
                       weight: weight,
                       minimizeOrMaximize: minimizeOrMaximize,
                       mayerOrLagrange: mayerOrLagrange,
+                      genericFcn: genericFcn,
                       nodes: penalty.nodes,
                       quadratureRules: penalty.quadratureRules,
                       derivative: penalty.derivative,
@@ -647,12 +691,17 @@ class _PathTile extends StatelessWidget {
                     ? (penalty as Objective).mayerOrLagrange
                     : null;
 
+                final genericFcn = penalty.runtimeType == Objective
+                    ? (penalty as Objective).genericFcn
+                    : null;
+
                 penaltyInterface.update(
                     penaltyFactory(
                       penalty.fcn,
                       weight: weight,
                       minimizeOrMaximize: minimizeOrMaximize,
                       mayerOrLagrange: mayerOrLagrange,
+                      genericFcn: genericFcn,
                       nodes: penalty.nodes,
                       quadratureRules: penalty.quadratureRules,
                       derivative: value,
@@ -686,12 +735,17 @@ class _PathTile extends StatelessWidget {
                       ? (penalty as Objective).mayerOrLagrange
                       : null;
 
+                  final genericFcn = penalty.runtimeType == Objective
+                      ? (penalty as Objective).genericFcn
+                      : null;
+
                   penaltyInterface.update(
                       penaltyFactory(
                         penalty.fcn,
                         weight: weight,
                         minimizeOrMaximize: minimizeOrMaximize,
                         mayerOrLagrange: mayerOrLagrange,
+                        genericFcn: genericFcn,
                         nodes: penalty.nodes,
                         quadratureRules: penalty.quadratureRules,
                         derivative: false,

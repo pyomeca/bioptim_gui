@@ -80,6 +80,101 @@ mixin ObjectiveFcn implements PenaltyFcn {
   }
 }
 
+enum GenericFcn implements ObjectiveFcn {
+  minimizeAngularMomentum,
+  minimizeComPosition,
+  minimizeComVelocity,
+  minimizeLinearMomentum,
+  minimizeControls,
+  minimizePower,
+  minimizeStates,
+  minimizeMarkers,
+  minimizeMarkersAcceleration,
+  minimizeMarkersVelocity,
+  minimizeSegmentRotation,
+  minimizeSegmentVelocity,
+  proportionalControl,
+  proportionalState,
+  superimposeMarkers,
+  trackMarkerWithSegmentAxis,
+  trackSegmentWithCustomRT,
+  trackVectorOrientationsFromMarkers,
+  minimizeTime,
+  minimizeQDot,
+  ;
+
+  @override
+  List<PenaltyFcn> get fcnValues {
+    final out = <ObjectiveFcn>[];
+    for (final obj in values) {
+      out.add(obj);
+    }
+    return out;
+  }
+
+  @override
+  String get penaltyTypeToString => 'Generic';
+
+  @override
+  String get penaltyType => 'Objective';
+
+  @override
+  String toPythonString() {
+    return 'GenericFcn.toPythonString shoudn\'t be called';
+  }
+
+  @override
+  List<PenaltyArgument> get mandatoryArguments {
+    return [];
+  }
+
+  @override
+  String toString() {
+    switch (this) {
+      case minimizeAngularMomentum:
+        return 'Minimize angular momentum';
+      case minimizeComPosition:
+        return 'Minimize CoM position';
+      case minimizeComVelocity:
+        return 'Minimize CoM velocity';
+      case minimizeLinearMomentum:
+        return 'Minimize linear momentum';
+      case minimizeControls:
+        return 'Minimize controls';
+      case minimizePower:
+        return 'Minimize power';
+      case minimizeStates:
+        return 'Minimize states';
+      case minimizeMarkers:
+        return 'Minimize markers';
+      case minimizeMarkersAcceleration:
+        return 'Minimize markers acceleration';
+      case minimizeMarkersVelocity:
+        return 'Minimize markers velocity';
+      case minimizeSegmentRotation:
+        return 'Minimize segment rotation';
+      case minimizeSegmentVelocity:
+        return 'Minimize segment velocity';
+      case proportionalControl:
+        return 'Proportional control';
+      case proportionalState:
+        return 'Proportional state';
+      case superimposeMarkers:
+        return 'Superimpose markers';
+      case trackMarkerWithSegmentAxis:
+        return 'Track marker with segment axis';
+      case trackSegmentWithCustomRT:
+        return 'Track segment with custom RT';
+      case trackVectorOrientationsFromMarkers:
+        return 'Track vector orientations from markers';
+      case minimizeQDot:
+        return 'Minimize qdot';
+      case minimizeTime:
+        return 'Minimize time';
+    }
+  }
+}
+
 enum LagrangeFcn implements ObjectiveFcn {
   // regroup the objectives by arguments, then alphabetical order
   // (argument_name:type[ | type ][ =default_value ])
@@ -800,6 +895,8 @@ class Objective extends Penalty {
   double weight;
   MinMax minimizeOrMaximize;
   MayerLagrange mayerOrLagrange;
+  GenericFcn genericFcn;
+
   Objective.generic(
       {ObjectiveFcn fcn = LagrangeFcn.minimizeControls,
       super.nodes = Nodes.all,
@@ -813,6 +910,7 @@ class Objective extends Penalty {
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
       this.mayerOrLagrange = MayerLagrange.lagrange,
+      this.genericFcn = GenericFcn.minimizeControls,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
 
@@ -829,6 +927,7 @@ class Objective extends Penalty {
       this.weight = 100,
       this.minimizeOrMaximize = MinMax.minimize,
       this.mayerOrLagrange = MayerLagrange.lagrange,
+      this.genericFcn = GenericFcn.minimizeControls,
       Map<String, dynamic>? arguments})
       : super(fcn,
             arguments: arguments ??
@@ -849,6 +948,7 @@ class Objective extends Penalty {
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
       this.mayerOrLagrange = MayerLagrange.mayer,
+      this.genericFcn = GenericFcn.minimizeTime,
       Map<String, dynamic>? arguments,
       required double minBound,
       required double maxBound})
@@ -871,6 +971,7 @@ class Objective extends Penalty {
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
       this.mayerOrLagrange = MayerLagrange.lagrange,
+      this.genericFcn = GenericFcn.minimizeControls,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
 
@@ -886,6 +987,7 @@ class Objective extends Penalty {
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
       this.mayerOrLagrange = MayerLagrange.mayer,
+      this.genericFcn = GenericFcn.minimizeControls,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
 }
@@ -903,4 +1005,190 @@ class Constraint extends Penalty {
       super.multiThread = false,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
+}
+
+ObjectiveFcn getObjectiveCorrepondance(
+    GenericFcn genericFcn, MayerLagrange mayerOrLagrange) {
+  if (mayerOrLagrange == MayerLagrange.mayer) {
+    switch (genericFcn) {
+      case GenericFcn.minimizeAngularMomentum:
+        return MayerFcn.minimizeAngularMomentum;
+      case GenericFcn.minimizeComPosition:
+        return MayerFcn.minimizeComPosition;
+      case GenericFcn.minimizeComVelocity:
+        return MayerFcn.minimizeComVelocity;
+      case GenericFcn.minimizeLinearMomentum:
+        return MayerFcn.minimizeLinearMomentum;
+      case GenericFcn.minimizeControls:
+        return MayerFcn.minimizeControls;
+      case GenericFcn.minimizePower:
+        return MayerFcn.minimizePower;
+      case GenericFcn.minimizeStates:
+        return MayerFcn.minimizeStates;
+      case GenericFcn.minimizeMarkers:
+        return MayerFcn.minimizeMarkers;
+      case GenericFcn.minimizeMarkersAcceleration:
+        return MayerFcn.minimizeMarkersAcceleration;
+      case GenericFcn.minimizeMarkersVelocity:
+        return MayerFcn.minimizeMarkersVelocity;
+      case GenericFcn.minimizeSegmentRotation:
+        return MayerFcn.minimizeSegmentRotation;
+      case GenericFcn.minimizeSegmentVelocity:
+        return MayerFcn.minimizeSegmentVelocity;
+      case GenericFcn.proportionalControl:
+        return MayerFcn.proportionalControl;
+      case GenericFcn.proportionalState:
+        return MayerFcn.proportionalState;
+      case GenericFcn.superimposeMarkers:
+        return MayerFcn.superimposeMarkers;
+      case GenericFcn.trackMarkerWithSegmentAxis:
+        return MayerFcn.trackMarkerWithSegmentAxis;
+      case GenericFcn.trackSegmentWithCustomRT:
+        return MayerFcn.trackSegmentWithCustomRT;
+      case GenericFcn.trackVectorOrientationsFromMarkers:
+        return MayerFcn.trackVectorOrientationsFromMarkers;
+      case GenericFcn.minimizeQDot:
+        return MayerFcn.minimizeQDot;
+      case GenericFcn.minimizeTime:
+        return MayerFcn.minimizeTime;
+    }
+  } else {
+    switch (genericFcn) {
+      case GenericFcn.minimizeAngularMomentum:
+        return LagrangeFcn.minimizeAngularMomentum;
+      case GenericFcn.minimizeComPosition:
+        return LagrangeFcn.minimizeComPosition;
+      case GenericFcn.minimizeComVelocity:
+        return LagrangeFcn.minimizeComVelocity;
+      case GenericFcn.minimizeLinearMomentum:
+        return LagrangeFcn.minimizeLinearMomentum;
+      case GenericFcn.minimizeControls:
+        return LagrangeFcn.minimizeControls;
+      case GenericFcn.minimizePower:
+        return LagrangeFcn.minimizePower;
+      case GenericFcn.minimizeStates:
+        return LagrangeFcn.minimizeStates;
+      case GenericFcn.minimizeMarkers:
+        return LagrangeFcn.minimizeMarkers;
+      case GenericFcn.minimizeMarkersAcceleration:
+        return LagrangeFcn.minimizeMarkersAcceleration;
+      case GenericFcn.minimizeMarkersVelocity:
+        return LagrangeFcn.minimizeMarkersVelocity;
+      case GenericFcn.minimizeSegmentRotation:
+        return LagrangeFcn.minimizeSegmentRotation;
+      case GenericFcn.minimizeSegmentVelocity:
+        return LagrangeFcn.minimizeSegmentVelocity;
+      case GenericFcn.proportionalControl:
+        return LagrangeFcn.proportionalControl;
+      case GenericFcn.proportionalState:
+        return LagrangeFcn.proportionalState;
+      case GenericFcn.superimposeMarkers:
+        return LagrangeFcn.superimposeMarkers;
+      case GenericFcn.trackMarkerWithSegmentAxis:
+        return LagrangeFcn.trackMarkerWithSegmentAxis;
+      case GenericFcn.trackSegmentWithCustomRT:
+        return LagrangeFcn.trackSegmentWithCustomRT;
+      case GenericFcn.trackVectorOrientationsFromMarkers:
+        return LagrangeFcn.trackVectorOrientationsFromMarkers;
+      case GenericFcn.minimizeQDot:
+        return LagrangeFcn.minimizeQDot;
+      case GenericFcn.minimizeTime:
+        return LagrangeFcn.minimizeTime;
+    }
+  }
+}
+
+GenericFcn MayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
+  if (objectiveFcn.runtimeType == GenericFcn) return objectiveFcn as GenericFcn;
+
+  if (objectiveFcn.runtimeType == LagrangeFcn) {
+    switch (objectiveFcn as LagrangeFcn) {
+      case LagrangeFcn.minimizeAngularMomentum:
+        return GenericFcn.minimizeAngularMomentum;
+      case LagrangeFcn.minimizeComPosition:
+        return GenericFcn.minimizeComPosition;
+      case LagrangeFcn.minimizeComVelocity:
+        return GenericFcn.minimizeComVelocity;
+      case LagrangeFcn.minimizeLinearMomentum:
+        return GenericFcn.minimizeLinearMomentum;
+      case LagrangeFcn.minimizeControls:
+        return GenericFcn.minimizeControls;
+      case LagrangeFcn.minimizePower:
+        return GenericFcn.minimizePower;
+      case LagrangeFcn.minimizeStates:
+        return GenericFcn.minimizeStates;
+      case LagrangeFcn.minimizeMarkers:
+        return GenericFcn.minimizeMarkers;
+      case LagrangeFcn.minimizeMarkersAcceleration:
+        return GenericFcn.minimizeMarkersAcceleration;
+      case LagrangeFcn.minimizeMarkersVelocity:
+        return GenericFcn.minimizeMarkersVelocity;
+      case LagrangeFcn.minimizeSegmentRotation:
+        return GenericFcn.minimizeSegmentRotation;
+      case LagrangeFcn.minimizeSegmentVelocity:
+        return GenericFcn.minimizeSegmentVelocity;
+      case LagrangeFcn.proportionalControl:
+        return GenericFcn.proportionalControl;
+      case LagrangeFcn.proportionalState:
+        return GenericFcn.proportionalState;
+      case LagrangeFcn.superimposeMarkers:
+        return GenericFcn.superimposeMarkers;
+      case LagrangeFcn.trackMarkerWithSegmentAxis:
+        return GenericFcn.trackMarkerWithSegmentAxis;
+      case LagrangeFcn.trackSegmentWithCustomRT:
+        return GenericFcn.trackSegmentWithCustomRT;
+      case LagrangeFcn.trackVectorOrientationsFromMarkers:
+        return GenericFcn.trackVectorOrientationsFromMarkers;
+      case LagrangeFcn.minimizeQDot:
+        return GenericFcn.minimizeQDot;
+      case LagrangeFcn.minimizeTime:
+        return GenericFcn.minimizeTime;
+    }
+  } else {
+    if (objectiveFcn.runtimeType == MayerFcn) {
+      switch (objectiveFcn as MayerFcn) {
+        case MayerFcn.minimizeAngularMomentum:
+          return GenericFcn.minimizeAngularMomentum;
+        case MayerFcn.minimizeComPosition:
+          return GenericFcn.minimizeComPosition;
+        case MayerFcn.minimizeComVelocity:
+          return GenericFcn.minimizeComVelocity;
+        case MayerFcn.minimizeLinearMomentum:
+          return GenericFcn.minimizeLinearMomentum;
+        case MayerFcn.minimizeControls:
+          return GenericFcn.minimizeControls;
+        case MayerFcn.minimizePower:
+          return GenericFcn.minimizePower;
+        case MayerFcn.minimizeStates:
+          return GenericFcn.minimizeStates;
+        case MayerFcn.minimizeMarkers:
+          return GenericFcn.minimizeMarkers;
+        case MayerFcn.minimizeMarkersAcceleration:
+          return GenericFcn.minimizeMarkersAcceleration;
+        case MayerFcn.minimizeMarkersVelocity:
+          return GenericFcn.minimizeMarkersVelocity;
+        case MayerFcn.minimizeSegmentRotation:
+          return GenericFcn.minimizeSegmentRotation;
+        case MayerFcn.minimizeSegmentVelocity:
+          return GenericFcn.minimizeSegmentVelocity;
+        case MayerFcn.proportionalControl:
+          return GenericFcn.proportionalControl;
+        case MayerFcn.proportionalState:
+          return GenericFcn.proportionalState;
+        case MayerFcn.superimposeMarkers:
+          return GenericFcn.superimposeMarkers;
+        case MayerFcn.trackMarkerWithSegmentAxis:
+          return GenericFcn.trackMarkerWithSegmentAxis;
+        case MayerFcn.trackSegmentWithCustomRT:
+          return GenericFcn.trackSegmentWithCustomRT;
+        case MayerFcn.trackVectorOrientationsFromMarkers:
+          return GenericFcn.trackVectorOrientationsFromMarkers;
+        case MayerFcn.minimizeQDot:
+          return GenericFcn.minimizeQDot;
+        case MayerFcn.minimizeTime:
+          return GenericFcn.minimizeTime;
+      }
+    }
+  }
+  throw 'The objective function $objectiveFcn is not supported';
 }
