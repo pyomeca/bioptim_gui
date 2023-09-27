@@ -1,6 +1,7 @@
 import 'package:bioptim_gui/models/nodes.dart';
 import 'package:bioptim_gui/models/quadrature_rules.dart';
 import 'package:bioptim_gui/widgets/maximize_minimize_radio.dart';
+import 'package:bioptim_gui/widgets/mayer_lagrande_radio.dart';
 
 enum PenaltyArgumentType {
   integer,
@@ -798,6 +799,7 @@ abstract class Penalty {
 class Objective extends Penalty {
   double weight;
   MinMax minimizeOrMaximize;
+  MayerLagrange mayerOrLagrange;
   Objective.generic(
       {ObjectiveFcn fcn = LagrangeFcn.minimizeControls,
       super.nodes = Nodes.all,
@@ -810,6 +812,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
+      this.mayerOrLagrange = MayerLagrange.lagrange,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
 
@@ -825,6 +828,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 100,
       this.minimizeOrMaximize = MinMax.minimize,
+      this.mayerOrLagrange = MayerLagrange.lagrange,
       Map<String, dynamic>? arguments})
       : super(fcn,
             arguments: arguments ??
@@ -844,6 +848,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
+      this.mayerOrLagrange = MayerLagrange.mayer,
       Map<String, dynamic>? arguments,
       required double minBound,
       required double maxBound})
@@ -865,6 +870,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
+      this.mayerOrLagrange = MayerLagrange.lagrange,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
 
@@ -879,6 +885,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
+      this.mayerOrLagrange = MayerLagrange.mayer,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
 }
