@@ -403,8 +403,29 @@ class _PathTile extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             BooleanSwitch(
-              initialValue: true,
-              customOnChanged: (value) {},
+              initialValue: penalty.quadratic,
+              customOnChanged: (value) {
+                if (value == penalty.quadratic) return;
+
+                final weight = penalty.runtimeType == Objective
+                    ? (penalty as Objective).weight
+                    : null;
+                penaltyInterface.update(
+                    penaltyFactory(
+                      penalty.fcn,
+                      weight: weight,
+                      nodes: penalty.nodes,
+                      quadratureRules: penalty.quadratureRules,
+                      derivative: penalty.derivative,
+                      quadratic: value,
+                      expand: penalty.expand,
+                      explicitDerivative: penalty.explicitDerivative,
+                      multiThread: penalty.multiThread,
+                      target: penalty.target,
+                      arguments: penalty.arguments,
+                    ),
+                    penaltyIndex: penaltyIndex);
+              },
               leftText: 'Quadratic',
               width: width / 3 - 6,
             ),
@@ -414,15 +435,57 @@ class _PathTile extends StatelessWidget {
         Row(
           children: [
             BooleanSwitch(
-              initialValue: true,
-              customOnChanged: (value) {},
+              initialValue: penalty.expand,
+              customOnChanged: (value) {
+                if (value == penalty.expand) return;
+
+                final weight = penalty.runtimeType == Objective
+                    ? (penalty as Objective).weight
+                    : null;
+                penaltyInterface.update(
+                    penaltyFactory(
+                      penalty.fcn,
+                      weight: weight,
+                      nodes: penalty.nodes,
+                      quadratureRules: penalty.quadratureRules,
+                      derivative: penalty.derivative,
+                      quadratic: penalty.quadratic,
+                      expand: value,
+                      explicitDerivative: penalty.explicitDerivative,
+                      multiThread: penalty.multiThread,
+                      target: penalty.target,
+                      arguments: penalty.arguments,
+                    ),
+                    penaltyIndex: penaltyIndex);
+              },
               leftText: 'Expand',
               width: width / 2 - 6,
             ),
             const SizedBox(width: 12),
             BooleanSwitch(
-              initialValue: false,
-              customOnChanged: (value) {},
+              initialValue: penalty.multiThread,
+              customOnChanged: (value) {
+                if (value == penalty.multiThread) return;
+
+                final weight = penalty.runtimeType == Objective
+                    ? (penalty as Objective).weight
+                    : null;
+                penaltyInterface.update(
+                    penaltyFactory(
+                      penalty.fcn,
+                      weight: weight,
+                      nodes: penalty.nodes,
+                      quadratureRules: penalty.quadratureRules,
+                      derivative: penalty.derivative,
+                      quadratic: penalty.quadratic,
+                      expand: penalty.expand,
+                      explicitDerivative: penalty.explicitDerivative,
+                      multiThread: value,
+                      target: penalty.target,
+                      arguments: penalty.arguments,
+                    ),
+                    penaltyIndex: penaltyIndex);
+              },
               leftText: 'MultiThread',
               width: width / 2 - 6,
             ),
@@ -432,15 +495,57 @@ class _PathTile extends StatelessWidget {
         Row(
           children: [
             BooleanSwitch(
-              initialValue: false,
-              customOnChanged: (value) {},
+              initialValue: penalty.derivative,
+              customOnChanged: (value) {
+                if (value == penalty.derivative) return;
+
+                final weight = penalty.runtimeType == Objective
+                    ? (penalty as Objective).weight
+                    : null;
+                penaltyInterface.update(
+                    penaltyFactory(
+                      penalty.fcn,
+                      weight: weight,
+                      nodes: penalty.nodes,
+                      quadratureRules: penalty.quadratureRules,
+                      derivative: value,
+                      quadratic: penalty.quadratic,
+                      expand: penalty.expand,
+                      explicitDerivative: false,
+                      multiThread: penalty.multiThread,
+                      target: penalty.target,
+                      arguments: penalty.arguments,
+                    ),
+                    penaltyIndex: penaltyIndex);
+              },
               leftText: 'Derivative',
               width: width / 2 - 6,
             ),
             const SizedBox(width: 12),
             BooleanSwitch(
-                initialValue: false,
-                customOnChanged: (value) {},
+                initialValue: penalty.explicitDerivative,
+                customOnChanged: (value) {
+                  if (value == penalty.explicitDerivative) return;
+
+                  final weight = penalty.runtimeType == Objective
+                      ? (penalty as Objective).weight
+                      : null;
+                  penaltyInterface.update(
+                      penaltyFactory(
+                        penalty.fcn,
+                        weight: weight,
+                        nodes: penalty.nodes,
+                        quadratureRules: penalty.quadratureRules,
+                        derivative: false,
+                        quadratic: penalty.quadratic,
+                        expand: penalty.expand,
+                        explicitDerivative: value,
+                        multiThread: penalty.multiThread,
+                        target: penalty.target,
+                        arguments: penalty.arguments,
+                      ),
+                      penaltyIndex: penaltyIndex);
+                },
                 leftText: 'Explicit derivative',
                 width: width * 1 / 2 - 6),
           ],
