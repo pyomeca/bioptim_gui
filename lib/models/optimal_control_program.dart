@@ -137,6 +137,7 @@ class OptimalControlProgram {
         '"""\n'
         '\n'
         'from bioptim import *  # TODO Pariterre - Do not import "*"\n'
+        'import numpy as np\n'
         '\n'
         '\n');
 
