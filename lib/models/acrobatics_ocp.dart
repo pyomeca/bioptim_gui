@@ -249,7 +249,7 @@ class AcrobaticsOCPProgram {
             '        integration_rule=${objective.quadratureRules.toPythonString()},\n'
             '        multi_thread=${objective.multiThread.toPythonString()},\n'
             '${generic.nbSomersaults == 1 ? '' : '        phase=$phaseIndex,\n'}'
-            '        weight=${objective.weight},\n'
+            '        weight=${objective.minimizeOrMaximize.toPythonString()}${objective.weight},\n'
             '    )\n',
             mode: FileMode.append);
       }

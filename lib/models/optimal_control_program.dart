@@ -223,7 +223,7 @@ class OptimalControlProgram {
             '        integration_rule=${objective.quadratureRules.toPythonString()},\n'
             '        multi_thread=${objective.multiThread.toPythonString()},\n'
             '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
-            '        weight=${objective.weight},\n'
+            '        weight=${objective.minimizeOrMaximize.toPythonString()}${objective.weight},\n'
             '    )\n',
             mode: FileMode.append);
       }
