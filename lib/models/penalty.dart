@@ -843,7 +843,6 @@ abstract class Penalty {
   final bool expand;
   String target;
   final bool derivative;
-  final bool explicitDerivative;
   final QuadratureRules quadratureRules;
   final bool multiThread;
 
@@ -875,7 +874,6 @@ abstract class Penalty {
       required this.expand,
       required this.target,
       required this.derivative,
-      required this.explicitDerivative,
       required this.multiThread,
       required this.quadratureRules,
       required this.arguments}) {
@@ -911,7 +909,6 @@ class Objective extends Penalty {
       super.expand = true,
       super.target = 'None',
       super.derivative = false,
-      super.explicitDerivative = false,
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
@@ -928,7 +925,6 @@ class Objective extends Penalty {
       super.expand = true,
       super.target = 'None',
       super.derivative = false,
-      super.explicitDerivative = false,
       super.multiThread = false,
       this.weight = 100,
       this.minimizeOrMaximize = MinMax.minimize,
@@ -949,7 +945,6 @@ class Objective extends Penalty {
       super.expand = true,
       super.target = 'None',
       super.derivative = false,
-      super.explicitDerivative = false,
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
@@ -972,7 +967,6 @@ class Objective extends Penalty {
       super.expand = true,
       super.target = 'None',
       super.derivative = false,
-      super.explicitDerivative = false,
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
@@ -988,7 +982,6 @@ class Objective extends Penalty {
       super.expand = true,
       super.target = 'None',
       super.derivative = false,
-      super.explicitDerivative = false,
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
@@ -1007,7 +1000,6 @@ class Constraint extends Penalty {
       super.expand = true,
       super.target = 'None',
       super.derivative = false,
-      super.explicitDerivative = false,
       super.multiThread = false,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
