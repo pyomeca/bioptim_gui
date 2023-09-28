@@ -17,7 +17,7 @@ class AcrobaticPositionChooser extends StatelessWidget {
       child: CustomDropdownButton<AcrobaticsPosition>(
         value: controllers.position,
         items: AcrobaticsPosition.values,
-        title: 'Jump position',
+        title: 'Jump position *',
         onSelected: (value) => controllers.setPosition(value),
       ),
     );

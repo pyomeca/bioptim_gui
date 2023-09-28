@@ -8,6 +8,7 @@ class CustomDropdownButton<T extends Object> extends StatelessWidget {
     required this.items,
     this.onSelected,
     this.isExpanded = false,
+    this.color,
   });
 
   final T value;
@@ -15,6 +16,7 @@ class CustomDropdownButton<T extends Object> extends StatelessWidget {
   final String? title;
   final List<T> items;
   final bool isExpanded;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {

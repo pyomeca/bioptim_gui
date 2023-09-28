@@ -9,6 +9,7 @@ class PositiveIntegerTextField extends StatefulWidget {
     this.onChanged,
     this.enabled = true,
     this.allowZero = false,
+    this.color,
   });
 
   final String? label;
@@ -16,6 +17,7 @@ class PositiveIntegerTextField extends StatefulWidget {
   final Function(int value)? onChanged;
   final bool enabled;
   final bool allowZero;
+  final Color? color;
 
   @override
   State<PositiveIntegerTextField> createState() =>
@@ -39,7 +41,20 @@ class _PositiveIntegerTextFieldState extends State<PositiveIntegerTextField> {
       child: TextField(
         controller: widget.controller,
         decoration: InputDecoration(
-            labelText: widget.label, border: const OutlineInputBorder()),
+            // if color
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                  color:
+                      widget.color ?? Colors.black), // Unfocused border color
+              borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                  color: widget.color ?? Colors.black), // Focused border color
+              borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+            ),
+            labelText: widget.label,
+            border: const OutlineInputBorder()),
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         enabled: widget.enabled,
       ),
