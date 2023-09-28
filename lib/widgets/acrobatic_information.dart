@@ -20,6 +20,7 @@ class AcrobaticInformation extends StatelessWidget {
             label: 'Number of somersaults *',
             controller: controllers.nbSomersaultsController,
             enabled: true,
+            color: Colors.red,
           ),
         ),
         const SizedBox(height: 12),
@@ -30,7 +31,18 @@ class AcrobaticInformation extends StatelessWidget {
               child: TextField(
                 controller: controllers.finalTimeController,
                 decoration: const InputDecoration(
-                    labelText: 'Final time *', border: OutlineInputBorder()),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Colors.red), // Unfocused border color
+                      borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Colors.red), // Focused border color
+                      borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                    ),
+                    labelText: 'Final time *',
+                    border: OutlineInputBorder()),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'[0-9\.]'))
                 ],
@@ -42,6 +54,16 @@ class AcrobaticInformation extends StatelessWidget {
               child: TextField(
                 controller: controllers.finalTimeMarginController,
                 decoration: const InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Colors.red), // Unfocused border color
+                      borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Colors.red), // Focused border color
+                      borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                    ),
                     labelText: 'Final time margin *',
                     border: OutlineInputBorder()),
                 inputFormatters: [

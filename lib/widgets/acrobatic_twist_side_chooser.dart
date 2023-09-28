@@ -17,7 +17,7 @@ class AcrobaticTwistSideChooser extends StatelessWidget {
       child: CustomDropdownButton<PreferredTwistSide>(
         value: controllers.preferredTwistSide,
         items: PreferredTwistSide.values,
-        title: 'Preferred twist side',
+        title: 'Preferred twist side *',
         onSelected: (value) => controllers.setPreferredTwistSide(value),
       ),
     );

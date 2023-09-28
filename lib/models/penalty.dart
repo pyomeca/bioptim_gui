@@ -790,7 +790,9 @@ enum MayerFcn implements ObjectiveFcn {
 }
 
 enum ConstraintFcn implements PenaltyFcn {
-  timeConstraint;
+  timeConstraint,
+  continuity,
+  ;
 
   @override
   List<PenaltyFcn> get fcnValues {
@@ -808,6 +810,8 @@ enum ConstraintFcn implements PenaltyFcn {
     switch (this) {
       case timeConstraint:
         return 'Time constraint';
+      case ConstraintFcn.continuity:
+        return 'Continuity';
     }
   }
 
@@ -816,13 +820,15 @@ enum ConstraintFcn implements PenaltyFcn {
     switch (this) {
       case timeConstraint:
         return 'ConstraintFcn.TIME_CONSTRAINT';
+      case ConstraintFcn.continuity:
+        return 'ConstraintFcn.CONTINUITY';
     }
   }
 
   @override
   List<PenaltyArgument> get mandatoryArguments {
     switch (this) {
-      case timeConstraint:
+      case timeConstraint || continuity:
         return [];
     }
   }
@@ -837,7 +843,6 @@ abstract class Penalty {
   final bool expand;
   String target;
   final bool derivative;
-  final bool explicitDerivative;
   final QuadratureRules quadratureRules;
   final bool multiThread;
 
@@ -869,7 +874,6 @@ abstract class Penalty {
       required this.expand,
       required this.target,
       required this.derivative,
-      required this.explicitDerivative,
       required this.multiThread,
       required this.quadratureRules,
       required this.arguments}) {
@@ -905,7 +909,6 @@ class Objective extends Penalty {
       super.expand = true,
       super.target = 'None',
       super.derivative = false,
-      super.explicitDerivative = false,
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
@@ -922,7 +925,6 @@ class Objective extends Penalty {
       super.expand = true,
       super.target = 'None',
       super.derivative = false,
-      super.explicitDerivative = false,
       super.multiThread = false,
       this.weight = 100,
       this.minimizeOrMaximize = MinMax.minimize,
@@ -943,7 +945,6 @@ class Objective extends Penalty {
       super.expand = true,
       super.target = 'None',
       super.derivative = false,
-      super.explicitDerivative = false,
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
@@ -966,7 +967,6 @@ class Objective extends Penalty {
       super.expand = true,
       super.target = 'None',
       super.derivative = false,
-      super.explicitDerivative = false,
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
@@ -982,7 +982,6 @@ class Objective extends Penalty {
       super.expand = true,
       super.target = 'None',
       super.derivative = false,
-      super.explicitDerivative = false,
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
@@ -1001,13 +1000,12 @@ class Constraint extends Penalty {
       super.expand = true,
       super.target = 'None',
       super.derivative = false,
-      super.explicitDerivative = false,
       super.multiThread = false,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
 }
 
-ObjectiveFcn getObjectiveCorrepondance(
+ObjectiveFcn? getObjectiveCorrepondance(
     GenericFcn genericFcn, MayerLagrange mayerOrLagrange) {
   if (mayerOrLagrange == MayerLagrange.mayer) {
     switch (genericFcn) {
@@ -1051,8 +1049,10 @@ ObjectiveFcn getObjectiveCorrepondance(
         return MayerFcn.minimizeQDot;
       case GenericFcn.minimizeTime:
         return MayerFcn.minimizeTime;
+      default:
+        return null;
     }
-  } else {
+  } else if (mayerOrLagrange == MayerLagrange.lagrange) {
     switch (genericFcn) {
       case GenericFcn.minimizeAngularMomentum:
         return LagrangeFcn.minimizeAngularMomentum;
@@ -1094,11 +1094,15 @@ ObjectiveFcn getObjectiveCorrepondance(
         return LagrangeFcn.minimizeQDot;
       case GenericFcn.minimizeTime:
         return LagrangeFcn.minimizeTime;
+      default:
+        return null;
     }
+  } else {
+    return null;
   }
 }
 
-GenericFcn MayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
+GenericFcn? mayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
   if (objectiveFcn.runtimeType == GenericFcn) return objectiveFcn as GenericFcn;
 
   if (objectiveFcn.runtimeType == LagrangeFcn) {
@@ -1143,6 +1147,8 @@ GenericFcn MayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
         return GenericFcn.minimizeQDot;
       case LagrangeFcn.minimizeTime:
         return GenericFcn.minimizeTime;
+      default:
+        return null;
     }
   } else {
     if (objectiveFcn.runtimeType == MayerFcn) {
@@ -1187,8 +1193,10 @@ GenericFcn MayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
           return GenericFcn.minimizeQDot;
         case MayerFcn.minimizeTime:
           return GenericFcn.minimizeTime;
+        default:
+          return null;
       }
     }
   }
-  throw 'The objective function $objectiveFcn is not supported';
+  return null;
 }
