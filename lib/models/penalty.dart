@@ -233,6 +233,7 @@ enum LagrangeFcn implements ObjectiveFcn {
 
   //
   minimizeQDot,
+  minimizeTime,
   ;
 
   @override
@@ -294,6 +295,8 @@ enum LagrangeFcn implements ObjectiveFcn {
         return 'Track vector orientations from markers';
       case minimizeQDot:
         return 'Minimize qdot';
+      case minimizeTime:
+        return 'Minimize time';
     }
   }
 
@@ -338,6 +341,8 @@ enum LagrangeFcn implements ObjectiveFcn {
         return 'ObjectiveFcn.Lagrange.TRACK_VECTOR_ORIENTATIONS_FROM_MARKERS';
       case minimizeQDot:
         return 'ObjectiveFcn.Lagrange.MINIMIZE_QDOT';
+      case minimizeTime:
+        return 'ObjectiveFcn.Lagrange.MINIMIZE_TIME';
     }
   }
 
@@ -465,7 +470,7 @@ enum LagrangeFcn implements ObjectiveFcn {
         ];
 
       //
-      case minimizeQDot:
+      case minimizeQDot || minimizeTime:
         return [];
     }
   }
@@ -1095,6 +1100,8 @@ ObjectiveFcn? getObjectiveCorrepondance(
         return LagrangeFcn.trackVectorOrientationsFromMarkers;
       case GenericFcn.minimizeQDot:
         return LagrangeFcn.minimizeQDot;
+      case GenericFcn.minimizeTime:
+        return LagrangeFcn.minimizeTime;
       default:
         return null;
     }
@@ -1146,6 +1153,8 @@ GenericFcn? mayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
         return GenericFcn.trackVectorOrientationsFromMarkers;
       case LagrangeFcn.minimizeQDot:
         return GenericFcn.minimizeQDot;
+      case LagrangeFcn.minimizeTime:
+        return GenericFcn.minimizeTime;
       default:
         return null;
     }
