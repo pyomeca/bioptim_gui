@@ -233,7 +233,6 @@ enum LagrangeFcn implements ObjectiveFcn {
 
   //
   minimizeQDot,
-  minimizeTime,
   ;
 
   @override
@@ -295,8 +294,6 @@ enum LagrangeFcn implements ObjectiveFcn {
         return 'Track vector orientations from markers';
       case minimizeQDot:
         return 'Minimize qdot';
-      case minimizeTime:
-        return 'Minimize time';
     }
   }
 
@@ -341,8 +338,6 @@ enum LagrangeFcn implements ObjectiveFcn {
         return 'ObjectiveFcn.Lagrange.TRACK_VECTOR_ORIENTATIONS_FROM_MARKERS';
       case minimizeQDot:
         return 'ObjectiveFcn.Lagrange.MINIMIZE_QDOT';
-      case minimizeTime:
-        return 'ObjectiveFcn.Lagrange.MINIMIZE_TIME';
     }
   }
 
@@ -470,7 +465,7 @@ enum LagrangeFcn implements ObjectiveFcn {
         ];
 
       //
-      case minimizeQDot || minimizeTime:
+      case minimizeQDot:
         return [];
     }
   }
@@ -790,7 +785,9 @@ enum MayerFcn implements ObjectiveFcn {
 }
 
 enum ConstraintFcn implements PenaltyFcn {
-  timeConstraint;
+  timeConstraint,
+  continuity,
+  ;
 
   @override
   List<PenaltyFcn> get fcnValues {
@@ -808,6 +805,8 @@ enum ConstraintFcn implements PenaltyFcn {
     switch (this) {
       case timeConstraint:
         return 'Time constraint';
+      case ConstraintFcn.continuity:
+        return 'Continuity';
     }
   }
 
@@ -816,13 +815,15 @@ enum ConstraintFcn implements PenaltyFcn {
     switch (this) {
       case timeConstraint:
         return 'ConstraintFcn.TIME_CONSTRAINT';
+      case ConstraintFcn.continuity:
+        return 'ConstraintFcn.CONTINUITY';
     }
   }
 
   @override
   List<PenaltyArgument> get mandatoryArguments {
     switch (this) {
-      case timeConstraint:
+      case timeConstraint || continuity:
         return [];
     }
   }
@@ -1007,7 +1008,7 @@ class Constraint extends Penalty {
       : super(fcn, arguments: arguments ?? {});
 }
 
-ObjectiveFcn getObjectiveCorrepondance(
+ObjectiveFcn? getObjectiveCorrepondance(
     GenericFcn genericFcn, MayerLagrange mayerOrLagrange) {
   if (mayerOrLagrange == MayerLagrange.mayer) {
     switch (genericFcn) {
@@ -1051,8 +1052,10 @@ ObjectiveFcn getObjectiveCorrepondance(
         return MayerFcn.minimizeQDot;
       case GenericFcn.minimizeTime:
         return MayerFcn.minimizeTime;
+      default:
+        return null;
     }
-  } else {
+  } else if (mayerOrLagrange == MayerLagrange.lagrange) {
     switch (genericFcn) {
       case GenericFcn.minimizeAngularMomentum:
         return LagrangeFcn.minimizeAngularMomentum;
@@ -1092,13 +1095,15 @@ ObjectiveFcn getObjectiveCorrepondance(
         return LagrangeFcn.trackVectorOrientationsFromMarkers;
       case GenericFcn.minimizeQDot:
         return LagrangeFcn.minimizeQDot;
-      case GenericFcn.minimizeTime:
-        return LagrangeFcn.minimizeTime;
+      default:
+        return null;
     }
+  } else {
+    return null;
   }
 }
 
-GenericFcn MayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
+GenericFcn? mayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
   if (objectiveFcn.runtimeType == GenericFcn) return objectiveFcn as GenericFcn;
 
   if (objectiveFcn.runtimeType == LagrangeFcn) {
@@ -1141,8 +1146,8 @@ GenericFcn MayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
         return GenericFcn.trackVectorOrientationsFromMarkers;
       case LagrangeFcn.minimizeQDot:
         return GenericFcn.minimizeQDot;
-      case LagrangeFcn.minimizeTime:
-        return GenericFcn.minimizeTime;
+      default:
+        return null;
     }
   } else {
     if (objectiveFcn.runtimeType == MayerFcn) {
@@ -1187,8 +1192,10 @@ GenericFcn MayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
           return GenericFcn.minimizeQDot;
         case MayerFcn.minimizeTime:
           return GenericFcn.minimizeTime;
+        default:
+          return null;
       }
     }
   }
-  throw 'The objective function $objectiveFcn is not supported';
+  return null;
 }

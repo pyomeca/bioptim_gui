@@ -296,30 +296,69 @@ class _PathTile extends StatelessWidget {
               onSelected: (value) {
                 if (value == penalty.fcn) return;
 
-                final mayerOrLagrange = (penalty.runtimeType == Objective)
-                    ? (penalty as Objective).mayerOrLagrange
-                    : null;
+                if (penalty.runtimeType == Objective) {
+                  var mayerOrLagrange = (penalty as Objective).mayerOrLagrange;
 
-                // Update to a brand new fresh penalty
-                penaltyInterface.update(
-                    penaltyFactory(
-                      getObjectiveCorrepondance(
-                          value as GenericFcn, mayerOrLagrange!),
-                      weight: null,
-                      minimizeOrMaximize: null,
-                      mayerOrLagrange: mayerOrLagrange,
-                      genericFcn: MayerLagrange2GenricFcn(value),
-                      nodes: null,
-                      quadratureRules: null,
-                      derivative: null,
-                      expand: null,
-                      quadratic: null,
-                      explicitDerivative: null,
-                      multiThread: null,
-                      target: null,
-                      arguments: null,
-                    ),
-                    penaltyIndex: penaltyIndex);
+                  var newFcn = getObjectiveCorrepondance(
+                      value as GenericFcn, mayerOrLagrange);
+
+                  if (newFcn == null) {
+                    // Mayer/Lagrange does not exist for this specific objective
+
+                    // give the other type of objective
+                    // (Mayer if Lagrange does not exist
+                    // or Lagrange if Mayer does not exist)
+                    // example: if Mayer.MINIMIZE_EXIST does not exist
+                    // then give Lagrange.MINIMIZE_EXIST that exists
+                    mayerOrLagrange = (mayerOrLagrange == MayerLagrange.mayer)
+                        ? MayerLagrange.lagrange
+                        : MayerLagrange.mayer;
+
+                    newFcn = getObjectiveCorrepondance(
+                      value,
+                      mayerOrLagrange,
+                    );
+                  }
+
+                  // Update to a brand new fresh penalty
+                  penaltyInterface.update(
+                      penaltyFactory(
+                        newFcn as PenaltyFcn,
+                        weight: null,
+                        minimizeOrMaximize: null,
+                        mayerOrLagrange: mayerOrLagrange,
+                        genericFcn: value,
+                        nodes: null,
+                        quadratureRules: null,
+                        derivative: null,
+                        expand: null,
+                        quadratic: null,
+                        explicitDerivative: null,
+                        multiThread: null,
+                        target: null,
+                        arguments: null,
+                      ),
+                      penaltyIndex: penaltyIndex);
+                } else {
+                  penaltyInterface.update(
+                      penaltyFactory(
+                        value,
+                        weight: null,
+                        minimizeOrMaximize: null,
+                        mayerOrLagrange: null,
+                        genericFcn: null,
+                        nodes: null,
+                        quadratureRules: null,
+                        derivative: null,
+                        expand: null,
+                        quadratic: null,
+                        explicitDerivative: null,
+                        multiThread: null,
+                        target: null,
+                        arguments: null,
+                      ),
+                      penaltyIndex: penaltyIndex);
+                }
               },
               isExpanded: false,
             ),
@@ -332,12 +371,20 @@ class _PathTile extends StatelessWidget {
                 customOnChanged: (value) {
                   if (value == penalty.mayerOrLagrange) return;
 
+                  var newFcn = getObjectiveCorrepondance(
+                    mayerLagrange2GenricFcn(
+                        penalty.fcn as ObjectiveFcn)!, // always exists
+                    value!,
+                  );
+
+                  if (newFcn == null) {
+                    newFcn = penalty.fcn as ObjectiveFcn?;
+                    value = penalty.mayerOrLagrange;
+                  }
+
                   penaltyInterface.update(
                       penaltyFactory(
-                        getObjectiveCorrepondance(
-                          MayerLagrange2GenricFcn(penalty.fcn as ObjectiveFcn),
-                          value!,
-                        ),
+                        newFcn as PenaltyFcn,
                         weight: null,
                         minimizeOrMaximize: null,
                         mayerOrLagrange: value,
