@@ -6,6 +6,7 @@ import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/global.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/utils.dart';
+import 'package:bioptim_gui/widgets/mayer_lagrande_radio.dart';
 
 class _Somersault {
   int somersaultIndex;
@@ -246,7 +247,7 @@ class AcrobaticsOCPProgram {
             '        target=${objective.target == 'None' ? 'None' : 'np.array([${objective.target}])'},\n'
             '        derivative=${objective.derivative.toPythonString()},\n'
             '        explicit_derivative=${objective.explicitDerivative.toPythonString()},\n'
-            '        integration_rule=${objective.quadratureRules.toPythonString()},\n'
+            '${objective.mayerOrLagrange == MayerLagrange.mayer ? '' : '        integration_rule=${objective.quadratureRules.toPythonString()},\n'}'
             '        multi_thread=${objective.multiThread.toPythonString()},\n'
             '${generic.nbSomersaults == 1 ? '' : '        phase=$phaseIndex,\n'}'
             '        weight=${objective.minimizeOrMaximize.toPythonString()}${objective.weight},\n'
