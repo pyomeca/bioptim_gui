@@ -9,9 +9,9 @@ enum MayerLagrange {
   String toString() {
     switch (this) {
       case mayer:
-        return 'M';
+        return '\u2112'; // Laplace L
       case lagrange:
-        return 'L';
+        return '\u2133'; // German mark M
     }
   }
 }
