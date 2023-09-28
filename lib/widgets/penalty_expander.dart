@@ -297,9 +297,7 @@ class _PathTile extends StatelessWidget {
                 if (value == penalty.fcn) return;
 
                 final mayerOrLagrange = (penalty.runtimeType == Objective)
-                    ? ((value.runtimeType == LagrangeFcn)
-                        ? MayerLagrange.lagrange
-                        : MayerLagrange.mayer)
+                    ? (penalty as Objective).mayerOrLagrange
                     : null;
 
                 // Update to a brand new fresh penalty
@@ -310,8 +308,7 @@ class _PathTile extends StatelessWidget {
                       weight: null,
                       minimizeOrMaximize: null,
                       mayerOrLagrange: mayerOrLagrange,
-                      genericFcn:
-                          MayerLagrange2GenricFcn(value as ObjectiveFcn),
+                      genericFcn: MayerLagrange2GenricFcn(value),
                       nodes: null,
                       quadratureRules: null,
                       derivative: null,
