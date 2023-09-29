@@ -292,7 +292,7 @@ class _PathTile extends StatelessWidget {
                 if (penalty.runtimeType == Objective) {
                   var mayerOrLagrange = (penalty as Objective).mayerOrLagrange;
 
-                  var newFcn = getObjectiveCorrepondance(
+                  var newFcn = genericFcn2ObjectiveFcn(
                       value as GenericFcn, mayerOrLagrange);
 
                   if (newFcn == null) {
@@ -307,7 +307,7 @@ class _PathTile extends StatelessWidget {
                         ? MayerLagrange.lagrange
                         : MayerLagrange.mayer;
 
-                    newFcn = getObjectiveCorrepondance(
+                    newFcn = genericFcn2ObjectiveFcn(
                       value,
                       mayerOrLagrange,
                     );
@@ -362,8 +362,8 @@ class _PathTile extends StatelessWidget {
                 customOnChanged: (value) {
                   if (value == penalty.mayerOrLagrange) return;
 
-                  var newFcn = getObjectiveCorrepondance(
-                    mayerLagrange2GenricFcn(
+                  var newFcn = genericFcn2ObjectiveFcn(
+                    objectiveFcn2GenericFcn(
                         penalty.fcn as ObjectiveFcn)!, // always exists
                     value!,
                   );

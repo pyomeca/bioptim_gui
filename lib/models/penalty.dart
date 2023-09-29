@@ -1005,7 +1005,7 @@ class Constraint extends Penalty {
       : super(fcn, arguments: arguments ?? {});
 }
 
-ObjectiveFcn? getObjectiveCorrepondance(
+ObjectiveFcn? genericFcn2ObjectiveFcn(
     GenericFcn genericFcn, MayerLagrange mayerOrLagrange) {
   if (mayerOrLagrange == MayerLagrange.mayer) {
     switch (genericFcn) {
@@ -1049,8 +1049,6 @@ ObjectiveFcn? getObjectiveCorrepondance(
         return MayerFcn.minimizeQDot;
       case GenericFcn.minimizeTime:
         return MayerFcn.minimizeTime;
-      default:
-        return null;
     }
   } else if (mayerOrLagrange == MayerLagrange.lagrange) {
     switch (genericFcn) {
@@ -1094,15 +1092,12 @@ ObjectiveFcn? getObjectiveCorrepondance(
         return LagrangeFcn.minimizeQDot;
       case GenericFcn.minimizeTime:
         return LagrangeFcn.minimizeTime;
-      default:
-        return null;
     }
-  } else {
-    return null;
   }
+  return null;
 }
 
-GenericFcn? mayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
+GenericFcn? objectiveFcn2GenericFcn(ObjectiveFcn objectiveFcn) {
   if (objectiveFcn.runtimeType == GenericFcn) return objectiveFcn as GenericFcn;
 
   if (objectiveFcn.runtimeType == LagrangeFcn) {
@@ -1147,8 +1142,6 @@ GenericFcn? mayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
         return GenericFcn.minimizeQDot;
       case LagrangeFcn.minimizeTime:
         return GenericFcn.minimizeTime;
-      default:
-        return null;
     }
   } else {
     if (objectiveFcn.runtimeType == MayerFcn) {
@@ -1193,8 +1186,6 @@ GenericFcn? mayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
           return GenericFcn.minimizeQDot;
         case MayerFcn.minimizeTime:
           return GenericFcn.minimizeTime;
-        default:
-          return null;
       }
     }
   }
