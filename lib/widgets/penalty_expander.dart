@@ -8,7 +8,7 @@ import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
 import 'package:bioptim_gui/widgets/boolean_switch.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:bioptim_gui/widgets/maximize_minimize_radio.dart';
-import 'package:bioptim_gui/widgets/mayer_lagrande_radio.dart';
+import 'package:bioptim_gui/widgets/mayer_lagrange_radio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

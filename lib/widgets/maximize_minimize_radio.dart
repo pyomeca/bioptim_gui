@@ -1,3 +1,4 @@
+import 'package:bioptim_gui/widgets/custom_radio_button.dart';
 import 'package:flutter/material.dart';
 
 enum MinMax {
@@ -25,66 +26,22 @@ enum MinMax {
   }
 }
 
-class MinMaxRadio extends StatefulWidget {
-  final MinMax value; // Added the 'value' property
-  final ValueChanged<MinMax?>
-      customOnChanged; // Added the 'customOnChanged' property
+class MinMaxRadio extends StatelessWidget {
+  final MinMax value;
+  final ValueChanged<MinMax?> customOnChanged;
 
   const MinMaxRadio({
     Key? key,
-    required this.value, // Specify 'value' in the constructor
-    required this.customOnChanged, // Specify 'customOnChanged' in the constructor
+    required this.value,
+    required this.customOnChanged,
   }) : super(key: key);
 
   @override
-  State<MinMaxRadio> createState() => _MinMaxRadioState();
-}
-
-class _MinMaxRadioState extends State<MinMaxRadio> {
-  late MinMax? minOrMax;
-
-  @override
-  void initState() {
-    super.initState();
-    minOrMax = widget.value; // Initialize 'minOrMax' with the provided 'value'
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Column(children: [
-          Row(children: [
-            Radio<MinMax>(
-              value: MinMax.maximize,
-              groupValue: minOrMax,
-              onChanged: (MinMax? value) {
-                setState(() {
-                  minOrMax = value;
-                  widget.customOnChanged(
-                      value); // Call the custom onChanged callback
-                });
-              },
-            ),
-            const Text('Maximize'),
-          ]),
-          Row(children: [
-            Radio<MinMax>(
-              value: MinMax.minimize,
-              groupValue: minOrMax,
-              onChanged: (MinMax? value) {
-                setState(() {
-                  minOrMax = value;
-                  widget.customOnChanged(
-                      value); // Call the custom onChanged callback
-                });
-              },
-            ),
-            const Text('Minimize'),
-          ]),
-        ]),
-      ],
+    return CustomRadioButton<MinMax>(
+      value: value,
+      items: MinMax.values,
+      customOnChanged: customOnChanged,
     );
   }
 }

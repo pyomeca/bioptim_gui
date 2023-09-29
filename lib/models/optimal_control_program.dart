@@ -7,7 +7,7 @@ import 'package:bioptim_gui/models/global.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/utils.dart';
-import 'package:bioptim_gui/widgets/mayer_lagrande_radio.dart';
+import 'package:bioptim_gui/widgets/mayer_lagrange_radio.dart';
 
 class _Phase {
   int phaseIndex;

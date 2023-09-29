@@ -1,7 +1,7 @@
 import 'package:bioptim_gui/models/nodes.dart';
 import 'package:bioptim_gui/models/quadrature_rules.dart';
 import 'package:bioptim_gui/widgets/maximize_minimize_radio.dart';
-import 'package:bioptim_gui/widgets/mayer_lagrande_radio.dart';
+import 'package:bioptim_gui/widgets/mayer_lagrange_radio.dart';
 
 enum PenaltyArgumentType {
   integer,
