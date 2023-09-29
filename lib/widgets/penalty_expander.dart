@@ -261,6 +261,98 @@ class _PathTile extends StatelessWidget {
     required ObjectiveType? objectiveType,
     required GenericFcn? genericFcn,
   }) penaltyFactory;
+
+  ///
+  /// This function is used to create a new penalty with the same arguments as the previous one
+  /// except the ones that are not null in the parameters
+  /// This is used to update the penalty when the user changes the penalty type
+  Penalty _penaltyFactoryPartial(
+    Penalty penalty,
+    PenaltyFcn fcn, {
+    double? weight,
+    MinMax? minimizeOrMaximize,
+    ObjectiveType? objectiveType,
+    GenericFcn? genericFcn,
+    Nodes? nodes,
+    QuadratureRules? quadratureRules,
+    bool? quadratic,
+    bool? expand,
+    String? target,
+    bool? derivative,
+    bool? multiThread,
+    Map<String, dynamic>? arguments,
+  }) {
+    final objective =
+        penalty.runtimeType == Objective ? (penalty as Objective) : null;
+
+    fcn = fcn;
+    weight = weight ?? objective?.weight;
+    minimizeOrMaximize = minimizeOrMaximize ?? objective?.minimizeOrMaximize;
+    objectiveType = objectiveType ?? objective?.objectiveType;
+    genericFcn = genericFcn ?? objective?.genericFcn;
+    nodes = nodes ?? penalty.nodes;
+    quadratureRules = quadratureRules ?? penalty.quadratureRules;
+    quadratic = quadratic ?? penalty.quadratic;
+    expand = expand ?? penalty.expand;
+    target = target ?? penalty.target;
+    derivative = derivative ?? penalty.derivative;
+    multiThread = multiThread ?? penalty.multiThread;
+    arguments = arguments ?? penalty.arguments;
+
+    switch (fcn.runtimeType) {
+      case LagrangeFcn:
+        return penaltyFactory(
+          fcn,
+          weight: weight,
+          minimizeOrMaximize: minimizeOrMaximize,
+          objectiveType: objectiveType,
+          genericFcn: genericFcn,
+          nodes: nodes,
+          quadratureRules: quadratureRules,
+          quadratic: quadratic,
+          expand: expand,
+          target: target,
+          derivative: derivative,
+          multiThread: multiThread,
+          arguments: arguments,
+        );
+      case MayerFcn:
+        return penaltyFactory(
+          fcn,
+          weight: weight,
+          minimizeOrMaximize: minimizeOrMaximize,
+          objectiveType: objectiveType,
+          genericFcn: genericFcn,
+          nodes: nodes,
+          quadratureRules: quadratureRules,
+          quadratic: quadratic,
+          expand: expand,
+          target: target,
+          derivative: derivative,
+          multiThread: multiThread,
+          arguments: arguments,
+        );
+      case ConstraintFcn:
+        return penaltyFactory(
+          fcn,
+          weight: weight,
+          minimizeOrMaximize: minimizeOrMaximize,
+          objectiveType: objectiveType,
+          genericFcn: genericFcn,
+          nodes: nodes,
+          quadratureRules: quadratureRules,
+          quadratic: quadratic,
+          expand: expand,
+          target: target,
+          derivative: derivative,
+          multiThread: multiThread,
+          arguments: arguments,
+        );
+      default:
+        throw 'Wrong penalty type';
+    }
+  }
+
   final PenaltyInterface penaltyInterface;
   final int penaltyIndex;
   final double width;
@@ -291,20 +383,18 @@ class _PathTile extends StatelessWidget {
               onSelected: (value) {
                 if (value == penalty.fcn) return;
 
-                if (penalty.runtimeType == Objective) {
-                  var objectiveType = (penalty as Objective).objectiveType;
+                ObjectiveType? objectiveType;
+                GenericFcn? generic;
+                PenaltyFcn? newFcn = value;
 
-                  var newFcn = genericFcn2ObjectiveFcn(
-                      value as GenericFcn, objectiveType);
+                if (penalty.runtimeType == Objective) {
+                  objectiveType = (penalty as Objective).objectiveType;
+
+                  newFcn = genericFcn2ObjectiveFcn(
+                      value as GenericFcn, objectiveType) as PenaltyFcn;
 
                   if (newFcn == null) {
-                    // Mayer/Lagrange does not exist for this specific objective
-
-                    // give the other type of objective
-                    // (Mayer if Lagrange does not exist
-                    // or Lagrange if Mayer does not exist)
-                    // example: if Mayer.MINIMIZE_EXIST does not exist
-                    // then give Lagrange.MINIMIZE_EXIST that exists
+                    // switches to the other objective type if ObjectiveType.GenericFcn doesn't exist
                     objectiveType = (objectiveType == ObjectiveType.mayer)
                         ? ObjectiveType.lagrange
                         : ObjectiveType.mayer;
@@ -312,48 +402,28 @@ class _PathTile extends StatelessWidget {
                     newFcn = genericFcn2ObjectiveFcn(
                       value,
                       objectiveType,
-                    );
+                    ) as PenaltyFcn;
                   }
-
-                  // Update to a brand new fresh penalty
-                  penaltyInterface.update(
-                      penaltyFactory(
-                        newFcn as PenaltyFcn,
-                        weight: null,
-                        minimizeOrMaximize: null,
-                        objectiveType: objectiveType,
-                        genericFcn: value,
-                        nodes: null,
-                        quadratureRules: null,
-                        derivative: null,
-                        expand: null,
-                        quadratic: null,
-                        multiThread: null,
-                        target: null,
-                        arguments: null,
-                      ),
-                      penaltyIndex: penaltyIndex);
-                } else {
-                  penaltyInterface.update(
-                      penaltyFactory(
-                        value,
-                        weight: null,
-                        minimizeOrMaximize: null,
-                        objectiveType: null,
-                        genericFcn: null,
-                        nodes: null,
-                        quadratureRules: null,
-                        derivative: null,
-                        expand: null,
-                        quadratic: null,
-                        multiThread: null,
-                        target: null,
-                        arguments: null,
-                      ),
-                      penaltyIndex: penaltyIndex);
                 }
+
+                penaltyInterface.update(
+                    penaltyFactory(
+                      newFcn,
+                      weight: null,
+                      minimizeOrMaximize: null,
+                      objectiveType: objectiveType,
+                      genericFcn: generic,
+                      nodes: null,
+                      quadratureRules: null,
+                      derivative: null,
+                      expand: null,
+                      quadratic: null,
+                      multiThread: null,
+                      target: null,
+                      arguments: null,
+                    ),
+                    penaltyIndex: penaltyIndex);
               },
-              isExpanded: false,
             ),
           ),
           if (penalty.runtimeType == Objective)
@@ -429,41 +499,14 @@ class _PathTile extends StatelessWidget {
                 onSelected: (value) {
                   if (value == penalty.nodes) return;
 
-                  final weight = penalty.runtimeType == Objective
-                      ? (penalty as Objective).weight
-                      : null;
-
-                  final minimizeOrMaximize = penalty.runtimeType == Objective
-                      ? (penalty as Objective).minimizeOrMaximize
-                      : null;
-
-                  final objectiveType = penalty.runtimeType == Objective
-                      ? (penalty as Objective).objectiveType
-                      : null;
-
-                  final genericFcn = penalty.runtimeType == Objective
-                      ? (penalty as Objective).genericFcn
-                      : null;
-
                   penaltyInterface.update(
-                      penaltyFactory(
+                      _penaltyFactoryPartial(
+                        penalty,
                         penalty.fcn,
-                        weight: weight,
-                        minimizeOrMaximize: minimizeOrMaximize,
-                        objectiveType: objectiveType,
-                        genericFcn: genericFcn,
                         nodes: value,
-                        quadratureRules: penalty.quadratureRules,
-                        derivative: penalty.derivative,
-                        quadratic: penalty.quadratic,
-                        expand: penalty.expand,
-                        multiThread: penalty.multiThread,
-                        target: penalty.target,
-                        arguments: penalty.arguments,
                       ),
                       penaltyIndex: penaltyIndex);
                 },
-                isExpanded: false,
               ),
             ),
             if (penalty.runtimeType == Objective)
@@ -487,20 +530,10 @@ class _PathTile extends StatelessWidget {
                         if (value == penalty.minimizeOrMaximize) return;
 
                         penaltyInterface.update(
-                            penaltyFactory(
+                            _penaltyFactoryPartial(
+                              penalty,
                               penalty.fcn,
-                              weight: penalty.weight,
                               minimizeOrMaximize: value,
-                              objectiveType: penalty.objectiveType,
-                              genericFcn: penalty.genericFcn,
-                              nodes: penalty.nodes,
-                              quadratureRules: penalty.quadratureRules,
-                              derivative: penalty.derivative,
-                              quadratic: penalty.quadratic,
-                              expand: penalty.expand,
-                              multiThread: penalty.multiThread,
-                              target: penalty.target,
-                              arguments: penalty.arguments,
                             ),
                             penaltyIndex: penaltyIndex);
                       })),
@@ -538,38 +571,14 @@ class _PathTile extends StatelessWidget {
                   onSelected: (value) {
                     if (value == penalty.quadratureRules) return;
 
-                    final weight = penalty.runtimeType == Objective
-                        ? (penalty as Objective).weight
-                        : null;
-                    final minimizeOrMaximize = penalty.runtimeType == Objective
-                        ? (penalty as Objective).minimizeOrMaximize
-                        : null;
-                    final objectiveType = penalty.runtimeType == Objective
-                        ? (penalty as Objective).objectiveType
-                        : null;
-                    final genericFcn = penalty.runtimeType == Objective
-                        ? (penalty as Objective).genericFcn
-                        : null;
-
                     penaltyInterface.update(
-                        penaltyFactory(
+                        _penaltyFactoryPartial(
+                          penalty,
                           penalty.fcn,
-                          weight: weight,
-                          minimizeOrMaximize: minimizeOrMaximize,
-                          objectiveType: objectiveType,
-                          genericFcn: genericFcn,
-                          nodes: penalty.nodes,
                           quadratureRules: value,
-                          derivative: penalty.derivative,
-                          quadratic: penalty.quadratic,
-                          expand: penalty.expand,
-                          multiThread: penalty.multiThread,
-                          target: penalty.target,
-                          arguments: penalty.arguments,
                         ),
                         penaltyIndex: penaltyIndex);
                   },
-                  isExpanded: false,
                 ),
               ),
             ],
@@ -582,37 +591,11 @@ class _PathTile extends StatelessWidget {
               customOnChanged: (value) {
                 if (value == penalty.quadratic) return;
 
-                final weight = penalty.runtimeType == Objective
-                    ? (penalty as Objective).weight
-                    : null;
-
-                final minimizeOrMaximize = penalty.runtimeType == Objective
-                    ? (penalty as Objective).minimizeOrMaximize
-                    : null;
-
-                final objectiveType = penalty.runtimeType == Objective
-                    ? (penalty as Objective).objectiveType
-                    : null;
-
-                final genericFcn = penalty.runtimeType == Objective
-                    ? (penalty as Objective).genericFcn
-                    : null;
-
                 penaltyInterface.update(
-                    penaltyFactory(
+                    _penaltyFactoryPartial(
+                      penalty,
                       penalty.fcn,
-                      weight: weight,
-                      minimizeOrMaximize: minimizeOrMaximize,
-                      objectiveType: objectiveType,
-                      genericFcn: genericFcn,
-                      nodes: penalty.nodes,
-                      quadratureRules: penalty.quadratureRules,
-                      derivative: penalty.derivative,
                       quadratic: value,
-                      expand: penalty.expand,
-                      multiThread: penalty.multiThread,
-                      target: penalty.target,
-                      arguments: penalty.arguments,
                     ),
                     penaltyIndex: penaltyIndex);
               },
@@ -625,37 +608,11 @@ class _PathTile extends StatelessWidget {
               customOnChanged: (value) {
                 if (value == penalty.expand) return;
 
-                final weight = penalty.runtimeType == Objective
-                    ? (penalty as Objective).weight
-                    : null;
-
-                final minimizeOrMaximize = penalty.runtimeType == Objective
-                    ? (penalty as Objective).minimizeOrMaximize
-                    : null;
-
-                final objectiveType = penalty.runtimeType == Objective
-                    ? (penalty as Objective).objectiveType
-                    : null;
-
-                final genericFcn = penalty.runtimeType == Objective
-                    ? (penalty as Objective).genericFcn
-                    : null;
-
                 penaltyInterface.update(
-                    penaltyFactory(
+                    _penaltyFactoryPartial(
+                      penalty,
                       penalty.fcn,
-                      weight: weight,
-                      minimizeOrMaximize: minimizeOrMaximize,
-                      objectiveType: objectiveType,
-                      genericFcn: genericFcn,
-                      nodes: penalty.nodes,
-                      quadratureRules: penalty.quadratureRules,
-                      derivative: penalty.derivative,
-                      quadratic: penalty.quadratic,
                       expand: value,
-                      multiThread: penalty.multiThread,
-                      target: penalty.target,
-                      arguments: penalty.arguments,
                     ),
                     penaltyIndex: penaltyIndex);
               },
@@ -672,37 +629,11 @@ class _PathTile extends StatelessWidget {
               customOnChanged: (value) {
                 if (value == penalty.multiThread) return;
 
-                final weight = penalty.runtimeType == Objective
-                    ? (penalty as Objective).weight
-                    : null;
-
-                final minimizeOrMaximize = penalty.runtimeType == Objective
-                    ? (penalty as Objective).minimizeOrMaximize
-                    : null;
-
-                final objectiveType = penalty.runtimeType == Objective
-                    ? (penalty as Objective).objectiveType
-                    : null;
-
-                final genericFcn = penalty.runtimeType == Objective
-                    ? (penalty as Objective).genericFcn
-                    : null;
-
                 penaltyInterface.update(
-                    penaltyFactory(
+                    _penaltyFactoryPartial(
+                      penalty,
                       penalty.fcn,
-                      weight: weight,
-                      minimizeOrMaximize: minimizeOrMaximize,
-                      objectiveType: objectiveType,
-                      genericFcn: genericFcn,
-                      nodes: penalty.nodes,
-                      quadratureRules: penalty.quadratureRules,
-                      derivative: penalty.derivative,
-                      quadratic: penalty.quadratic,
-                      expand: penalty.expand,
                       multiThread: value,
-                      target: penalty.target,
-                      arguments: penalty.arguments,
                     ),
                     penaltyIndex: penaltyIndex);
               },
@@ -715,36 +646,11 @@ class _PathTile extends StatelessWidget {
               customOnChanged: (value) {
                 if (value == penalty.derivative) return;
 
-                final weight = penalty.runtimeType == Objective
-                    ? (penalty as Objective).weight
-                    : null;
-                final minimizeOrMaximize = penalty.runtimeType == Objective
-                    ? (penalty as Objective).minimizeOrMaximize
-                    : null;
-
-                final objectiveType = penalty.runtimeType == Objective
-                    ? (penalty as Objective).objectiveType
-                    : null;
-
-                final genericFcn = penalty.runtimeType == Objective
-                    ? (penalty as Objective).genericFcn
-                    : null;
-
                 penaltyInterface.update(
-                    penaltyFactory(
+                    _penaltyFactoryPartial(
+                      penalty,
                       penalty.fcn,
-                      weight: weight,
-                      minimizeOrMaximize: minimizeOrMaximize,
-                      objectiveType: objectiveType,
-                      genericFcn: genericFcn,
-                      nodes: penalty.nodes,
-                      quadratureRules: penalty.quadratureRules,
                       derivative: value,
-                      quadratic: penalty.quadratic,
-                      expand: penalty.expand,
-                      multiThread: penalty.multiThread,
-                      target: penalty.target,
-                      arguments: penalty.arguments,
                     ),
                     penaltyIndex: penaltyIndex);
               },
