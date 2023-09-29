@@ -1,5 +1,6 @@
 enum SolverType {
-  ipopt;
+  ipopt,
+  ;
 
   @override
   String toString() {

@@ -1,13 +1,14 @@
+import 'package:bioptim_gui/models/objective_type.dart';
+import 'package:bioptim_gui/models/minimize_maximize.dart';
 import 'package:bioptim_gui/models/nodes.dart';
 import 'package:bioptim_gui/models/quadrature_rules.dart';
-import 'package:bioptim_gui/widgets/maximize_minimize_radio.dart';
-import 'package:bioptim_gui/widgets/mayer_lagrande_radio.dart';
 
 enum PenaltyArgumentType {
   integer,
   float,
   string,
   array,
+  axis,
   ;
 
   @override
@@ -21,6 +22,8 @@ enum PenaltyArgumentType {
         return 'String';
       case array:
         return 'Array';
+      case axis:
+        return 'Axis';
     }
   }
 
@@ -34,6 +37,8 @@ enum PenaltyArgumentType {
         return RegExp(r'[a-zA-Z0-9]');
       case array:
         return RegExp(r'[0-9\.,]');
+      case axis:
+        return RegExp(r'[XYZxyz]');
     }
   }
 }
@@ -438,9 +443,8 @@ enum LagrangeFcn implements ObjectiveFcn {
               name: 'marker', dataType: PenaltyArgumentType.string),
           const PenaltyArgument(
               name: 'segment', dataType: PenaltyArgumentType.string),
-          // TODO implement argument
-          // const PenaltyArgument(
-          //    name: 'axis', dataType: PenaltyArgumentType.string),
+          const PenaltyArgument(
+              name: 'axis', dataType: PenaltyArgumentType.axis),
         ];
 
       // segment:int|str
@@ -741,9 +745,8 @@ enum MayerFcn implements ObjectiveFcn {
               name: 'marker', dataType: PenaltyArgumentType.string),
           const PenaltyArgument(
               name: 'segment', dataType: PenaltyArgumentType.string),
-          // TODO implement argument
-          // const PenaltyArgument(
-          //    name: 'axis', dataType: PenaltyArgumentType.string),
+          const PenaltyArgument(
+              name: 'axis', dataType: PenaltyArgumentType.axis),
         ];
 
       // segment:int|str
@@ -855,6 +858,8 @@ abstract class Penalty {
             .dataType) {
           case PenaltyArgumentType.array:
             return '$key=np.array([$argument])';
+          case PenaltyArgumentType.axis:
+            return '$key=Axis.${argument.toUpperCase()}';
           default:
             return '$key="$argument"';
         }
@@ -898,7 +903,7 @@ abstract class Penalty {
 class Objective extends Penalty {
   double weight;
   MinMax minimizeOrMaximize;
-  MayerLagrange mayerOrLagrange;
+  ObjectiveType objectiveType;
   GenericFcn genericFcn;
 
   Objective.generic(
@@ -912,7 +917,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
-      this.mayerOrLagrange = MayerLagrange.lagrange,
+      this.objectiveType = ObjectiveType.lagrange,
       this.genericFcn = GenericFcn.minimizeControls,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
@@ -928,7 +933,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 100,
       this.minimizeOrMaximize = MinMax.minimize,
-      this.mayerOrLagrange = MayerLagrange.lagrange,
+      this.objectiveType = ObjectiveType.lagrange,
       this.genericFcn = GenericFcn.minimizeControls,
       Map<String, dynamic>? arguments})
       : super(fcn,
@@ -948,7 +953,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
-      this.mayerOrLagrange = MayerLagrange.mayer,
+      this.objectiveType = ObjectiveType.mayer,
       this.genericFcn = GenericFcn.minimizeTime,
       Map<String, dynamic>? arguments,
       required double minBound,
@@ -970,7 +975,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
-      this.mayerOrLagrange = MayerLagrange.lagrange,
+      this.objectiveType = ObjectiveType.lagrange,
       this.genericFcn = GenericFcn.minimizeControls,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
@@ -985,7 +990,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
-      this.mayerOrLagrange = MayerLagrange.mayer,
+      this.objectiveType = ObjectiveType.mayer,
       this.genericFcn = GenericFcn.minimizeControls,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
@@ -1005,9 +1010,9 @@ class Constraint extends Penalty {
       : super(fcn, arguments: arguments ?? {});
 }
 
-ObjectiveFcn? getObjectiveCorrepondance(
-    GenericFcn genericFcn, MayerLagrange mayerOrLagrange) {
-  if (mayerOrLagrange == MayerLagrange.mayer) {
+ObjectiveFcn? genericFcn2ObjectiveFcn(
+    GenericFcn genericFcn, ObjectiveType objectiveType) {
+  if (objectiveType == ObjectiveType.mayer) {
     switch (genericFcn) {
       case GenericFcn.minimizeAngularMomentum:
         return MayerFcn.minimizeAngularMomentum;
@@ -1049,10 +1054,8 @@ ObjectiveFcn? getObjectiveCorrepondance(
         return MayerFcn.minimizeQDot;
       case GenericFcn.minimizeTime:
         return MayerFcn.minimizeTime;
-      default:
-        return null;
     }
-  } else if (mayerOrLagrange == MayerLagrange.lagrange) {
+  } else if (objectiveType == ObjectiveType.lagrange) {
     switch (genericFcn) {
       case GenericFcn.minimizeAngularMomentum:
         return LagrangeFcn.minimizeAngularMomentum;
@@ -1094,15 +1097,12 @@ ObjectiveFcn? getObjectiveCorrepondance(
         return LagrangeFcn.minimizeQDot;
       case GenericFcn.minimizeTime:
         return LagrangeFcn.minimizeTime;
-      default:
-        return null;
     }
-  } else {
-    return null;
   }
+  return null;
 }
 
-GenericFcn? mayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
+GenericFcn? objectiveFcn2GenericFcn(ObjectiveFcn objectiveFcn) {
   if (objectiveFcn.runtimeType == GenericFcn) return objectiveFcn as GenericFcn;
 
   if (objectiveFcn.runtimeType == LagrangeFcn) {
@@ -1147,8 +1147,6 @@ GenericFcn? mayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
         return GenericFcn.minimizeQDot;
       case LagrangeFcn.minimizeTime:
         return GenericFcn.minimizeTime;
-      default:
-        return null;
     }
   } else {
     if (objectiveFcn.runtimeType == MayerFcn) {
@@ -1193,8 +1191,6 @@ GenericFcn? mayerLagrange2GenricFcn(ObjectiveFcn objectiveFcn) {
           return GenericFcn.minimizeQDot;
         case MayerFcn.minimizeTime:
           return GenericFcn.minimizeTime;
-        default:
-          return null;
       }
     }
   }

@@ -4,9 +4,9 @@ import 'package:bioptim_gui/models/acrobatics_ocp_config.dart';
 import 'package:bioptim_gui/models/dynamics.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
 import 'package:bioptim_gui/models/global.dart';
+import 'package:bioptim_gui/models/objective_type.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/utils.dart';
-import 'package:bioptim_gui/widgets/mayer_lagrande_radio.dart';
 
 class _Somersault {
   int somersaultIndex;
@@ -141,6 +141,7 @@ class AcrobaticsOCPProgram {
         '\n'
         'import numpy as np\n'
         'from bioptim import (\n'
+        '    Axis,\n'
         '    BiorbdModel,\n'
         '    ConstraintFcn,\n'
         '    OptimalControlProgram,\n'
@@ -246,7 +247,7 @@ class AcrobaticsOCPProgram {
             '        expand=${objective.expand.toPythonString()},\n'
             '        target=${objective.target == 'None' ? 'None' : 'np.array([${objective.target}])'},\n'
             '        derivative=${objective.derivative.toPythonString()},\n'
-            '${objective.mayerOrLagrange == MayerLagrange.mayer ? '' : '        integration_rule=${objective.quadratureRules.toPythonString()},\n'}'
+            '${objective.objectiveType == ObjectiveType.mayer ? '' : '        integration_rule=${objective.quadratureRules.toPythonString()},\n'}'
             '        multi_thread=${objective.multiThread.toPythonString()},\n'
             '${generic.nbSomersaults == 1 ? '' : '        phase=$phaseIndex,\n'}'
             '        weight=${objective.minimizeOrMaximize.toPythonString()}${objective.weight},\n'
