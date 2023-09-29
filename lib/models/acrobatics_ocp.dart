@@ -141,6 +141,7 @@ class AcrobaticsOCPProgram {
         '\n'
         'import numpy as np\n'
         'from bioptim import (\n'
+        '    Axis,\n'
         '    BiorbdModel,\n'
         '    ConstraintFcn,\n'
         '    OptimalControlProgram,\n'

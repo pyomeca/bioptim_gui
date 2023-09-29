@@ -8,6 +8,7 @@ enum PenaltyArgumentType {
   float,
   string,
   array,
+  axis,
   ;
 
   @override
@@ -21,6 +22,8 @@ enum PenaltyArgumentType {
         return 'String';
       case array:
         return 'Array';
+      case axis:
+        return 'Axis';
     }
   }
 
@@ -34,6 +37,8 @@ enum PenaltyArgumentType {
         return RegExp(r'[a-zA-Z0-9]');
       case array:
         return RegExp(r'[0-9\.,]');
+      case axis:
+        return RegExp(r'[XYZxyz]');
     }
   }
 }
@@ -438,9 +443,8 @@ enum LagrangeFcn implements ObjectiveFcn {
               name: 'marker', dataType: PenaltyArgumentType.string),
           const PenaltyArgument(
               name: 'segment', dataType: PenaltyArgumentType.string),
-          // TODO implement argument
-          // const PenaltyArgument(
-          //    name: 'axis', dataType: PenaltyArgumentType.string),
+          const PenaltyArgument(
+              name: 'axis', dataType: PenaltyArgumentType.axis),
         ];
 
       // segment:int|str
@@ -741,9 +745,8 @@ enum MayerFcn implements ObjectiveFcn {
               name: 'marker', dataType: PenaltyArgumentType.string),
           const PenaltyArgument(
               name: 'segment', dataType: PenaltyArgumentType.string),
-          // TODO implement argument
-          // const PenaltyArgument(
-          //    name: 'axis', dataType: PenaltyArgumentType.string),
+          const PenaltyArgument(
+              name: 'axis', dataType: PenaltyArgumentType.axis),
         ];
 
       // segment:int|str
@@ -855,6 +858,8 @@ abstract class Penalty {
             .dataType) {
           case PenaltyArgumentType.array:
             return '$key=np.array([$argument])';
+          case PenaltyArgumentType.axis:
+            return '$key=Axis.${argument.toUpperCase()}';
           default:
             return '$key="$argument"';
         }
