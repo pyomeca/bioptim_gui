@@ -137,35 +137,35 @@ enum GenericFcn implements ObjectiveFcn {
   String toString() {
     switch (this) {
       case minimizeAngularMomentum:
-        return 'Minimize angular momentum';
+        return 'Optimize angular momentum';
       case minimizeComPosition:
-        return 'Minimize CoM position';
+        return 'Optimize CoM position';
       case minimizeComVelocity:
-        return 'Minimize CoM velocity';
+        return 'Optimize CoM velocity';
       case minimizeLinearMomentum:
-        return 'Minimize linear momentum';
+        return 'Optimize linear momentum';
       case minimizeControls:
-        return 'Minimize controls';
+        return 'Optimize controls';
       case minimizePower:
-        return 'Minimize power';
+        return 'Optimize power';
       case minimizeStates:
-        return 'Minimize states';
+        return 'Optimize states';
       case minimizeMarkers:
-        return 'Minimize markers';
+        return 'Optimize markers';
       case minimizeMarkersAcceleration:
-        return 'Minimize markers acceleration';
+        return 'Optimize markers acceleration';
       case minimizeMarkersVelocity:
-        return 'Minimize markers velocity';
+        return 'Optimize markers velocity';
       case minimizeSegmentRotation:
-        return 'Minimize segment rotation';
+        return 'Optimize segment rotation';
       case minimizeSegmentVelocity:
-        return 'Minimize segment velocity';
+        return 'Optimize segment velocity';
       case proportionalControl:
         return 'Proportional control';
       case proportionalState:
         return 'Proportional state';
       case superimposeMarkers:
-        return 'Superimpose markers';
+        return 'Marker distance';
       case trackMarkerWithSegmentAxis:
         return 'Track marker with segment axis';
       case trackSegmentWithCustomRT:
@@ -173,9 +173,9 @@ enum GenericFcn implements ObjectiveFcn {
       case trackVectorOrientationsFromMarkers:
         return 'Track vector orientations from markers';
       case minimizeQDot:
-        return 'Minimize qdot';
+        return 'Optimize qdot';
       case minimizeTime:
-        return 'Minimize time';
+        return 'Optimize time';
     }
   }
 }
