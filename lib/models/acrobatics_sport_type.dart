@@ -9,11 +9,4 @@ enum AcrobaticsSportType {
         return 'Trampoline';
     }
   }
-
-  String toPythonString() {
-    switch (this) {
-      case trampoline:
-        return 'Trampoline';
-    }
-  }
 }

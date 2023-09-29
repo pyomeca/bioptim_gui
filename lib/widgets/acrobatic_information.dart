@@ -32,14 +32,10 @@ class AcrobaticInformation extends StatelessWidget {
                 controller: controllers.finalTimeController,
                 decoration: const InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Colors.red), // Unfocused border color
-                      borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                      borderSide: BorderSide(color: Colors.red),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Colors.red), // Focused border color
-                      borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                      borderSide: BorderSide(color: Colors.red),
                     ),
                     labelText: 'Final time *',
                     border: OutlineInputBorder()),
@@ -55,14 +51,10 @@ class AcrobaticInformation extends StatelessWidget {
                 controller: controllers.finalTimeMarginController,
                 decoration: const InputDecoration(
                     enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Colors.red), // Unfocused border color
-                      borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                      borderSide: BorderSide(color: Colors.red),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderSide:
-                          BorderSide(color: Colors.red), // Focused border color
-                      borderRadius: BorderRadius.all(Radius.circular(4.0)),
+                      borderSide: BorderSide(color: Colors.red),
                     ),
                     labelText: 'Final time margin *',
                     border: OutlineInputBorder()),

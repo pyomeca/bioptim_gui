@@ -15,15 +15,4 @@ enum AcrobaticsPosition {
         return 'Pike';
     }
   }
-
-  String toPythonString() {
-    switch (this) {
-      case straight:
-        return 'Straight';
-      case tuck:
-        return 'Tuck';
-      case pike:
-        return 'Pike';
-    }
-  }
 }

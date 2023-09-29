@@ -4,7 +4,10 @@ import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:flutter/material.dart';
 
 class AcrobaticTwistSideChooser extends StatelessWidget {
-  const AcrobaticTwistSideChooser({super.key, required this.width});
+  const AcrobaticTwistSideChooser({
+    super.key,
+    required this.width,
+  });
 
   final double width;
 
