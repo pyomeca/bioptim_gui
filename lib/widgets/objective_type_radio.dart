@@ -1,12 +1,12 @@
-import 'package:bioptim_gui/models/mayer_lagrange_enum.dart';
+import 'package:bioptim_gui/models/objective_type.dart';
 import 'package:bioptim_gui/widgets/custom_radio_button.dart';
 import 'package:flutter/material.dart';
 
-class MayerLagrangeRadio extends StatelessWidget {
+class ObjectiveTypeRadio extends StatelessWidget {
   final ObjectiveType value;
   final ValueChanged<ObjectiveType?> customOnChanged;
 
-  const MayerLagrangeRadio({
+  const ObjectiveTypeRadio({
     Key? key,
     required this.value,
     required this.customOnChanged,

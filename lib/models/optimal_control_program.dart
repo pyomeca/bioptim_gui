@@ -5,7 +5,7 @@ import 'package:bioptim_gui/models/dynamics.dart';
 import 'package:bioptim_gui/models/generic_ocp_config.dart';
 import 'package:bioptim_gui/models/global.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
-import 'package:bioptim_gui/models/mayer_lagrange_enum.dart';
+import 'package:bioptim_gui/models/objective_type.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/utils.dart';
 

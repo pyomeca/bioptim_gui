@@ -1,4 +1,4 @@
-import 'package:bioptim_gui/models/mayer_lagrange_enum.dart';
+import 'package:bioptim_gui/models/objective_type.dart';
 import 'package:bioptim_gui/models/minimize_maximize.dart';
 import 'package:bioptim_gui/models/nodes.dart';
 import 'package:bioptim_gui/models/quadrature_rules.dart';
@@ -1006,8 +1006,8 @@ class Constraint extends Penalty {
 }
 
 ObjectiveFcn? genericFcn2ObjectiveFcn(
-    GenericFcn genericFcn, ObjectiveType mayerOrLagrange) {
-  if (mayerOrLagrange == ObjectiveType.mayer) {
+    GenericFcn genericFcn, ObjectiveType objectiveType) {
+  if (objectiveType == ObjectiveType.mayer) {
     switch (genericFcn) {
       case GenericFcn.minimizeAngularMomentum:
         return MayerFcn.minimizeAngularMomentum;
@@ -1050,7 +1050,7 @@ ObjectiveFcn? genericFcn2ObjectiveFcn(
       case GenericFcn.minimizeTime:
         return MayerFcn.minimizeTime;
     }
-  } else if (mayerOrLagrange == ObjectiveType.lagrange) {
+  } else if (objectiveType == ObjectiveType.lagrange) {
     switch (genericFcn) {
       case GenericFcn.minimizeAngularMomentum:
         return LagrangeFcn.minimizeAngularMomentum;

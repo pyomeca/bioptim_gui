@@ -1,5 +1,5 @@
 import 'package:bioptim_gui/models/acrobatics_ocp_controllers.dart';
-import 'package:bioptim_gui/models/mayer_lagrange_enum.dart';
+import 'package:bioptim_gui/models/objective_type.dart';
 import 'package:bioptim_gui/models/minimize_maximize.dart';
 import 'package:bioptim_gui/models/nodes.dart';
 import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
@@ -10,7 +10,7 @@ import 'package:bioptim_gui/widgets/animated_expanding_widget.dart';
 import 'package:bioptim_gui/widgets/boolean_switch.dart';
 import 'package:bioptim_gui/widgets/custom_dropdown_button.dart';
 import 'package:bioptim_gui/widgets/maximize_minimize_radio.dart';
-import 'package:bioptim_gui/widgets/mayer_lagrange_radio.dart';
+import 'package:bioptim_gui/widgets/objective_type_radio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -41,7 +41,7 @@ class PenaltyExpander extends StatelessWidget {
     PenaltyFcn fcn, {
     required double? weight,
     required MinMax? minimizeOrMaximize,
-    required ObjectiveType? mayerOrLagrange,
+    required ObjectiveType? objectiveType,
     required GenericFcn? genericFcn,
     required Nodes? nodes,
     required QuadratureRules? quadratureRules,
@@ -58,7 +58,7 @@ class PenaltyExpander extends StatelessWidget {
           fcn as LagrangeFcn,
           weight: weight ?? 1,
           minimizeOrMaximize: minimizeOrMaximize ?? MinMax.minimize,
-          objectiveType: mayerOrLagrange ?? ObjectiveType.mayer,
+          objectiveType: objectiveType ?? ObjectiveType.mayer,
           genericFcn: genericFcn ?? GenericFcn.minimizeControls,
           nodes: nodes ?? Nodes.all,
           quadratureRules:
@@ -75,7 +75,7 @@ class PenaltyExpander extends StatelessWidget {
           fcn as MayerFcn,
           weight: weight ?? 1,
           minimizeOrMaximize: minimizeOrMaximize ?? MinMax.minimize,
-          objectiveType: mayerOrLagrange ?? ObjectiveType.mayer,
+          objectiveType: objectiveType ?? ObjectiveType.mayer,
           genericFcn: genericFcn ?? GenericFcn.minimizeControls,
           nodes: nodes ?? Nodes.end,
           quadratureRules:
@@ -179,7 +179,7 @@ class PenaltyExpander extends StatelessWidget {
                     quadratureRules,
                     weight,
                     minimizeOrMaximize,
-                    mayerOrLagrange,
+                    objectiveType,
                     genericFcn,
                   }) {
                     return _penaltyFactory(
@@ -194,7 +194,7 @@ class PenaltyExpander extends StatelessWidget {
                       target: target,
                       weight: weight,
                       minimizeOrMaximize: minimizeOrMaximize,
-                      mayerOrLagrange: mayerOrLagrange,
+                      objectiveType: objectiveType,
                       genericFcn: genericFcn,
                     );
                   },
@@ -258,7 +258,7 @@ class _PathTile extends StatelessWidget {
     required bool? multiThread,
     required double? weight,
     required MinMax? minimizeOrMaximize,
-    required ObjectiveType? mayerOrLagrange,
+    required ObjectiveType? objectiveType,
     required GenericFcn? genericFcn,
   }) penaltyFactory;
   final PenaltyInterface penaltyInterface;
@@ -292,10 +292,10 @@ class _PathTile extends StatelessWidget {
                 if (value == penalty.fcn) return;
 
                 if (penalty.runtimeType == Objective) {
-                  var mayerOrLagrange = (penalty as Objective).objectiveType;
+                  var objectiveType = (penalty as Objective).objectiveType;
 
                   var newFcn = genericFcn2ObjectiveFcn(
-                      value as GenericFcn, mayerOrLagrange);
+                      value as GenericFcn, objectiveType);
 
                   if (newFcn == null) {
                     // Mayer/Lagrange does not exist for this specific objective
@@ -305,13 +305,13 @@ class _PathTile extends StatelessWidget {
                     // or Lagrange if Mayer does not exist)
                     // example: if Mayer.MINIMIZE_EXIST does not exist
                     // then give Lagrange.MINIMIZE_EXIST that exists
-                    mayerOrLagrange = (mayerOrLagrange == ObjectiveType.mayer)
+                    objectiveType = (objectiveType == ObjectiveType.mayer)
                         ? ObjectiveType.lagrange
                         : ObjectiveType.mayer;
 
                     newFcn = genericFcn2ObjectiveFcn(
                       value,
-                      mayerOrLagrange,
+                      objectiveType,
                     );
                   }
 
@@ -321,7 +321,7 @@ class _PathTile extends StatelessWidget {
                         newFcn as PenaltyFcn,
                         weight: null,
                         minimizeOrMaximize: null,
-                        mayerOrLagrange: mayerOrLagrange,
+                        objectiveType: objectiveType,
                         genericFcn: value,
                         nodes: null,
                         quadratureRules: null,
@@ -339,7 +339,7 @@ class _PathTile extends StatelessWidget {
                         value,
                         weight: null,
                         minimizeOrMaximize: null,
-                        mayerOrLagrange: null,
+                        objectiveType: null,
                         genericFcn: null,
                         nodes: null,
                         quadratureRules: null,
@@ -359,7 +359,7 @@ class _PathTile extends StatelessWidget {
           if (penalty.runtimeType == Objective)
             SizedBox(
               width: width * 0.13,
-              child: MayerLagrangeRadio(
+              child: ObjectiveTypeRadio(
                 value: (penalty as Objective).objectiveType,
                 customOnChanged: (value) {
                   if (value == penalty.objectiveType) return;
@@ -380,7 +380,7 @@ class _PathTile extends StatelessWidget {
                         newFcn as PenaltyFcn,
                         weight: null,
                         minimizeOrMaximize: null,
-                        mayerOrLagrange: value,
+                        objectiveType: value,
                         genericFcn: penalty.genericFcn,
                         nodes: null,
                         quadratureRules: null,
@@ -437,7 +437,7 @@ class _PathTile extends StatelessWidget {
                       ? (penalty as Objective).minimizeOrMaximize
                       : null;
 
-                  final mayerOrLagrange = penalty.runtimeType == Objective
+                  final objectiveType = penalty.runtimeType == Objective
                       ? (penalty as Objective).objectiveType
                       : null;
 
@@ -450,7 +450,7 @@ class _PathTile extends StatelessWidget {
                         penalty.fcn,
                         weight: weight,
                         minimizeOrMaximize: minimizeOrMaximize,
-                        mayerOrLagrange: mayerOrLagrange,
+                        objectiveType: objectiveType,
                         genericFcn: genericFcn,
                         nodes: value,
                         quadratureRules: penalty.quadratureRules,
@@ -491,7 +491,7 @@ class _PathTile extends StatelessWidget {
                               penalty.fcn,
                               weight: penalty.weight,
                               minimizeOrMaximize: value,
-                              mayerOrLagrange: penalty.objectiveType,
+                              objectiveType: penalty.objectiveType,
                               genericFcn: penalty.genericFcn,
                               nodes: penalty.nodes,
                               quadratureRules: penalty.quadratureRules,
@@ -544,7 +544,7 @@ class _PathTile extends StatelessWidget {
                     final minimizeOrMaximize = penalty.runtimeType == Objective
                         ? (penalty as Objective).minimizeOrMaximize
                         : null;
-                    final mayerOrLagrange = penalty.runtimeType == Objective
+                    final objectiveType = penalty.runtimeType == Objective
                         ? (penalty as Objective).objectiveType
                         : null;
                     final genericFcn = penalty.runtimeType == Objective
@@ -556,7 +556,7 @@ class _PathTile extends StatelessWidget {
                           penalty.fcn,
                           weight: weight,
                           minimizeOrMaximize: minimizeOrMaximize,
-                          mayerOrLagrange: mayerOrLagrange,
+                          objectiveType: objectiveType,
                           genericFcn: genericFcn,
                           nodes: penalty.nodes,
                           quadratureRules: value,
@@ -590,7 +590,7 @@ class _PathTile extends StatelessWidget {
                     ? (penalty as Objective).minimizeOrMaximize
                     : null;
 
-                final mayerOrLagrange = penalty.runtimeType == Objective
+                final objectiveType = penalty.runtimeType == Objective
                     ? (penalty as Objective).objectiveType
                     : null;
 
@@ -603,7 +603,7 @@ class _PathTile extends StatelessWidget {
                       penalty.fcn,
                       weight: weight,
                       minimizeOrMaximize: minimizeOrMaximize,
-                      mayerOrLagrange: mayerOrLagrange,
+                      objectiveType: objectiveType,
                       genericFcn: genericFcn,
                       nodes: penalty.nodes,
                       quadratureRules: penalty.quadratureRules,
@@ -633,7 +633,7 @@ class _PathTile extends StatelessWidget {
                     ? (penalty as Objective).minimizeOrMaximize
                     : null;
 
-                final mayerOrLagrange = penalty.runtimeType == Objective
+                final objectiveType = penalty.runtimeType == Objective
                     ? (penalty as Objective).objectiveType
                     : null;
 
@@ -646,7 +646,7 @@ class _PathTile extends StatelessWidget {
                       penalty.fcn,
                       weight: weight,
                       minimizeOrMaximize: minimizeOrMaximize,
-                      mayerOrLagrange: mayerOrLagrange,
+                      objectiveType: objectiveType,
                       genericFcn: genericFcn,
                       nodes: penalty.nodes,
                       quadratureRules: penalty.quadratureRules,
@@ -680,7 +680,7 @@ class _PathTile extends StatelessWidget {
                     ? (penalty as Objective).minimizeOrMaximize
                     : null;
 
-                final mayerOrLagrange = penalty.runtimeType == Objective
+                final objectiveType = penalty.runtimeType == Objective
                     ? (penalty as Objective).objectiveType
                     : null;
 
@@ -693,7 +693,7 @@ class _PathTile extends StatelessWidget {
                       penalty.fcn,
                       weight: weight,
                       minimizeOrMaximize: minimizeOrMaximize,
-                      mayerOrLagrange: mayerOrLagrange,
+                      objectiveType: objectiveType,
                       genericFcn: genericFcn,
                       nodes: penalty.nodes,
                       quadratureRules: penalty.quadratureRules,
@@ -722,7 +722,7 @@ class _PathTile extends StatelessWidget {
                     ? (penalty as Objective).minimizeOrMaximize
                     : null;
 
-                final mayerOrLagrange = penalty.runtimeType == Objective
+                final objectiveType = penalty.runtimeType == Objective
                     ? (penalty as Objective).objectiveType
                     : null;
 
@@ -735,7 +735,7 @@ class _PathTile extends StatelessWidget {
                       penalty.fcn,
                       weight: weight,
                       minimizeOrMaximize: minimizeOrMaximize,
-                      mayerOrLagrange: mayerOrLagrange,
+                      objectiveType: objectiveType,
                       genericFcn: genericFcn,
                       nodes: penalty.nodes,
                       quadratureRules: penalty.quadratureRules,
