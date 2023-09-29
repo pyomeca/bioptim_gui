@@ -19,6 +19,7 @@ class AcrobaticPositionChooser extends StatelessWidget {
         items: AcrobaticsPosition.values,
         title: 'Jump position *',
         onSelected: (value) => controllers.setPosition(value),
+        color: Colors.red,
       ),
     );
   }

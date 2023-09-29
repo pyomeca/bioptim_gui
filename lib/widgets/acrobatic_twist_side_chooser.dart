@@ -19,6 +19,7 @@ class AcrobaticTwistSideChooser extends StatelessWidget {
         items: PreferredTwistSide.values,
         title: 'Preferred twist side *',
         onSelected: (value) => controllers.setPreferredTwistSide(value),
+        color: Colors.red,
       ),
     );
   }

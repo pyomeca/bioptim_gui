@@ -22,6 +22,14 @@ class CustomDropdownButton<T extends Object> extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownButtonFormField<T>(
       decoration: InputDecoration(
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: color ?? Colors.black),
+            borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: color ?? Colors.black),
+            borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+          ),
           label: title == null ? null : Text(title!),
           border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black))),
