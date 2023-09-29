@@ -383,20 +383,13 @@ class _PathTile extends StatelessWidget {
               onSelected: (value) {
                 if (value == penalty.fcn) return;
 
-                ObjectiveType? objectiveType;
-                GenericFcn? generic;
-                PenaltyFcn? newFcn = value;
-
                 if (penalty.runtimeType == Objective) {
-                  objectiveType = (penalty as Objective).objectiveType;
+                  var objectiveType = (penalty as Objective).objectiveType;
 
-                  newFcn = genericFcn2ObjectiveFcn(
-                      value as GenericFcn, objectiveType) as PenaltyFcn;
+                  var newFcn = genericFcn2ObjectiveFcn(
+                      value as GenericFcn, objectiveType);
 
-                  // keep it, it will be useful when the Mayer and Lagrange will not have the same genericFcn
-                  // ignore: unnecessary_null_comparison
                   if (newFcn == null) {
-                    // switches to the other objective type if ObjectiveType.GenericFcn doesn't exist
                     objectiveType = (objectiveType == ObjectiveType.mayer)
                         ? ObjectiveType.lagrange
                         : ObjectiveType.mayer;
@@ -404,27 +397,46 @@ class _PathTile extends StatelessWidget {
                     newFcn = genericFcn2ObjectiveFcn(
                       value,
                       objectiveType,
-                    ) as PenaltyFcn;
+                    );
                   }
-                }
 
-                penaltyInterface.update(
-                    penaltyFactory(
-                      newFcn,
-                      weight: null,
-                      minimizeOrMaximize: null,
-                      objectiveType: objectiveType,
-                      genericFcn: generic,
-                      nodes: null,
-                      quadratureRules: null,
-                      derivative: null,
-                      expand: null,
-                      quadratic: null,
-                      multiThread: null,
-                      target: null,
-                      arguments: null,
-                    ),
-                    penaltyIndex: penaltyIndex);
+                  // Update to a brand new fresh penalty
+                  penaltyInterface.update(
+                      penaltyFactory(
+                        newFcn as PenaltyFcn,
+                        weight: null,
+                        minimizeOrMaximize: null,
+                        objectiveType: objectiveType,
+                        genericFcn: value,
+                        nodes: null,
+                        quadratureRules: null,
+                        derivative: null,
+                        expand: null,
+                        quadratic: null,
+                        multiThread: null,
+                        target: null,
+                        arguments: null,
+                      ),
+                      penaltyIndex: penaltyIndex);
+                } else {
+                  penaltyInterface.update(
+                      penaltyFactory(
+                        value,
+                        weight: null,
+                        minimizeOrMaximize: null,
+                        objectiveType: null,
+                        genericFcn: null,
+                        nodes: null,
+                        quadratureRules: null,
+                        derivative: null,
+                        expand: null,
+                        quadratic: null,
+                        multiThread: null,
+                        target: null,
+                        arguments: null,
+                      ),
+                      penaltyIndex: penaltyIndex);
+                }
               },
             ),
           ),
