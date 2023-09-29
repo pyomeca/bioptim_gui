@@ -8,7 +8,9 @@ class CustomDropdownButton<T extends Object> extends StatelessWidget {
     required this.items,
     this.onSelected,
     this.isExpanded = false,
-    this.color,
+    this.color = Colors.black,
+    this.focusColor = Colors.transparent,
+    this.dropdownColor = Colors.white,
   });
 
   final T value;
@@ -16,24 +18,23 @@ class CustomDropdownButton<T extends Object> extends StatelessWidget {
   final String? title;
   final List<T> items;
   final bool isExpanded;
-  final Color? color;
+  final Color color;
+  final Color focusColor;
+  final Color dropdownColor;
 
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<T>(
       decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: color ?? Colors.black),
-            borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+            borderSide: BorderSide(color: color),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: color ?? Colors.black),
-            borderRadius: const BorderRadius.all(Radius.circular(4.0)),
+            borderSide: BorderSide(color: color),
           ),
           label: title == null ? null : Text(title!),
-          border: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black))),
-      focusColor: Colors.transparent,
+          border: OutlineInputBorder(borderSide: BorderSide(color: color))),
+      focusColor: focusColor,
       isExpanded: isExpanded,
       menuMaxHeight: MediaQuery.of(context).size.height * 1 / 2,
       value: value,
@@ -41,7 +42,7 @@ class CustomDropdownButton<T extends Object> extends StatelessWidget {
           .map((e) => DropdownMenuItem(value: e, child: Text(e.toString())))
           .toList(),
       onChanged: onSelected == null ? null : (value) => onSelected!(value!),
-      dropdownColor: Colors.white,
+      dropdownColor: dropdownColor,
     );
   }
 }

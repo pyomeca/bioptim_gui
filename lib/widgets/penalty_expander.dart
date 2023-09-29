@@ -393,6 +393,8 @@ class _PathTile extends StatelessWidget {
                   newFcn = genericFcn2ObjectiveFcn(
                       value as GenericFcn, objectiveType) as PenaltyFcn;
 
+                  // keep it, it will be useful when the Mayer and Lagrange will not have the same genericFcn
+                  // ignore: unnecessary_null_comparison
                   if (newFcn == null) {
                     // switches to the other objective type if ObjectiveType.GenericFcn doesn't exist
                     objectiveType = (objectiveType == ObjectiveType.mayer)
