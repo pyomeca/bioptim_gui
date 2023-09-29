@@ -1,7 +1,7 @@
+import 'package:bioptim_gui/models/mayer_lagrange_enum.dart';
+import 'package:bioptim_gui/models/minimize_maximize.dart';
 import 'package:bioptim_gui/models/nodes.dart';
 import 'package:bioptim_gui/models/quadrature_rules.dart';
-import 'package:bioptim_gui/widgets/maximize_minimize_radio.dart';
-import 'package:bioptim_gui/widgets/mayer_lagrange_radio.dart';
 
 enum PenaltyArgumentType {
   integer,
@@ -898,7 +898,7 @@ abstract class Penalty {
 class Objective extends Penalty {
   double weight;
   MinMax minimizeOrMaximize;
-  MayerLagrange mayerOrLagrange;
+  ObjectiveType objectiveType;
   GenericFcn genericFcn;
 
   Objective.generic(
@@ -912,7 +912,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
-      this.mayerOrLagrange = MayerLagrange.lagrange,
+      this.objectiveType = ObjectiveType.lagrange,
       this.genericFcn = GenericFcn.minimizeControls,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
@@ -928,7 +928,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 100,
       this.minimizeOrMaximize = MinMax.minimize,
-      this.mayerOrLagrange = MayerLagrange.lagrange,
+      this.objectiveType = ObjectiveType.lagrange,
       this.genericFcn = GenericFcn.minimizeControls,
       Map<String, dynamic>? arguments})
       : super(fcn,
@@ -948,7 +948,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
-      this.mayerOrLagrange = MayerLagrange.mayer,
+      this.objectiveType = ObjectiveType.mayer,
       this.genericFcn = GenericFcn.minimizeTime,
       Map<String, dynamic>? arguments,
       required double minBound,
@@ -970,7 +970,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
-      this.mayerOrLagrange = MayerLagrange.lagrange,
+      this.objectiveType = ObjectiveType.lagrange,
       this.genericFcn = GenericFcn.minimizeControls,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
@@ -985,7 +985,7 @@ class Objective extends Penalty {
       super.multiThread = false,
       this.weight = 1,
       this.minimizeOrMaximize = MinMax.minimize,
-      this.mayerOrLagrange = MayerLagrange.mayer,
+      this.objectiveType = ObjectiveType.mayer,
       this.genericFcn = GenericFcn.minimizeControls,
       Map<String, dynamic>? arguments})
       : super(fcn, arguments: arguments ?? {});
@@ -1006,8 +1006,8 @@ class Constraint extends Penalty {
 }
 
 ObjectiveFcn? genericFcn2ObjectiveFcn(
-    GenericFcn genericFcn, MayerLagrange mayerOrLagrange) {
-  if (mayerOrLagrange == MayerLagrange.mayer) {
+    GenericFcn genericFcn, ObjectiveType mayerOrLagrange) {
+  if (mayerOrLagrange == ObjectiveType.mayer) {
     switch (genericFcn) {
       case GenericFcn.minimizeAngularMomentum:
         return MayerFcn.minimizeAngularMomentum;
@@ -1050,7 +1050,7 @@ ObjectiveFcn? genericFcn2ObjectiveFcn(
       case GenericFcn.minimizeTime:
         return MayerFcn.minimizeTime;
     }
-  } else if (mayerOrLagrange == MayerLagrange.lagrange) {
+  } else if (mayerOrLagrange == ObjectiveType.lagrange) {
     switch (genericFcn) {
       case GenericFcn.minimizeAngularMomentum:
         return LagrangeFcn.minimizeAngularMomentum;

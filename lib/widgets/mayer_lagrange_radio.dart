@@ -1,25 +1,10 @@
+import 'package:bioptim_gui/models/mayer_lagrange_enum.dart';
 import 'package:bioptim_gui/widgets/custom_radio_button.dart';
 import 'package:flutter/material.dart';
 
-enum MayerLagrange {
-  mayer,
-  lagrange,
-  ;
-
-  @override
-  String toString() {
-    switch (this) {
-      case mayer:
-        return '\u2133'; // German mark M
-      case lagrange:
-        return '\u2112'; // Laplace L
-    }
-  }
-}
-
 class MayerLagrangeRadio extends StatelessWidget {
-  final MayerLagrange value;
-  final ValueChanged<MayerLagrange?> customOnChanged;
+  final ObjectiveType value;
+  final ValueChanged<ObjectiveType?> customOnChanged;
 
   const MayerLagrangeRadio({
     Key? key,
@@ -29,9 +14,9 @@ class MayerLagrangeRadio extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomRadioButton<MayerLagrange>(
+    return CustomRadioButton<ObjectiveType>(
       value: value,
-      items: MayerLagrange.values,
+      items: ObjectiveType.values,
       customOnChanged: customOnChanged,
     );
   }

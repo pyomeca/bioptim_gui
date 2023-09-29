@@ -5,9 +5,9 @@ import 'package:bioptim_gui/models/dynamics.dart';
 import 'package:bioptim_gui/models/generic_ocp_config.dart';
 import 'package:bioptim_gui/models/global.dart';
 import 'package:bioptim_gui/models/decision_variables.dart';
+import 'package:bioptim_gui/models/mayer_lagrange_enum.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/utils.dart';
-import 'package:bioptim_gui/widgets/mayer_lagrange_radio.dart';
 
 class _Phase {
   int phaseIndex;
@@ -220,7 +220,7 @@ class OptimalControlProgram {
             '        expand=${objective.expand.toPythonString()},\n'
             '        target=${objective.target == 'None' ? 'None' : 'np.array([${objective.target}])'},\n'
             '        derivative=${objective.derivative.toPythonString()},\n'
-            '${objective.mayerOrLagrange == MayerLagrange.mayer ? '' : '        integration_rule=${objective.quadratureRules.toPythonString()},\n'}'
+            '${objective.objectiveType == ObjectiveType.mayer ? '' : '        integration_rule=${objective.quadratureRules.toPythonString()},\n'}'
             '        multi_thread=${objective.multiThread.toPythonString()},\n'
             '${generic.nbPhases == 1 ? '' : '        phase=$phaseIndex,\n'}'
             '        weight=${objective.minimizeOrMaximize.toPythonString()}${objective.weight},\n'
