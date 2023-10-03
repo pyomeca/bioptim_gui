@@ -259,7 +259,7 @@ class AcrobaticsOCPProgram {
             '${constraint.expand == true ? '' : '        expand=${constraint.expand.toPythonString()},\n'}'
             '${constraint.target == 'None' ? '' : '        target=${constraint.target == 'None' ? 'None' : 'np.array([${constraint.target}])'},\n'}'
             '${constraint.derivative == false ? '' : '        derivative=${constraint.derivative.toPythonString()},\n'}'
-            '        integration_rule=${constraint.quadratureRules.toPythonString()},\n'
+            '${constraint.quadratureRules == QuadratureRules.rectangleLeft ? '' : '        integration_rule=${constraint.quadratureRules.toPythonString()},\n'}'
             '${constraint.multiThread == false ? '' : '        multi_thread=${constraint.multiThread.toPythonString()},\n'}'
             '${generic.nbSomersaults == 1 ? '' : '        phase=$phaseIndex,\n'}'
             '${generic.nbSomersaults == 1 ? '' : '        phase=$phaseIndex,\n'}'
