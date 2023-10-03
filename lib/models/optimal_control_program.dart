@@ -140,6 +140,7 @@ class OptimalControlProgram {
         '\n'
         'from bioptim import *  # TODO Pariterre - Do not import "*"\n'
         'import numpy as np\n'
+        'import pickle as pkl\n'
         '\n'
         '\n');
 
@@ -313,7 +314,7 @@ class OptimalControlProgram {
 
     // Write run as a script section
     file.writeAsStringSync(
-        'def main():\n'
+        'if __name__ == "__main__":\n'
         '    """\n'
         '    If this file is run, then it will perform the optimization\n'
         '    """\n'
@@ -321,13 +322,23 @@ class OptimalControlProgram {
         '    # --- Prepare the ocp --- #\n'
         '    ocp = prepare_ocp()\n'
         '\n'
+        '    solver = Solver.IPOPT()\n'
         '    # --- Solve the ocp --- #\n'
-        '    sol = ocp.solve(solver=${generic.solver.type.toPythonString()}())\n'
-        '    sol.animate()\n'
+        '    sol = ocp.solve(solver=solver)\n'
         '\n'
+        '    out = sol.integrate(merge_phases=True)\n'
+        '    state, time_vector = out._states["unscaled"], out._time_vector\n'
         '\n'
-        'if __name__ == "__main__":\n'
-        '    main()\n',
+        '    save = {\n'
+        '        "solution": sol,\n'
+        '        "unscaled_state": state,\n'
+        '        "time_vector": time_vector,\n'
+        '    }\n'
+        '\n'
+        '    del sol.ocp\n'
+        '    with open(f"somersault.pkl", "wb") as f:\n'
+        '        pkl.dump(save, f)\n'
+        '\n',
         mode: FileMode.append);
   }
 }

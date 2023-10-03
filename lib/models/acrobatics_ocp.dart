@@ -379,7 +379,6 @@ class AcrobaticsOCPProgram {
         '    x_bounds[n_somersault - 1]["q"].max[5, 2] = '
         '${generic.preferredTwistSide == PreferredTwistSide.left ? 'np.pi * sum(n_half_twist) + 0.1\n' : '-np.pi * sum(n_half_twist) + 0.1\n'}'
         '\n'
-        '    # Taken from https://github.com/EveCharbie/AnthropoImpactOnTech/blob/main/TechOpt83.py\n'
         '    vzinit = (\n'
         '        9.81 / 2 * phase_time[0]\n'
         '    )  # vitesse initiale en z du CoM pour revenir a terre au temps final\n'
@@ -496,7 +495,7 @@ class AcrobaticsOCPProgram {
         '    )\n'
         '\n'
         '\n'
-        'def main():\n'
+        'if __name__ == "__main__":\n'
         '    """\n'
         '    If this file is run, then it will perform the optimization\n'
         '    """\n'
@@ -507,7 +506,6 @@ class AcrobaticsOCPProgram {
         '    solver = Solver.IPOPT()\n'
         '    # --- Solve the ocp --- #\n'
         '    sol = ocp.solve(solver=solver)\n'
-        '    sol.animate()\n'
         '\n'
         '    out = sol.integrate(merge_phases=True)\n'
         '    state, time_vector = out._states["unscaled"], out._time_vector\n'
@@ -521,10 +519,7 @@ class AcrobaticsOCPProgram {
         '    del sol.ocp\n'
         '    with open(f"somersault.pkl", "wb") as f:\n'
         '        pkl.dump(save, f)\n'
-        '\n'
-        '\n'
-        'if __name__ == "__main__":\n'
-        '    main()\n',
+        '\n',
         mode: FileMode.append);
   }
 }
