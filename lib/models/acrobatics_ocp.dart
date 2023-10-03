@@ -200,8 +200,6 @@ class AcrobaticsOCPProgram {
         somersaults[i].nbHalfTwists.toString()
     ]}';
 
-    final preferredTwistSide = generic.preferredTwistSide.toPythonString();
-
     final durationAsString = '${[
       for (int i = 0; i < nSomersaults; i++) somersaults[i].duration.toString()
     ]}';
@@ -393,10 +391,12 @@ class AcrobaticsOCPProgram {
         '    x_bounds[0]["qdot"].min[3, 0] = '
         '${somersaultDirection == SomersaultDirection.forward ? '0.5' : '-20'}'
         '\n'
+        '\n'
         '    x_bounds[0]["qdot"].max[:, 0] = -x_bounds[0]["qdot"].min[:, 0]\n'
         '    x_bounds[0]["qdot"].max[2, 0] = vzinit + 2\n'
         '    x_bounds[0]["qdot"].max[3, 0] = '
         '${somersaultDirection == SomersaultDirection.forward ? '20' : '-0.5'}'
+        '\n'
         '\n'
         '    for phase in range(n_somersault):\n'
         '        if phase != 0:\n'
@@ -410,10 +410,12 @@ class AcrobaticsOCPProgram {
         '        x_bounds[phase]["qdot"].min[3, 1] = '
         '${somersaultDirection == SomersaultDirection.forward ? '0.5' : '-20'}'
         '\n'
+        '\n'
         '        x_bounds[phase]["qdot"].max[:, 1] = [100] * n_qdot\n'
         '        x_bounds[phase]["qdot"].max[:2, 1] = 10\n'
         '        x_bounds[phase]["qdot"].max[3, 1] = '
         '${somersaultDirection == SomersaultDirection.forward ? '20' : '-0.5'}'
+        '\n'
         '\n'
         '        # Final bounds, same as intermediate\n'
         '        x_bounds[phase]["qdot"].min[:, 2] = x_bounds[phase]["qdot"].min[:, 1]\n'
