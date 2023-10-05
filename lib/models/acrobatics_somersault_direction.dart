@@ -1,5 +1,0 @@
-enum SomersaultDirection {
-  forward,
-  backward,
-  ;
-}
