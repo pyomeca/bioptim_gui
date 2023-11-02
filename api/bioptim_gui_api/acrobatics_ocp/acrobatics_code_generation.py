@@ -41,6 +41,8 @@ def get_acrobatics_generated_code():
     max_q_bounds = np.array(bio_model.bounds_from_ranges("q").max.tolist())
     min_qdot_bounds = np.array(bio_model.bounds_from_ranges("qdot").min.tolist())
     max_qdot_bounds = np.array(bio_model.bounds_from_ranges("qdot").max.tolist())
+    nb_tau = bio_model.nb_tau - bio_model.nb_root
+    nb_q = bio_model.nb_q
 
     somersaults = data["somersaults_info"]
     half_twists = [s["nb_half_twists"] for s in somersaults]
@@ -248,8 +250,8 @@ def prepare_ocp():
         generated += f"""
     x_initial_guesses.add(
         "q",
-        initial_guess={format_2d_array(q_init[i])},
-        interpolation=InterpolationType.CONSTANT,
+        initial_guess={format_2d_array(q_init[i].T)},
+        interpolation=InterpolationType.LINEAR,
         phase={i},
     )
 """
@@ -284,8 +286,8 @@ def prepare_ocp():
     mapping = BiMappingList()
     mapping.add(
         "tau",
-        to_second=[None, None, None, None, None, None, 0, 1, 2, 3],
-        to_first=[6, 7, 8, 9],
+        to_second=[None, None, None, None, None, None, {", ".join([str(i) for i in range(nb_tau)])}],
+        to_first=[{", ".join([str(i + (nb_q - nb_tau)) for i in range(nb_tau)])}],
     )
 
     # Construct and return the optimal control program (OCP)
