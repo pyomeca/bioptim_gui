@@ -4,26 +4,11 @@ from fastapi import APIRouter, HTTPException
 
 from bioptim_gui_api.acrobatics_ocp.acrobatics_utils import read_acrobatics_data
 from bioptim_gui_api.variables.pike_acrobatics_variables import PikeAcrobaticsVariables
+from bioptim_gui_api.utils.format_utils import format_2d_array, arg_to_string
 
 router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
-
-
-def arg_to_string(argument: dict) -> str:
-    name, arg_type, value = argument["name"], argument["type"], argument["value"]
-    if arg_type == "int" or arg_type == "float":
-        return f"{name}={value}"
-    else:
-        return f'{name}="{value}"'
-
-
-def format_2d_array(array, indent: int = 8) -> str:
-    res = " [\n"
-    for arr in array:
-        res += f"{' ' * (indent + 4)}[{', '.join([str(round(value, 2)) for value in arr])}],\n"
-    res += f"{' ' * indent}]"
-    return res
 
 
 @router.get("/generate_code", response_model=str)

@@ -8,14 +8,15 @@ router = APIRouter(
 )
 
 
+def get_spaced_capitalized(enum) -> list:
+    return [e.value.replace("_", " ").capitalize() for e in enum]
+
+
 @router.get("/nodes", response_model=list[str])
 def get_nodes():
-    return [node.value.replace("_", " ").capitalize() for node in Node]
+    return get_spaced_capitalized(Node)
 
 
 @router.get("/integration_rules", response_model=list[str])
 def get_integration_rules():
-    return [
-        integration_rule.value.replace("_", " ").capitalize()
-        for integration_rule in QuadratureRule
-    ]
+    return get_spaced_capitalized(QuadratureRule)
