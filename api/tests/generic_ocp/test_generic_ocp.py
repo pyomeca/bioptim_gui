@@ -4,7 +4,7 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from bioptim_gui_api.generic_ocp.generic_ocp import router
+from bioptim_gui_api.generic_ocp.generic_ocp import router, add_phase_info, remove_phase_info
 from bioptim_gui_api.generic_ocp.generic_ocp_config import DefaultGenericOCPConfig
 
 test_app = FastAPI()
@@ -27,6 +27,13 @@ def run_for_all():
 
     os.remove(datafile)
 
+def test_add_phase_info_wrong():
+    with pytest.raises(ValueError):
+        add_phase_info(0)
+
+def test_remove_phase_info_wrong():
+    with pytest.raises(ValueError):
+        remove_phase_info(-1)
 
 # basic setter/getter tests
 

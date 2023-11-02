@@ -39,14 +39,14 @@ def get_objective_dropdown_list(somersault_index: int, objective_index: int):
     somersaults_info = read_acrobatics_data("somersaults_info")
     objective = somersaults_info[somersault_index]["objectives"][objective_index]
     objective_type = objective["objective_type"]
-    if objective_type == "mayer":
-        enum = ObjectiveFcn.Mayer
-    elif objective_type == "lagrange":
-        enum = ObjectiveFcn.Lagrange
-    else:
-        raise HTTPException(
-            status_code=400, detail="objective_type has to be mayer or lagrange"
-        )
+    # if objective_type == "mayer":
+    #     enum = ObjectiveFcn.Mayer
+    # elif objective_type == "lagrange":
+    #     enum = ObjectiveFcn.Lagrange
+    # else:
+    #     raise HTTPException(
+    #         status_code=400, detail="objective_type has to be mayer or lagrange"
+    #     )
 
     # weight = objective["weight"]
 

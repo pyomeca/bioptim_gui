@@ -40,14 +40,14 @@ def get_objective_dropdown_list(phase_index: int, objective_index: int):
     phases_info = read_generic_ocp_data("phases_info")
     objective = phases_info[phase_index]["objectives"][objective_index]
     objective_type = objective["objective_type"]
-    if objective_type == "mayer":
-        enum = ObjectiveFcn.Mayer
-    elif objective_type == "lagrange":
-        enum = ObjectiveFcn.Lagrange
-    else:
-        raise HTTPException(
-            status_code=400, detail="objective_type has to be mayer or lagrange"
-        )
+    # if objective_type == "mayer":
+    #     enum = ObjectiveFcn.Mayer
+    # elif objective_type == "lagrange":
+    #     enum = ObjectiveFcn.Lagrange
+    # else:
+    #     raise HTTPException(
+    #         status_code=400, detail="objective_type has to be mayer or lagrange"
+    #     )
 
     # weight = objective["weight"]
 

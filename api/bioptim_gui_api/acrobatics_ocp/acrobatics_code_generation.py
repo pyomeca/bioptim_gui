@@ -1,6 +1,9 @@
-from fastapi import APIRouter
+import numpy as np
+from bioptim import BiorbdModel
+from fastapi import APIRouter, HTTPException
 
 from bioptim_gui_api.acrobatics_ocp.acrobatics_utils import read_acrobatics_data
+from bioptim_gui_api.variables.pike_acrobatics_variables import PikeAcrobaticsVariables
 
 router = APIRouter(
     responses={404: {"description": "Not found"}},
@@ -15,18 +18,49 @@ def arg_to_string(argument: dict) -> str:
         return f'{name}="{value}"'
 
 
+def format_2d_array(array, indent: int = 8) -> str:
+    res = " [\n"
+    for arr in array:
+        res += f"{' ' * (indent + 4)}[{', '.join([str(round(value, 2)) for value in arr])}],\n"
+    res += f"{' ' * indent}]"
+    return res
+
+
 @router.get("/generate_code", response_model=str)
 def get_acrobatics_generated_code():
     data = read_acrobatics_data()
 
     nb_somersaults = data["nb_somersaults"]
+
     model_path = data["model_path"]
+    if not model_path:
+        raise HTTPException(status_code=400, detail="No model path provided")
+
+    bio_model = BiorbdModel(rf"{model_path}")
+    min_q_bounds = np.array(bio_model.bounds_from_ranges("q").min.tolist())
+    max_q_bounds = np.array(bio_model.bounds_from_ranges("q").max.tolist())
+    min_qdot_bounds = np.array(bio_model.bounds_from_ranges("qdot").min.tolist())
+    max_qdot_bounds = np.array(bio_model.bounds_from_ranges("qdot").max.tolist())
 
     somersaults = data["somersaults_info"]
-    total_half_twists = sum([s["nb_half_twists"] for s in somersaults])
+    half_twists = [s["nb_half_twists"] for s in somersaults]
+    total_half_twists = sum(half_twists)
     is_forward = (total_half_twists % 2) != 0
     prefer_left = data["preferred_twist_side"] == "left"
     total_time = sum([s["duration"] for s in somersaults])
+
+    q_bounds = PikeAcrobaticsVariables.get_q_bounds(
+        min_q_bounds, max_q_bounds, half_twists, prefer_left
+    )
+    q_init = PikeAcrobaticsVariables.get_q_init(half_twists, prefer_left)
+
+    qdot_bounds = PikeAcrobaticsVariables.get_qdot_bounds(
+        min_qdot_bounds, max_qdot_bounds, nb_somersaults, total_time, is_forward
+    )
+    qdot_init = PikeAcrobaticsVariables.get_qdot_init()
+
+    tau_bounds = PikeAcrobaticsVariables.get_tau_bounds()
+    tau_init = PikeAcrobaticsVariables.get_tau_init()
 
     generated = """\"""This file was automatically generated using BioptimGUI version 0.0.1\"""
 
@@ -71,17 +105,18 @@ def prepare_ocp():
 """
 
     generated += f"""
-    
+
     # Declaration of generic elements
     n_shooting = [{", ".join([str(s["nb_shooting_points"]) for s in somersaults])}]
     phase_time = [{", ".join([str(s["duration"]) for s in somersaults])}]
     n_somersault = {nb_somersaults}
-    n_half_twist = [{", ".join([str(s["nb_half_twists"]) for s in somersaults])}]
 
     bio_model = [BiorbdModel(r"{model_path}") for _ in range(n_somersault)]
     # can't use * to have multiple, needs duplication
 
 """
+
+    # OBJECTIVES/CONSTRAINTS
 
     generated += f"""
     # Declaration of the constraints and objectives of the ocp
@@ -131,8 +166,9 @@ def prepare_ocp():
         quadratic={constraint["quadratic"]},
 """
 
-            for argument in constraint["arguments"]:
-                generated += f"        {arg_to_string(argument)},\n"
+            # we don't have constraints with arguments yet
+            # for argument in constraint["arguments"]:
+            #     generated += f"        {arg_to_string(argument)},\n"
 
             if not constraint["expand"]:
                 generated += "        expand = False,\n"
@@ -149,6 +185,8 @@ def prepare_ocp():
 
             generated += """    )
 """
+
+    # DYNAMICS
 
     generated += f"""
     # Declaration of the dynamics function used during integration
@@ -172,189 +210,77 @@ def prepare_ocp():
         )
 """
 
+    # PATH CONSTRAINTS
+
     generated += f"""
-    # Define control path constraint
-    tau_min, tau_max, tau_init = -500, 500, 0
-
-    n_q = bio_model[0].nb_q
-    n_qdot = bio_model[0].nb_qdot
-    n_tau = bio_model[0].nb_tau - bio_model[0].nb_root
-
     # Declaration of optimization variables bounds and initial guesses
     # Path constraint
     x_bounds = BoundsList()
-
-    for phase in range(n_somersault):
-        x_bounds.add("q", bio_model[phase].bounds_from_ranges("q"), phase=phase)
-        x_bounds.add("qdot", bio_model[phase].bounds_from_ranges("qdot"), phase=phase)
-
-    # Initial bounds
-    x_bounds[0]["q"].min[:, 0] = [0] * n_q
-    x_bounds[0]["q"].min[:3, 0] = -0.001
-    x_bounds[0]["q"].min[[7, 9], 0] = 2.9, -2.9
-
-    x_bounds[0]["q"].max[:, 0] = -x_bounds[0]["q"].min[:, 0]
-    x_bounds[0]["q"].max[[7, 9], 0] = 2.9, -2.9
-
-    intermediate_min_bounds = [
-        -1,  # transX
-        -1,  # transY
-        -0.1,  # transZ
-        0,  # somersault to adapt
-        -np.pi / 4,  # tilt
-        0,  # twist to adapt
-        -0.65,  # right upper arm rotation Z
-        -0.05,  # right upper arm rotation Y
-        -2,  # left upper arm rotation Z
-        -3,  # left upper arm rotation Y
-    ]
-
-    intermediate_max_bounds = [
-        1,  # transX
-        1,  # transY
-        10,  # transZ
-        0,  # somersault to adapt
-        np.pi / 4,  # tilt
-        0,  # twist to adapt
-        2,  # right upper arm rotation Z
-        3,  # right upper arm rotation Y
-        0.65,  # left upper arm rotation Z
-        0.05,  # left upper arm rotation Y
-    ]
-
-    for phase in range(n_somersault):
-        if phase != 0:
-            # initial bounds, same as final bounds of previous phase
-            x_bounds[phase]["q"].min[:, 0] = x_bounds[phase - 1]["q"].min[:, 2]
-            x_bounds[phase]["q"].max[:, 0] = x_bounds[phase - 1]["q"].max[:, 2]
-
-        # Intermediate bounds, same for every phase
-        x_bounds[phase]["q"].min[:, 1] = intermediate_min_bounds
-        x_bounds[phase]["q"].min[3, 1] = {is_forward and '2 * np.pi * phase' or '-(2 * np.pi * (phase + 1))'}
-        x_bounds[phase]["q"].min[5, 1] = {prefer_left and 'np.pi * sum(n_half_twist[:phase]) - 0.2' or 
-                                          '-(np.pi * sum(n_half_twist[: phase + 1])) - 0.2'}
-
-        x_bounds[phase]["q"].max[:, 1] = intermediate_max_bounds
-        x_bounds[phase]["q"].max[3, 1] = {is_forward and '2 * np.pi * (phase + 1)' or '-(2 * np.pi * phase)'}
-        x_bounds[phase]["q"].max[5, 1] = {prefer_left and 'np.pi * sum(n_half_twist[: phase + 1]) + 0.2' or 
-                                          '-(np.pi * sum(n_half_twist[:phase])) + 0.2'}
-
-        # Final bounds, used for next phase initial bounds
-        x_bounds[phase]["q"].min[:, 2] = intermediate_min_bounds
-        x_bounds[phase]["q"].min[3, 2] = {is_forward and '2 * np.pi * (phase + 1)' or '-2 * np.pi * (phase + 1)'}
-        x_bounds[phase]["q"].min[5, 2] = {prefer_left and 'np.pi * sum(n_half_twist[: phase + 1]) - 0.2' or 
-                                          '-(np.pi * sum(n_half_twist[: phase + 1])) - 0.2'}
-
-        x_bounds[phase]["q"].max[:, 2] = intermediate_max_bounds
-        x_bounds[phase]["q"].max[3, 2] = {is_forward and '2 * np.pi * (phase + 1)' or '-2 * np.pi * (phase + 1)'}
-        x_bounds[phase]["q"].max[5, 2] = {prefer_left and 'np.pi * sum(n_half_twist[: phase + 1]) + 0.2' or 
-                                          '-(np.pi * sum(n_half_twist[: phase + 1])) + 0.2'}
-
-    # Final and last bounds
-    x_bounds[n_somersault - 1]["q"].min[:, 2] = (
-        np.array([-0.9, -0.9, 0, 0, 0, 2.9, 0, 0, 0, -2.9]) - 0.1
-    )
-    x_bounds[n_somersault - 1]["q"].min[3, 2] = {is_forward and '2 * np.pi * n_somersault - 0.1' or 
-                                                 '-2 * np.pi * n_somersault - 0.1'}
-    x_bounds[n_somersault - 1]["q"].min[5, 2] = {prefer_left and 'np.pi * sum(n_half_twist) - 0.1' or 
-                                                 '-np.pi * sum(n_half_twist) - 0.1'}
-
-
-    x_bounds[n_somersault - 1]["q"].max[:, 2] = np.array([0.9, 0.9, 0, 0, 0, 2.9, 0, 0, 0, -2.9]) + 0.1
-    x_bounds[n_somersault - 1]["q"].max[3, 2] = {is_forward and '2 * np.pi * n_somersault + 0.1' or 
-                                                 '-2 * np.pi * n_somersault + 0.1'}
-    x_bounds[n_somersault - 1]["q"].max[5, 2] = {prefer_left and 'np.pi * sum(n_half_twist) + 0.1' or 
-                                                 '-np.pi * sum(n_half_twist) + 0.1'}
-
-
-    vzinit = (
-        9.81 / 2 * {total_time}
-    )  # vitesse initiale en z du CoM pour revenir a terre au temps final
-
-    # Initial bounds
-    x_bounds[0]["qdot"].min[:, 0] = [0] * n_qdot
-    x_bounds[0]["qdot"].min[:2, 0] = -0.5
-    x_bounds[0]["qdot"].min[2, 0] = vzinit - 2
-    x_bounds[0]["qdot"].min[3, 0] = {is_forward and '0.5' or '-20'}
-
-
-    x_bounds[0]["qdot"].max[:, 0] = -x_bounds[0]["qdot"].min[:, 0]
-    x_bounds[0]["qdot"].max[2, 0] = vzinit + 2
-    x_bounds[0]["qdot"].max[3, 0] = {is_forward and '20' or '-0.5'}
-
-
-    for phase in range(n_somersault):
-        if phase != 0:
-            # initial bounds, same as final bounds of previous phase
-            x_bounds[phase]["qdot"].min[:, 0] = x_bounds[phase - 1]["qdot"].min[:, 2]
-            x_bounds[phase]["qdot"].max[:, 0] = x_bounds[phase - 1]["qdot"].max[:, 2]
-
-        # Intermediate bounds
-        x_bounds[phase]["qdot"].min[:, 1] = [-100] * n_qdot
-        x_bounds[phase]["qdot"].min[:2, 1] = -10
-        x_bounds[phase]["qdot"].min[3, 1] = {is_forward and '0.5' or '-20'}
-
-
-        x_bounds[phase]["qdot"].max[:, 1] = [100] * n_qdot
-        x_bounds[phase]["qdot"].max[:2, 1] = 10
-        x_bounds[phase]["qdot"].max[3, 1] = {is_forward and '20' or '-0.5'}
-
-
-        # Final bounds, same as intermediate
-        x_bounds[phase]["qdot"].min[:, 2] = x_bounds[phase]["qdot"].min[:, 1]
-        x_bounds[phase]["qdot"].max[:, 2] = x_bounds[phase]["qdot"].max[:, 1]
-
-    x_inits = np.zeros((n_somersault, 2, n_q))
-
-    x_inits[0] = np.array([0, 0, 0, 0, 0, 2.9, 0, 0, 0, -2.9])
-
-    for phase in range(n_somersault):
-        if phase != 0:
-            x_inits[phase][0] = x_inits[phase - 1][1]
-
-        x_inits[phase][1][3] = {is_forward and '2 * np.pi * (phase + 1)' or '-2 * np.pi * (phase + 1)'}
-
-
-        x_inits[phase][1][5] = {prefer_left and 'np.pi * sum(n_half_twist[: phase + 1])' or 
-                                '-np.pi * sum(n_half_twist[: phase + 1])'}
-
-
-        x_inits[phase][1][[7, 9]] = 2.9, -2.9
-
     x_initial_guesses = InitialGuessList()
 
-    for phase in range(n_somersault):
-        x_initial_guesses.add(
-            "q",
-            initial_guess=x_inits[phase].T,
-            interpolation=InterpolationType.LINEAR,
-            phase=phase,
-        )
+    u_bounds = BoundsList()
+    u_initial_guesses = InitialGuessList()
+"""
 
+    for i in range(nb_somersaults):
+        generated += f"""
+    x_bounds.add(
+        "q",
+        min_bound={format_2d_array(q_bounds[i]["min"])},
+        max_bound={format_2d_array(q_bounds[i]["max"])},
+        interpolation=InterpolationType.CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT,
+        phase={i},
+    )
+"""
+
+    for i in range(nb_somersaults):
+        generated += f"""
+    x_bounds.add(
+        "qdot",
+        min_bound={format_2d_array(qdot_bounds[i]["min"])},
+        max_bound={format_2d_array(qdot_bounds[i]["max"])},
+        interpolation=InterpolationType.CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT,
+        phase={i},
+    )
+"""
+
+    for i in range(nb_somersaults):
+        generated += f"""
+    x_initial_guesses.add(
+        "q",
+        initial_guess={format_2d_array(q_init[i])},
+        interpolation=InterpolationType.CONSTANT,
+        phase={i},
+    )
+"""
+    generated += f"""
     x_initial_guesses.add(
         "qdot",
-        initial_guess=[0.0] * n_qdot,
+        initial_guess={qdot_init},
         interpolation=InterpolationType.CONSTANT,
-        phase=0,
     )
+"""
 
-    u_bounds = BoundsList()
-    for phase in range(n_somersault):
-        u_bounds.add(
-            "tau",
-            min_bound=[tau_min] * n_tau,
-            max_bound=[tau_max] * n_tau,
-            interpolation=InterpolationType.CONSTANT,
-            phase=phase,
-        )
+    for i in range(nb_somersaults):
+        generated += f"""
+    u_bounds.add(
+        "tau",
+        min_bound={tau_bounds["min"]},
+        max_bound={tau_bounds["max"]},
+        interpolation=InterpolationType.CONSTANT,
+        phase={i},
+    )
+"""
 
-    u_initial_guesses = InitialGuessList()
+    generated += f"""
     u_initial_guesses.add(
         "tau",
-        initial_guess=[tau_init] * n_tau,
+        initial_guess={tau_init},
         interpolation=InterpolationType.CONSTANT,
     )
+"""
 
+    generated += f"""
     mapping = BiMappingList()
     mapping.add(
         "tau",
@@ -383,7 +309,7 @@ def prepare_ocp():
 if __name__ == "__main__":
     \"\"\"
     If this file is run, then it will perform the optimization
-    
+
     \"\"\"
 
     # --- Prepare the ocp --- #

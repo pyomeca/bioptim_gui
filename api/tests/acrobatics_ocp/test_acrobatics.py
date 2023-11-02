@@ -4,7 +4,7 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from bioptim_gui_api.acrobatics_ocp.acrobatics import router
+from bioptim_gui_api.acrobatics_ocp.acrobatics import router, add_somersault_info, remove_somersault_info
 from bioptim_gui_api.acrobatics_ocp.acrobatics_config import DefaultAcrobaticsConfig
 
 test_app = FastAPI()
@@ -30,6 +30,14 @@ def run_for_all():
 
 
 # basic setter/getter tests
+
+def test_add_somersault_info_wrong():
+    with pytest.raises(ValueError):
+        add_somersault_info(0)
+
+def test_remove_somersault_info_wrong():
+    with pytest.raises(ValueError):
+        remove_somersault_info(-1)
 
 
 def test_put_nb_somersault_negative():
@@ -189,6 +197,14 @@ def test_put_preferred_twist_side_same():
         "/acrobatics/preferred_twist_side/", json={"preferred_twist_side": "left"}
     )
     assert response.status_code == 304, response
+
+def test_put_preferred_twist_side_good():
+    response = client.put(
+        "/acrobatics/preferred_twist_side/", json={"preferred_twist_side": "right"}
+    )
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data == {"preferred_twist_side": "right"}
 
 
 def test_put_preferred_twist_side_wrong():
