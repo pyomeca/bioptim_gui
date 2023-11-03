@@ -19,12 +19,12 @@ class StraightAcrobaticsVariables:
 
     q_min_bounds = np.array(
         [
-            [-3.14159265, -3.14159265, -3.14159265],
-            [-3.14159265, -3.14159265, -3.14159265],
-            [-3.14159265, -3.14159265, -3.14159265],
-            [-3.14159265, -3.14159265, -3.14159265],
-            [-3.14159265, -3.14159265, -3.14159265],
-            [-3.14159265, -3.14159265, -3.14159265],
+            [-1, -1, -1],
+            [-1, -1, -1],
+            [-0.1, -0.1, -0.1],
+            [0, 0, 0],
+            [-np.pi / 4, -np.pi / 4, -np.pi / 4],
+            [0, 0, 0],
             [-0.65, -0.65, -0.65],
             [-0.05, -0.05, -0.05],
             [-2.0, -2.0, -2.0],
@@ -34,12 +34,12 @@ class StraightAcrobaticsVariables:
 
     q_max_bounds = np.array(
         [
-            [3.14159265, 3.14159265, 3.14159265],
-            [3.14159265, 3.14159265, 3.14159265],
-            [3.14159265, 3.14159265, 3.14159265],
-            [3.14159265, 3.14159265, 3.14159265],
-            [3.14159265, 3.14159265, 3.14159265],
-            [3.14159265, 3.14159265, 3.14159265],
+            [1, 1, 1],
+            [1, 1, 1],
+            [10, 10, 10],
+            [0, 0, 0],
+            [np.pi / 4, np.pi / 4, np.pi / 4],
+            [0, 0, 0],
             [2.0, 2.0, 2.0],
             [3.0, 3.0, 3.0],
             [0.65, 0.65, 0.65],
@@ -67,42 +67,8 @@ class StraightAcrobaticsVariables:
         x_bounds[0]["max"][[cls.YrotRightUpperArm, cls.YrotLeftUpperArm], 0] = 2.9, -2.9
 
         intermediate_min_bounds = cls.q_min_bounds.copy()[:, 0]
-        intermediate_min_bounds[
-            [
-                cls.X,
-                cls.Y,
-                cls.Z,
-                cls.Xrot,
-                cls.Yrot,
-                cls.Zrot,
-            ]
-        ] = (
-            -1,
-            -1,
-            -0.1,
-            0,
-            -np.pi / 4,
-            0,
-        )
 
         intermediate_max_bounds = cls.q_max_bounds.copy()[:, 0]
-        intermediate_max_bounds[
-            [
-                cls.X,
-                cls.Y,
-                cls.Z,
-                cls.Xrot,
-                cls.Yrot,
-                cls.Zrot,
-            ]
-        ] = (
-            1,
-            1,
-            10,
-            0,
-            np.pi / 4,
-            0,
-        )
 
         for phase in range(nb_somersaults):
             if phase != 0:
