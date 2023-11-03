@@ -15,15 +15,47 @@ class StraightAcrobaticsVariables:
 
     nb_q, nb_qdot, nb_tau = 10, 10, 4
     tau_min, tau_max, tau_init = -500, 500, 0
+    qdot_min, qdot_max = -10 * np.pi, 10 * np.pi
+
+    q_min_bounds = np.array(
+        [
+            [-3.14159265, -3.14159265, -3.14159265],
+            [-3.14159265, -3.14159265, -3.14159265],
+            [-3.14159265, -3.14159265, -3.14159265],
+            [-3.14159265, -3.14159265, -3.14159265],
+            [-3.14159265, -3.14159265, -3.14159265],
+            [-3.14159265, -3.14159265, -3.14159265],
+            [-0.65, -0.65, -0.65],
+            [-0.05, -0.05, -0.05],
+            [-2.0, -2.0, -2.0],
+            [-3.0, -3.0, -3.0],
+        ]
+    )
+
+    q_max_bounds = np.array(
+        [
+            [3.14159265, 3.14159265, 3.14159265],
+            [3.14159265, 3.14159265, 3.14159265],
+            [3.14159265, 3.14159265, 3.14159265],
+            [3.14159265, 3.14159265, 3.14159265],
+            [3.14159265, 3.14159265, 3.14159265],
+            [3.14159265, 3.14159265, 3.14159265],
+            [2.0, 2.0, 2.0],
+            [3.0, 3.0, 3.0],
+            [0.65, 0.65, 0.65],
+            [0.05, 0.05, 0.05],
+        ]
+    )
 
     @classmethod
-    def get_q_bounds(
-        cls, min_bounds, max_bounds, half_twists: list, prefer_left: bool
-    ) -> dict:
+    def get_q_bounds(cls, half_twists: list, prefer_left: bool) -> dict:
         nb_somersaults = len(half_twists)
         is_forward = sum(half_twists) % 2 != 0
         x_bounds = [
-            {"min": min_bounds.copy(), "max": max_bounds.copy()}
+            {
+                "min": cls.q_min_bounds.copy(),
+                "max": cls.q_max_bounds.copy(),
+            }
             for _ in range(nb_somersaults)
         ]
 
@@ -34,7 +66,7 @@ class StraightAcrobaticsVariables:
         x_bounds[0]["max"][:, 0] = -x_bounds[0]["min"][:, 0]
         x_bounds[0]["max"][[cls.YrotRightUpperArm, cls.YrotLeftUpperArm], 0] = 2.9, -2.9
 
-        intermediate_min_bounds = min_bounds.copy()[:, 0]
+        intermediate_min_bounds = cls.q_min_bounds.copy()[:, 0]
         intermediate_min_bounds[
             [
                 cls.X,
@@ -53,7 +85,7 @@ class StraightAcrobaticsVariables:
             0,
         )
 
-        intermediate_max_bounds = max_bounds.copy()[:, 0]
+        intermediate_max_bounds = cls.q_max_bounds.copy()[:, 0]
         intermediate_max_bounds[
             [
                 cls.X,
@@ -211,8 +243,6 @@ class StraightAcrobaticsVariables:
     @classmethod
     def get_qdot_bounds(
         cls,
-        min_bounds,
-        max_bounds,
         nb_somersaults: int,
         final_time: float,
         is_forward: bool,
@@ -222,7 +252,10 @@ class StraightAcrobaticsVariables:
         )  # vitesse initiale en z du CoM pour revenir a terre au temps final
 
         x_bounds = [
-            {"min": min_bounds.copy(), "max": max_bounds.copy()}
+            {
+                "min": np.zeros((cls.nb_qdot, 3)) + cls.qdot_min,
+                "max": np.zeros((cls.nb_qdot, 3)) + cls.qdot_max,
+            }
             for _ in range(nb_somersaults)
         ]
 

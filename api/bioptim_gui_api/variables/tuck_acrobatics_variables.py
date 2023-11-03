@@ -1,3 +1,5 @@
+import numpy as np
+
 from bioptim_gui_api.variables.straight_acrobatics_variables import (
     StraightAcrobaticsVariables,
 )
@@ -24,16 +26,46 @@ class TuckAcrobaticsVariables(StraightAcrobaticsVariables):
 
     nb_q, nb_qdot, nb_tau = 17, 17, 11
 
-    @classmethod
-    def get_q_bounds(
-        cls, min_bounds, max_bounds, half_twists: list, prefer_left: bool
-    ) -> dict:
-        min_bounds_cpy = min_bounds.copy()
-        max_bounds_cpy = max_bounds.copy()
+    q_min_bounds = np.array(
+        [
+            [-3.14159265, -3.14159265, -3.14159265],
+            [-3.14159265, -3.14159265, -3.14159265],
+            [-3.14159265, -3.14159265, -3.14159265],
+            [-3.14159265, -3.14159265, -3.14159265],
+            [-3.14159265, -3.14159265, -3.14159265],
+            [-3.14159265, -3.14159265, -3.14159265],
+            [-0.65, -0.65, -0.65],
+            [-0.05, -0.05, -0.05],
+            [-1.8, -1.8, -1.8],
+            [-2.65, -2.65, -2.65],
+            [-2.0, -2.0, -2.0],
+            [-3.0, -3.0, -3.0],
+            [-1.1, -1.1, -1.1],
+            [-2.65, -2.65, -2.65],
+            [-2.7, -2.7, -2.7],
+            [-0.1, -0.1, -0.1],
+            [-np.pi, -np.pi, -np.pi],
+        ]
+    )
 
-        min_bounds_cpy[cls.YrotUpperLegs, :] = -0.1
-        max_bounds_cpy[cls.YrotUpperLegs, :] = 0.1
-
-        return super().get_q_bounds(
-            min_bounds_cpy, max_bounds_cpy, half_twists, prefer_left
-        )
+    q_max_bounds = np.array(
+        [
+            [3.14159265, 3.14159265, 3.14159265],
+            [3.14159265, 3.14159265, 3.14159265],
+            [3.14159265, 3.14159265, 3.14159265],
+            [3.14159265, 3.14159265, 3.14159265],
+            [3.14159265, 3.14159265, 3.14159265],
+            [3.14159265, 3.14159265, 3.14159265],
+            [2.0, 2.0, 2.0],
+            [3.0, 3.0, 3.0],
+            [1.1, 1.1, 1.1],
+            [0.0, 0.0, 0.0],
+            [0.65, 0.65, 0.65],
+            [0.05, 0.05, 0.05],
+            [1.8, 1.8, 1.8],
+            [0.0, 0.0, 0.0],
+            [0.3, 0.3, 0.3],
+            [0.1, 0.1, 0.1],
+            [np.pi, np.pi, np.pi],
+        ]
+    )

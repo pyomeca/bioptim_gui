@@ -35,14 +35,22 @@ def test_generate_code_no_model():
     assert response.status_code == 400
 
 
-def test_generate_code_simple_pike():
-    # using base data and a pike model (16 degrees of freedom)
-    model_path = Path("test_biomods/pike.bioMod").absolute()
+@pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
+def test_generate_code_simple_position(position):
+    # using base data and a position model (16 degrees of freedom)
+    model_path = Path(f"test_biomods/{position}.bioMod").absolute()
     response = client.put(
         "/acrobatics/model_path", json={"model_path": str(model_path)}
     )
-    with open("acrobatics_ocp/generated_examples/pike/base_pike.txt", "r") as f:
-        base_pike_content = f.read()
+    assert response.status_code == 200, response
+
+    response = client.put("/acrobatics/position", json={"position": f"{position}"})
+    assert response.status_code != 400, response
+
+    with open(
+        f"acrobatics_ocp/generated_examples/{position}/base_{position}.txt", "r"
+    ) as f:
+        base_position_content = f.read()
 
     response = client.get("/acrobatics/generate_code")
     assert response.status_code == 200, response
@@ -53,31 +61,37 @@ def test_generate_code_simple_pike():
     data = "\n".join(
         [line for line in data.split("\n") if not line.startswith("    bio_model")]
     )
-    base_pike_content = "\n".join(
+    base_position_content = "\n".join(
         [
             line
-            for line in base_pike_content.split("\n")
+            for line in base_position_content.split("\n")
             if not line.startswith("    bio_model")
         ]
     )
 
-    assert data == base_pike_content
+    assert data == base_position_content
 
 
-def test_generate_code_pike_no_objective_no_constraint():
-    # using base data and a pike model (16 degrees of freedom)
-    model_path = Path("test_biomods/pike.bioMod").absolute()
+@pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
+def test_generate_code_position_no_objective_no_constraint(position):
+    # using base data and a position model (16 degrees of freedom)
+    model_path = Path(f"test_biomods/{position}.bioMod").absolute()
     response = client.put(
         "/acrobatics/model_path", json={"model_path": str(model_path)}
     )
+    assert response.status_code == 200, response
+
+    response = client.put("/acrobatics/position", json={"position": f"{position}"})
+    assert response.status_code != 400, response
+
     client.delete("/acrobatics/somersaults_info/0/objectives/0")
     client.delete("/acrobatics/somersaults_info/0/objectives/0")
 
     with open(
-        "acrobatics_ocp/generated_examples/pike/base_pike_no_objectives_no_constraints.txt",
+        f"acrobatics_ocp/generated_examples/{position}/base_{position}_no_objectives_no_constraints.txt",
         "r",
     ) as f:
-        base_pike_content = f.read()
+        base_position_content = f.read()
 
     response = client.get("/acrobatics/generate_code")
     assert response.status_code == 200, response
@@ -88,29 +102,34 @@ def test_generate_code_pike_no_objective_no_constraint():
     data = "\n".join(
         [line for line in data.split("\n") if not line.startswith("    bio_model")]
     )
-    base_pike_content = "\n".join(
+    base_position_content = "\n".join(
         [
             line
-            for line in base_pike_content.split("\n")
+            for line in base_position_content.split("\n")
             if not line.startswith("    bio_model")
         ]
     )
 
-    assert data == base_pike_content
+    assert data == base_position_content
 
 
-def test_generate_code_pike_objective_and_constraint():
-    # using base data and a pike model (16 degrees of freedom)
-    model_path = Path("test_biomods/pike.bioMod").absolute()
+@pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
+def test_generate_code_position_objective_and_constraint(position):
+    # using base data and a position model (16 degrees of freedom)
+    model_path = Path(f"test_biomods/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
+
+    response = client.put("/acrobatics/position", json={"position": f"{position}"})
+    assert response.status_code != 400, response
 
     client.post("/acrobatics/somersaults_info/0/constraints")
     client.post("/acrobatics/somersaults_info/0/constraints")
 
     with open(
-        "acrobatics_ocp/generated_examples/pike/pike_constraint_and_objective.txt", "r"
+        f"acrobatics_ocp/generated_examples/{position}/{position}_constraint_and_objective.txt",
+        "r",
     ) as f:
-        base_pike_content = f.read()
+        base_position_content = f.read()
 
     response = client.get("/acrobatics/generate_code")
     assert response.status_code == 200, response
@@ -121,21 +140,26 @@ def test_generate_code_pike_objective_and_constraint():
     data = "\n".join(
         [line for line in data.split("\n") if not line.startswith("    bio_model")]
     )
-    base_pike_content = "\n".join(
+    base_position_content = "\n".join(
         [
             line
-            for line in base_pike_content.split("\n")
+            for line in base_position_content.split("\n")
             if not line.startswith("    bio_model")
         ]
     )
 
-    assert data == base_pike_content
+    assert data == base_position_content
 
 
-def test_generate_code_2_phase_pike_objective_and_constraint():
-    # using base data and a pike model (16 degrees of freedom)
-    model_path = Path("test_biomods/pike.bioMod").absolute()
+@pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
+def test_generate_code_2_phase_position_objective_and_constraint(position):
+    # using base data and a position model (16 degrees of freedom)
+    model_path = Path(f"test_biomods/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
+
+    response = client.put("/acrobatics/position", json={"position": f"{position}"})
+    assert response.status_code != 400, response
+
     client.put("/acrobatics/nb_somersaults", json={"nb_somersaults": 2})
 
     client.post("/acrobatics/somersaults_info/0/constraints")
@@ -144,10 +168,10 @@ def test_generate_code_2_phase_pike_objective_and_constraint():
     client.post("/acrobatics/somersaults_info/1/constraints")
 
     with open(
-        "acrobatics_ocp/generated_examples/pike/pike_two_phases_obj_constraints.txt",
+        f"acrobatics_ocp/generated_examples/{position}/{position}_two_phases_obj_constraints.txt",
         "r",
     ) as f:
-        base_pike_content = f.read()
+        base_position_content = f.read()
 
     response = client.get("/acrobatics/generate_code")
     assert response.status_code == 200, response
@@ -158,21 +182,25 @@ def test_generate_code_2_phase_pike_objective_and_constraint():
     data = "\n".join(
         [line for line in data.split("\n") if not line.startswith("    bio_model")]
     )
-    base_pike_content = "\n".join(
+    base_position_content = "\n".join(
         [
             line
-            for line in base_pike_content.split("\n")
+            for line in base_position_content.split("\n")
             if not line.startswith("    bio_model")
         ]
     )
 
-    assert data == base_pike_content
+    assert data == base_position_content
 
 
-def test_generate_code_modified_objective_and_constraint():
-    # using base data and a pike model (16 degrees of freedom)
-    model_path = Path("test_biomods/pike.bioMod").absolute()
+@pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
+def test_generate_code_modified_objective_and_constraint(position):
+    # using base data and a position model (16 degrees of freedom)
+    model_path = Path(f"test_biomods/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
+
+    response = client.put("/acrobatics/position", json={"position": f"{position}"})
+    assert response.status_code != 400, response
 
     client.post("/acrobatics/somersaults_info/0/constraints")
     response = client.put(
@@ -236,10 +264,10 @@ def test_generate_code_modified_objective_and_constraint():
     assert response.status_code == 200
 
     with open(
-        "acrobatics_ocp/generated_examples/pike/pike_modified_objectives_constraints.txt",
+        f"acrobatics_ocp/generated_examples/{position}/{position}_modified_objectives_constraints.txt",
         "r",
     ) as f:
-        base_pike_content = f.read()
+        base_position_content = f.read()
 
     response = client.get("/acrobatics/generate_code")
     assert response.status_code == 200, response
@@ -250,12 +278,12 @@ def test_generate_code_modified_objective_and_constraint():
     data = "\n".join(
         [line for line in data.split("\n") if not line.startswith("    bio_model")]
     )
-    base_pike_content = "\n".join(
+    base_position_content = "\n".join(
         [
             line
-            for line in base_pike_content.split("\n")
+            for line in base_position_content.split("\n")
             if not line.startswith("    bio_model")
         ]
     )
 
-    assert data == base_pike_content
+    assert data == base_position_content

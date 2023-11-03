@@ -43,46 +43,13 @@ def prepare_ocp():
     phase_time = [1.0]
     n_somersault = 1
 
-    bio_model = [BiorbdModel(r"/home/aweng/afs/trampoOCP/models/AdChStraight.bioMod") for _ in range(n_somersault)]
+    bio_model = [BiorbdModel(r"/home/aweng/afs/trampoOCP/models/AdChTuck.bioMod") for _ in range(n_somersault)]
     # can't use * to have multiple, needs duplication
 
 
     # Declaration of the constraints and objectives of the ocp
     constraints = ConstraintList()
     objective_functions = ObjectiveList()
-
-    objective_functions.add(
-        objective=ObjectiveFcn.Lagrange.MINIMIZE_CONTROL,
-        key="tau",
-        node=Node.ALL_SHOOTING,
-        quadratic=False,
-        weight=100.0,
-        expand = False,
-        target = [1.0, 0.0],
-        derivative = True,
-        integration_rule = QuadratureRule.MIDPOINT,
-        multi_thread = True,
-    )
-
-    objective_functions.add(
-        objective=ObjectiveFcn.Mayer.MINIMIZE_TIME,
-        min_bound=0.9,
-        max_bound=1.1,
-        node=Node.END,
-        quadratic=True,
-        weight=1.0,
-    )
-
-    constraints.add(
-        constraint=ConstraintFcn.TIME_CONSTRAINT,
-        node=Node.END,
-        quadratic=False,
-        expand = False,
-        target = [5.5, 3.14],
-        derivative = True,
-        integration_rule = QuadratureRule.APPROXIMATE_TRAPEZOIDAL,
-        multi_thread = True,
-    )
 
     # Declaration of the dynamics function used during integration
     dynamics = DynamicsList()
@@ -111,8 +78,15 @@ def prepare_ocp():
             [0.0, -0.2, -0.1],
             [0.0, -0.65, -0.1],
             [2.9, -0.05, 2.8],
+            [0.0, -1.8, -0.1],
+            [0.0, -2.65, -0.1],
             [0.0, -2.0, -0.1],
             [-2.9, -3.0, -3.0],
+            [0.0, -1.1, -0.1],
+            [0.0, -2.65, -0.1],
+            [0.0, -2.7, -0.1],
+            [0.0, -0.1, -0.1],
+            [0.0, -3.14, -0.1],
         ],
         max_bound= [
             [0.0, 1.0, 1.0],
@@ -123,8 +97,15 @@ def prepare_ocp():
             [-0.0, 0.2, 0.1],
             [-0.0, 2.0, 0.1],
             [2.9, 3.0, 3.0],
+            [-0.0, 1.1, 0.1],
+            [-0.0, 0.0, 0.1],
             [-0.0, 0.65, 0.1],
             [-2.9, 0.05, -2.8],
+            [-0.0, 1.8, 0.1],
+            [-0.0, 0.0, 0.1],
+            [-0.0, 0.3, 0.1],
+            [-0.0, 0.1, 0.1],
+            [-0.0, 3.14, 0.1],
         ],
         interpolation=InterpolationType.CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT,
         phase=0,
@@ -143,12 +124,26 @@ def prepare_ocp():
             [0.0, -100.0, -100.0],
             [0.0, -100.0, -100.0],
             [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
         ],
         max_bound= [
             [0.5, 10.0, 10.0],
             [0.5, 10.0, 10.0],
             [6.9, 100.0, 100.0],
             [-0.5, -0.5, -0.5],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
             [-0.0, 100.0, 100.0],
             [-0.0, 100.0, 100.0],
             [-0.0, 100.0, 100.0],
@@ -172,7 +167,14 @@ def prepare_ocp():
             [0.0, 0.0],
             [2.9, 2.9],
             [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.0],
             [-2.9, -2.9],
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.0],
         ],
         interpolation=InterpolationType.LINEAR,
         phase=0,
@@ -180,29 +182,29 @@ def prepare_ocp():
 
     x_initial_guesses.add(
         "qdot",
-        initial_guess=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        initial_guess=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         interpolation=InterpolationType.CONSTANT,
     )
 
     u_bounds.add(
         "tau",
-        min_bound=[-500, -500, -500, -500],
-        max_bound=[500, 500, 500, 500],
+        min_bound=[-500, -500, -500, -500, -500, -500, -500, -500, -500, -500, -500],
+        max_bound=[500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500],
         interpolation=InterpolationType.CONSTANT,
         phase=0,
     )
 
     u_initial_guesses.add(
         "tau",
-        initial_guess=[0, 0, 0, 0],
+        initial_guess=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         interpolation=InterpolationType.CONSTANT,
     )
 
     mapping = BiMappingList()
     mapping.add(
         "tau",
-        to_second=[None, None, None, None, None, None, 0, 1, 2, 3],
-        to_first=[6, 7, 8, 9],
+        to_second=[None, None, None, None, None, None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        to_first=[6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
     )
 
     # Construct and return the optimal control program (OCP)

@@ -4,90 +4,6 @@ from bioptim_gui_api.variables.pike_acrobatics_variables import (
     PikeAcrobaticsVariables,
 )
 
-q_min_bounds = np.array(
-    [
-        [-3.14159265, -3.14159265, -3.14159265],
-        [-3.14159265, -3.14159265, -3.14159265],
-        [-3.14159265, -3.14159265, -3.14159265],
-        [-3.14159265, -3.14159265, -3.14159265],
-        [-3.14159265, -3.14159265, -3.14159265],
-        [-3.14159265, -3.14159265, -3.14159265],
-        [-0.65, -0.65, -0.65],
-        [-0.05, -0.05, -0.05],
-        [-1.8, -1.8, -1.8],
-        [-2.65, -2.65, -2.65],
-        [-2.0, -2.0, -2.0],
-        [-3.0, -3.0, -3.0],
-        [-1.1, -1.1, -1.1],
-        [-2.65, -2.65, -2.65],
-        [-2.7, -2.7, -2.7],
-        [-0.35, -0.35, -0.35],
-    ]
-)
-
-q_max_bounds = np.array(
-    [
-        [3.14159265, 3.14159265, 3.14159265],
-        [3.14159265, 3.14159265, 3.14159265],
-        [3.14159265, 3.14159265, 3.14159265],
-        [3.14159265, 3.14159265, 3.14159265],
-        [3.14159265, 3.14159265, 3.14159265],
-        [3.14159265, 3.14159265, 3.14159265],
-        [2.0, 2.0, 2.0],
-        [3.0, 3.0, 3.0],
-        [1.1, 1.1, 1.1],
-        [0.0, 0.0, 0.0],
-        [0.65, 0.65, 0.65],
-        [0.05, 0.05, 0.05],
-        [1.8, 1.8, 1.8],
-        [0.0, 0.0, 0.0],
-        [0.3, 0.3, 0.3],
-        [0.35, 0.35, 0.35],
-    ]
-)
-
-qdot_min_bounds = np.array(
-    [
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-        [-31.41592653589793, -31.41592653589793, -31.41592653589793],
-    ]
-)
-
-qdot_max_bounds = np.array(
-    [
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-        [31.41592653589793, 31.41592653589793, 31.41592653589793],
-    ]
-)
-
 
 def test_q_bounds_single_right_forward():
     expected = [
@@ -132,8 +48,6 @@ def test_q_bounds_single_right_forward():
     ]
 
     actual = PikeAcrobaticsVariables.get_q_bounds(
-        q_min_bounds,
-        q_max_bounds,
         half_twists=[1],
         prefer_left=False,
     )
@@ -185,8 +99,6 @@ def test_q_bounds_single_left_forward():
     ]
 
     actual = PikeAcrobaticsVariables.get_q_bounds(
-        q_min_bounds,
-        q_max_bounds,
         half_twists=[1],
         prefer_left=True,
     )
@@ -238,8 +150,6 @@ def test_q_bounds_single_right_backward():
     ]
 
     actual = PikeAcrobaticsVariables.get_q_bounds(
-        q_min_bounds,
-        q_max_bounds,
         half_twists=[2],
         prefer_left=False,
     )
@@ -291,8 +201,6 @@ def test_q_bounds_single_left_backward():
     ]
 
     actual = PikeAcrobaticsVariables.get_q_bounds(
-        q_min_bounds,
-        q_max_bounds,
         half_twists=[2],
         prefer_left=True,
     )
@@ -458,8 +366,6 @@ def test_q_bounds_quadruple_left_forward():
     ]
 
     actual = PikeAcrobaticsVariables.get_q_bounds(
-        q_min_bounds,
-        q_max_bounds,
         half_twists=[1, 0, 2, 4],
         prefer_left=True,
     )
@@ -870,9 +776,7 @@ def test_qdot_bounds_single_right_forward():
         }
     ]
 
-    actual = PikeAcrobaticsVariables.get_qdot_bounds(
-        qdot_min_bounds, qdot_max_bounds, 1, 1.0, True
-    )
+    actual = PikeAcrobaticsVariables.get_qdot_bounds(1, 1.0, True)
 
     assert np.allclose(actual[0]["min"], expected[0]["min"])
     assert np.allclose(actual[0]["max"], expected[0]["max"])
@@ -920,9 +824,7 @@ def test_qdot_bounds_single_left_forward():
         }
     ]
 
-    actual = PikeAcrobaticsVariables.get_qdot_bounds(
-        qdot_min_bounds, qdot_max_bounds, 1, 1.0, True
-    )
+    actual = PikeAcrobaticsVariables.get_qdot_bounds(1, 1.0, True)
 
     assert np.allclose(actual[0]["min"], expected[0]["min"])
     assert np.allclose(actual[0]["max"], expected[0]["max"])
@@ -970,9 +872,7 @@ def test_qdot_bounds_single_right_backward():
         }
     ]
 
-    actual = PikeAcrobaticsVariables.get_qdot_bounds(
-        qdot_min_bounds, qdot_max_bounds, 1, 1.0, False
-    )
+    actual = PikeAcrobaticsVariables.get_qdot_bounds(1, 1.0, False)
 
     assert np.allclose(actual[0]["min"], expected[0]["min"])
     assert np.allclose(actual[0]["max"], expected[0]["max"])
@@ -1020,9 +920,7 @@ def test_qdot_bounds_single_left_backward():
         }
     ]
 
-    actual = PikeAcrobaticsVariables.get_qdot_bounds(
-        qdot_min_bounds, qdot_max_bounds, 1, 1.0, False
-    )
+    actual = PikeAcrobaticsVariables.get_qdot_bounds(1, 1.0, False)
 
     assert np.allclose(actual[0]["min"], expected[0]["min"])
     assert np.allclose(actual[0]["max"], expected[0]["max"])
@@ -1184,9 +1082,7 @@ def test_qdot_bounds_quadruple_left_forward():
         },
     ]
 
-    actual = PikeAcrobaticsVariables.get_qdot_bounds(
-        qdot_min_bounds, qdot_max_bounds, 4, 4.0, True
-    )
+    actual = PikeAcrobaticsVariables.get_qdot_bounds(4, 4.0, True)
 
     for i in range(4):
         for m in "min", "max":

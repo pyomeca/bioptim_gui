@@ -52,7 +52,7 @@ def remove_somersault_info(n: int = 0) -> None:
     n_somersaults = before - n
     final_time = data["final_time"]
     for i in range(0, n_somersaults):
-        somersaults_info[i]["duration"] = final_time / n_somersaults
+        somersaults_info[i]["duration"] = round(final_time / n_somersaults, 2)
 
     for _ in range(n):
         somersaults_info.pop()
@@ -83,15 +83,19 @@ def get_acrobatics_data():
 
 @router.put("/nb_somersaults", response_model=dict)
 def update_nb_somersaults(nb_somersaults: NbSomersaultsRequest):
+    nb_max_somersaults = 5
     old_value = read_acrobatics_data("nb_somersaults")
     new_value = nb_somersaults.nb_somersaults
-    if new_value < 0:
+    if new_value < 0 or new_value > nb_max_somersaults:
         raise HTTPException(status_code=400, detail="nb_somersaults must be positive")
 
     if new_value > old_value:
         add_somersault_info(new_value - old_value)
     elif new_value < old_value:
         remove_somersault_info(old_value - new_value)
+
+    # if new_value == 1:
+    #     update_acrobatics_data("position", Position.STRAIGHT.value)
 
     update_acrobatics_data("nb_somersaults", new_value)
 
@@ -127,6 +131,10 @@ def put_final_time_margin(final_time_margin: FinalTimeMarginRequest):
 
 @router.get("/position", response_model=list)
 def get_position():
+    # TODO implement with frontend
+    # nb_somersaults = read_acrobatics_data("nb_somersaults")
+    # if nb_somersaults == 1:
+    #     return [Position.STRAIGHT.capitalize()]
     return [side.capitalize() for side in Position]
 
 

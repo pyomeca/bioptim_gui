@@ -4,7 +4,11 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from bioptim_gui_api.acrobatics_ocp.acrobatics import router, add_somersault_info, remove_somersault_info
+from bioptim_gui_api.acrobatics_ocp.acrobatics import (
+    router,
+    add_somersault_info,
+    remove_somersault_info,
+)
 from bioptim_gui_api.acrobatics_ocp.acrobatics_config import DefaultAcrobaticsConfig
 
 test_app = FastAPI()
@@ -31,13 +35,23 @@ def run_for_all():
 
 # basic setter/getter tests
 
+
 def test_add_somersault_info_wrong():
     with pytest.raises(ValueError):
         add_somersault_info(0)
 
+
 def test_remove_somersault_info_wrong():
     with pytest.raises(ValueError):
         remove_somersault_info(-1)
+
+
+@pytest.mark.parametrize("nb_somersaults", [6, 7, 8, 9, 100, 1e9])
+def test_put_nb_somersaults_too_much(nb_somersaults):
+    response = client.put(
+        "/acrobatics/nb_somersaults/", json={"nb_somersaults": nb_somersaults}
+    )
+    assert response.status_code == 400, response
 
 
 def test_put_nb_somersault_negative():
@@ -134,10 +148,28 @@ def test_put_final_time_margin():
     assert response.json()["final_time_margin"] == 0.2
 
 
-def test_get_position():
+def test_get_position_single_somersault():
     response = client.get("/acrobatics/position/")
     assert response.status_code == 200, response
-    assert set(response.json()) == {"Straight", "Tuck", "Pike"}
+    assert set(response.json()) == {"Straight"}
+
+
+def test_get_position_multiple_somersaults():
+    client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
+    response = client.get("/acrobatics/position/")
+    assert response.status_code == 200, response
+    assert set(response.json()) == {"Tuck", "Straight", "Pike"}
+
+
+# removed for now as it is not implemented in frontend
+# def test_position_after_add_remove_somersault():
+#     client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
+#     response = client.put("/acrobatics/position/", json={"position": "tuck"})
+#     assert response.status_code == 200, response
+#
+#     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 1})
+#     assert response.status_code == 200, response
+#     assert response.json()["position"] == "straight"
 
 
 def test_put_position():
@@ -197,6 +229,7 @@ def test_put_preferred_twist_side_same():
         "/acrobatics/preferred_twist_side/", json={"preferred_twist_side": "left"}
     )
     assert response.status_code == 304, response
+
 
 def test_put_preferred_twist_side_good():
     response = client.put(
@@ -259,7 +292,7 @@ def test_add_somersault():
 
 
 def test_add_multiple_somersault():
-    many = 10
+    many = 5
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": many})
     assert response.status_code == 200, response
     assert response.json()["nb_somersaults"] == many
@@ -364,7 +397,7 @@ def test_remove_single_somersault():
 
 
 def test_add_and_remove_multiple_somersault():
-    many = 10
+    many = 5
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": many})
     assert response.status_code == 200, response
     assert response.json()["nb_somersaults"] == many
@@ -381,7 +414,7 @@ def test_add_and_remove_multiple_somersault():
     assert data["preferred_twist_side"] == "left"
     assert len(data["somersaults_info"]) == many
     for i in range(many):
-        assert data["somersaults_info"][i]["duration"] == 1 / many
+        assert data["somersaults_info"][i]["duration"] == round(1 / many, 2)
         assert len(data["somersaults_info"][i]["objectives"]) == 2
         assert len(data["somersaults_info"][i]["constraints"]) == 0
 

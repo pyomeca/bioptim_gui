@@ -1,14 +1,14 @@
-import numpy as np
-from bioptim import BiorbdModel
 from fastapi import APIRouter, HTTPException
 
 from bioptim_gui_api.acrobatics_ocp.acrobatics_utils import read_acrobatics_data
-from bioptim_gui_api.variables.pike_acrobatics_variables import PikeAcrobaticsVariables
 from bioptim_gui_api.utils.format_utils import format_2d_array, arg_to_string
-
-router = APIRouter(
-    responses={404: {"description": "Not found"}},
+from bioptim_gui_api.variables.pike_acrobatics_variables import PikeAcrobaticsVariables
+from bioptim_gui_api.variables.straight_acrobatics_variables import (
+    StraightAcrobaticsVariables,
 )
+from bioptim_gui_api.variables.tuck_acrobatics_variables import TuckAcrobaticsVariables
+
+router = APIRouter()
 
 
 @router.get("/generate_code", response_model=str)
@@ -21,33 +21,36 @@ def get_acrobatics_generated_code():
     if not model_path:
         raise HTTPException(status_code=400, detail="No model path provided")
 
-    bio_model = BiorbdModel(rf"{model_path}")
-    min_q_bounds = np.array(bio_model.bounds_from_ranges("q").min.tolist())
-    max_q_bounds = np.array(bio_model.bounds_from_ranges("q").max.tolist())
-    min_qdot_bounds = np.array(bio_model.bounds_from_ranges("qdot").min.tolist())
-    max_qdot_bounds = np.array(bio_model.bounds_from_ranges("qdot").max.tolist())
-    nb_tau = bio_model.nb_tau - bio_model.nb_root
-    nb_q = bio_model.nb_q
+    # TODO generate a file with the correct DoF with model_converter
 
     somersaults = data["somersaults_info"]
     half_twists = [s["nb_half_twists"] for s in somersaults]
     total_half_twists = sum(half_twists)
+
+    position = data["position"]
     is_forward = (total_half_twists % 2) != 0
     prefer_left = data["preferred_twist_side"] == "left"
     total_time = sum([s["duration"] for s in somersaults])
 
-    q_bounds = PikeAcrobaticsVariables.get_q_bounds(
-        min_q_bounds, max_q_bounds, half_twists, prefer_left
-    )
-    q_init = PikeAcrobaticsVariables.get_q_init(half_twists, prefer_left)
+    acrobatics_variables = PikeAcrobaticsVariables
+    if position == "straight":
+        acrobatics_variables = StraightAcrobaticsVariables
+    elif position == "tuck":
+        acrobatics_variables = TuckAcrobaticsVariables
 
-    qdot_bounds = PikeAcrobaticsVariables.get_qdot_bounds(
-        min_qdot_bounds, max_qdot_bounds, nb_somersaults, total_time, is_forward
-    )
-    qdot_init = PikeAcrobaticsVariables.get_qdot_init()
+    q_bounds = acrobatics_variables.get_q_bounds(half_twists, prefer_left)
+    q_init = acrobatics_variables.get_q_init(half_twists, prefer_left)
 
-    tau_bounds = PikeAcrobaticsVariables.get_tau_bounds()
-    tau_init = PikeAcrobaticsVariables.get_tau_init()
+    qdot_bounds = acrobatics_variables.get_qdot_bounds(
+        nb_somersaults, total_time, is_forward
+    )
+    qdot_init = acrobatics_variables.get_qdot_init()
+
+    tau_bounds = acrobatics_variables.get_tau_bounds()
+    tau_init = acrobatics_variables.get_tau_init()
+
+    nb_q = acrobatics_variables.nb_q
+    nb_tau = acrobatics_variables.nb_tau
 
     generated = """\"""This file was automatically generated using BioptimGUI version 0.0.1\"""
 
