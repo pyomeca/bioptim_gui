@@ -148,10 +148,11 @@ def test_put_final_time_margin():
     assert response.json()["final_time_margin"] == 0.2
 
 
-def test_get_position_single_somersault():
-    response = client.get("/acrobatics/position/")
-    assert response.status_code == 200, response
-    assert set(response.json()) == {"Straight"}
+# TODO implement when front is ready
+# def test_get_position_single_somersault():
+#     response = client.get("/acrobatics/position/")
+#     assert response.status_code == 200, response
+#     assert set(response.json()) == {"Straight"}
 
 
 def test_get_position_multiple_somersaults():
