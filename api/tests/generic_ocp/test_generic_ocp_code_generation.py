@@ -28,7 +28,7 @@ def run_for_all():
     os.remove(datafile)
 
 
-def test_generate_code():
+def test_generate_code_work():
     response = client.get("/generic_ocp/generate_code")
     assert response.status_code == 200, response
     data = response.json()
