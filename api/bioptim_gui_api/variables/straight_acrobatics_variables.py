@@ -67,7 +67,6 @@ class StraightAcrobaticsVariables:
         x_bounds[0]["max"][[cls.YrotRightUpperArm, cls.YrotLeftUpperArm], 0] = 2.9, -2.9
 
         intermediate_min_bounds = cls.q_min_bounds.copy()[:, 0]
-
         intermediate_max_bounds = cls.q_max_bounds.copy()[:, 0]
 
         for phase in range(nb_somersaults):

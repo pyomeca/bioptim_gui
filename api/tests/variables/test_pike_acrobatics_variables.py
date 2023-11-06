@@ -1,8 +1,56 @@
 import numpy as np
+import pytest
 
 from bioptim_gui_api.variables.pike_acrobatics_variables import (
     PikeAcrobaticsVariables,
 )
+
+
+# P pike
+# S somersault
+# K kick out
+# T twist
+# L landing
+@pytest.mark.parametrize(
+    ("half_twists", "expected_number_of_phase", "phases_str"),
+    [
+        ([0, 0], 4, "PSKL"),
+        ([1, 0], 5, "TPSKL"),
+        ([0, 1], 5, "PSKTL"),
+        ([1, 1], 6, "TPSKTL"),
+        ([0, 0, 0], 4, "PSKL"),
+        ([0, 0, 1], 5, "PSKTL"),
+        ([0, 1, 0], 8, "PSKTPSKL"),
+        ([0, 1, 1], 9, "PSKTPSKTL"),
+        ([1, 0, 0], 5, "TPSKL"),
+        ([1, 0, 1], 6, "TPSKTL"),
+        ([1, 1, 0], 9, "TPSKTPSKL"),
+        ([0, 0, 0, 0], 4, "PSKL"),
+        ([0, 0, 0, 1], 5, "PSKTL"),
+        ([0, 0, 1, 0], 8, "PSKTPSKL"),
+        ([0, 0, 1, 1], 9, "PSKTPSKTL"),
+        ([0, 1, 0, 0], 8, "PSKTPSKL"),
+        ([0, 1, 0, 1], 9, "PSKTPSKTL"),
+        ([0, 1, 1, 0], 12, "PSKTPSKTPSKL"),
+        ([0, 1, 1, 1], 13, "PSKTPSKTPSKTL"),
+        ([1, 0, 0, 0], 5, "TPSKL"),
+        ([1, 0, 0, 1], 6, "TPSKTL"),
+        ([1, 0, 1, 0], 9, "TPSKTPSKL"),
+        ([1, 0, 1, 1], 10, "TPSKTPSKTL"),
+        ([1, 1, 0, 0], 9, "TPSKTPSKL"),
+        ([1, 1, 0, 1], 10, "TPSKTPSKTL"),
+        ([1, 1, 1, 0], 13, "TPSKTPSKTPSKL"),
+        ([1, 1, 1, 1], 14, "TPSKTPSKTPSKTL"),
+    ],
+)
+def test_q_bounds_number(half_twists, expected_number_of_phase, phases_str):
+    phases = PikeAcrobaticsVariables.get_q_bounds(
+        half_twists=half_twists,
+        prefer_left=False,
+    )
+    assert len(phases) == expected_number_of_phase
+    # assert expected_number_of_phase == len(phases_str) # to check if the test is correctly written
+    # assert "".join(phases) == phases_str
 
 
 def test_q_bounds_single_right_forward():

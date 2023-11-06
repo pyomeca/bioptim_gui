@@ -66,3 +66,40 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
             [0.1, 0.1, 0.1],
         ]
     )
+
+    @classmethod
+    def get_q_bounds(cls, half_twists: list, prefer_left: bool) -> dict:
+        nb_somersaults = len(half_twists)
+        bounds = []
+        current_somersault = 1
+
+        # twists
+        if half_twists[0] > 0:
+            bounds.append("T")
+
+        last_have_twist = True
+        next_have_twist = half_twists[1] > 0
+        for i in range(1, nb_somersaults):
+            is_last_somersault = i == nb_somersaults - 1
+            # piking
+            if last_have_twist:
+                bounds.append("P")
+
+            # somersaulting
+            if i == nb_somersaults - 1 or next_have_twist:
+                bounds.append("S")
+
+            # kick out
+            if next_have_twist or is_last_somersault:
+                bounds.append("K")
+
+            if next_have_twist:
+                bounds.append("T")
+
+            last_have_twist = next_have_twist
+            next_have_twist = is_last_somersault or half_twists[i + 1] > 0
+
+        # landing
+        bounds.append("L")
+
+        return bounds
