@@ -2,7 +2,7 @@ class DefaultAcrobaticsConfig:
     datafile = "acrobatics_data.json"
 
     default_phases_info = {
-        "nb_shooting_points": 24,
+        "nb_shooting_points": 40,
         "nb_half_twists": 0,
         "duration": 1.0,
         "objectives": [
