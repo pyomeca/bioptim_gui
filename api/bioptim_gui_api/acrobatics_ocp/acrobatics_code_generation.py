@@ -3,10 +3,6 @@ from fastapi import APIRouter, HTTPException
 from bioptim_gui_api.acrobatics_ocp.acrobatics_utils import read_acrobatics_data
 from bioptim_gui_api.utils.format_utils import format_2d_array, arg_to_string
 from bioptim_gui_api.variables.pike_acrobatics_variables import PikeAcrobaticsVariables
-from bioptim_gui_api.variables.straight_acrobatics_variables import (
-    StraightAcrobaticsVariables,
-)
-from bioptim_gui_api.variables.tuck_acrobatics_variables import TuckAcrobaticsVariables
 
 router = APIRouter()
 
@@ -14,7 +10,6 @@ router = APIRouter()
 @router.get("/generate_code", response_model=str)
 def get_acrobatics_generated_code():
     data = read_acrobatics_data()
-
     nb_somersaults = data["nb_somersaults"]
 
     model_path = data["model_path"]
@@ -33,17 +28,20 @@ def get_acrobatics_generated_code():
     total_time = sum([s["duration"] for s in somersaults])
 
     acrobatics_variables = PikeAcrobaticsVariables
-    if position == "straight":
-        acrobatics_variables = StraightAcrobaticsVariables
-    elif position == "tuck":
-        acrobatics_variables = TuckAcrobaticsVariables
+    # if position == "straight":
+    #     acrobatics_variables = StraightAcrobaticsVariables
+    # elif position == "tuck":
+    #     acrobatics_variables = TuckAcrobaticsVariables
 
     q_bounds = acrobatics_variables.get_q_bounds(half_twists, prefer_left)
+    nb_phases = len(q_bounds)
+
     q_init = acrobatics_variables.get_q_init(half_twists, prefer_left)
 
     qdot_bounds = acrobatics_variables.get_qdot_bounds(
         nb_somersaults, total_time, is_forward
     )
+
     qdot_init = acrobatics_variables.get_qdot_init()
 
     tau_bounds = acrobatics_variables.get_tau_bounds()
@@ -212,7 +210,9 @@ def prepare_ocp():
     u_initial_guesses = InitialGuessList()
 """
 
-    for i in range(nb_somersaults):
+    n_phases = len(q_bounds)
+
+    for i in range(n_phases):
         generated += f"""
     x_bounds.add(
         "q",
@@ -251,15 +251,15 @@ def prepare_ocp():
     )
 """
 
-    for i in range(nb_somersaults):
-        generated += f"""
-    u_bounds.add(
-        "tau",
-        min_bound={tau_bounds["min"]},
-        max_bound={tau_bounds["max"]},
-        interpolation=InterpolationType.CONSTANT,
-        phase={i},
-    )
+    generated += f"""
+    for phase in range({nb_phases}):
+        u_bounds.add(
+            "tau",
+            min_bound={tau_bounds["min"]},
+            max_bound={tau_bounds["max"]},
+            interpolation=InterpolationType.CONSTANT,
+            phase=phase,
+        )
 """
 
     generated += f"""
@@ -306,6 +306,9 @@ if __name__ == "__main__":
     ocp = prepare_ocp()
 
     solver = Solver.IPOPT()
+    solver = Solver.IPOPT(
+        show_online_optim=True, show_options={{"show_bounds": True}}
+    )  # debug purposes
     # --- Solve the ocp --- #
     sol = ocp.solve(solver=solver)
 
