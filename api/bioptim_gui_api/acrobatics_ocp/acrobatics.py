@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 
 import bioptim_gui_api.acrobatics_ocp.acrobatics_code_generation as acrobatics_code_generation
 import bioptim_gui_api.acrobatics_ocp.acrobatics_config as config
-import bioptim_gui_api.acrobatics_ocp.acrobatics_somersaults as acrobatics_somersaults
+import bioptim_gui_api.acrobatics_ocp.acrobatics_phases as acrobatics_somersaults
 from bioptim_gui_api.acrobatics_ocp.acrobatics_responses import *
 
 router = APIRouter(
@@ -121,7 +121,8 @@ def put_nb_half_twist(somersault_index: int, half_twists_request: NbHalfTwistsRe
 
     # TODO update phases
 
-    return []  # TODO return phases
+    phases_info = read_acrobatics_data("phases_info")
+    return phases_info
 
 
 @router.put("/model_path", response_model=ModelPathResponse)

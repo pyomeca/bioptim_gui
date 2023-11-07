@@ -13,30 +13,30 @@ router = APIRouter()
 # objectives endpoints
 
 
-@router.get("/{somersault_index}/objectives", response_model=list)
-def get_objectives(somersault_index: int):
+@router.get("/{phase_index}/objectives", response_model=list)
+def get_objectives(phase_index: int):
     phases_info = read_acrobatics_data("phases_info")
-    objectives = phases_info[somersault_index]["objectives"]
+    objectives = phases_info[phase_index]["objectives"]
     return objectives
 
 
-@router.post("/{somersault_index}/objectives", response_model=list)
-def add_objective(somersault_index: int):
+@router.post("/{phase_index}/objectives", response_model=list)
+def add_objective(phase_index: int):
     phases_info = read_acrobatics_data("phases_info")
-    objectives = phases_info[somersault_index]["objectives"]
+    objectives = phases_info[phase_index]["objectives"]
     objectives.append(penalty_config.DefaultPenaltyConfig.default_objective)
-    phases_info[somersault_index]["objectives"] = objectives
+    phases_info[phase_index]["objectives"] = objectives
     update_acrobatics_data("phases_info", phases_info)
     return objectives
 
 
 @router.get(
-    "/{somersault_index}/objectives/{objective_index}",
+    "/{phase_index}/objectives/{objective_index}",
     response_model=list,
 )
-def get_objective_dropdown_list(somersault_index: int, objective_index: int):
+def get_objective_dropdown_list(phase_index: int, objective_index: int):
     phases_info = read_acrobatics_data("phases_info")
-    objective = phases_info[somersault_index]["objectives"][objective_index]
+    objective = phases_info[phase_index]["objectives"][objective_index]
     objective_type = objective["objective_type"]
     # if objective_type == "mayer":
     #     enum = ObjectiveFcn.Mayer
@@ -77,103 +77,95 @@ def get_objective_dropdown_list(somersault_index: int, objective_index: int):
 
 
 @router.delete(
-    "/{somersault_index}/objectives/{objective_index}",
+    "/{phase_index}/objectives/{objective_index}",
     response_model=list,
 )
-def delete_objective(somersault_index: int, objective_index: int):
+def delete_objective(phase_index: int, objective_index: int):
     phases_info = read_acrobatics_data("phases_info")
-    objectives = phases_info[somersault_index]["objectives"]
+    objectives = phases_info[phase_index]["objectives"]
     objectives.pop(objective_index)
-    phases_info[somersault_index]["objectives"] = objectives
+    phases_info[phase_index]["objectives"] = objectives
     update_acrobatics_data("phases_info", phases_info)
     return objectives
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/objective_type",
+    "/{phase_index}/objectives/{objective_index}/objective_type",
     response_model=dict,
 )
 def put_objective_type(
-    somersault_index: int, objective_index: int, objective_type: ObjectiveTypeRequest
+    phase_index: int, objective_index: int, objective_type: ObjectiveTypeRequest
 ):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["objectives"][objective_index][
+    phases_info[phase_index]["objectives"][objective_index][
         "objective_type"
     ] = objective_type.objective_type.value
 
     objective_type_value = objective_type.objective_type.value
-    penalty_type = phases_info[somersault_index]["objectives"][objective_index][
+    penalty_type = phases_info[phase_index]["objectives"][objective_index][
         "penalty_type"
     ]
     arguments = obj_arguments(objective_type_value, penalty_type)
 
-    phases_info[somersault_index]["objectives"][objective_index][
-        "arguments"
-    ] = arguments
+    phases_info[phase_index]["objectives"][objective_index]["arguments"] = arguments
 
     update_acrobatics_data("phases_info", phases_info)
     data = read_acrobatics_data()
-    return data["phases_info"][somersault_index]["objectives"][objective_index]
+    return data["phases_info"][phase_index]["objectives"][objective_index]
 
 
 # common arguments
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/penalty_type",
+    "/{phase_index}/objectives/{objective_index}/penalty_type",
     response_model=dict,
 )
 def put_objective_penalty_type(
-    somersault_index: int, objective_index: int, penalty_type: ObjectiveFcnRequest
+    phase_index: int, objective_index: int, penalty_type: ObjectiveFcnRequest
 ):
     penalty_type_value = penalty_type.penalty_type
     phases_info = read_acrobatics_data("phases_info")
 
-    phases_info[somersault_index]["objectives"][objective_index][
+    phases_info[phase_index]["objectives"][objective_index][
         "penalty_type"
     ] = penalty_type_value
 
-    objective_type = phases_info[somersault_index]["objectives"][objective_index][
+    objective_type = phases_info[phase_index]["objectives"][objective_index][
         "objective_type"
     ]
     arguments = obj_arguments(
         objective_type=objective_type, penalty_type=penalty_type_value
     )
 
-    phases_info[somersault_index]["objectives"][objective_index][
-        "arguments"
-    ] = arguments
+    phases_info[phase_index]["objectives"][objective_index]["arguments"] = arguments
 
     update_acrobatics_data("phases_info", phases_info)
 
     data = read_acrobatics_data()
-    return data["phases_info"][somersault_index]["objectives"][objective_index]
+    return data["phases_info"][phase_index]["objectives"][objective_index]
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/nodes",
+    "/{phase_index}/objectives/{objective_index}/nodes",
     response_model=NodesResponse,
 )
-def put_objective_nodes(
-    somersault_index: int, objective_index: int, nodes: NodesRequest
-):
+def put_objective_nodes(phase_index: int, objective_index: int, nodes: NodesRequest):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["objectives"][objective_index][
-        "nodes"
-    ] = nodes.nodes.value
+    phases_info[phase_index]["objectives"][objective_index]["nodes"] = nodes.nodes.value
     update_acrobatics_data("phases_info", phases_info)
     return NodesResponse(nodes=nodes.nodes)
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/quadratic",
+    "/{phase_index}/objectives/{objective_index}/quadratic",
     response_model=QuadraticResponse,
 )
 def put_objective_quadratic(
-    somersault_index: int, objective_index: int, quadratic: QuadraticRequest
+    phase_index: int, objective_index: int, quadratic: QuadraticRequest
 ):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["objectives"][objective_index][
+    phases_info[phase_index]["objectives"][objective_index][
         "quadratic"
     ] = quadratic.quadratic
     update_acrobatics_data("phases_info", phases_info)
@@ -181,44 +173,36 @@ def put_objective_quadratic(
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/expand",
+    "/{phase_index}/objectives/{objective_index}/expand",
     response_model=ExpandResponse,
 )
-def put_objective_expand(
-    somersault_index: int, objective_index: int, expand: ExpandRequest
-):
+def put_objective_expand(phase_index: int, objective_index: int, expand: ExpandRequest):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["objectives"][objective_index][
-        "expand"
-    ] = expand.expand
+    phases_info[phase_index]["objectives"][objective_index]["expand"] = expand.expand
     update_acrobatics_data("phases_info", phases_info)
     return ExpandResponse(expand=expand.expand)
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/target",
+    "/{phase_index}/objectives/{objective_index}/target",
     response_model=TargetResponse,
 )
-def put_objective_target(
-    somersault_index: int, objective_index: int, target: TargetRequest
-):
+def put_objective_target(phase_index: int, objective_index: int, target: TargetRequest):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["objectives"][objective_index][
-        "target"
-    ] = target.target
+    phases_info[phase_index]["objectives"][objective_index]["target"] = target.target
     update_acrobatics_data("phases_info", phases_info)
     return TargetResponse(target=target.target)
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/derivative",
+    "/{phase_index}/objectives/{objective_index}/derivative",
     response_model=DerivativeResponse,
 )
 def put_objective_derivative(
-    somersault_index: int, objective_index: int, derivative: DerivativeRequest
+    phase_index: int, objective_index: int, derivative: DerivativeRequest
 ):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["objectives"][objective_index][
+    phases_info[phase_index]["objectives"][objective_index][
         "derivative"
     ] = derivative.derivative
     update_acrobatics_data("phases_info", phases_info)
@@ -226,16 +210,16 @@ def put_objective_derivative(
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/integration_rule",
+    "/{phase_index}/objectives/{objective_index}/integration_rule",
     response_model=IntegrationRuleResponse,
 )
 def put_objective_integration_rule(
-    somersault_index: int,
+    phase_index: int,
     objective_index: int,
     integration_rule: IntegrationRuleRequest,
 ):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["objectives"][objective_index][
+    phases_info[phase_index]["objectives"][objective_index][
         "integration_rule"
     ] = integration_rule.integration_rule.value
     update_acrobatics_data("phases_info", phases_info)
@@ -243,14 +227,14 @@ def put_objective_integration_rule(
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/multi_thread",
+    "/{phase_index}/objectives/{objective_index}/multi_thread",
     response_model=MultiThreadResponse,
 )
 def put_objective_multi_thread(
-    somersault_index: int, objective_index: int, multi_thread: MultiThreadRequest
+    phase_index: int, objective_index: int, multi_thread: MultiThreadRequest
 ):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["objectives"][objective_index][
+    phases_info[phase_index]["objectives"][objective_index][
         "multi_thread"
     ] = multi_thread.multi_thread
     update_acrobatics_data("phases_info", phases_info)
@@ -258,57 +242,51 @@ def put_objective_multi_thread(
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/weight",
+    "/{phase_index}/objectives/{objective_index}/weight",
     response_model=WeightResponse,
 )
-def put_objective_weight(
-    somersault_index: int, objective_index: int, weight: WeightRequest
-):
+def put_objective_weight(phase_index: int, objective_index: int, weight: WeightRequest):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["objectives"][objective_index][
-        "weight"
-    ] = weight.weight
+    phases_info[phase_index]["objectives"][objective_index]["weight"] = weight.weight
     update_acrobatics_data("phases_info", phases_info)
     return WeightResponse(weight=weight.weight)
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/weight/maximize",
+    "/{phase_index}/objectives/{objective_index}/weight/maximize",
     response_model=dict,
 )
-def put_objective_weight_maximize(somersault_index: int, objective_index: int):
+def put_objective_weight_maximize(phase_index: int, objective_index: int):
     phases_info = read_acrobatics_data("phases_info")
-    old_weight = phases_info[somersault_index]["objectives"][objective_index]["weight"]
+    old_weight = phases_info[phase_index]["objectives"][objective_index]["weight"]
     new_weight = -abs(old_weight)
 
-    phases_info[somersault_index]["objectives"][objective_index]["weight"] = new_weight
+    phases_info[phase_index]["objectives"][objective_index]["weight"] = new_weight
     update_acrobatics_data("phases_info", phases_info)
-    return phases_info[somersault_index]["objectives"][objective_index]
+    return phases_info[phase_index]["objectives"][objective_index]
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/weight/minimize",
+    "/{phase_index}/objectives/{objective_index}/weight/minimize",
     response_model=dict,
 )
-def put_objective_weight_minimize(somersault_index: int, objective_index: int):
+def put_objective_weight_minimize(phase_index: int, objective_index: int):
     phases_info = read_acrobatics_data("phases_info")
-    old_weight = phases_info[somersault_index]["objectives"][objective_index]["weight"]
+    old_weight = phases_info[phase_index]["objectives"][objective_index]["weight"]
     new_weight = abs(old_weight)
 
-    phases_info[somersault_index]["objectives"][objective_index]["weight"] = new_weight
+    phases_info[phase_index]["objectives"][objective_index]["weight"] = new_weight
     update_acrobatics_data("phases_info", phases_info)
-    return phases_info[somersault_index]["objectives"][objective_index]
+    return phases_info[phase_index]["objectives"][objective_index]
 
 
 @router.get(
-    "/{somersault_index}/objectives/{objective_index}/arguments/{key}",
+    "/{phase_index}/objectives/{objective_index}/arguments/{key}",
     response_model=ArgumentResponse,
 )
-def get_objective_arguments(somersault_index: int, objective_index: int, key: str):
+def get_objective_arguments(phase_index: int, objective_index: int, key: str):
     phases_info = read_acrobatics_data("phases_info")
-    arguments = phases_info[somersault_index]["objectives"][objective_index][
-        "arguments"
-    ]
+    arguments = phases_info[phase_index]["objectives"][objective_index]["arguments"]
 
     for argument in arguments:
         if argument["name"] == key:
@@ -323,24 +301,22 @@ def get_objective_arguments(somersault_index: int, objective_index: int, key: st
 
 
 @router.put(
-    "/{somersault_index}/objectives/{objective_index}/arguments/{key}",
+    "/{phase_index}/objectives/{objective_index}/arguments/{key}",
     response_model=ArgumentResponse,
 )
 def put_objective_arguments(
-    somersault_index: int, objective_index: int, key: str, argument_req: ArgumentRequest
+    phase_index: int, objective_index: int, key: str, argument_req: ArgumentRequest
 ):
     phases_info = read_acrobatics_data("phases_info")
 
-    arguments = phases_info[somersault_index]["objectives"][objective_index][
-        "arguments"
-    ]
+    arguments = phases_info[phase_index]["objectives"][objective_index]["arguments"]
 
     for argument in arguments:
         if argument["name"] == key:
             argument["type"] = argument_req.type
             argument["value"] = argument_req.value
 
-            phases_info[somersault_index]["objectives"][objective_index][
+            phases_info[phase_index]["objectives"][objective_index][
                 "arguments"
             ] = arguments
             update_acrobatics_data("phases_info", phases_info)

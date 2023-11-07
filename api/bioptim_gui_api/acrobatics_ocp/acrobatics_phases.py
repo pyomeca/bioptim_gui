@@ -1,12 +1,12 @@
 from fastapi import APIRouter, HTTPException
 
-from bioptim_gui_api.acrobatics_ocp.acrobatics_responses import *
-from bioptim_gui_api.acrobatics_ocp.acrobatics_somersaults_constraints import (
+from bioptim_gui_api.acrobatics_ocp.acrobatics_phases_constraints import (
     router as constraints_router,
 )
-from bioptim_gui_api.acrobatics_ocp.acrobatics_somersaults_objectives import (
+from bioptim_gui_api.acrobatics_ocp.acrobatics_phases_objectives import (
     router as objectives_router,
 )
+from bioptim_gui_api.acrobatics_ocp.acrobatics_responses import *
 from bioptim_gui_api.acrobatics_ocp.acrobatics_utils import (
     read_acrobatics_data,
     update_acrobatics_data,
@@ -26,31 +26,31 @@ def get_phases_info():
     return phases_info
 
 
-@router.get("/{somersault_index}", response_model=dict)
-def get_phases_info(somersault_index: int):
+@router.get("/{phase_index}", response_model=dict)
+def get_phases_info(phase_index: int):
     n_somersaults = read_acrobatics_data("nb_somersaults")
-    if somersault_index < 0 or somersault_index >= n_somersaults:
+    if phase_index < 0 or phase_index >= n_somersaults:
         raise HTTPException(
             status_code=404,
-            detail=f"somersault_index must be between 0 and {n_somersaults - 1}",
+            detail=f"phase_index must be between 0 and {n_somersaults - 1}",
         )
     phases_info = read_acrobatics_data("phases_info")
-    return phases_info[somersault_index]
+    return phases_info[phase_index]
 
 
 @router.put(
-    "/{somersault_index}/nb_shooting_points",
+    "/{phase_index}/nb_shooting_points",
     response_model=NbShootingPointsResponse,
 )
 def put_nb_shooting_points(
-    somersault_index: int, nb_shooting_points: NbShootingPointsRequest
+    phase_index: int, nb_shooting_points: NbShootingPointsRequest
 ):
     if nb_shooting_points.nb_shooting_points <= 0:
         raise HTTPException(
             status_code=400, detail="nb_shooting_points must be positive"
         )
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index][
+    phases_info[phase_index][
         "nb_shooting_points"
     ] = nb_shooting_points.nb_shooting_points
     update_acrobatics_data("phases_info", phases_info)
@@ -60,15 +60,15 @@ def put_nb_shooting_points(
 
 
 @router.put(
-    "/{somersault_index}/duration",
+    "/{phase_index}/duration",
     response_model=SomersaultDurationResponse,
 )
-def put_duration(somersault_index: int, duration: SomersaultDurationRequest):
+def put_duration(phase_index: int, duration: SomersaultDurationRequest):
     if duration.duration <= 0:
         raise HTTPException(status_code=400, detail="duration must be positive")
     infos = read_acrobatics_data()
     phases_info = infos["phases_info"]
-    phases_info[somersault_index]["duration"] = duration.duration
+    phases_info[phase_index]["duration"] = duration.duration
     infos["final_time"] = sum(somersault["duration"] for somersault in phases_info)
     update_acrobatics_data("phases_info", phases_info)
     update_acrobatics_data("final_time", infos["final_time"])

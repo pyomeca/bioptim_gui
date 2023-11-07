@@ -13,25 +13,25 @@ router = APIRouter()
 # constraints endpoints
 
 
-@router.get("/{somersault_index}/constraints", response_model=list)
-def get_constraints(somersault_index: int):
+@router.get("/{phase_index}/constraints", response_model=list)
+def get_constraints(phase_index: int):
     phases_info = read_acrobatics_data("phases_info")
-    constraints = phases_info[somersault_index]["constraints"]
+    constraints = phases_info[phase_index]["constraints"]
     return constraints
 
 
-@router.post("/{somersault_index}/constraints", response_model=list)
-def add_constraint(somersault_index: int):
+@router.post("/{phase_index}/constraints", response_model=list)
+def add_constraint(phase_index: int):
     phases_info = read_acrobatics_data("phases_info")
-    constraints = phases_info[somersault_index]["constraints"]
+    constraints = phases_info[phase_index]["constraints"]
     constraints.append(penalty_config.DefaultPenaltyConfig.default_constraint)
-    phases_info[somersault_index]["constraints"] = constraints
+    phases_info[phase_index]["constraints"] = constraints
     update_acrobatics_data("phases_info", phases_info)
     return constraints
 
 
 @router.get(
-    "/{somersault_index}/constraints/{constraint_index}",
+    "/{phase_index}/constraints/{constraint_index}",
     response_model=list,
 )
 def get_constraints_dropdown_list():
@@ -45,14 +45,14 @@ def get_constraints_dropdown_list():
 
 
 @router.delete(
-    "/{somersault_index}/constraints/{constraint_index}",
+    "/{phase_index}/constraints/{constraint_index}",
     response_model=list,
 )
-def delete_constraint(somersault_index: int, constraint_index: int):
+def delete_constraint(phase_index: int, constraint_index: int):
     phases_info = read_acrobatics_data("phases_info")
-    constraints = phases_info[somersault_index]["constraints"]
+    constraints = phases_info[phase_index]["constraints"]
     constraints.pop(constraint_index)
-    phases_info[somersault_index]["constraints"] = constraints
+    phases_info[phase_index]["constraints"] = constraints
     update_acrobatics_data("phases_info", phases_info)
     return constraints
 
@@ -61,37 +61,33 @@ def delete_constraint(somersault_index: int, constraint_index: int):
 
 
 @router.put(
-    "/{somersault_index}/constraints/{constraint_index}/penalty_type",
+    "/{phase_index}/constraints/{constraint_index}/penalty_type",
     response_model=dict,
 )
 def put_constraint_penalty_type(
-    somersault_index: int, constraint_index: int, penalty_type: ConstraintFcnRequest
+    phase_index: int, constraint_index: int, penalty_type: ConstraintFcnRequest
 ):
     penalty_type_value = penalty_type.penalty_type
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["constraints"][constraint_index][
+    phases_info[phase_index]["constraints"][constraint_index][
         "penalty_type"
     ] = penalty_type_value
 
     arguments = constraint_arguments(penalty_type.penalty_type)
-    phases_info[somersault_index]["constraints"][constraint_index][
-        "arguments"
-    ] = arguments
+    phases_info[phase_index]["constraints"][constraint_index]["arguments"] = arguments
 
     update_acrobatics_data("phases_info", phases_info)
     data = read_acrobatics_data()
-    return data["phases_info"][somersault_index]["constraints"][constraint_index]
+    return data["phases_info"][phase_index]["constraints"][constraint_index]
 
 
 @router.put(
-    "/{somersault_index}/constraints/{constraint_index}/nodes",
+    "/{phase_index}/constraints/{constraint_index}/nodes",
     response_model=NodesResponse,
 )
-def put_constraint_nodes(
-    somersault_index: int, constraint_index: int, nodes: NodesRequest
-):
+def put_constraint_nodes(phase_index: int, constraint_index: int, nodes: NodesRequest):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["constraints"][constraint_index][
+    phases_info[phase_index]["constraints"][constraint_index][
         "nodes"
     ] = nodes.nodes.value
     update_acrobatics_data("phases_info", phases_info)
@@ -99,14 +95,14 @@ def put_constraint_nodes(
 
 
 @router.put(
-    "/{somersault_index}/constraints/{constraint_index}/quadratic",
+    "/{phase_index}/constraints/{constraint_index}/quadratic",
     response_model=QuadraticResponse,
 )
 def put_constraint_quadratic(
-    somersault_index: int, constraint_index: int, quadratic: QuadraticRequest
+    phase_index: int, constraint_index: int, quadratic: QuadraticRequest
 ):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["constraints"][constraint_index][
+    phases_info[phase_index]["constraints"][constraint_index][
         "quadratic"
     ] = quadratic.quadratic
     update_acrobatics_data("phases_info", phases_info)
@@ -114,44 +110,40 @@ def put_constraint_quadratic(
 
 
 @router.put(
-    "/{somersault_index}/constraints/{constraint_index}/expand",
+    "/{phase_index}/constraints/{constraint_index}/expand",
     response_model=ExpandResponse,
 )
 def put_constraint_expand(
-    somersault_index: int, constraint_index: int, expand: ExpandRequest
+    phase_index: int, constraint_index: int, expand: ExpandRequest
 ):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["constraints"][constraint_index][
-        "expand"
-    ] = expand.expand
+    phases_info[phase_index]["constraints"][constraint_index]["expand"] = expand.expand
     update_acrobatics_data("phases_info", phases_info)
     return ExpandResponse(expand=expand.expand)
 
 
 @router.put(
-    "/{somersault_index}/constraints/{constraint_index}/target",
+    "/{phase_index}/constraints/{constraint_index}/target",
     response_model=TargetResponse,
 )
 def put_constraint_target(
-    somersault_index: int, constraint_index: int, target: TargetRequest
+    phase_index: int, constraint_index: int, target: TargetRequest
 ):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["constraints"][constraint_index][
-        "target"
-    ] = target.target
+    phases_info[phase_index]["constraints"][constraint_index]["target"] = target.target
     update_acrobatics_data("phases_info", phases_info)
     return TargetResponse(target=target.target)
 
 
 @router.put(
-    "/{somersault_index}/constraints/{constraint_index}/derivative",
+    "/{phase_index}/constraints/{constraint_index}/derivative",
     response_model=DerivativeResponse,
 )
 def put_constraint_derivative(
-    somersault_index: int, constraint_index: int, derivative: DerivativeRequest
+    phase_index: int, constraint_index: int, derivative: DerivativeRequest
 ):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["constraints"][constraint_index][
+    phases_info[phase_index]["constraints"][constraint_index][
         "derivative"
     ] = derivative.derivative
     update_acrobatics_data("phases_info", phases_info)
@@ -159,16 +151,16 @@ def put_constraint_derivative(
 
 
 @router.put(
-    "/{somersault_index}/constraints/{constraint_index}/integration_rule",
+    "/{phase_index}/constraints/{constraint_index}/integration_rule",
     response_model=IntegrationRuleResponse,
 )
 def put_constraint_integration_rule(
-    somersault_index: int,
+    phase_index: int,
     constraint_index: int,
     integration_rule: IntegrationRuleRequest,
 ):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["constraints"][constraint_index][
+    phases_info[phase_index]["constraints"][constraint_index][
         "integration_rule"
     ] = integration_rule.integration_rule.value
     update_acrobatics_data("phases_info", phases_info)
@@ -176,14 +168,14 @@ def put_constraint_integration_rule(
 
 
 @router.put(
-    "/{somersault_index}/constraints/{constraint_index}/multi_thread",
+    "/{phase_index}/constraints/{constraint_index}/multi_thread",
     response_model=MultiThreadResponse,
 )
 def put_constraint_multi_thread(
-    somersault_index: int, constraint_index: int, multi_thread: MultiThreadRequest
+    phase_index: int, constraint_index: int, multi_thread: MultiThreadRequest
 ):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["constraints"][constraint_index][
+    phases_info[phase_index]["constraints"][constraint_index][
         "multi_thread"
     ] = multi_thread.multi_thread
     update_acrobatics_data("phases_info", phases_info)
@@ -191,14 +183,12 @@ def put_constraint_multi_thread(
 
 
 @router.get(
-    "/{somersault_index}/constraints/{constraint_index}/arguments/{key}",
+    "/{phase_index}/constraints/{constraint_index}/arguments/{key}",
     response_model=ArgumentResponse,
 )
-def get_constraint_arguments(somersault_index: int, constraint_index: int, key: str):
+def get_constraint_arguments(phase_index: int, constraint_index: int, key: str):
     phases_info = read_acrobatics_data("phases_info")
-    arguments = phases_info[somersault_index]["constraints"][constraint_index][
-        "arguments"
-    ]
+    arguments = phases_info[phase_index]["constraints"][constraint_index]["arguments"]
 
     for argument in arguments:
         if argument["name"] == key:
@@ -213,26 +203,24 @@ def get_constraint_arguments(somersault_index: int, constraint_index: int, key: 
 
 
 @router.put(
-    "/{somersault_index}/constraints/{constraint_index}/arguments/{key}",
+    "/{phase_index}/constraints/{constraint_index}/arguments/{key}",
     response_model=ArgumentResponse,
 )
 def put_constraint_arguments(
-    somersault_index: int,
+    phase_index: int,
     constraint_index: int,
     key: str,
     argument_req: ArgumentRequest,
 ):
     phases_info = read_acrobatics_data("phases_info")
-    arguments = phases_info[somersault_index]["constraints"][constraint_index][
-        "arguments"
-    ]
+    arguments = phases_info[phase_index]["constraints"][constraint_index]["arguments"]
 
     for argument in arguments:
         if argument["name"] == key:
             argument["type"] = argument_req.type
             argument["value"] = argument_req.value
 
-            phases_info[somersault_index]["constraints"][constraint_index][
+            phases_info[phase_index]["constraints"][constraint_index][
                 "arguments"
             ] = arguments
             update_acrobatics_data("phases_info", phases_info)
