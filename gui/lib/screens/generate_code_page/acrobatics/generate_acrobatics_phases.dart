@@ -26,7 +26,7 @@ class SomersaultGenerationMenu extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 36),
               child: SizedBox(
                 width: width,
-                child: _buildSomersault(
+                child: _buildSomersaultPhase(
                   somersaultIndex: i,
                   width: width,
                 ),
@@ -37,7 +37,7 @@ class SomersaultGenerationMenu extends StatelessWidget {
     });
   }
 
-  Widget _buildSomersault({
+  Widget _buildSomersaultPhase({
     required int somersaultIndex,
     required double width,
   }) {
@@ -45,7 +45,7 @@ class SomersaultGenerationMenu extends StatelessWidget {
       return AnimatedExpandingWidget(
         header: Center(
           child: Text(
-            acrobaticsData.nbPhases > 1
+            acrobaticsData.phaseInfo.length > 1
                 ? 'Information on somersault ${somersaultIndex + 1}'
                 : 'Information on the somersault',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

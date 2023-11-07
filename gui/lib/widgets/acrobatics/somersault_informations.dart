@@ -18,7 +18,8 @@ class SomersaultInformation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<OCPData>(builder: (context, data, child) {
-      final somersault = (data.phaseInfo[somersaultIndex] as Somersault);
+      final somersaultPhase =
+          (data.phaseInfo[somersaultIndex] as SomersaultPhase);
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -28,7 +29,7 @@ class SomersaultInformation extends StatelessWidget {
                 width: width / 2 - 6,
                 child: PositiveIntegerTextField(
                   label: 'Number of shooting points',
-                  value: somersault.nbShootingPoints.toString(),
+                  value: somersaultPhase.nbShootingPoints.toString(),
                   onSubmitted: (newValue) {
                     if (newValue.isNotEmpty) {
                       data.updatePhaseField(
@@ -40,7 +41,7 @@ class SomersaultInformation extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: PositiveFloatTextField(
-                  value: somersault.duration.toString(),
+                  value: somersaultPhase.duration.toString(),
                   label: 'Phase time (s)',
                   onSubmitted: (newValue) {
                     if (newValue.isNotEmpty) {

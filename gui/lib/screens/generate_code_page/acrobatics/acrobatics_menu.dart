@@ -1,7 +1,7 @@
 import 'package:bioptim_gui/models/acrobatics_data.dart';
 import 'package:bioptim_gui/models/acrobatics_request_maker.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
-import 'package:bioptim_gui/screens/generate_code_page/acrobatics/generate_somersaults.dart';
+import 'package:bioptim_gui/screens/generate_code_page/acrobatics/generate_acrobatics_phases.dart';
 import 'package:bioptim_gui/widgets/acrobatics/acrobatic_bio_model_chooser.dart';
 import 'package:bioptim_gui/widgets/acrobatics/acrobatic_information.dart';
 import 'package:bioptim_gui/widgets/acrobatics/acrobatic_position_chooser.dart';

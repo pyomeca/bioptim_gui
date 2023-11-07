@@ -15,8 +15,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   String position;
   String sportType;
   String preferredTwistSide;
-
-  List<Somersault> somersaultInfo = [];
+  List<SomersaultPhase> phasesInfo = [];
 
   AcrobaticsData.fromJson(Map<String, dynamic> data)
       : _nbSomersaults = data["nb_somersaults"],
@@ -27,9 +26,8 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
         position = data["position"],
         sportType = data["sport_type"],
         preferredTwistSide = data["preferred_twist_side"],
-        somersaultInfo =
-            (data["phases_info"] as List<dynamic>).map((somersault) {
-          return Somersault.fromJson(somersault);
+        phasesInfo = (data["phases_info"] as List<dynamic>).map((somersault) {
+          return SomersaultPhase.fromJson(somersault);
         }).toList();
 
   ///
@@ -41,7 +39,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   }
 
   @override
-  List<Phase> get phaseInfo => somersaultInfo;
+  List<Phase> get phaseInfo => phasesInfo;
 
   @override
   String get modelPath => _modelPath;
@@ -103,10 +101,10 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
 
     switch (fieldName) {
       case "duration":
-        somersaultInfo[phaseIndex].duration = double.parse(newValue);
+        phasesInfo[phaseIndex].duration = double.parse(newValue);
         break;
       case "nb_shooting_points":
-        somersaultInfo[phaseIndex].nbShootingPoints = int.parse(newValue);
+        phasesInfo[phaseIndex].nbShootingPoints = int.parse(newValue);
         break;
       default:
         break;
@@ -123,7 +121,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
     position = newData.position;
     sportType = newData.sportType;
     preferredTwistSide = newData.preferredTwistSide;
-    somersaultInfo = List.from(newData.somersaultInfo);
+    phasesInfo = List.from(newData.phasesInfo);
 
     notifyListeners();
   }
@@ -132,10 +130,9 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   void updatePenalties(
       int somersaultIndex, String penaltyType, List<Penalty> penalties) {
     if (penaltyType == "objective") {
-      somersaultInfo[somersaultIndex].objectives = penalties as List<Objective>;
+      phasesInfo[somersaultIndex].objectives = penalties as List<Objective>;
     } else {
-      somersaultInfo[somersaultIndex].constraints =
-          penalties as List<Constraint>;
+      phasesInfo[somersaultIndex].constraints = penalties as List<Constraint>;
     }
     notifyListeners();
   }
@@ -144,10 +141,10 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   void updatePenalty(int somersaultIndex, String penaltyType, int penaltyIndex,
       Penalty penalty) {
     if (penaltyType == "objective") {
-      somersaultInfo[somersaultIndex].objectives[penaltyIndex] =
+      phasesInfo[somersaultIndex].objectives[penaltyIndex] =
           penalty as Objective;
     } else {
-      somersaultInfo[somersaultIndex].constraints[penaltyIndex] =
+      phasesInfo[somersaultIndex].constraints[penaltyIndex] =
           penalty as Constraint;
     }
 
@@ -156,8 +153,9 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
 
   @override
   void updatePhaseInfo(List newData) {
-    final newPhases = (newData).map((p) => Somersault.fromJson(p)).toList();
-    somersaultInfo = newPhases;
+    final newPhases =
+        (newData).map((p) => SomersaultPhase.fromJson(p)).toList();
+    phasesInfo = newPhases;
 
     notifyListeners();
   }
@@ -180,7 +178,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
     requestMaker.updatePenaltyArgument(phaseIndex, objectiveIndex, argumentName,
         newValue, argumentType, penaltyType);
 
-    somersaultInfo[phaseIndex]
+    phasesInfo[phaseIndex]
         .objectives[objectiveIndex]
         .arguments[argumentIndex]
         .value = newValue;
@@ -199,33 +197,33 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
 
     switch (fieldName) {
       case "target":
-        somersaultInfo[phaseIndex].objectives[penaltyIndex].target = newValue;
+        phasesInfo[phaseIndex].objectives[penaltyIndex].target = newValue;
         break;
       case "integration_rule":
-        somersaultInfo[phaseIndex].objectives[penaltyIndex].integrationRule =
+        phasesInfo[phaseIndex].objectives[penaltyIndex].integrationRule =
             newValue!;
         break;
       case "weight":
-        somersaultInfo[phaseIndex].objectives[penaltyIndex].weight =
+        phasesInfo[phaseIndex].objectives[penaltyIndex].weight =
             double.tryParse(newValue!) ?? 0.0;
         break;
       case "nodes":
-        somersaultInfo[phaseIndex].constraints[penaltyIndex].nodes = newValue!;
+        phasesInfo[phaseIndex].constraints[penaltyIndex].nodes = newValue!;
         break;
       case "quadratic":
-        somersaultInfo[phaseIndex].constraints[penaltyIndex].quadratic =
+        phasesInfo[phaseIndex].constraints[penaltyIndex].quadratic =
             newValue == "true";
         break;
       case "expand":
-        somersaultInfo[phaseIndex].constraints[penaltyIndex].expand =
+        phasesInfo[phaseIndex].constraints[penaltyIndex].expand =
             newValue == "true";
         break;
       case "multi_thread":
-        somersaultInfo[phaseIndex].constraints[penaltyIndex].multiThread =
+        phasesInfo[phaseIndex].constraints[penaltyIndex].multiThread =
             newValue == "true";
         break;
       case "derivative":
-        somersaultInfo[phaseIndex].constraints[penaltyIndex].derivative =
+        phasesInfo[phaseIndex].constraints[penaltyIndex].derivative =
             newValue == "true";
         break;
       default:
@@ -250,7 +248,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   }
 }
 
-class Somersault extends Phase {
-  Somersault.fromJson(Map<String, dynamic> somersaultData)
+class SomersaultPhase extends Phase {
+  SomersaultPhase.fromJson(Map<String, dynamic> somersaultData)
       : super.fromJson(somersaultData);
 }
