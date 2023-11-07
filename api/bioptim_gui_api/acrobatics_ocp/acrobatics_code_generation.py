@@ -19,7 +19,7 @@ def get_acrobatics_generated_code():
     # TODO generate a file with the correct DoF with model_converter
 
     somersaults = data["phases_info"]
-    half_twists = [s["nb_half_twists"] for s in somersaults]
+    half_twists = data["nb_half_twists"]
     total_half_twists = sum(half_twists)
 
     position = data["position"]

@@ -93,6 +93,46 @@ def test_put_nb_somersault():
     assert data["nb_half_twists"] == [0, 0]
 
 
+def test_put_nb_half_twists():
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nb_half_twists"] == [0]
+
+    response = client.put(
+        "/acrobatics/nb_half_twists/0",
+        json={"nb_half_twists": 1},
+    )
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nb_half_twists"] == [1]
+
+
+def test_put_nb_half_twists_wrong():
+    response = client.put(
+        "/acrobatics/nb_half_twists/0",
+        json={"nb_half_twists": -1},
+    )
+    assert response.status_code == 400, response
+
+    response = client.put(
+        "/acrobatics/nb_half_twists/0",
+        json={"nb_half_twists": 0},
+    )
+    assert response.status_code == 200, response
+
+
+def test_put_nb_half_twists_wrong_type():
+    response = client.put(
+        "/acrobatics/nb_half_twists/0",
+        json={"nb_half_twists": "wrong"},
+    )
+    assert response.status_code == 422, response
+
+
 def test_put_model_path():
     response = client.put("/acrobatics/model_path/", json={"model_path": "test/path"})
     assert response.status_code == 200, response
