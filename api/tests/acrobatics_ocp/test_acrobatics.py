@@ -262,10 +262,10 @@ def test_base_info():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["somersaults_info"]) == 1
-    assert data["somersaults_info"][0]["duration"] == 1
-    assert len(data["somersaults_info"][0]["objectives"]) == 2
-    assert len(data["somersaults_info"][0]["constraints"]) == 0
+    assert len(data["phases_info"]) == 1
+    assert data["phases_info"][0]["duration"] == 1
+    assert len(data["phases_info"][0]["objectives"]) == 2
+    assert len(data["phases_info"][0]["constraints"]) == 0
 
 
 def test_add_somersault():
@@ -283,13 +283,13 @@ def test_add_somersault():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["somersaults_info"]) == 2
-    assert data["somersaults_info"][0]["duration"] == 0.5
-    assert data["somersaults_info"][1]["duration"] == 0.5
-    assert len(data["somersaults_info"][0]["objectives"]) == 2
-    assert len(data["somersaults_info"][0]["constraints"]) == 0
-    assert len(data["somersaults_info"][1]["objectives"]) == 2
-    assert len(data["somersaults_info"][1]["constraints"]) == 0
+    assert len(data["phases_info"]) == 2
+    assert data["phases_info"][0]["duration"] == 0.5
+    assert data["phases_info"][1]["duration"] == 0.5
+    assert len(data["phases_info"][0]["objectives"]) == 2
+    assert len(data["phases_info"][0]["constraints"]) == 0
+    assert len(data["phases_info"][1]["objectives"]) == 2
+    assert len(data["phases_info"][1]["constraints"]) == 0
 
 
 def test_add_multiple_somersault():
@@ -308,11 +308,11 @@ def test_add_multiple_somersault():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["somersaults_info"]) == many
+    assert len(data["phases_info"]) == many
     for i in range(many):
-        assert data["somersaults_info"][i]["duration"] == 1 / many
-        assert len(data["somersaults_info"][i]["objectives"]) == 2
-        assert len(data["somersaults_info"][i]["constraints"]) == 0
+        assert data["phases_info"][i]["duration"] == 1 / many
+        assert len(data["phases_info"][i]["objectives"]) == 2
+        assert len(data["phases_info"][i]["constraints"]) == 0
 
 
 def test_add_odd_somersault_durations_are_rounded_2_digit():
@@ -331,11 +331,11 @@ def test_add_odd_somersault_durations_are_rounded_2_digit():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["somersaults_info"]) == many
+    assert len(data["phases_info"]) == many
     for i in range(many):
-        assert data["somersaults_info"][i]["duration"] == 0.33
-        assert len(data["somersaults_info"][i]["objectives"]) == 2
-        assert len(data["somersaults_info"][i]["constraints"]) == 0
+        assert data["phases_info"][i]["duration"] == 0.33
+        assert len(data["phases_info"][i]["objectives"]) == 2
+        assert len(data["phases_info"][i]["constraints"]) == 0
 
 
 def test_remove_one_somersault_2to1():
@@ -353,11 +353,11 @@ def test_remove_one_somersault_2to1():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["somersaults_info"]) == 2
+    assert len(data["phases_info"]) == 2
     for i in range(2):
-        assert data["somersaults_info"][i]["duration"] == 1 / 2
-        assert len(data["somersaults_info"][i]["objectives"]) == 2
-        assert len(data["somersaults_info"][i]["constraints"]) == 0
+        assert data["phases_info"][i]["duration"] == 1 / 2
+        assert len(data["phases_info"][i]["objectives"]) == 2
+        assert len(data["phases_info"][i]["constraints"]) == 0
 
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 1})
     assert response.status_code == 200, response
@@ -373,10 +373,10 @@ def test_remove_one_somersault_2to1():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["somersaults_info"]) == 1
-    assert data["somersaults_info"][0]["duration"] == 1
-    assert len(data["somersaults_info"][0]["objectives"]) == 2
-    assert len(data["somersaults_info"][0]["constraints"]) == 0
+    assert len(data["phases_info"]) == 1
+    assert data["phases_info"][0]["duration"] == 1
+    assert len(data["phases_info"][0]["objectives"]) == 2
+    assert len(data["phases_info"][0]["constraints"]) == 0
 
 
 def test_remove_single_somersault():
@@ -394,7 +394,7 @@ def test_remove_single_somersault():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["somersaults_info"]) == 0
+    assert len(data["phases_info"]) == 0
 
 
 def test_add_and_remove_multiple_somersault():
@@ -413,11 +413,11 @@ def test_add_and_remove_multiple_somersault():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["somersaults_info"]) == many
+    assert len(data["phases_info"]) == many
     for i in range(many):
-        assert data["somersaults_info"][i]["duration"] == round(1 / many, 2)
-        assert len(data["somersaults_info"][i]["objectives"]) == 2
-        assert len(data["somersaults_info"][i]["constraints"]) == 0
+        assert data["phases_info"][i]["duration"] == round(1 / many, 2)
+        assert len(data["phases_info"][i]["objectives"]) == 2
+        assert len(data["phases_info"][i]["constraints"]) == 0
 
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 1})
     assert response.status_code == 200, response
@@ -433,7 +433,7 @@ def test_add_and_remove_multiple_somersault():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["somersaults_info"]) == 1
-    assert data["somersaults_info"][0]["duration"] == 1
-    assert len(data["somersaults_info"][0]["objectives"]) == 2
-    assert len(data["somersaults_info"][0]["constraints"]) == 0
+    assert len(data["phases_info"]) == 1
+    assert data["phases_info"][0]["duration"] == 1
+    assert len(data["phases_info"][0]["objectives"]) == 2
+    assert len(data["phases_info"][0]["constraints"]) == 0

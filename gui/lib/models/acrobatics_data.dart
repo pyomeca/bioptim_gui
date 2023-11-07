@@ -26,7 +26,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
         sportType = data["sport_type"],
         preferredTwistSide = data["preferred_twist_side"],
         somersaultInfo =
-            (data["somersaults_info"] as List<dynamic>).map((somersault) {
+            (data["phases_info"] as List<dynamic>).map((somersault) {
           return Somersault.fromJson(somersault);
         }).toList();
 

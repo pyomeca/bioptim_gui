@@ -12,7 +12,7 @@ import 'package:http/http.dart' as http;
 /// class to reduce code duplication.
 /// example: the only thing that differs between the "generic OCP" and the
 /// "acrobatics OCP" is the endpoint beginning "generic_ocp/phases_info" or
-/// "acrobatics/somersaults_info".
+/// "acrobatics/phases_info".
 class OCPRequestMaker<T extends OCPData> {
   OCPRequestMaker({required this.prefix, required this.phaseInfoString});
 

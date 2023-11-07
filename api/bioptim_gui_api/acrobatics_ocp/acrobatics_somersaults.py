@@ -21,21 +21,21 @@ router.include_router(constraints_router)
 
 
 @router.get("/", response_model=list)
-def get_somersaults_info():
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    return somersaults_info
+def get_phases_info():
+    phases_info = read_acrobatics_data("phases_info")
+    return phases_info
 
 
 @router.get("/{somersault_index}", response_model=dict)
-def get_somersaults_info(somersault_index: int):
+def get_phases_info(somersault_index: int):
     n_somersaults = read_acrobatics_data("nb_somersaults")
     if somersault_index < 0 or somersault_index >= n_somersaults:
         raise HTTPException(
             status_code=404,
             detail=f"somersault_index must be between 0 and {n_somersaults - 1}",
         )
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    return somersaults_info[somersault_index]
+    phases_info = read_acrobatics_data("phases_info")
+    return phases_info[somersault_index]
 
 
 @router.put(
@@ -49,11 +49,11 @@ def put_nb_shooting_points(
         raise HTTPException(
             status_code=400, detail="nb_shooting_points must be positive"
         )
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    somersaults_info[somersault_index][
+    phases_info = read_acrobatics_data("phases_info")
+    phases_info[somersault_index][
         "nb_shooting_points"
     ] = nb_shooting_points.nb_shooting_points
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    update_acrobatics_data("phases_info", phases_info)
     return NbShootingPointsResponse(
         nb_shooting_points=nb_shooting_points.nb_shooting_points
     )
@@ -67,10 +67,10 @@ def put_duration(somersault_index: int, duration: SomersaultDurationRequest):
     if duration.duration <= 0:
         raise HTTPException(status_code=400, detail="duration must be positive")
     infos = read_acrobatics_data()
-    somersaults_info = infos["somersaults_info"]
-    somersaults_info[somersault_index]["duration"] = duration.duration
-    infos["final_time"] = sum(somersault["duration"] for somersault in somersaults_info)
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    phases_info = infos["phases_info"]
+    phases_info[somersault_index]["duration"] = duration.duration
+    infos["final_time"] = sum(somersault["duration"] for somersault in phases_info)
+    update_acrobatics_data("phases_info", phases_info)
     update_acrobatics_data("final_time", infos["final_time"])
     return SomersaultDurationResponse(duration=duration.duration)
 
@@ -84,7 +84,7 @@ def put_nb_half_twist(somersault_index: int, nb_half_twists: NbHalfTwistsRequest
         raise HTTPException(
             status_code=400, detail="nb_half_twists must be positive or zero"
         )
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    somersaults_info[somersault_index]["nb_half_twists"] = nb_half_twists.nb_half_twists
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    phases_info = read_acrobatics_data("phases_info")
+    phases_info[somersault_index]["nb_half_twists"] = nb_half_twists.nb_half_twists
+    update_acrobatics_data("phases_info", phases_info)
     return NbHalfTwistsResponse(nb_half_twists=nb_half_twists.nb_half_twists)

@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 
 class AcrobaticsRequestMaker extends OCPRequestMaker<AcrobaticsData> {
   AcrobaticsRequestMaker()
-      : super(prefix: 'acrobatics', phaseInfoString: 'somersaults_info');
+      : super(prefix: 'acrobatics', phaseInfoString: 'phases_info');
 
   Future<AcrobaticsData> fetchData() async {
     final url = Uri.parse('${APIConfig.url}/$prefix');

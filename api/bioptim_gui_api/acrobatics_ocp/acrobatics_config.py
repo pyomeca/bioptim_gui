@@ -1,7 +1,7 @@
 class DefaultAcrobaticsConfig:
     datafile = "acrobatics_data.json"
 
-    default_somersaults_info = {
+    default_phases_info = {
         "nb_shooting_points": 24,
         "nb_half_twists": 0,
         "duration": 1.0,
@@ -49,5 +49,5 @@ class DefaultAcrobaticsConfig:
         "position": "straight",
         "sport_type": "trampoline",
         "preferred_twist_side": "left",
-        "somersaults_info": [default_somersaults_info.copy()],
+        "phases_info": [default_phases_info.copy()],
     }

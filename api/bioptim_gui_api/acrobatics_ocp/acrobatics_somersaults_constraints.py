@@ -15,18 +15,18 @@ router = APIRouter()
 
 @router.get("/{somersault_index}/constraints", response_model=list)
 def get_constraints(somersault_index: int):
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    constraints = somersaults_info[somersault_index]["constraints"]
+    phases_info = read_acrobatics_data("phases_info")
+    constraints = phases_info[somersault_index]["constraints"]
     return constraints
 
 
 @router.post("/{somersault_index}/constraints", response_model=list)
 def add_constraint(somersault_index: int):
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    constraints = somersaults_info[somersault_index]["constraints"]
+    phases_info = read_acrobatics_data("phases_info")
+    constraints = phases_info[somersault_index]["constraints"]
     constraints.append(penalty_config.DefaultPenaltyConfig.default_constraint)
-    somersaults_info[somersault_index]["constraints"] = constraints
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    phases_info[somersault_index]["constraints"] = constraints
+    update_acrobatics_data("phases_info", phases_info)
     return constraints
 
 
@@ -49,11 +49,11 @@ def get_constraints_dropdown_list():
     response_model=list,
 )
 def delete_constraint(somersault_index: int, constraint_index: int):
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    constraints = somersaults_info[somersault_index]["constraints"]
+    phases_info = read_acrobatics_data("phases_info")
+    constraints = phases_info[somersault_index]["constraints"]
     constraints.pop(constraint_index)
-    somersaults_info[somersault_index]["constraints"] = constraints
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    phases_info[somersault_index]["constraints"] = constraints
+    update_acrobatics_data("phases_info", phases_info)
     return constraints
 
 
@@ -68,19 +68,19 @@ def put_constraint_penalty_type(
     somersault_index: int, constraint_index: int, penalty_type: ConstraintFcnRequest
 ):
     penalty_type_value = penalty_type.penalty_type
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    somersaults_info[somersault_index]["constraints"][constraint_index][
+    phases_info = read_acrobatics_data("phases_info")
+    phases_info[somersault_index]["constraints"][constraint_index][
         "penalty_type"
     ] = penalty_type_value
 
     arguments = constraint_arguments(penalty_type.penalty_type)
-    somersaults_info[somersault_index]["constraints"][constraint_index][
+    phases_info[somersault_index]["constraints"][constraint_index][
         "arguments"
     ] = arguments
 
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    update_acrobatics_data("phases_info", phases_info)
     data = read_acrobatics_data()
-    return data["somersaults_info"][somersault_index]["constraints"][constraint_index]
+    return data["phases_info"][somersault_index]["constraints"][constraint_index]
 
 
 @router.put(
@@ -90,11 +90,11 @@ def put_constraint_penalty_type(
 def put_constraint_nodes(
     somersault_index: int, constraint_index: int, nodes: NodesRequest
 ):
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    somersaults_info[somersault_index]["constraints"][constraint_index][
+    phases_info = read_acrobatics_data("phases_info")
+    phases_info[somersault_index]["constraints"][constraint_index][
         "nodes"
     ] = nodes.nodes.value
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    update_acrobatics_data("phases_info", phases_info)
     return NodesResponse(nodes=nodes.nodes)
 
 
@@ -105,11 +105,11 @@ def put_constraint_nodes(
 def put_constraint_quadratic(
     somersault_index: int, constraint_index: int, quadratic: QuadraticRequest
 ):
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    somersaults_info[somersault_index]["constraints"][constraint_index][
+    phases_info = read_acrobatics_data("phases_info")
+    phases_info[somersault_index]["constraints"][constraint_index][
         "quadratic"
     ] = quadratic.quadratic
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    update_acrobatics_data("phases_info", phases_info)
     return QuadraticResponse(quadratic=quadratic.quadratic)
 
 
@@ -120,11 +120,11 @@ def put_constraint_quadratic(
 def put_constraint_expand(
     somersault_index: int, constraint_index: int, expand: ExpandRequest
 ):
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    somersaults_info[somersault_index]["constraints"][constraint_index][
+    phases_info = read_acrobatics_data("phases_info")
+    phases_info[somersault_index]["constraints"][constraint_index][
         "expand"
     ] = expand.expand
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    update_acrobatics_data("phases_info", phases_info)
     return ExpandResponse(expand=expand.expand)
 
 
@@ -135,11 +135,11 @@ def put_constraint_expand(
 def put_constraint_target(
     somersault_index: int, constraint_index: int, target: TargetRequest
 ):
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    somersaults_info[somersault_index]["constraints"][constraint_index][
+    phases_info = read_acrobatics_data("phases_info")
+    phases_info[somersault_index]["constraints"][constraint_index][
         "target"
     ] = target.target
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    update_acrobatics_data("phases_info", phases_info)
     return TargetResponse(target=target.target)
 
 
@@ -150,11 +150,11 @@ def put_constraint_target(
 def put_constraint_derivative(
     somersault_index: int, constraint_index: int, derivative: DerivativeRequest
 ):
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    somersaults_info[somersault_index]["constraints"][constraint_index][
+    phases_info = read_acrobatics_data("phases_info")
+    phases_info[somersault_index]["constraints"][constraint_index][
         "derivative"
     ] = derivative.derivative
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    update_acrobatics_data("phases_info", phases_info)
     return DerivativeResponse(derivative=derivative.derivative)
 
 
@@ -167,11 +167,11 @@ def put_constraint_integration_rule(
     constraint_index: int,
     integration_rule: IntegrationRuleRequest,
 ):
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    somersaults_info[somersault_index]["constraints"][constraint_index][
+    phases_info = read_acrobatics_data("phases_info")
+    phases_info[somersault_index]["constraints"][constraint_index][
         "integration_rule"
     ] = integration_rule.integration_rule.value
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    update_acrobatics_data("phases_info", phases_info)
     return IntegrationRuleResponse(integration_rule=integration_rule.integration_rule)
 
 
@@ -182,11 +182,11 @@ def put_constraint_integration_rule(
 def put_constraint_multi_thread(
     somersault_index: int, constraint_index: int, multi_thread: MultiThreadRequest
 ):
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    somersaults_info[somersault_index]["constraints"][constraint_index][
+    phases_info = read_acrobatics_data("phases_info")
+    phases_info[somersault_index]["constraints"][constraint_index][
         "multi_thread"
     ] = multi_thread.multi_thread
-    update_acrobatics_data("somersaults_info", somersaults_info)
+    update_acrobatics_data("phases_info", phases_info)
     return MultiThreadResponse(multi_thread=multi_thread.multi_thread)
 
 
@@ -195,8 +195,8 @@ def put_constraint_multi_thread(
     response_model=ArgumentResponse,
 )
 def get_constraint_arguments(somersault_index: int, constraint_index: int, key: str):
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    arguments = somersaults_info[somersault_index]["constraints"][constraint_index][
+    phases_info = read_acrobatics_data("phases_info")
+    arguments = phases_info[somersault_index]["constraints"][constraint_index][
         "arguments"
     ]
 
@@ -222,8 +222,8 @@ def put_constraint_arguments(
     key: str,
     argument_req: ArgumentRequest,
 ):
-    somersaults_info = read_acrobatics_data("somersaults_info")
-    arguments = somersaults_info[somersault_index]["constraints"][constraint_index][
+    phases_info = read_acrobatics_data("phases_info")
+    arguments = phases_info[somersault_index]["constraints"][constraint_index][
         "arguments"
     ]
 
@@ -232,10 +232,10 @@ def put_constraint_arguments(
             argument["type"] = argument_req.type
             argument["value"] = argument_req.value
 
-            somersaults_info[somersault_index]["constraints"][constraint_index][
+            phases_info[somersault_index]["constraints"][constraint_index][
                 "arguments"
             ] = arguments
-            update_acrobatics_data("somersaults_info", somersaults_info)
+            update_acrobatics_data("phases_info", phases_info)
 
             return ArgumentResponse(
                 key=key, type=argument["type"], value=argument["value"]

@@ -84,8 +84,8 @@ def test_generate_code_position_no_objective_no_constraint(position):
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
     assert response.status_code != 400, response
 
-    client.delete("/acrobatics/somersaults_info/0/objectives/0")
-    client.delete("/acrobatics/somersaults_info/0/objectives/0")
+    client.delete("/acrobatics/phases_info/0/objectives/0")
+    client.delete("/acrobatics/phases_info/0/objectives/0")
 
     with open(
         f"acrobatics_ocp/generated_examples/{position}/base_{position}_no_objectives_no_constraints.txt",
@@ -122,8 +122,8 @@ def test_generate_code_position_objective_and_constraint(position):
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
     assert response.status_code != 400, response
 
-    client.post("/acrobatics/somersaults_info/0/constraints")
-    client.post("/acrobatics/somersaults_info/0/constraints")
+    client.post("/acrobatics/phases_info/0/constraints")
+    client.post("/acrobatics/phases_info/0/constraints")
 
     with open(
         f"acrobatics_ocp/generated_examples/{position}/{position}_constraint_and_objective.txt",
@@ -162,10 +162,10 @@ def test_generate_code_2_phase_position_objective_and_constraint(position):
 
     client.put("/acrobatics/nb_somersaults", json={"nb_somersaults": 2})
 
-    client.post("/acrobatics/somersaults_info/0/constraints")
-    client.post("/acrobatics/somersaults_info/0/constraints")
-    client.post("/acrobatics/somersaults_info/1/constraints")
-    client.post("/acrobatics/somersaults_info/1/constraints")
+    client.post("/acrobatics/phases_info/0/constraints")
+    client.post("/acrobatics/phases_info/0/constraints")
+    client.post("/acrobatics/phases_info/1/constraints")
+    client.post("/acrobatics/phases_info/1/constraints")
 
     with open(
         f"acrobatics_ocp/generated_examples/{position}/{position}_two_phases_obj_constraints.txt",
@@ -202,63 +202,63 @@ def test_generate_code_modified_objective_and_constraint(position):
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
     assert response.status_code != 400, response
 
-    client.post("/acrobatics/somersaults_info/0/constraints")
+    client.post("/acrobatics/phases_info/0/constraints")
     response = client.put(
-        "acrobatics/somersaults_info/0/constraints/0/quadratic",
+        "acrobatics/phases_info/0/constraints/0/quadratic",
         json={"quadratic": False},
     )
     assert response.status_code == 200
 
     response = client.put(
-        "acrobatics/somersaults_info/0/constraints/0/expand", json={"expand": False}
+        "acrobatics/phases_info/0/constraints/0/expand", json={"expand": False}
     )
     assert response.status_code == 200
     response = client.put(
-        "acrobatics/somersaults_info/0/constraints/0/multi_thread",
+        "acrobatics/phases_info/0/constraints/0/multi_thread",
         json={"multi_thread": True},
     )
     assert response.status_code == 200
     response = client.put(
-        "acrobatics/somersaults_info/0/constraints/0/derivative",
+        "acrobatics/phases_info/0/constraints/0/derivative",
         json={"derivative": True},
     )
     assert response.status_code == 200
     response = client.put(
-        "acrobatics/somersaults_info/0/constraints/0/target",
+        "acrobatics/phases_info/0/constraints/0/target",
         json={"target": [5.5, 3.14]},
     )
     assert response.status_code == 200
     response = client.put(
-        "acrobatics/somersaults_info/0/constraints/0/integration_rule",
+        "acrobatics/phases_info/0/constraints/0/integration_rule",
         json={"integration_rule": "approximate_trapezoidal"},
     )
     assert response.status_code == 200
 
     response = client.put(
-        "acrobatics/somersaults_info/0/objectives/0/quadratic",
+        "acrobatics/phases_info/0/objectives/0/quadratic",
         json={"quadratic": False},
     )
     assert response.status_code == 200
     response = client.put(
-        "acrobatics/somersaults_info/0/objectives/0/expand", json={"expand": False}
+        "acrobatics/phases_info/0/objectives/0/expand", json={"expand": False}
     )
     assert response.status_code == 200
     response = client.put(
-        "acrobatics/somersaults_info/0/objectives/0/multi_thread",
+        "acrobatics/phases_info/0/objectives/0/multi_thread",
         json={"multi_thread": True},
     )
     assert response.status_code == 200
     response = client.put(
-        "acrobatics/somersaults_info/0/objectives/0/derivative",
+        "acrobatics/phases_info/0/objectives/0/derivative",
         json={"derivative": True},
     )
     assert response.status_code == 200
     response = client.put(
-        "acrobatics/somersaults_info/0/objectives/0/target", json={"target": [1.0, 0.0]}
+        "acrobatics/phases_info/0/objectives/0/target", json={"target": [1.0, 0.0]}
     )
     assert response.status_code == 200
     response = client.put(
-        "acrobatics/somersaults_info/0/objectives/0/integration_rule",
+        "acrobatics/phases_info/0/objectives/0/integration_rule",
         json={"integration_rule": "midpoint"},
     )
     assert response.status_code == 200

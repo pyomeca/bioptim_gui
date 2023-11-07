@@ -29,8 +29,8 @@ def run_for_all():
     os.remove(datafile)
 
 
-def test_get_somersaults_info():
-    response = client.get("/acrobatics/somersaults_info/")
+def test_get_phases_info():
+    response = client.get("/acrobatics/phases_info/")
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 1
@@ -39,7 +39,7 @@ def test_get_somersaults_info():
     assert len(data[0]["constraints"]) == 0
 
     client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
-    response = client.get("/acrobatics/somersaults_info/")
+    response = client.get("/acrobatics/phases_info/")
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 2
@@ -49,7 +49,7 @@ def test_get_somersaults_info():
 
 
 def test_get_somersault_with_index():
-    response = client.get("/acrobatics/somersaults_info/0")
+    response = client.get("/acrobatics/phases_info/0")
     assert response.status_code == 200, response
     data = response.json()
     assert data["duration"] == 1
@@ -58,23 +58,23 @@ def test_get_somersault_with_index():
 
 
 def test_get_somersault_with_index_wrong():
-    response = client.get("/acrobatics/somersaults_info/1")
+    response = client.get("/acrobatics/phases_info/1")
     assert response.status_code == 404, response
 
 
 def test_put_shooting_points():
-    response = client.get("/acrobatics/somersaults_info/0")
+    response = client.get("/acrobatics/phases_info/0")
     assert response.status_code == 200, response
     data = response.json()
     assert data["nb_shooting_points"] == 24
 
     response = client.put(
-        "/acrobatics/somersaults_info/0/nb_shooting_points",
+        "/acrobatics/phases_info/0/nb_shooting_points",
         json={"nb_shooting_points": 10},
     )
     assert response.status_code == 200, response
 
-    response = client.get("/acrobatics/somersaults_info/0")
+    response = client.get("/acrobatics/phases_info/0")
     assert response.status_code == 200, response
     data = response.json()
     assert data["nb_shooting_points"] == 10
@@ -82,13 +82,13 @@ def test_put_shooting_points():
 
 def test_put_shooting_points_wrong():
     response = client.put(
-        "/acrobatics/somersaults_info/0/nb_shooting_points",
+        "/acrobatics/phases_info/0/nb_shooting_points",
         json={"nb_shooting_points": -10},
     )
     assert response.status_code == 400, response
 
     response = client.put(
-        "/acrobatics/somersaults_info/0/nb_shooting_points",
+        "/acrobatics/phases_info/0/nb_shooting_points",
         json={"nb_shooting_points": 0},
     )
     assert response.status_code == 400, response
@@ -96,7 +96,7 @@ def test_put_shooting_points_wrong():
 
 def test_put_shooting_points_wrong_type():
     response = client.put(
-        "/acrobatics/somersaults_info/0/nb_shooting_points",
+        "/acrobatics/phases_info/0/nb_shooting_points",
         json={"nb_shooting_points": "wrong"},
     )
     assert response.status_code == 422, response
@@ -110,12 +110,12 @@ def test_put_shooting_points_unchanged_other_somersaults():
     assert response.status_code == 200, response
 
     response = client.put(
-        "/acrobatics/somersaults_info/0/nb_shooting_points",
+        "/acrobatics/phases_info/0/nb_shooting_points",
         json={"nb_shooting_points": 10},
     )
     assert response.status_code == 200, response
 
-    response = client.get("/acrobatics/somersaults_info")
+    response = client.get("/acrobatics/phases_info")
     assert response.status_code == 200, response
     data = response.json()
     assert data[0]["nb_shooting_points"] == 10
@@ -123,18 +123,18 @@ def test_put_shooting_points_unchanged_other_somersaults():
 
 
 def test_put_somersault_duration():
-    response = client.get("/acrobatics/somersaults_info/0")
+    response = client.get("/acrobatics/phases_info/0")
     assert response.status_code == 200, response
     data = response.json()
     assert data["duration"] == 1
 
     response = client.put(
-        "/acrobatics/somersaults_info/0/duration",
+        "/acrobatics/phases_info/0/duration",
         json={"duration": 0.5},
     )
     assert response.status_code == 200, response
 
-    response = client.get("/acrobatics/somersaults_info/0")
+    response = client.get("/acrobatics/phases_info/0")
     assert response.status_code == 200, response
     data = response.json()
     assert data["duration"] == 0.5
@@ -142,13 +142,13 @@ def test_put_somersault_duration():
 
 def test_put_somersault_duration_wrong():
     response = client.put(
-        "/acrobatics/somersaults_info/0/duration",
+        "/acrobatics/phases_info/0/duration",
         json={"duration": -0.5},
     )
     assert response.status_code == 400, response
 
     response = client.put(
-        "/acrobatics/somersaults_info/0/duration",
+        "/acrobatics/phases_info/0/duration",
         json={"duration": 0},
     )
     assert response.status_code == 400, response
@@ -156,7 +156,7 @@ def test_put_somersault_duration_wrong():
 
 def test_put_somersault_duration_wrong_type():
     response = client.put(
-        "/acrobatics/somersaults_info/0/duration",
+        "/acrobatics/phases_info/0/duration",
         json={"duration": "wrong"},
     )
     assert response.status_code == 422, response
@@ -170,12 +170,12 @@ def test_put_somersault_duration_unchanged_other_somersaults():
     assert response.status_code == 200, response
 
     response = client.put(
-        "/acrobatics/somersaults_info/0/duration",
+        "/acrobatics/phases_info/0/duration",
         json={"duration": 0.2},
     )
     assert response.status_code == 200, response
 
-    response = client.get("/acrobatics/somersaults_info")
+    response = client.get("/acrobatics/phases_info")
     assert response.status_code == 200, response
     data = response.json()
     assert data[0]["duration"] == 0.2
@@ -184,7 +184,7 @@ def test_put_somersault_duration_unchanged_other_somersaults():
 
 def test_put_somersault_duration_changes_final_time_simple_more():
     response = client.put(
-        "/acrobatics/somersaults_info/0/duration",
+        "/acrobatics/phases_info/0/duration",
         json={"duration": 1.2},
     )
     assert response.status_code == 200, response
@@ -197,7 +197,7 @@ def test_put_somersault_duration_changes_final_time_simple_more():
 
 def test_put_somersault_duration_changes_final_time_simple_less():
     response = client.put(
-        "/acrobatics/somersaults_info/0/duration",
+        "/acrobatics/phases_info/0/duration",
         json={"duration": 0.2},
     )
     assert response.status_code == 200, response
@@ -213,12 +213,12 @@ def test_put_somersault_duration_changes_final_time_simple_more_multiple():
     assert response.status_code == 200, response
 
     client.put(
-        "/acrobatics/somersaults_info/0/duration",
+        "/acrobatics/phases_info/0/duration",
         json={"duration": 1.2},
     )
 
     response = client.put(
-        "/acrobatics/somersaults_info/1/duration",
+        "/acrobatics/phases_info/1/duration",
         json={"duration": 0.6},
     )
     # durations : 1.2, 0.6, 0.2, 0.2, 0.2, final_time = 2.4
@@ -236,12 +236,12 @@ def test_put_somersault_duration_changes_final_time_simple_less_multiple():
     assert response.status_code == 200, response
 
     client.put(
-        "/acrobatics/somersaults_info/0/duration",
+        "/acrobatics/phases_info/0/duration",
         json={"duration": 0.1},
     )
 
     response = client.put(
-        "/acrobatics/somersaults_info/1/duration",
+        "/acrobatics/phases_info/1/duration",
         json={"duration": 0.1},
     )
     # durations : 0.1, 0.1, 0.2, 0.2, 0.2 final_time = 0.8
@@ -255,18 +255,18 @@ def test_put_somersault_duration_changes_final_time_simple_less_multiple():
 
 
 def test_put_nb_half_twists():
-    response = client.get("/acrobatics/somersaults_info/0")
+    response = client.get("/acrobatics/phases_info/0")
     assert response.status_code == 200, response
     data = response.json()
     assert data["nb_half_twists"] == 0
 
     response = client.put(
-        "/acrobatics/somersaults_info/0/nb_half_twists",
+        "/acrobatics/phases_info/0/nb_half_twists",
         json={"nb_half_twists": 1},
     )
     assert response.status_code == 200, response
 
-    response = client.get("/acrobatics/somersaults_info/0")
+    response = client.get("/acrobatics/phases_info/0")
     assert response.status_code == 200, response
     data = response.json()
     assert data["nb_half_twists"] == 1
@@ -274,13 +274,13 @@ def test_put_nb_half_twists():
 
 def test_put_nb_half_twists_wrong():
     response = client.put(
-        "/acrobatics/somersaults_info/0/nb_half_twists",
+        "/acrobatics/phases_info/0/nb_half_twists",
         json={"nb_half_twists": -1},
     )
     assert response.status_code == 400, response
 
     response = client.put(
-        "/acrobatics/somersaults_info/0/nb_half_twists",
+        "/acrobatics/phases_info/0/nb_half_twists",
         json={"nb_half_twists": 0},
     )
     assert response.status_code == 200, response
@@ -288,7 +288,7 @@ def test_put_nb_half_twists_wrong():
 
 def test_put_nb_half_twists_wrong_type():
     response = client.put(
-        "/acrobatics/somersaults_info/0/nb_half_twists",
+        "/acrobatics/phases_info/0/nb_half_twists",
         json={"nb_half_twists": "wrong"},
     )
     assert response.status_code == 422, response

@@ -14,8 +14,7 @@ router = APIRouter(
 )
 router.include_router(
     acrobatics_somersaults.router,
-    prefix="/somersaults_info",
-    tags=["somersaults"],
+    prefix="/phases_info",
     responses={404: {"description": "Not found"}},
 )
 router.include_router(acrobatics_code_generation.router)
@@ -27,18 +26,18 @@ def add_somersault_info(n: int = 1) -> None:
         raise ValueError("n must be positive")
 
     data = read_acrobatics_data()
-    somersaults_info = data["somersaults_info"]
-    before = len(somersaults_info)
+    phases_info = data["phases_info"]
+    before = len(phases_info)
     n_somersaults = before + n
     final_time = data["final_time"]
     for i in range(0, before):
-        somersaults_info[i]["duration"] = round(final_time / n_somersaults, 2)
+        phases_info[i]["duration"] = round(final_time / n_somersaults, 2)
 
     for i in range(before, before + n):
-        somersaults_info.append(config.DefaultAcrobaticsConfig.default_somersaults_info)
-        somersaults_info[i]["duration"] = round(final_time / n_somersaults, 2)
+        phases_info.append(config.DefaultAcrobaticsConfig.default_phases_info)
+        phases_info[i]["duration"] = round(final_time / n_somersaults, 2)
 
-    data["somersaults_info"] = somersaults_info
+    data["phases_info"] = phases_info
     with open(config.DefaultAcrobaticsConfig.datafile, "w") as f:
         json.dump(data, f)
 
@@ -47,16 +46,16 @@ def remove_somersault_info(n: int = 0) -> None:
     if n < 0:
         raise ValueError("n must be positive")
     data = read_acrobatics_data()
-    somersaults_info = data["somersaults_info"]
-    before = len(somersaults_info)
+    phases_info = data["phases_info"]
+    before = len(phases_info)
     n_somersaults = before - n
     final_time = data["final_time"]
     for i in range(0, n_somersaults):
-        somersaults_info[i]["duration"] = round(final_time / n_somersaults, 2)
+        phases_info[i]["duration"] = round(final_time / n_somersaults, 2)
 
     for _ in range(n):
-        somersaults_info.pop()
-    data["somersaults_info"] = somersaults_info
+        phases_info.pop()
+    data["phases_info"] = phases_info
     with open(config.DefaultAcrobaticsConfig.datafile, "w") as f:
         json.dump(data, f)
 

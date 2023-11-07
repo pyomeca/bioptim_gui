@@ -30,14 +30,14 @@ def run_for_all():
 
 
 def test_get_constraints():
-    response = client.get("/acrobatics/somersaults_info/0/constraints")
+    response = client.get("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 0
 
 
 def test_post_constraint():
-    response = client.post("/acrobatics/somersaults_info/0/constraints")
+    response = client.post("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 1
@@ -53,7 +53,7 @@ def test_post_constraint():
 
 def test_post_constraint_multiple():
     for i in range(8):
-        response = client.post("/acrobatics/somersaults_info/0/constraints")
+        response = client.post("/acrobatics/phases_info/0/constraints")
         assert response.status_code == 200, response
         data = response.json()
         assert len(data) == i + 1
@@ -68,17 +68,17 @@ def test_post_constraint_multiple():
 
 
 def test_delete_constraint_0():
-    response = client.post("/acrobatics/somersaults_info/0/constraints")
+    response = client.post("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 1
 
-    response = client.delete("/acrobatics/somersaults_info/0/constraints/0")
+    response = client.delete("/acrobatics/phases_info/0/constraints/0")
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 0
 
-    response = client.get("/acrobatics/somersaults_info/0/constraints")
+    response = client.get("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 0
@@ -102,49 +102,49 @@ def test_delete_constraint_0():
     ],
 )
 def test_put_constraints_common_argument(key, default_value, new_value):
-    response = client.post("/acrobatics/somersaults_info/0/constraints")
+    response = client.post("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 1
 
-    response = client.get("/acrobatics/somersaults_info/0/constraints")
+    response = client.get("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
     data = response.json()
     assert data[0][key] == default_value
 
     response = client.put(
-        f"/acrobatics/somersaults_info/0/constraints/0/{key}",
+        f"/acrobatics/phases_info/0/constraints/0/{key}",
         json={key: new_value},
     )
     assert response.status_code == 200, response
 
-    response = client.get("/acrobatics/somersaults_info/0/constraints")
+    response = client.get("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
     data = response.json()
     assert data[0][key] == new_value
 
 
 def test_remove_constraints_fields_delete():
-    response = client.post("/acrobatics/somersaults_info/0/constraints")
+    response = client.post("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
 
     client.put(
-        "/acrobatics/somersaults_info/0/constraints/0/penalty_type",
+        "/acrobatics/phases_info/0/constraints/0/penalty_type",
         json={"penalty_type": "CONTINUITY"},
     )
 
-    response = client.delete("/acrobatics/somersaults_info/0/constraints/0")
+    response = client.delete("/acrobatics/phases_info/0/constraints/0")
     assert response.status_code == 200, response
 
-    response = client.get("/acrobatics/somersaults_info/0/constraints")
+    response = client.get("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 0
 
-    response = client.post("/acrobatics/somersaults_info/0/constraints")
+    response = client.post("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
 
-    response = client.get("/acrobatics/somersaults_info/0/constraints")
+    response = client.get("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 1
@@ -152,22 +152,22 @@ def test_remove_constraints_fields_delete():
 
 
 def test_add_constraints_check_arguments_changing_penalty_type():
-    response = client.post("/acrobatics/somersaults_info/0/constraints")
+    response = client.post("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
 
-    response = client.get("/acrobatics/somersaults_info/0/constraints")
+    response = client.get("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 1
     assert len(data[0]["arguments"]) == 0
 
     response = client.put(
-        "/acrobatics/somersaults_info/0/constraints/0/penalty_type",
+        "/acrobatics/phases_info/0/constraints/0/penalty_type",
         json={"penalty_type": "TRACK_POWER"},
     )
     assert response.status_code == 200, response
 
-    response = client.get("/acrobatics/somersaults_info/0/constraints")
+    response = client.get("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 1
@@ -176,17 +176,17 @@ def test_add_constraints_check_arguments_changing_penalty_type():
 
 
 def test_get_arguments_constraint():
-    response = client.post("/acrobatics/somersaults_info/0/constraints")
+    response = client.post("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
 
     response = client.put(
-        "/acrobatics/somersaults_info/0/constraints/0/penalty_type",
+        "/acrobatics/phases_info/0/constraints/0/penalty_type",
         json={"penalty_type": "TRACK_POWER"},
     )
     assert response.status_code == 200, response
 
     response = client.get(
-        "/acrobatics/somersaults_info/0/constraints/0/arguments/key_control",
+        "/acrobatics/phases_info/0/constraints/0/arguments/key_control",
     )
     assert response.status_code == 200, response
     data = response.json()
@@ -194,33 +194,33 @@ def test_get_arguments_constraint():
 
 
 def test_get_arguments_constraint_bad():
-    client.post("/acrobatics/somersaults_info/0/constraints")
+    client.post("/acrobatics/phases_info/0/constraints")
     client.put(
-        "/acrobatics/somersaults_info/0/constraints/0/penalty_type",
+        "/acrobatics/phases_info/0/constraints/0/penalty_type",
         json={"penalty_type": "TRACK_POWER"},
     )
 
     response = client.get(
-        "/acrobatics/somersaults_info/0/constraints/0/arguments/impossible",
+        "/acrobatics/phases_info/0/constraints/0/arguments/impossible",
     )
     assert response.status_code == 404, response
 
 
 def test_put_arguments_constraint():
-    client.post("/acrobatics/somersaults_info/0/constraints")
+    client.post("/acrobatics/phases_info/0/constraints")
     client.put(
-        "/acrobatics/somersaults_info/0/constraints/0/penalty_type",
+        "/acrobatics/phases_info/0/constraints/0/penalty_type",
         json={"penalty_type": "TRACK_POWER"},
     )
 
     response = client.put(
-        "/acrobatics/somersaults_info/0/constraints/0/arguments/key_control",
+        "/acrobatics/phases_info/0/constraints/0/arguments/key_control",
         json={"type": "list", "value": [1, 2, 3]},
     )
     assert response.status_code == 200, response
 
     response = client.get(
-        "/acrobatics/somersaults_info/0/constraints/0/arguments/key_control",
+        "/acrobatics/phases_info/0/constraints/0/arguments/key_control",
     )
     assert response.status_code == 200, response
     data = response.json()
@@ -229,20 +229,20 @@ def test_put_arguments_constraint():
 
 
 def test_put_arguments_constraint_bad():
-    client.post("/acrobatics/somersaults_info/0/constraints")
+    client.post("/acrobatics/phases_info/0/constraints")
 
     response = client.put(
-        "/acrobatics/somersaults_info/0/constraints/0/arguments/impossible",
+        "/acrobatics/phases_info/0/constraints/0/arguments/impossible",
         json={"type": "list", "value": [1, 2, 3]},
     )
     assert response.status_code == 404, response
 
 
 def test_get_constraints_fcn():
-    response = client.post("/acrobatics/somersaults_info/0/constraints")
+    response = client.post("/acrobatics/phases_info/0/constraints")
     assert response.status_code == 200, response
 
-    response = client.get("/acrobatics/somersaults_info/0/constraints/0")
+    response = client.get("/acrobatics/phases_info/0/constraints/0")
     assert response.status_code == 200, response
     data = response.json()
     assert type(data) is list
