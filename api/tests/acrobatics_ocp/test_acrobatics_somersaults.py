@@ -66,7 +66,7 @@ def test_put_shooting_points():
     response = client.get("/acrobatics/phases_info/0")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["nb_shooting_points"] == 24
+    assert data["nb_shooting_points"] == 40
 
     response = client.put(
         "/acrobatics/phases_info/0/nb_shooting_points",
@@ -119,7 +119,7 @@ def test_put_shooting_points_unchanged_other_somersaults():
     assert response.status_code == 200, response
     data = response.json()
     assert data[0]["nb_shooting_points"] == 10
-    assert data[1]["nb_shooting_points"] == 24
+    assert data[1]["nb_shooting_points"] == 40
 
 
 def test_put_somersault_duration():
@@ -255,32 +255,32 @@ def test_put_somersault_duration_changes_final_time_simple_less_multiple():
 
 
 def test_put_nb_half_twists():
-    response = client.get("/acrobatics/phases_info/0")
+    response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["nb_half_twists"] == 0
+    assert data["nb_half_twists"] == [0]
 
     response = client.put(
-        "/acrobatics/phases_info/0/nb_half_twists",
+        "/acrobatics/nb_half_twists/0",
         json={"nb_half_twists": 1},
     )
     assert response.status_code == 200, response
 
-    response = client.get("/acrobatics/phases_info/0")
+    response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["nb_half_twists"] == 1
+    assert data["nb_half_twists"] == [1]
 
 
 def test_put_nb_half_twists_wrong():
     response = client.put(
-        "/acrobatics/phases_info/0/nb_half_twists",
+        "/acrobatics/nb_half_twists/0",
         json={"nb_half_twists": -1},
     )
     assert response.status_code == 400, response
 
     response = client.put(
-        "/acrobatics/phases_info/0/nb_half_twists",
+        "/acrobatics/nb_half_twists/0",
         json={"nb_half_twists": 0},
     )
     assert response.status_code == 200, response
@@ -288,7 +288,7 @@ def test_put_nb_half_twists_wrong():
 
 def test_put_nb_half_twists_wrong_type():
     response = client.put(
-        "/acrobatics/phases_info/0/nb_half_twists",
+        "/acrobatics/nb_half_twists/0",
         json={"nb_half_twists": "wrong"},
     )
     assert response.status_code == 422, response

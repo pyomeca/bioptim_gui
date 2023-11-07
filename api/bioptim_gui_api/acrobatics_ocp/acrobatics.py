@@ -35,6 +35,8 @@ def add_somersault_info(n: int = 1) -> None:
 
     for i in range(before, before + n):
         phases_info.append(config.DefaultAcrobaticsConfig.default_phases_info)
+        data["nb_half_twists"].append(0)
+
         phases_info[i]["duration"] = round(final_time / n_somersaults, 2)
 
     data["phases_info"] = phases_info
@@ -55,6 +57,8 @@ def remove_somersault_info(n: int = 0) -> None:
 
     for _ in range(n):
         phases_info.pop()
+        data["nb_half_twists"].pop()
+
     data["phases_info"] = phases_info
     with open(config.DefaultAcrobaticsConfig.datafile, "w") as f:
         json.dump(data, f)
@@ -100,6 +104,24 @@ def update_nb_somersaults(nb_somersaults: NbSomersaultsRequest):
 
     data = read_acrobatics_data()
     return data
+
+
+@router.put(
+    "/nb_half_twists/{somersault_index}",
+    response_model=list,
+)
+def put_nb_half_twist(somersault_index: int, half_twists_request: NbHalfTwistsRequest):
+    if half_twists_request.nb_half_twists < 0:
+        raise HTTPException(
+            status_code=400, detail="nb_half_twists must be positive or zero"
+        )
+    half_twists = read_acrobatics_data("nb_half_twists")
+    half_twists[somersault_index] = half_twists_request.nb_half_twists
+    update_acrobatics_data("nb_half_twists", half_twists)
+
+    # TODO update phases
+
+    return []  # TODO return phases
 
 
 @router.put("/model_path", response_model=ModelPathResponse)

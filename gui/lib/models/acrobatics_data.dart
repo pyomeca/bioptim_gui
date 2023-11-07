@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 
 class AcrobaticsData extends ChangeNotifier implements OCPData {
   int _nbSomersaults;
+  List<int> halfTwists = [];
   String _modelPath;
   double finalTime;
   double finalTimeMargin;
@@ -19,6 +20,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
 
   AcrobaticsData.fromJson(Map<String, dynamic> data)
       : _nbSomersaults = data["nb_somersaults"],
+        halfTwists = List.from(data["nb_half_twists"]),
         _modelPath = data["model_path"],
         finalTime = data["final_time"],
         finalTimeMargin = data["final_time_margin"],
@@ -55,6 +57,13 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
 
   ///
   /// Update methods
+
+  void updateHalfTwists(int index, int value) {
+    requestMaker.updateHalfTwists(index, value);
+
+    halfTwists[index] = value;
+    notifyListeners();
+  }
 
   @override
   void updateField(String name, String value) {
@@ -93,9 +102,6 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
     requestMaker.updatePhaseField(phaseIndex, fieldName, newValue);
 
     switch (fieldName) {
-      case "nb_half_twists":
-        somersaultInfo[phaseIndex].nbHalfTwists = int.parse(newValue);
-        break;
       case "duration":
         somersaultInfo[phaseIndex].duration = double.parse(newValue);
         break;
@@ -110,6 +116,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
 
   void updateData(AcrobaticsData newData) {
     nbSomersaults = newData.nbSomersaults;
+    halfTwists = List.from(newData.halfTwists);
     _modelPath = newData._modelPath;
     finalTime = newData.finalTime;
     finalTimeMargin = newData.finalTimeMargin;
@@ -244,9 +251,6 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
 }
 
 class Somersault extends Phase {
-  int nbHalfTwists;
-
   Somersault.fromJson(Map<String, dynamic> somersaultData)
-      : nbHalfTwists = somersaultData["nb_half_twists"],
-        super.fromJson(somersaultData);
+      : super.fromJson(somersaultData);
 }

@@ -3,7 +3,6 @@ class DefaultAcrobaticsConfig:
 
     default_phases_info = {
         "nb_shooting_points": 40,
-        "nb_half_twists": 0,
         "duration": 1.0,
         "objectives": [
             {
@@ -43,6 +42,7 @@ class DefaultAcrobaticsConfig:
 
     base_data = {
         "nb_somersaults": 1,
+        "nb_half_twists": [0],
         "model_path": "",
         "final_time": 1.0,
         "final_time_margin": 0.1,

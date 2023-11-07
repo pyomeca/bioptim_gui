@@ -42,6 +42,24 @@ class AcrobaticInformation extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
+              for (int i = 0; i < acrobaticsData.halfTwists.length; i++)
+                SizedBox(
+                  width: (width / acrobaticsData.halfTwists.length),
+                  child: PositiveIntegerTextField(
+                    label: 'Number of half twists *',
+                    value: acrobaticsData.halfTwists[i].toString(),
+                    onSubmitted: (newValue) {
+                      if (newValue.isNotEmpty) {
+                        data.updateHalfTwists(i, int.parse(newValue));
+                      }
+                    },
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
               SizedBox(
                 width: width / 2 - 6,
                 child: PositiveFloatTextField(

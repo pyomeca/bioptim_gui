@@ -22,20 +22,6 @@ class SomersaultInformation extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: width / 2 - 6,
-            child: PositiveIntegerTextField(
-              label: 'Number of half twists *',
-              value: somersault.nbHalfTwists.toString(),
-              onSubmitted: (newValue) {
-                if (newValue.isNotEmpty) {
-                  data.updatePhaseField(
-                      somersaultIndex, "nb_half_twists", newValue);
-                }
-              },
-            ),
-          ),
-          const SizedBox(height: 24),
           Row(
             children: [
               SizedBox(

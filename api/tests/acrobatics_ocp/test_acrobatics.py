@@ -70,6 +70,12 @@ def test_put_nb_somersault_zero():
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 0})
     assert response.status_code == 200, response
 
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nb_somersaults"] == 0
+    assert data["nb_half_twists"] == []
+
 
 def test_put_nb_somersault():
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
@@ -78,10 +84,13 @@ def test_put_nb_somersault():
 
     data = json.load(open("acrobatics_data.json"))
     assert data["nb_somersaults"] == 2
+    assert data["nb_half_twists"] == [0, 0]
 
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
-    assert response.json()["nb_somersaults"] == 2
+    data = response.json()
+    assert data["nb_somersaults"] == 2
+    assert data["nb_half_twists"] == [0, 0]
 
 
 def test_put_model_path():

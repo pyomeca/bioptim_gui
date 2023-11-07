@@ -73,18 +73,3 @@ def put_duration(somersault_index: int, duration: SomersaultDurationRequest):
     update_acrobatics_data("phases_info", phases_info)
     update_acrobatics_data("final_time", infos["final_time"])
     return SomersaultDurationResponse(duration=duration.duration)
-
-
-@router.put(
-    "/{somersault_index}/nb_half_twists",
-    response_model=NbHalfTwistsResponse,
-)
-def put_nb_half_twist(somersault_index: int, nb_half_twists: NbHalfTwistsRequest):
-    if nb_half_twists.nb_half_twists < 0:
-        raise HTTPException(
-            status_code=400, detail="nb_half_twists must be positive or zero"
-        )
-    phases_info = read_acrobatics_data("phases_info")
-    phases_info[somersault_index]["nb_half_twists"] = nb_half_twists.nb_half_twists
-    update_acrobatics_data("phases_info", phases_info)
-    return NbHalfTwistsResponse(nb_half_twists=nb_half_twists.nb_half_twists)
