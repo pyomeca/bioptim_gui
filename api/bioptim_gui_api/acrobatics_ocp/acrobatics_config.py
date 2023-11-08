@@ -68,7 +68,7 @@ def phase_name_to_phase(phase_name: str):
     # some will be duplicated on all phases
     res = copy.deepcopy(DefaultAcrobaticsConfig.default_phases_info)
     res["phase_name"] = phase_name
-    if phase_name == "Pike":
+    if phase_name in ["Pike", "Tuck"]:
         for side in "D", "G":
             res["objectives"].append(
                 {
