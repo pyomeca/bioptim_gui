@@ -45,7 +45,7 @@ class SomersaultGenerationMenu extends StatelessWidget {
       return AnimatedExpandingWidget(
         header: Center(
           child: Text(
-            'Information on somersault ${acrobaticsData.phaseInfo[somersaultIndex].phaseName}',
+            'Information on ${acrobaticsData.phaseInfo[somersaultIndex].phaseName}',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
