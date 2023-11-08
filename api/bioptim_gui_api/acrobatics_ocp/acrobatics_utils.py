@@ -85,3 +85,43 @@ def remove_somersault_info(n: int = 0) -> None:
     data["phases_info"] = phases_info
     with open(config.DefaultAcrobaticsConfig.datafile, "w") as f:
         json.dump(data, f)
+
+
+def acrobatics_phase_names(
+    nb_somersaults: int, position: str, half_twists: list[int]
+) -> list[str]:
+    if position == "straight":
+        return [f"Somersault {i + 1}" for i in range(nb_somersaults)] + ["Landing"]
+
+    names = []
+
+    # twist start
+    if half_twists[0] > 0:
+        names.append("Twist")
+
+    last_have_twist = True
+    next_have_twist = half_twists[1] > 0
+    for i in range(1, nb_somersaults):
+        is_last_somersault = i == nb_somersaults - 1
+        # piking/tuck
+        if last_have_twist:
+            names.append("Pike" if position == "pike" else "Tuck")
+
+        # somersaulting in pike
+        if i == nb_somersaults - 1 or next_have_twist:
+            names.append("Somersault")
+
+        # kick out
+        if next_have_twist or is_last_somersault:
+            names.append("Kick out")
+
+        # twisting
+        if next_have_twist:
+            names.append("Twist")
+
+        last_have_twist = next_have_twist
+        next_have_twist = is_last_somersault or half_twists[i + 1] > 0
+
+    # landing
+    names.append("Landing")
+    return names

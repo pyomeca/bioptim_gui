@@ -43,6 +43,24 @@ def update_nb_somersaults(nb_somersaults: NbSomersaultsRequest):
     update_acrobatics_data("nb_somersaults", new_value)
 
     data = read_acrobatics_data()
+    nb_somersaults = data["nb_somersaults"]
+    position = data["position"]
+    half_twists = data["nb_half_twists"]
+
+    new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
+    nb_phases = len(new_phase_names)
+
+    new_phases = [
+        config.DefaultAcrobaticsConfig.default_phases_info.copy()
+        for _ in range(nb_phases)
+    ]
+    for i in range(nb_phases):
+        new_phases[i]["phase_name"] = new_phase_names[i]
+
+    data["phases_info"] = new_phases
+
+    update_acrobatics_data("phases_info", new_phases)
+
     return data
 
 
@@ -59,7 +77,23 @@ def put_nb_half_twist(somersault_index: int, half_twists_request: NbHalfTwistsRe
     half_twists[somersault_index] = half_twists_request.nb_half_twists
     update_acrobatics_data("nb_half_twists", half_twists)
 
-    # TODO update phases
+    data = read_acrobatics_data()
+    nb_somersaults = data["nb_somersaults"]
+    position = data["position"]
+    half_twists = data["nb_half_twists"]
+
+    new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
+    nb_phases = len(new_phase_names)
+
+    new_phases = [
+        config.DefaultAcrobaticsConfig.default_phases_info.copy()
+        for _ in range(nb_phases)
+    ]
+    for i in range(nb_phases):
+        new_phases[i]["phase_name"] = new_phase_names[i]
+
+    data["phases_info"] = new_phases
+    update_acrobatics_data("phases_info", new_phases)
 
     phases_info = read_acrobatics_data("phases_info")
     return phases_info
@@ -110,6 +144,8 @@ def put_position(position: PositionRequest):
             status_code=304,
             detail=f"position is already {position}",
         )
+
+    # TODO update phases
 
     update_acrobatics_data("position", new_value)
     return PositionResponse(position=new_value)

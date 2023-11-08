@@ -47,13 +47,15 @@ abstract class OCPData<T extends Phase> with ChangeNotifier {
 /// "generic OCP"'s [GenericPhase] and "acrobatics OCP" [Somersault] that
 /// contains additional fields.
 abstract class Phase {
+  late String? phaseName;
   late int nbShootingPoints;
   late double duration;
   late List<Objective> objectives;
   late List<Constraint> constraints;
 
   Phase.fromJson(Map<String, dynamic> phaseData)
-      : nbShootingPoints = phaseData["nb_shooting_points"],
+      : phaseName = phaseData["phase_name"],
+        nbShootingPoints = phaseData["nb_shooting_points"],
         duration = phaseData["duration"],
         objectives =
             (phaseData["objectives"] as List<dynamic>).map((objective) {

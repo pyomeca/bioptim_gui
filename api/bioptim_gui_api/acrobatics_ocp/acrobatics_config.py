@@ -2,6 +2,7 @@ class DefaultAcrobaticsConfig:
     datafile = "acrobatics_data.json"
 
     default_phases_info = {
+        "phase_name": None,
         "nb_shooting_points": 40,
         "duration": 1.0,
         "objectives": [
@@ -49,5 +50,7 @@ class DefaultAcrobaticsConfig:
         "position": "straight",
         "sport_type": "trampoline",
         "preferred_twist_side": "left",
-        "phases_info": [default_phases_info.copy()],
+        "phases_info": [default_phases_info.copy(), default_phases_info.copy()],
     }
+    base_data["phases_info"][0]["phase_name"] = "Somersault 1"
+    base_data["phases_info"][1]["phase_name"] = "Landing"

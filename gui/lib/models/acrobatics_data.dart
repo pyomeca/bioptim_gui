@@ -15,7 +15,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   String position;
   String sportType;
   String preferredTwistSide;
-  List<SomersaultPhase> phasesInfo = [];
+  List<SomersaultPhase> _phasesInfo = [];
 
   AcrobaticsData.fromJson(Map<String, dynamic> data)
       : _nbSomersaults = data["nb_somersaults"],
@@ -26,7 +26,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
         position = data["position"],
         sportType = data["sport_type"],
         preferredTwistSide = data["preferred_twist_side"],
-        phasesInfo = (data["phases_info"] as List<dynamic>).map((somersault) {
+        _phasesInfo = (data["phases_info"] as List<dynamic>).map((somersault) {
           return SomersaultPhase.fromJson(somersault);
         }).toList();
 
@@ -39,7 +39,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   }
 
   @override
-  List<Phase> get phaseInfo => phasesInfo;
+  List<Phase> get phaseInfo => _phasesInfo;
 
   @override
   String get modelPath => _modelPath;
@@ -56,8 +56,14 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   ///
   /// Update methods
 
-  void updateHalfTwists(int index, int value) {
-    requestMaker.updateHalfTwists(index, value);
+  void updateHalfTwists(int index, int value) async {
+    final response = await requestMaker.updateHalfTwists(index, value);
+
+    final newPhases = (json.decode(response.body) as List<dynamic>)
+        .map((p) => SomersaultPhase.fromJson(p))
+        .toList();
+
+    _phasesInfo = newPhases;
 
     halfTwists[index] = value;
     notifyListeners();
@@ -101,10 +107,10 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
 
     switch (fieldName) {
       case "duration":
-        phasesInfo[phaseIndex].duration = double.parse(newValue);
+        _phasesInfo[phaseIndex].duration = double.parse(newValue);
         break;
       case "nb_shooting_points":
-        phasesInfo[phaseIndex].nbShootingPoints = int.parse(newValue);
+        _phasesInfo[phaseIndex].nbShootingPoints = int.parse(newValue);
         break;
       default:
         break;
@@ -121,7 +127,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
     position = newData.position;
     sportType = newData.sportType;
     preferredTwistSide = newData.preferredTwistSide;
-    phasesInfo = List.from(newData.phasesInfo);
+    _phasesInfo = List.from(newData._phasesInfo);
 
     notifyListeners();
   }
@@ -130,9 +136,9 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   void updatePenalties(
       int somersaultIndex, String penaltyType, List<Penalty> penalties) {
     if (penaltyType == "objective") {
-      phasesInfo[somersaultIndex].objectives = penalties as List<Objective>;
+      _phasesInfo[somersaultIndex].objectives = penalties as List<Objective>;
     } else {
-      phasesInfo[somersaultIndex].constraints = penalties as List<Constraint>;
+      _phasesInfo[somersaultIndex].constraints = penalties as List<Constraint>;
     }
     notifyListeners();
   }
@@ -141,10 +147,10 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   void updatePenalty(int somersaultIndex, String penaltyType, int penaltyIndex,
       Penalty penalty) {
     if (penaltyType == "objective") {
-      phasesInfo[somersaultIndex].objectives[penaltyIndex] =
+      _phasesInfo[somersaultIndex].objectives[penaltyIndex] =
           penalty as Objective;
     } else {
-      phasesInfo[somersaultIndex].constraints[penaltyIndex] =
+      _phasesInfo[somersaultIndex].constraints[penaltyIndex] =
           penalty as Constraint;
     }
 
@@ -155,7 +161,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   void updatePhaseInfo(List newData) {
     final newPhases =
         (newData).map((p) => SomersaultPhase.fromJson(p)).toList();
-    phasesInfo = newPhases;
+    _phasesInfo = newPhases;
 
     notifyListeners();
   }
@@ -178,7 +184,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
     requestMaker.updatePenaltyArgument(phaseIndex, objectiveIndex, argumentName,
         newValue, argumentType, penaltyType);
 
-    phasesInfo[phaseIndex]
+    _phasesInfo[phaseIndex]
         .objectives[objectiveIndex]
         .arguments[argumentIndex]
         .value = newValue;
@@ -197,33 +203,33 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
 
     switch (fieldName) {
       case "target":
-        phasesInfo[phaseIndex].objectives[penaltyIndex].target = newValue;
+        _phasesInfo[phaseIndex].objectives[penaltyIndex].target = newValue;
         break;
       case "integration_rule":
-        phasesInfo[phaseIndex].objectives[penaltyIndex].integrationRule =
+        _phasesInfo[phaseIndex].objectives[penaltyIndex].integrationRule =
             newValue!;
         break;
       case "weight":
-        phasesInfo[phaseIndex].objectives[penaltyIndex].weight =
+        _phasesInfo[phaseIndex].objectives[penaltyIndex].weight =
             double.tryParse(newValue!) ?? 0.0;
         break;
       case "nodes":
-        phasesInfo[phaseIndex].constraints[penaltyIndex].nodes = newValue!;
+        _phasesInfo[phaseIndex].constraints[penaltyIndex].nodes = newValue!;
         break;
       case "quadratic":
-        phasesInfo[phaseIndex].constraints[penaltyIndex].quadratic =
+        _phasesInfo[phaseIndex].constraints[penaltyIndex].quadratic =
             newValue == "true";
         break;
       case "expand":
-        phasesInfo[phaseIndex].constraints[penaltyIndex].expand =
+        _phasesInfo[phaseIndex].constraints[penaltyIndex].expand =
             newValue == "true";
         break;
       case "multi_thread":
-        phasesInfo[phaseIndex].constraints[penaltyIndex].multiThread =
+        _phasesInfo[phaseIndex].constraints[penaltyIndex].multiThread =
             newValue == "true";
         break;
       case "derivative":
-        phasesInfo[phaseIndex].constraints[penaltyIndex].derivative =
+        _phasesInfo[phaseIndex].constraints[penaltyIndex].derivative =
             newValue == "true";
         break;
       default:

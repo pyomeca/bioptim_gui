@@ -4,7 +4,11 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from bioptim_gui_api.acrobatics_ocp.acrobatics import router
+from bioptim_gui_api.acrobatics_ocp.acrobatics import (
+    router,
+    add_somersault_info,
+    remove_somersault_info,
+)
 from bioptim_gui_api.acrobatics_ocp.acrobatics_config import DefaultAcrobaticsConfig
 
 test_app = FastAPI()
@@ -29,226 +33,229 @@ def run_for_all():
     os.remove(datafile)
 
 
-def test_get_phases_info():
-    response = client.get("/acrobatics/phases_info/")
-    assert response.status_code == 200, response
-    data = response.json()
-    assert len(data) == 1
-    assert data[0]["duration"] == 1
-    assert len(data[0]["objectives"]) == 2
-    assert len(data[0]["constraints"]) == 0
-
-    client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
-    response = client.get("/acrobatics/phases_info/")
-    assert response.status_code == 200, response
-    data = response.json()
-    assert len(data) == 2
-    assert data[0]["duration"] == 0.5
-    assert len(data[0]["objectives"]) == 2
-    assert len(data[0]["constraints"]) == 0
+def test_add_somersault_info_wrong():
+    with pytest.raises(ValueError):
+        add_somersault_info(0)
 
 
-def test_get_somersault_with_index():
-    response = client.get("/acrobatics/phases_info/0")
-    assert response.status_code == 200, response
-    data = response.json()
-    assert data["duration"] == 1
-    assert len(data["objectives"]) == 2
-    assert len(data["constraints"]) == 0
+def test_remove_somersault_info_wrong():
+    with pytest.raises(ValueError):
+        remove_somersault_info(-1)
 
 
-def test_get_somersault_with_index_wrong():
-    response = client.get("/acrobatics/phases_info/1")
-    assert response.status_code == 404, response
-
-
-def test_put_shooting_points():
-    response = client.get("/acrobatics/phases_info/0")
-    assert response.status_code == 200, response
-    data = response.json()
-    assert data["nb_shooting_points"] == 40
-
+@pytest.mark.parametrize("nb_somersaults", [6, 7, 8, 9, 100, 1e9])
+def test_put_nb_somersaults_too_much(nb_somersaults):
     response = client.put(
-        "/acrobatics/phases_info/0/nb_shooting_points",
-        json={"nb_shooting_points": 10},
-    )
-    assert response.status_code == 200, response
-
-    response = client.get("/acrobatics/phases_info/0")
-    assert response.status_code == 200, response
-    data = response.json()
-    assert data["nb_shooting_points"] == 10
-
-
-def test_put_shooting_points_wrong():
-    response = client.put(
-        "/acrobatics/phases_info/0/nb_shooting_points",
-        json={"nb_shooting_points": -10},
-    )
-    assert response.status_code == 400, response
-
-    response = client.put(
-        "/acrobatics/phases_info/0/nb_shooting_points",
-        json={"nb_shooting_points": 0},
+        "/acrobatics/nb_somersaults/", json={"nb_somersaults": nb_somersaults}
     )
     assert response.status_code == 400, response
 
 
-def test_put_shooting_points_wrong_type():
-    response = client.put(
-        "/acrobatics/phases_info/0/nb_shooting_points",
-        json={"nb_shooting_points": "wrong"},
-    )
-    assert response.status_code == 422, response
+def test_put_nb_somersault_negative():
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": -10})
+    assert response.status_code == 400, response
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    assert response.json()["nb_somersaults"] == 1
+
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": -1})
+    assert response.status_code == 400, response
 
 
-def test_put_shooting_points_unchanged_other_somersaults():
-    """
-    add a somersault, change its shooting points, check that the other somersaults are unchanged
-    """
+def test_put_nb_somersault_zero():
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 0})
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nb_somersaults"] == 0
+    assert data["nb_half_twists"] == []
+
+
+def test_put_nb_somersault():
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
     assert response.status_code == 200, response
+    assert response.json()["nb_somersaults"] == 2
 
-    response = client.put(
-        "/acrobatics/phases_info/0/nb_shooting_points",
-        json={"nb_shooting_points": 10},
-    )
-    assert response.status_code == 200, response
+    data = json.load(open("acrobatics_data.json"))
+    assert data["nb_somersaults"] == 2
+    assert data["nb_half_twists"] == [0, 0]
 
-    response = client.get("/acrobatics/phases_info")
-    assert response.status_code == 200, response
-    data = response.json()
-    assert data[0]["nb_shooting_points"] == 10
-    assert data[1]["nb_shooting_points"] == 40
-
-
-def test_put_somersault_duration():
-    response = client.get("/acrobatics/phases_info/0")
+    response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["duration"] == 1
-
-    response = client.put(
-        "/acrobatics/phases_info/0/duration",
-        json={"duration": 0.5},
-    )
-    assert response.status_code == 200, response
-
-    response = client.get("/acrobatics/phases_info/0")
-    assert response.status_code == 200, response
-    data = response.json()
-    assert data["duration"] == 0.5
+    assert data["nb_somersaults"] == 2
+    assert data["nb_half_twists"] == [0, 0]
 
 
-def test_put_somersault_duration_wrong():
-    response = client.put(
-        "/acrobatics/phases_info/0/duration",
-        json={"duration": -0.5},
-    )
-    assert response.status_code == 400, response
-
-    response = client.put(
-        "/acrobatics/phases_info/0/duration",
-        json={"duration": 0},
-    )
-    assert response.status_code == 400, response
-
-
-def test_put_somersault_duration_wrong_type():
-    response = client.put(
-        "/acrobatics/phases_info/0/duration",
-        json={"duration": "wrong"},
-    )
-    assert response.status_code == 422, response
-
-
-def test_put_somersault_duration_unchanged_other_somersaults():
-    """
-    add a somersault, change its duration, check that the other somersaults are unchanged
-    """
+def test_add_somersault():
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
     assert response.status_code == 200, response
-
-    response = client.put(
-        "/acrobatics/phases_info/0/duration",
-        json={"duration": 0.2},
-    )
-    assert response.status_code == 200, response
-
-    response = client.get("/acrobatics/phases_info")
-    assert response.status_code == 200, response
-    data = response.json()
-    assert data[0]["duration"] == 0.2
-    assert data[1]["duration"] == 0.5
-
-
-def test_put_somersault_duration_changes_final_time_simple_more():
-    response = client.put(
-        "/acrobatics/phases_info/0/duration",
-        json={"duration": 1.2},
-    )
-    assert response.status_code == 200, response
+    assert response.json()["nb_somersaults"] == 2
 
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["final_time"] == 1.2
+    assert data["nb_somersaults"] == 2
+    assert data["model_path"] == ""
+    assert data["final_time"] == 1
+    assert data["final_time_margin"] == 0.1
+    assert data["position"] == "straight"
+    assert data["sport_type"] == "trampoline"
+    assert data["preferred_twist_side"] == "left"
+    assert len(data["phases_info"]) == 2
+    assert data["phases_info"][0]["duration"] == 0.5
+    assert data["phases_info"][1]["duration"] == 0.5
+    assert len(data["phases_info"][0]["objectives"]) == 2
+    assert len(data["phases_info"][0]["constraints"]) == 0
+    assert len(data["phases_info"][1]["objectives"]) == 2
+    assert len(data["phases_info"][1]["constraints"]) == 0
 
 
-def test_put_somersault_duration_changes_final_time_simple_less():
-    response = client.put(
-        "/acrobatics/phases_info/0/duration",
-        json={"duration": 0.2},
-    )
+def test_add_multiple_somersault():
+    many = 5
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": many})
     assert response.status_code == 200, response
+    assert response.json()["nb_somersaults"] == many
 
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["final_time"] == 0.2
+    assert data["nb_somersaults"] == many
+    assert data["model_path"] == ""
+    assert data["final_time"] == 1
+    assert data["final_time_margin"] == 0.1
+    assert data["position"] == "straight"
+    assert data["sport_type"] == "trampoline"
+    assert data["preferred_twist_side"] == "left"
+    assert len(data["phases_info"]) == many
+    for i in range(many):
+        assert data["phases_info"][i]["duration"] == 1 / many
+        assert len(data["phases_info"][i]["objectives"]) == 2
+        assert len(data["phases_info"][i]["constraints"]) == 0
 
 
-def test_put_somersault_duration_changes_final_time_simple_more_multiple():
-    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 5})
+def test_add_odd_somersault_durations_are_rounded_2_digit():
+    many = 3
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": many})
     assert response.status_code == 200, response
-
-    client.put(
-        "/acrobatics/phases_info/0/duration",
-        json={"duration": 1.2},
-    )
-
-    response = client.put(
-        "/acrobatics/phases_info/1/duration",
-        json={"duration": 0.6},
-    )
-    # durations : 1.2, 0.6, 0.2, 0.2, 0.2, final_time = 2.4
-
-    assert response.status_code == 200, response
+    assert response.json()["nb_somersaults"] == many
 
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["final_time"] == 2.4
+    assert data["nb_somersaults"] == many
+    assert data["model_path"] == ""
+    assert data["final_time"] == 1
+    assert data["final_time_margin"] == 0.1
+    assert data["position"] == "straight"
+    assert data["sport_type"] == "trampoline"
+    assert data["preferred_twist_side"] == "left"
+    assert len(data["phases_info"]) == many
+    for i in range(many):
+        assert data["phases_info"][i]["duration"] == 0.33
+        assert len(data["phases_info"][i]["objectives"]) == 2
+        assert len(data["phases_info"][i]["constraints"]) == 0
 
 
-def test_put_somersault_duration_changes_final_time_simple_less_multiple():
-    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 5})
+def test_remove_one_somersault_2to1():
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
     assert response.status_code == 200, response
-
-    client.put(
-        "/acrobatics/phases_info/0/duration",
-        json={"duration": 0.1},
-    )
-
-    response = client.put(
-        "/acrobatics/phases_info/1/duration",
-        json={"duration": 0.1},
-    )
-    # durations : 0.1, 0.1, 0.2, 0.2, 0.2 final_time = 0.8
-
-    assert response.status_code == 200, response
+    assert response.json()["nb_somersaults"] == 2
 
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["final_time"] == 0.8
+    assert data["nb_somersaults"] == 2
+    assert data["model_path"] == ""
+    assert data["final_time"] == 1
+    assert data["final_time_margin"] == 0.1
+    assert data["position"] == "straight"
+    assert data["sport_type"] == "trampoline"
+    assert data["preferred_twist_side"] == "left"
+    assert len(data["phases_info"]) == 2
+    for i in range(2):
+        assert data["phases_info"][i]["duration"] == 1 / 2
+        assert len(data["phases_info"][i]["objectives"]) == 2
+        assert len(data["phases_info"][i]["constraints"]) == 0
+
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 1})
+    assert response.status_code == 200, response
+    assert response.json()["nb_somersaults"] == 1
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nb_somersaults"] == 1
+    assert data["model_path"] == ""
+    assert data["final_time"] == 1
+    assert data["final_time_margin"] == 0.1
+    assert data["position"] == "straight"
+    assert data["sport_type"] == "trampoline"
+    assert data["preferred_twist_side"] == "left"
+    assert len(data["phases_info"]) == 1
+    assert data["phases_info"][0]["duration"] == 1
+    assert len(data["phases_info"][0]["objectives"]) == 2
+    assert len(data["phases_info"][0]["constraints"]) == 0
+
+
+def test_remove_single_somersault():
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 0})
+    assert response.status_code == 200, response
+    assert response.json()["nb_somersaults"] == 0
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nb_somersaults"] == 0
+    assert data["model_path"] == ""
+    assert data["final_time"] == 1
+    assert data["final_time_margin"] == 0.1
+    assert data["position"] == "straight"
+    assert data["sport_type"] == "trampoline"
+    assert data["preferred_twist_side"] == "left"
+    assert len(data["phases_info"]) == 0
+
+
+def test_add_and_remove_multiple_somersault():
+    many = 5
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": many})
+    assert response.status_code == 200, response
+    assert response.json()["nb_somersaults"] == many
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nb_somersaults"] == many
+    assert data["model_path"] == ""
+    assert data["final_time"] == 1
+    assert data["final_time_margin"] == 0.1
+    assert data["position"] == "straight"
+    assert data["sport_type"] == "trampoline"
+    assert data["preferred_twist_side"] == "left"
+    assert len(data["phases_info"]) == many
+    for i in range(many):
+        assert data["phases_info"][i]["duration"] == round(1 / many, 2)
+        assert len(data["phases_info"][i]["objectives"]) == 2
+        assert len(data["phases_info"][i]["constraints"]) == 0
+
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 1})
+    assert response.status_code == 200, response
+    assert response.json()["nb_somersaults"] == 1
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nb_somersaults"] == 1
+    assert data["model_path"] == ""
+    assert data["final_time"] == 1
+    assert data["final_time_margin"] == 0.1
+    assert data["position"] == "straight"
+    assert data["sport_type"] == "trampoline"
+    assert data["preferred_twist_side"] == "left"
+    assert len(data["phases_info"]) == 1
+    assert data["phases_info"][0]["duration"] == 1
+    assert len(data["phases_info"][0]["objectives"]) == 2
+    assert len(data["phases_info"][0]["constraints"]) == 0
