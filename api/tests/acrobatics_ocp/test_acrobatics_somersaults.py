@@ -6,8 +6,7 @@ from fastapi.testclient import TestClient
 
 from bioptim_gui_api.acrobatics_ocp.acrobatics import (
     router,
-    add_somersault_info,
-    remove_somersault_info,
+    update_phase_info,
 )
 from bioptim_gui_api.acrobatics_ocp.acrobatics_config import DefaultAcrobaticsConfig
 
@@ -35,12 +34,7 @@ def run_for_all():
 
 def test_add_somersault_info_wrong():
     with pytest.raises(ValueError):
-        add_somersault_info(0)
-
-
-def test_remove_somersault_info_wrong():
-    with pytest.raises(ValueError):
-        remove_somersault_info(-1)
+        update_phase_info([])
 
 
 @pytest.mark.parametrize("nb_somersaults", [6, 7, 8, 9, 100, 1e9])
@@ -105,13 +99,16 @@ def test_add_somersault():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["phases_info"]) == 2
-    assert data["phases_info"][0]["duration"] == 0.5
-    assert data["phases_info"][1]["duration"] == 0.5
+    assert len(data["phases_info"]) == 3
+    assert data["phases_info"][0]["duration"] == 0.33
+    assert data["phases_info"][1]["duration"] == 0.33
+    assert data["phases_info"][1]["duration"] == 0.33
     assert len(data["phases_info"][0]["objectives"]) == 2
     assert len(data["phases_info"][0]["constraints"]) == 0
     assert len(data["phases_info"][1]["objectives"]) == 2
     assert len(data["phases_info"][1]["constraints"]) == 0
+    assert len(data["phases_info"][2]["objectives"]) == 2
+    assert len(data["phases_info"][2]["constraints"]) == 0
 
 
 def test_add_multiple_somersault():
@@ -130,15 +127,19 @@ def test_add_multiple_somersault():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["phases_info"]) == many
+    # 1 phase for each somersault + 1 for landing
+    assert len(data["phases_info"]) == many + 1
     for i in range(many):
-        assert data["phases_info"][i]["duration"] == 1 / many
+        assert data["phases_info"][i]["duration"] == 0.17
+        assert data["phases_info"][i]["phase_name"] == f"Somersault {i+1}"
         assert len(data["phases_info"][i]["objectives"]) == 2
         assert len(data["phases_info"][i]["constraints"]) == 0
 
+    assert data["phases_info"][many]["phase_name"] == "Landing"
+
 
 def test_add_odd_somersault_durations_are_rounded_2_digit():
-    many = 3
+    many = 2
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": many})
     assert response.status_code == 200, response
     assert response.json()["nb_somersaults"] == many
@@ -153,7 +154,7 @@ def test_add_odd_somersault_durations_are_rounded_2_digit():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["phases_info"]) == many
+    assert len(data["phases_info"]) == many + 1
     for i in range(many):
         assert data["phases_info"][i]["duration"] == 0.33
         assert len(data["phases_info"][i]["objectives"]) == 2
@@ -175,9 +176,9 @@ def test_remove_one_somersault_2to1():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["phases_info"]) == 2
+    assert len(data["phases_info"]) == 3
     for i in range(2):
-        assert data["phases_info"][i]["duration"] == 1 / 2
+        assert data["phases_info"][i]["duration"] == 0.33
         assert len(data["phases_info"][i]["objectives"]) == 2
         assert len(data["phases_info"][i]["constraints"]) == 0
 
@@ -195,28 +196,10 @@ def test_remove_one_somersault_2to1():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["phases_info"]) == 1
-    assert data["phases_info"][0]["duration"] == 1
+    assert len(data["phases_info"]) == 2
+    assert data["phases_info"][0]["duration"] == 0.5
     assert len(data["phases_info"][0]["objectives"]) == 2
     assert len(data["phases_info"][0]["constraints"]) == 0
-
-
-def test_remove_single_somersault():
-    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 0})
-    assert response.status_code == 200, response
-    assert response.json()["nb_somersaults"] == 0
-
-    response = client.get("/acrobatics/")
-    assert response.status_code == 200, response
-    data = response.json()
-    assert data["nb_somersaults"] == 0
-    assert data["model_path"] == ""
-    assert data["final_time"] == 1
-    assert data["final_time_margin"] == 0.1
-    assert data["position"] == "straight"
-    assert data["sport_type"] == "trampoline"
-    assert data["preferred_twist_side"] == "left"
-    assert len(data["phases_info"]) == 0
 
 
 def test_add_and_remove_multiple_somersault():
@@ -235,9 +218,9 @@ def test_add_and_remove_multiple_somersault():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["phases_info"]) == many
+    assert len(data["phases_info"]) == many + 1
     for i in range(many):
-        assert data["phases_info"][i]["duration"] == round(1 / many, 2)
+        assert data["phases_info"][i]["duration"] == round(1 / (many + 1), 2)
         assert len(data["phases_info"][i]["objectives"]) == 2
         assert len(data["phases_info"][i]["constraints"]) == 0
 
@@ -255,7 +238,7 @@ def test_add_and_remove_multiple_somersault():
     assert data["position"] == "straight"
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
-    assert len(data["phases_info"]) == 1
-    assert data["phases_info"][0]["duration"] == 1
+    assert len(data["phases_info"]) == 2
+    assert data["phases_info"][0]["duration"] == 0.5
     assert len(data["phases_info"][0]["objectives"]) == 2
     assert len(data["phases_info"][0]["constraints"]) == 0

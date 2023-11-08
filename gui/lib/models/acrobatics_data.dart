@@ -69,6 +69,19 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
     notifyListeners();
   }
 
+  Future<bool> updatePosition(String value) async {
+    final response = await requestMaker.updateField("position", value);
+
+    if (response.statusCode != 200) {
+      return Future(() => false);
+    }
+
+    final newData = AcrobaticsData.fromJson(json.decode(response.body));
+
+    updateData(newData);
+    return Future(() => true);
+  }
+
   @override
   void updateField(String name, String value) {
     requestMaker.updateField(name, value);

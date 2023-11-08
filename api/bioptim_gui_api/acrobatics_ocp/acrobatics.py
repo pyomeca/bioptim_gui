@@ -26,42 +26,41 @@ def get_acrobatics_data():
 
 @router.put("/nb_somersaults", response_model=dict)
 def update_nb_somersaults(nb_somersaults: NbSomersaultsRequest):
+    """
+    Append or pop the half_twists list
+    Update the number of somersaults of the acrobatics ocp
+    Update the phase info of the acrobatics ocp accordingly
+    """
     nb_max_somersaults = 5
     old_value = read_acrobatics_data("nb_somersaults")
     new_value = nb_somersaults.nb_somersaults
+
     if new_value < 0 or new_value > nb_max_somersaults:
         raise HTTPException(status_code=400, detail="nb_somersaults must be positive")
-
-    if new_value > old_value:
-        add_somersault_info(new_value - old_value)
-    elif new_value < old_value:
-        remove_somersault_info(old_value - new_value)
-
-    # if new_value == 1:
-    #     update_acrobatics_data("position", Position.STRAIGHT.value)
 
     update_acrobatics_data("nb_somersaults", new_value)
 
     data = read_acrobatics_data()
-    nb_somersaults = data["nb_somersaults"]
+    nb_somersaults = new_value
     position = data["position"]
     half_twists = data["nb_half_twists"]
 
-    new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
-    nb_phases = len(new_phase_names)
+    half_twists = half_twists[:nb_somersaults]
+    for i in range(old_value, new_value):
+        half_twists.append(0)
 
-    new_phases = [
-        config.DefaultAcrobaticsConfig.default_phases_info.copy()
-        for _ in range(nb_phases)
-    ]
-    for i in range(nb_phases):
-        new_phases[i]["phase_name"] = new_phase_names[i]
+    # 1 somersault tuck/pike are not allowed, set the position to straight
+    new_phases_names = []
+    if position != "straight" and nb_somersaults == 1:
+        update_acrobatics_data("position", "straight")
+        new_phase_names = acrobatics_phase_names(nb_somersaults, "straight", half_twists)
+    else:
+        new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
 
-    data["phases_info"] = new_phases
+    update_phase_info(new_phase_names)
 
-    update_acrobatics_data("phases_info", new_phases)
-
-    return data
+    update_acrobatics_data("nb_half_twists", half_twists)
+    return read_acrobatics_data()
 
 
 @router.put(
@@ -134,7 +133,7 @@ def get_position():
     return [side.capitalize() for side in Position]
 
 
-@router.put("/position", response_model=PositionResponse)
+@router.put("/position", response_model=dict)
 def put_position(position: PositionRequest):
     new_value = position.position.value
     old_value = read_acrobatics_data("position")
@@ -145,10 +144,29 @@ def put_position(position: PositionRequest):
             detail=f"position is already {position}",
         )
 
-    # TODO update phases
-
     update_acrobatics_data("position", new_value)
-    return PositionResponse(position=new_value)
+
+    # TODO update phases
+    data = read_acrobatics_data()
+    nb_somersaults = data["nb_somersaults"]
+    half_twists = data["nb_half_twists"]
+
+    # 1 somersault tuck/pike are not allowed, set the nb_somersault to 2
+    if old_value == "straight" and nb_somersaults == 1:
+        update_acrobatics_data("position", new_value)
+        update_acrobatics_data("nb_somersaults", 2)
+
+        half_twists = data["nb_half_twists"] + [0]
+        update_acrobatics_data("nb_half_twists", half_twists)
+
+        new_phase_names = acrobatics_phase_names(2, new_value, half_twists)
+        update_phase_info(new_phase_names)
+    else:
+        new_phase_names = acrobatics_phase_names(nb_somersaults, new_value, half_twists)
+        update_phase_info(new_phase_names)
+
+
+    return read_acrobatics_data()
 
 
 @router.get("/sport_type", response_model=list)

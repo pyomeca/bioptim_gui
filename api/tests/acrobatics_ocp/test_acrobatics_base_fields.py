@@ -140,7 +140,6 @@ def test_get_position_multiple_somersaults():
 def test_put_position():
     response = client.put("/acrobatics/position/", json={"position": "tuck"})
     assert response.status_code == 200, response
-    assert response.json() == {"position": "tuck"}
 
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response

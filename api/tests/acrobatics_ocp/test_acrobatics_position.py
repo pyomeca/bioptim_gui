@@ -45,21 +45,10 @@ def test_get_position_multiple_somersaults():
     assert set(response.json()) == {"Tuck", "Straight", "Pike"}
 
 
-# removed for now as it is not implemented in frontend
-# def test_position_after_add_remove_somersault():
-#     client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
-#     response = client.put("/acrobatics/position/", json={"position": "tuck"})
-#     assert response.status_code == 200, response
-#
-#     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 1})
-#     assert response.status_code == 200, response
-#     assert response.json()["position"] == "straight"
-
-
 def test_put_position():
     response = client.put("/acrobatics/position/", json={"position": "tuck"})
     assert response.status_code == 200, response
-    assert response.json() == {"position": "tuck"}
+    assert response.json()["position"] == "tuck"
 
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
@@ -74,3 +63,62 @@ def test_put_position_wrong():
 def test_put_position_same():
     response = client.put("/acrobatics/position/", json={"position": "straight"})
     assert response.status_code == 304, response
+
+
+def test_1_somersault_to_pike():
+    """
+    as 1 somersault in pike/tuck is not allowed, nb_somersaults should be changed to 2
+    """
+    response = client.put("/acrobatics/position/", json={"position": "pike"})
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nb_somersaults"] == 2
+    assert len(data["phases_info"]) == 4  # pike, somersault, kickout, landing
+    assert len(data["nb_half_twists"]) == 2
+
+
+def test_2_somersault_pike_to_1_somersault():
+    """
+    as 1 somersault in pike/tuck is not allowed, position should be changed to straight
+    """
+    client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
+
+    response = client.put("/acrobatics/position/", json={"position": "pike"})
+    assert response.status_code == 200, response
+
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 1})
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nb_somersaults"] == 1
+    assert len(data["phases_info"]) == 2  # somersault 1, landing
+    assert len(data["nb_half_twists"]) == 1
+
+
+def test_pike_to_straight():
+    client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
+
+    response = client.put("/acrobatics/position/", json={"position": "pike"})
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nb_somersaults"] == 2
+    assert len(data["phases_info"]) == 4  # pike, somersault, kickout, landing
+    assert data["nb_half_twists"] == [0, 0]
+
+    response = client.put("/acrobatics/position/", json={"position": "straight"})
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nb_somersaults"] == 2
+    assert len(data["phases_info"]) == 3  # somersault 1, somersault 2, landing
+    assert data["nb_half_twists"] == [0, 0]

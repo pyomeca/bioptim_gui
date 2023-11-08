@@ -15,18 +15,19 @@ class CustomHttpDropdown extends StatefulWidget {
     required this.width,
     required this.defaultValue,
     required this.getEndpoint,
-    required this.putEndpoint,
+    this.putEndpoint,
     required this.requestKey,
     this.color = Colors.black,
     this.customStringFormatting = _defaultToString,
     this.customCallBack,
+    this.customOnSelected,
   });
 
   final String title;
   final double width;
   final String defaultValue;
   final String getEndpoint;
-  final String putEndpoint;
+  final String? putEndpoint;
   // the key used in the request of the put method
   final String requestKey;
   final Color color;
@@ -35,6 +36,7 @@ class CustomHttpDropdown extends StatefulWidget {
   static String _defaultToString(String s) => s.toString().toLowerCase();
 
   final Function(http.Response)? customCallBack;
+  final Function(String)? customOnSelected;
 
   @override
   CustomHttpDropdownState createState() => CustomHttpDropdownState();
@@ -93,6 +95,21 @@ class CustomHttpDropdownState extends State<CustomHttpDropdown> {
     if (widget.customCallBack != null) widget.customCallBack!(response);
   }
 
+  Future<void> _selectUpdate(String value) async {
+    if (widget.customOnSelected != null) {
+      final success = await widget.customOnSelected!(value);
+      if (!success) {
+        setState(() {
+          _selectedValue = value;
+        });
+      }
+    } else {
+      setState(() {
+        _selectedValue = value;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -101,7 +118,12 @@ class CustomHttpDropdownState extends State<CustomHttpDropdown> {
         value: _selectedValue,
         items: _availableValues,
         title: widget.title,
-        onSelected: (value) => _updateValue(value),
+        onSelected: (value) => {
+          if (widget.customOnSelected != null)
+            _selectUpdate(value)
+          else
+            _updateValue(value)
+        },
         color: widget.color,
       ),
     );

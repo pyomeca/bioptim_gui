@@ -33,7 +33,7 @@ def test_get_phases_info():
     response = client.get("/acrobatics/phases_info/")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 1
+    assert len(data) == 2
     assert data[0]["duration"] == 1
     assert len(data[0]["objectives"]) == 2
     assert len(data[0]["constraints"]) == 0
@@ -42,8 +42,8 @@ def test_get_phases_info():
     response = client.get("/acrobatics/phases_info/")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 2
-    assert data[0]["duration"] == 0.5
+    assert len(data) == 3
+    assert data[0]["duration"] == 0.33
     assert len(data[0]["objectives"]) == 2
     assert len(data[0]["constraints"]) == 0
 
@@ -179,7 +179,7 @@ def test_put_somersault_duration_unchanged_other_somersaults():
     assert response.status_code == 200, response
     data = response.json()
     assert data[0]["duration"] == 0.2
-    assert data[1]["duration"] == 0.5
+    assert data[1]["duration"] == 0.33
 
 
 def test_put_somersault_duration_changes_final_time_simple_more():
@@ -192,7 +192,7 @@ def test_put_somersault_duration_changes_final_time_simple_more():
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["final_time"] == 1.2
+    assert data["final_time"] == 2.2
 
 
 def test_put_somersault_duration_changes_final_time_simple_less():
@@ -205,11 +205,11 @@ def test_put_somersault_duration_changes_final_time_simple_less():
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["final_time"] == 0.2
+    assert data["final_time"] == 1.2
 
 
 def test_put_somersault_duration_changes_final_time_simple_more_multiple():
-    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 5})
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 4})
     assert response.status_code == 200, response
 
     client.put(
@@ -221,7 +221,7 @@ def test_put_somersault_duration_changes_final_time_simple_more_multiple():
         "/acrobatics/phases_info/1/duration",
         json={"duration": 0.6},
     )
-    # durations : 1.2, 0.6, 0.2, 0.2, 0.2, final_time = 2.4
+    # durations : 1.2, 0.6, 0.2, 0.2, 0.2 final_time = 2.4
 
     assert response.status_code == 200, response
 
@@ -232,7 +232,7 @@ def test_put_somersault_duration_changes_final_time_simple_more_multiple():
 
 
 def test_put_somersault_duration_changes_final_time_simple_less_multiple():
-    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 5})
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 4})
     assert response.status_code == 200, response
 
     client.put(

@@ -47,7 +47,7 @@ class OCPRequestMaker<T extends OCPData> {
     return response;
   }
 
-  Future<void> updatePhaseField(
+  Future<http.Response> updatePhaseField(
       int phaseIndex, String fieldName, String newValue) async {
     final url = Uri.parse(
         '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/$fieldName');
@@ -55,14 +55,16 @@ class OCPRequestMaker<T extends OCPData> {
     final response =
         await http.put(url, body: body, headers: APIConfig.headers);
 
-    if (kDebugMode) {
-      if (response.statusCode == 200) {
-        print(
-            '$phaseInfoString $phaseIndex, $fieldName updated with value: $newValue');
-      } else {
-        print('Failed to update $phaseInfoString $phaseIndex\'s $fieldName');
-      }
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Failed to update $phaseInfoString $phaseIndex\'s $fieldName');
     }
+
+    if (kDebugMode) {
+      print(
+          '$phaseInfoString $phaseIndex, $fieldName updated with value: $newValue');
+    }
+    return response;
   }
 
   Future<http.Response> updateMaximizeMinimize(

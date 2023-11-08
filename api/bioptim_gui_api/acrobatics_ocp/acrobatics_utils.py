@@ -43,46 +43,48 @@ def read_acrobatics_data(key: str = None):
     return data if key is None else data[key]
 
 
-def add_somersault_info(n: int = 1) -> None:
-    # rounding is necessary to avoid buffer overflow in the frontend
-    if n < 1:
+def update_phase_info(phase_names: list[str]) -> None:
+    """
+    Determines the number of phases from the length of the given phase_names
+    Update the phase info of the acrobatics ocp accordingly
+    Split the final time equally between the phases
+    Round the duration of each phase to 2 decimals
+
+
+    Parameters
+    ----------
+    phase_names: list[str]
+        The names of the phases to add
+
+    Returns
+    -------
+    None
+
+    Raises
+    ------
+    ValueError
+        If the number of phases is negative (i.e the phase_names is empty)
+    """
+    if len(phase_names) == 0:
         raise ValueError("n must be positive")
 
     data = read_acrobatics_data()
-    phases_info = data["phases_info"]
-    before = len(phases_info)
-    n_somersaults = before + n
+
+    n_phases = len(phase_names)
     final_time = data["final_time"]
-    for i in range(0, before):
-        phases_info[i]["duration"] = round(final_time / n_somersaults, 2)
 
-    for i in range(before, before + n):
-        phases_info.append(config.DefaultAcrobaticsConfig.default_phases_info)
-        data["nb_half_twists"].append(0)
+    new_phases = [
+        config.DefaultAcrobaticsConfig.default_phases_info.copy()
+        for _ in range(n_phases)
+    ]
+    for i in range(n_phases):
+        new_phases[i]["phase_name"] = phase_names[i]
 
-        phases_info[i]["duration"] = round(final_time / n_somersaults, 2)
+    for i in range(0, n_phases):
+        # rounding is necessary to avoid buffer overflow in the frontend
+        new_phases[i]["duration"] = round(final_time / n_phases, 2)
 
-    data["phases_info"] = phases_info
-    with open(config.DefaultAcrobaticsConfig.datafile, "w") as f:
-        json.dump(data, f)
-
-
-def remove_somersault_info(n: int = 0) -> None:
-    if n < 0:
-        raise ValueError("n must be positive")
-    data = read_acrobatics_data()
-    phases_info = data["phases_info"]
-    before = len(phases_info)
-    n_somersaults = before - n
-    final_time = data["final_time"]
-    for i in range(0, n_somersaults):
-        phases_info[i]["duration"] = round(final_time / n_somersaults, 2)
-
-    for _ in range(n):
-        phases_info.pop()
-        data["nb_half_twists"].pop()
-
-    data["phases_info"] = phases_info
+    data["phases_info"] = new_phases
     with open(config.DefaultAcrobaticsConfig.datafile, "w") as f:
         json.dump(data, f)
 
