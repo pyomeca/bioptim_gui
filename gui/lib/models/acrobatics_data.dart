@@ -45,7 +45,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   String get modelPath => _modelPath;
 
   @override
-  int get nbPhases => _nbSomersaults;
+  int get nbPhases => phaseInfo.length;
 
   int get nbSomersaults => _nbSomersaults;
   set nbSomersaults(int value) {
