@@ -1,3 +1,6 @@
+import copy
+
+
 class DefaultAcrobaticsConfig:
     datafile = "acrobatics_data.json"
 
@@ -50,7 +53,85 @@ class DefaultAcrobaticsConfig:
         "position": "straight",
         "sport_type": "trampoline",
         "preferred_twist_side": "left",
-        "phases_info": [default_phases_info.copy(), default_phases_info.copy()],
+        "phases_info": [
+            copy.deepcopy(default_phases_info),
+            copy.deepcopy(default_phases_info),
+        ],
     }
     base_data["phases_info"][0]["phase_name"] = "Somersault 1"
     base_data["phases_info"][1]["phase_name"] = "Landing"
+
+
+def phase_name_to_phase(phase_name: str):
+    # needed as there are nested list inside it
+    # removing the deepcopy will cause issues on the objectives and constraints
+    # some will be duplicated on all phases
+    res = copy.deepcopy(DefaultAcrobaticsConfig.default_phases_info)
+    res["phase_name"] = phase_name
+    if phase_name == "Pike":
+        for side in "D", "G":
+            res["objectives"].append(
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "SUPERIMPOSE_MARKERS",
+                    "nodes": "end",
+                    "quadratic": True,
+                    "expand": True,
+                    "target": None,
+                    "derivative": False,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": False,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "first_marker",
+                            "value": f"MidMain{side}",
+                            "type": "str",
+                        },
+                        {
+                            "name": "second_marker",
+                            "value": f"CibleMain{side}",
+                            "type": "str",
+                        },
+                    ],
+                },
+            )
+    elif phase_name == "Somersault":
+        for side in "D", "G":
+            res["constraints"].append(
+                {
+                    "penalty_type": "SUPERIMPOSE_MARKERS",
+                    "nodes": "all_shooting",
+                    "quadratic": True,
+                    "expand": True,
+                    "target": None,
+                    "derivative": False,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": False,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "min_bound",
+                            "value": -0.05,
+                            "type": "float",
+                        },
+                        {
+                            "name": "max_bound",
+                            "value": 0.05,
+                            "type": "float",
+                        },
+                        {
+                            "name": "first_marker",
+                            "value": f"MidMain{side}",
+                            "type": "str",
+                        },
+                        {
+                            "name": "second_marker",
+                            "value": f"CibleMain{side}",
+                            "type": "str",
+                        },
+                    ],
+                },
+            )
+
+    return res

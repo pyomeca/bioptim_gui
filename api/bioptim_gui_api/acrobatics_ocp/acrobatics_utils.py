@@ -73,10 +73,8 @@ def update_phase_info(phase_names: list[str]) -> None:
     n_phases = len(phase_names)
     final_time = data["final_time"]
 
-    new_phases = [
-        config.DefaultAcrobaticsConfig.default_phases_info.copy()
-        for _ in range(n_phases)
-    ]
+    new_phases = [config.phase_name_to_phase(name) for name in phase_names]
+
     for i in range(n_phases):
         new_phases[i]["phase_name"] = phase_names[i]
 
