@@ -39,14 +39,21 @@ class AcrobaticInformation extends StatelessWidget {
               },
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
+          const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Number of half twists *",
+                textAlign: TextAlign.left,
+              )),
           Row(
             children: [
               for (int i = 0; i < acrobaticsData.halfTwists.length; i++)
                 SizedBox(
                   width: (width / acrobaticsData.halfTwists.length),
                   child: PositiveIntegerTextField(
-                    label: 'Number of half twists *',
+                    label: '',
+                    color: Colors.red,
                     value: acrobaticsData.halfTwists[i].toString(),
                     onSubmitted: (newValue) {
                       if (newValue.isNotEmpty) {

@@ -34,6 +34,8 @@ class _PositiveIntegerTextFieldState extends State<PositiveIntegerTextField> {
     // if label ends with *, it is mandatory, and the color is red
     if (widget.label != null && widget.label!.endsWith('*')) {
       color = Colors.red;
+    } else {
+      color = widget.color;
     }
     super.initState();
   }
