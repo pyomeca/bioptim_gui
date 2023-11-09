@@ -35,8 +35,10 @@ def test_get_phases_info():
     data = response.json()
     assert len(data) == 2
     assert data[0]["duration"] == 1
-    assert len(data[0]["objectives"]) == 2
+    assert len(data[0]["objectives"]) == 5
     assert len(data[0]["constraints"]) == 0
+    assert len(data[1]["objectives"]) == 5
+    assert len(data[1]["constraints"]) == 0
 
     client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
     response = client.get("/acrobatics/phases_info/")
@@ -44,8 +46,12 @@ def test_get_phases_info():
     data = response.json()
     assert len(data) == 3
     assert data[0]["duration"] == 0.33
-    assert len(data[0]["objectives"]) == 2
+    assert len(data[0]["objectives"]) == 5
     assert len(data[0]["constraints"]) == 0
+    assert len(data[1]["objectives"]) == 5
+    assert len(data[1]["constraints"]) == 0
+    assert len(data[2]["objectives"]) == 5
+    assert len(data[2]["constraints"]) == 0
 
 
 def test_get_somersault_with_index():
@@ -53,7 +59,7 @@ def test_get_somersault_with_index():
     assert response.status_code == 200, response
     data = response.json()
     assert data["duration"] == 1
-    assert len(data["objectives"]) == 2
+    assert len(data["objectives"]) == 5
     assert len(data["constraints"]) == 0
 
 

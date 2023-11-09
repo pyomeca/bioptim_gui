@@ -112,3 +112,33 @@ def constraint_arguments(penalty_type: str) -> list:
 
     arguments = get_args(penalty_fcn)
     return arguments
+
+
+def create_objective(**kwargs):
+    return {
+        "objective_type": kwargs.get("objective_type", "lagrange"),
+        "penalty_type": kwargs.get("penalty_type", "MINIMIZE_CONTROL"),
+        "nodes": kwargs.get("nodes", "all_shooting"),
+        "quadratic": kwargs.get("quadratic", True),
+        "expand": kwargs.get("expand", True),
+        "target": kwargs.get("target", None),
+        "derivative": kwargs.get("derivative", False),
+        "integration_rule": kwargs.get("integration_rule", "rectangle_left"),
+        "multi_thread": kwargs.get("multi_thread", False),
+        "weight": kwargs.get("weight", 1.0),
+        "arguments": kwargs.get("arguments", []),
+    }
+
+
+def create_constraint(**kwargs):
+    return {
+        "penalty_type": kwargs.get("penalty_type", "TIME_CONSTRAINT"),
+        "nodes": kwargs.get("nodes", "end"),
+        "quadratic": kwargs.get("quadratic", True),
+        "expand": kwargs.get("expand", True),
+        "target": kwargs.get("target", None),
+        "derivative": kwargs.get("derivative", False),
+        "integration_rule": kwargs.get("integration_rule", "rectangle_left"),
+        "multi_thread": kwargs.get("multi_thread", False),
+        "arguments": kwargs.get("arguments", []),
+    }

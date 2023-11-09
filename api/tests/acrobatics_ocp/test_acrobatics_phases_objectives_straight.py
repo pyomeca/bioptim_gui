@@ -33,8 +33,8 @@ def test_get_objectives():
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 2
-    assert data[0]["weight"] == 100.0
+    assert len(data) == 5
+    assert data[0]["weight"] == 1.0
     assert data[1]["weight"] == 1.0
 
 
@@ -42,7 +42,7 @@ def test_add_objective_simple():
     response = client.post("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 3
+    assert len(data) == 6
 
 
 def test_add_objective_multiple():
@@ -50,30 +50,32 @@ def test_add_objective_multiple():
         response = client.post("/acrobatics/phases_info/0/objectives")
         assert response.status_code == 200, response
         data = response.json()
-        assert len(data) == _ + 3
+        assert len(data) == _ + 6
 
 
 def test_delete_objective_0():
     response = client.delete("/acrobatics/phases_info/0/objectives/0")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 1
-    assert data[0]["penalty_type"] == "MINIMIZE_TIME"
+    assert len(data) == 4
+    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[1]["penalty_type"] == "MINIMIZE_TIME"
 
 
 def test_delete_objective_1():
     response = client.delete("/acrobatics/phases_info/0/objectives/1")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 1
+    assert len(data) == 4
     assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[1]["penalty_type"] == "MINIMIZE_TIME"
 
 
 def test_add_and_remove_objective():
     response = client.post("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 3
+    assert len(data) == 6
 
     client.delete("/acrobatics/phases_info/0/objectives/0")
     client.delete("/acrobatics/phases_info/0/objectives/0")
@@ -81,8 +83,8 @@ def test_add_and_remove_objective():
 
     response = client.get("/acrobatics/phases_info/0/objectives")
     data = response.json()
-    assert len(data) == 1
-    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert len(data) == 4
+    assert data[0]["penalty_type"] == "MINIMIZE_TIME"
 
 
 def test_multiple_somersaults_add_remove_objective():
@@ -90,7 +92,7 @@ def test_multiple_somersaults_add_remove_objective():
     response = client.post("/acrobatics/phases_info/3/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 3
+    assert len(data) == 6
 
     client.delete("/acrobatics/phases_info/3/objectives/0")
     client.delete("/acrobatics/phases_info/3/objectives/0")
@@ -98,15 +100,16 @@ def test_multiple_somersaults_add_remove_objective():
 
     response = client.get("/acrobatics/phases_info/3/objectives")
     data = response.json()
-    assert len(data) == 1
-    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert len(data) == 4
+    assert data[0]["penalty_type"] == "MINIMIZE_TIME"
 
     for i in [0, 1, 2, 4]:
         response = client.get(f"/acrobatics/phases_info/{i}/objectives")
         data = response.json()
-        assert len(data) == 2
+        assert len(data) == 5
         assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
-        assert data[1]["penalty_type"] == "MINIMIZE_TIME"
+        assert data[1]["penalty_type"] == "MINIMIZE_CONTROL"
+        assert data[2]["penalty_type"] == "MINIMIZE_TIME"
 
 
 @pytest.mark.parametrize(
@@ -125,7 +128,7 @@ def test_multiple_somersaults_add_remove_objective():
         ("derivative", False, True),
         ("integration_rule", "rectangle_left", "rectangle_right"),
         ("multi_thread", False, True),
-        ("weight", 100.0, 10.0),
+        ("weight", 1.0, 10.0),
     ],
 )
 def test_put_objective_common_argument(key, default_value, new_value):
@@ -150,7 +153,7 @@ def test_put_weight_minmax():
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert data[0]["weight"] == 100.0
+    assert data[0]["weight"] == 1.0
 
     response = client.put(
         f"/acrobatics/phases_info/0/objectives/0/weight/maximize",
@@ -160,7 +163,7 @@ def test_put_weight_minmax():
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert data[0]["weight"] == -100.0
+    assert data[0]["weight"] == -1.0
 
     response = client.put(
         f"/acrobatics/phases_info/0/objectives/0/weight/minimize",
@@ -170,14 +173,14 @@ def test_put_weight_minmax():
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert data[0]["weight"] == 100.0
+    assert data[0]["weight"] == 1.0
 
 
 def test_put_weight_minmax_no_change():
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert data[0]["weight"] == 100.0
+    assert data[0]["weight"] == 1.0
 
     response = client.put(
         f"/acrobatics/phases_info/0/objectives/0/weight/minimize",
@@ -187,7 +190,7 @@ def test_put_weight_minmax_no_change():
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert data[0]["weight"] == 100.0
+    assert data[0]["weight"] == 1.0
 
     response = client.put(
         f"/acrobatics/phases_info/0/objectives/0/weight/maximize",
@@ -197,7 +200,7 @@ def test_put_weight_minmax_no_change():
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert data[0]["weight"] == -100.0
+    assert data[0]["weight"] == -1.0
 
     response = client.put(
         f"/acrobatics/phases_info/0/objectives/0/weight/maximize",
@@ -207,7 +210,7 @@ def test_put_weight_minmax_no_change():
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert data[0]["weight"] == -100.0
+    assert data[0]["weight"] == -1.0
 
 
 @pytest.mark.parametrize(
@@ -216,9 +219,9 @@ def test_put_weight_minmax_no_change():
         "new_value",
     ),
     [
-        ("objective_type", "mayer"),
-        ("penalty_type", "MINIMIZE_TIME"),
-        ("nodes", "end"),
+        ("objective_type", "lagrange"),
+        ("penalty_type", "MINIMIZE_CONTROL"),
+        ("nodes", "all"),
         ("quadratic", False),
         ("expand", False),
         ("target", [0.2, 0.5]),
@@ -238,22 +241,22 @@ def test_actually_deleted_fields_objective(key, new_value):
     response = client.post("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 3
+    assert len(data) == 6
 
     response = client.put(
-        f"/acrobatics/phases_info/0/objectives/2/{key}", json={key: new_value}
+        f"/acrobatics/phases_info/0/objectives/5/{key}", json={key: new_value}
     )
     assert response.status_code == 200, response
 
-    response = client.delete("/acrobatics/phases_info/0/objectives/2")
+    response = client.delete("/acrobatics/phases_info/0/objectives/5")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 2
+    assert len(data) == 5
 
     response = client.post("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 3
+    assert len(data) == 6
     assert data[2][key] != new_value
 
 
@@ -261,17 +264,23 @@ def test_add_objective_check_arguments_changing_penalty_type():
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 2
+    assert len(data) == 5
 
     assert data[0]["objective_type"] == "lagrange"
     assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
     assert data[0]["nodes"] == "all_shooting"
     assert len(data[0]["arguments"]) == 1
 
-    assert data[1]["objective_type"] == "mayer"
-    assert data[1]["penalty_type"] == "MINIMIZE_TIME"
-    assert data[1]["nodes"] == "end"
-    assert len(data[1]["arguments"]) == 2
+    assert data[1]["objective_type"] == "lagrange"
+    assert data[1]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[1]["nodes"] == "all_shooting"
+    assert data[1]["derivative"] == True
+    assert len(data[1]["arguments"]) == 1
+
+    assert data[2]["objective_type"] == "mayer"
+    assert data[2]["penalty_type"] == "MINIMIZE_TIME"
+    assert data[2]["nodes"] == "end"
+    assert len(data[2]["arguments"]) == 2
 
     # change the penalty_type of MINIMIZE_CONTROL to PROPORTIONAL_STATE
     response = client.put(
@@ -304,21 +313,21 @@ def test_add_objective_check_arguments_changing_objective_type():
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert len(data) == 2
+    assert len(data) == 5
 
     assert data[0]["objective_type"] == "lagrange"
     assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
     assert data[0]["nodes"] == "all_shooting"
     assert len(data[0]["arguments"]) == 1
 
-    assert data[1]["objective_type"] == "mayer"
-    assert data[1]["penalty_type"] == "MINIMIZE_TIME"
-    assert data[1]["nodes"] == "end"
-    assert len(data[1]["arguments"]) == 2
+    assert data[2]["objective_type"] == "mayer"
+    assert data[2]["penalty_type"] == "MINIMIZE_TIME"
+    assert data[2]["nodes"] == "end"
+    assert len(data[2]["arguments"]) == 2
 
     # change the objective_type from mayer to lagrange for time
     response = client.put(
-        "/acrobatics/phases_info/0/objectives/1/objective_type",
+        "/acrobatics/phases_info/0/objectives/2/objective_type",
         json={"objective_type": "lagrange"},
     )
     assert response.status_code == 200, response
@@ -326,37 +335,46 @@ def test_add_objective_check_arguments_changing_objective_type():
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
     data = response.json()
-    assert data[1]["objective_type"] == "lagrange"
-    assert data[1]["penalty_type"] == "MINIMIZE_TIME"
-    assert data[1]["nodes"] == "end"
-    assert len(data[1]["arguments"]) == 0
+    assert data[2]["objective_type"] == "lagrange"
+    assert data[2]["penalty_type"] == "MINIMIZE_TIME"
+    assert data[2]["nodes"] == "end"
+    assert len(data[2]["arguments"]) == 0
 
 
 def test_get_objective_arguments():
     response = client.get(
-        "/acrobatics/phases_info/0/objectives/1/arguments/min_bound",
+        "/acrobatics/phases_info/0/objectives/2/arguments/min_bound",
     )
     assert response.status_code == 200, response
     data = response.json()
-    assert data["value"] == 0.9
+    assert data["value"] == 0.0
+    assert data["type"] == "float"
+
+    response = client.get(
+        "/acrobatics/phases_info/0/objectives/2/arguments/max_bound",
+    )
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["value"] == 100.0
+    assert data["type"] == "float"
 
 
 def test_get_objective_arguments_bad():
     response = client.get(
-        "/acrobatics/phases_info/0/objectives/1/arguments/impossible",
+        "/acrobatics/phases_info/0/objectives/2/arguments/impossible",
     )
     assert response.status_code == 404, response
 
 
 def test_put_argument_objective():
     response = client.put(
-        "/acrobatics/phases_info/0/objectives/1/arguments/min_bound",
+        "/acrobatics/phases_info/0/objectives/2/arguments/min_bound",
         json={"type": "list", "value": [1, 2, 3]},
     )
     assert response.status_code == 200, response
 
     response = client.get(
-        "/acrobatics/phases_info/0/objectives/1/arguments/min_bound",
+        "/acrobatics/phases_info/0/objectives/2/arguments/min_bound",
     )
     assert response.status_code == 200, response
     data = response.json()
@@ -377,7 +395,8 @@ def test_get_objective_fcn():
     assert response.status_code == 200, response
     data = response.json()
     assert data[0]["objective_type"] == "lagrange"
-    assert data[1]["objective_type"] == "mayer"
+    assert data[1]["objective_type"] == "lagrange"
+    assert data[2]["objective_type"] == "mayer"
 
     response = client.get("/acrobatics/phases_info/0/objectives/0")
     assert response.status_code == 200, response

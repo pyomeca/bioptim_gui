@@ -85,7 +85,10 @@ def put_nb_half_twist(somersault_index: int, half_twists_request: NbHalfTwistsRe
 
     new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
 
-    new_phases = [config.phase_name_to_phase(name) for name in new_phase_names]
+    new_phases = [
+        config.phase_name_to_phase(position, new_phase_names, i)
+        for i, _ in enumerate(new_phase_names)
+    ]
 
     data["phases_info"] = new_phases
     update_acrobatics_data("phases_info", new_phases)

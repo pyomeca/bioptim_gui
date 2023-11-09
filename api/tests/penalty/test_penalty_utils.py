@@ -7,6 +7,8 @@ from bioptim_gui_api.penalty.penalty_utils import (
     format_arg_type,
     obj_arguments,
     constraint_arguments,
+    create_objective,
+    create_constraint,
 )
 
 
@@ -120,3 +122,35 @@ def test_bad_objective_fcn():
 def test_bad_constraint_fcn():
     with pytest.raises(HTTPException):
         constraint_arguments("NOT_IMPLEMENTED")
+
+
+def test_create_objective():
+    objective = create_objective(penalty_type="MINIMIZE_STATE")
+    assert objective == {
+        "objective_type": "lagrange",
+        "penalty_type": "MINIMIZE_STATE",
+        "nodes": "all_shooting",
+        "quadratic": True,
+        "expand": True,
+        "target": None,
+        "derivative": False,
+        "integration_rule": "rectangle_left",
+        "multi_thread": False,
+        "weight": 1.0,
+        "arguments": [],
+    }
+
+
+def test_create_constraint():
+    constraint = create_constraint(penalty_type="TIME_CONSTRAINT")
+    assert constraint == {
+        "penalty_type": "TIME_CONSTRAINT",
+        "nodes": "end",
+        "quadratic": True,
+        "expand": True,
+        "target": None,
+        "derivative": False,
+        "integration_rule": "rectangle_left",
+        "multi_thread": False,
+        "arguments": [],
+    }

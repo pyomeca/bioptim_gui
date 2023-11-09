@@ -44,27 +44,6 @@ def read_acrobatics_data(key: str = None):
 
 
 def update_phase_info(phase_names: list[str]) -> None:
-    """
-    Determines the number of phases from the length of the given phase_names
-    Update the phase info of the acrobatics ocp accordingly
-    Split the final time equally between the phases
-    Round the duration of each phase to 2 decimals
-
-
-    Parameters
-    ----------
-    phase_names: list[str]
-        The names of the phases to add
-
-    Returns
-    -------
-    None
-
-    Raises
-    ------
-    ValueError
-        If the number of phases is negative (i.e the phase_names is empty)
-    """
     if len(phase_names) == 0:
         raise ValueError("n must be positive")
 
@@ -72,8 +51,12 @@ def update_phase_info(phase_names: list[str]) -> None:
 
     n_phases = len(phase_names)
     final_time = data["final_time"]
+    position = data["position"]
 
-    new_phases = [config.phase_name_to_phase(name) for name in phase_names]
+    new_phases = [
+        config.phase_name_to_phase(position, phase_names, i)
+        for i, _ in enumerate(phase_names)
+    ]
 
     for i in range(n_phases):
         new_phases[i]["phase_name"] = phase_names[i]

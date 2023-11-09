@@ -17,6 +17,22 @@ class StraightAcrobaticsVariables:
     tau_min, tau_max, tau_init = -500, 500, 0
     qdot_min, qdot_max = -10 * np.pi, 10 * np.pi
 
+    arm_dofs = [
+        ZrotRightUpperArm,
+        YrotRightUpperArm,
+        ZrotLeftUpperArm,
+        YrotLeftUpperArm,
+    ]
+
+    shoulder_dofs = [
+        ZrotRightUpperArm,
+        YrotRightUpperArm,
+        ZrotLeftUpperArm,
+        YrotLeftUpperArm,
+    ]
+
+    elbow_dofs = []
+
     q_min_bounds = np.array(
         [
             [-1, -1, -1],

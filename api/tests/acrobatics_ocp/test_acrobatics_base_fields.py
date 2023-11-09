@@ -44,8 +44,14 @@ def test_base_info():
     assert data["preferred_twist_side"] == "left"
     assert len(data["phases_info"]) == 2
     assert data["phases_info"][0]["duration"] == 1.0
-    assert len(data["phases_info"][0]["objectives"]) == 2
+
+    assert data["phases_info"][0]["phase_name"] == "Somersault 1"
+    assert len(data["phases_info"][0]["objectives"]) == 5
     assert len(data["phases_info"][0]["constraints"]) == 0
+
+    assert data["phases_info"][1]["phase_name"] == "Landing"
+    assert len(data["phases_info"][1]["objectives"]) == 5
+    assert len(data["phases_info"][1]["constraints"]) == 0
 
 
 def test_put_model_path():

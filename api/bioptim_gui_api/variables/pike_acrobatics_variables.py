@@ -25,6 +25,29 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
 
     nb_q, nb_qdot, nb_tau = 16, 16, 10
 
+    arm_dofs = [
+        ZrotRightUpperArm,
+        YrotRightUpperArm,
+        ZrotRightLowerArm,
+        XrotRightLowerArm,
+        ZrotLeftUpperArm,
+        YrotLeftUpperArm,
+        ZrotLeftLowerArm,
+        XrotLeftLowerArm,
+    ]
+    shoulder_dofs = [
+        ZrotRightUpperArm,
+        YrotRightUpperArm,
+        ZrotLeftUpperArm,
+        YrotLeftUpperArm,
+    ]
+    elbow_dofs = [
+        ZrotRightLowerArm,
+        XrotRightLowerArm,
+        ZrotLeftLowerArm,
+        XrotLeftLowerArm,
+    ]
+
     q_min_bounds = np.array(
         [
             [-1, -1, -1],
