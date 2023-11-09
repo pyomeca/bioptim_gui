@@ -3,6 +3,10 @@ from fastapi import APIRouter, HTTPException
 from bioptim_gui_api.acrobatics_ocp.acrobatics_utils import read_acrobatics_data
 from bioptim_gui_api.utils.format_utils import format_2d_array, arg_to_string
 from bioptim_gui_api.variables.pike_acrobatics_variables import PikeAcrobaticsVariables
+from bioptim_gui_api.variables.straight_acrobatics_variables import (
+    StraightAcrobaticsVariables,
+)
+from bioptim_gui_api.variables.tuck_acrobatics_variables import TuckAcrobaticsVariables
 
 router = APIRouter()
 
@@ -18,20 +22,20 @@ def get_acrobatics_generated_code():
 
     # TODO generate a file with the correct DoF with model_converter
 
-    somersaults = data["phases_info"]
+    phases = data["phases_info"]
     half_twists = data["nb_half_twists"]
     total_half_twists = sum(half_twists)
 
     position = data["position"]
     is_forward = (total_half_twists % 2) != 0
     prefer_left = data["preferred_twist_side"] == "left"
-    total_time = sum([s["duration"] for s in somersaults])
+    total_time = sum([s["duration"] for s in phases])
 
     acrobatics_variables = PikeAcrobaticsVariables
-    # if position == "straight":
-    #     acrobatics_variables = StraightAcrobaticsVariables
-    # elif position == "tuck":
-    #     acrobatics_variables = TuckAcrobaticsVariables
+    if position == "straight":
+        acrobatics_variables = StraightAcrobaticsVariables
+    elif position == "tuck":
+        acrobatics_variables = TuckAcrobaticsVariables
 
     q_bounds = acrobatics_variables.get_q_bounds(half_twists, prefer_left)
     nb_phases = len(q_bounds)
@@ -39,7 +43,7 @@ def get_acrobatics_generated_code():
     q_init = acrobatics_variables.get_q_init(half_twists, prefer_left)
 
     qdot_bounds = acrobatics_variables.get_qdot_bounds(
-        nb_somersaults, total_time, is_forward
+        nb_phases, total_time, is_forward
     )
 
     qdot_init = acrobatics_variables.get_qdot_init()
@@ -95,11 +99,11 @@ def prepare_ocp():
     generated += f"""
 
     # Declaration of generic elements
-    n_shooting = [{", ".join([str(s["nb_shooting_points"]) for s in somersaults])}]
-    phase_time = [{", ".join([str(s["duration"]) for s in somersaults])}]
-    n_somersault = {nb_somersaults}
+    n_shooting = [{", ".join([str(s["nb_shooting_points"]) for s in phases])}]
+    phase_time = [{", ".join([str(s["duration"]) for s in phases])}]
+    nb_phases = {nb_phases}
 
-    bio_model = [BiorbdModel(r"{model_path}") for _ in range(n_somersault)]
+    bio_model = [BiorbdModel(r"{model_path}") for _ in range(nb_phases)]
     # can't use * to have multiple, needs duplication
 
 """
@@ -112,8 +116,8 @@ def prepare_ocp():
     objective_functions = ObjectiveList()
 """
 
-    for i in range(nb_somersaults):
-        for objective in somersaults[i]["objectives"]:
+    for i in range(nb_phases):
+        for objective in phases[i]["objectives"]:
             generated += f"""
     objective_functions.add(
         objective=ObjectiveFcn.{objective["objective_type"].capitalize()}.{objective["penalty_type"]},
@@ -138,13 +142,13 @@ def prepare_ocp():
                 generated += f"        integration_rule = QuadratureRule.{objective['integration_rule'].upper()},\n"
             if objective["multi_thread"]:
                 generated += "        multi_thread = True,\n"
-            if nb_somersaults > 1:
+            if nb_phases > 1:
                 generated += f"        phase={i},\n"
 
             generated += """    )
 """
 
-        for constraint in somersaults[i]["constraints"]:
+        for constraint in phases[i]["constraints"]:
             generated += f"""
     constraints.add(
         constraint=ConstraintFcn.{constraint["penalty_type"]},"""
@@ -168,7 +172,7 @@ def prepare_ocp():
                 generated += f"        integration_rule = QuadratureRule.{constraint['integration_rule'].upper()},\n"
             if constraint["multi_thread"]:
                 generated += "        multi_thread = True,\n"
-            if nb_somersaults > 1:
+            if nb_phases > 1:
                 generated += f"        phase={i},\n"
 
             generated += """    )
@@ -181,7 +185,7 @@ def prepare_ocp():
     dynamics = DynamicsList()
 """
 
-    if nb_somersaults == 1:
+    if nb_phases == 1:
         generated += f"""
     dynamics.add(
         DynamicsFcn.TORQUE_DRIVEN,
@@ -190,7 +194,7 @@ def prepare_ocp():
 """
     else:
         generated += f"""
-    for i in range(n_somersault):
+    for i in range(nb_phases):
         dynamics.add(
             DynamicsFcn.TORQUE_DRIVEN,
             expand=True,
@@ -223,7 +227,7 @@ def prepare_ocp():
     )
 """
 
-    for i in range(nb_somersaults):
+    for i in range(nb_phases):
         generated += f"""
     x_bounds.add(
         "qdot",
@@ -234,7 +238,7 @@ def prepare_ocp():
     )
 """
 
-    for i in range(nb_somersaults):
+    for i in range(nb_phases):
         generated += f"""
     x_initial_guesses.add(
         "q",
@@ -252,7 +256,7 @@ def prepare_ocp():
 """
 
     generated += f"""
-    for phase in range({nb_phases}):
+    for phase in range(nb_phases):
         u_bounds.add(
             "tau",
             min_bound={tau_bounds["min"]},
@@ -306,9 +310,9 @@ if __name__ == "__main__":
     ocp = prepare_ocp()
 
     solver = Solver.IPOPT()
-    solver = Solver.IPOPT(
-        show_online_optim=True, show_options={{"show_bounds": True}}
-    )  # debug purposes
+    # solver = Solver.IPOPT(
+    #     show_online_optim=True, show_options={{"show_bounds": True}}
+    # )  # debug purposes
     # --- Solve the ocp --- #
     sol = ocp.solve(solver=solver)
 
