@@ -5,10 +5,6 @@ from bioptim import Axis
 from bioptim_gui_api.acrobatics_ocp.acrobatics_requests import *
 
 
-class NbSomersaultsResponse(NbSomersaultsRequest):
-    pass
-
-
 class ModelPathResponse(ModelPathRequest):
     pass
 
@@ -18,10 +14,6 @@ class FinalTimeResponse(FinalTimeRequest):
 
 
 class FinalTimeMarginResponse(FinalTimeMarginRequest):
-    pass
-
-
-class PositionResponse(PositionRequest):
     pass
 
 
@@ -38,10 +30,6 @@ class NbShootingPointsResponse(NbShootingPointsRequest):
 
 
 class SomersaultDurationResponse(SomersaultDurationRequest):
-    pass
-
-
-class NbHalfTwistsResponse(NbHalfTwistsRequest):
     pass
 
 
@@ -74,22 +62,6 @@ class MultiThreadResponse(MultiThreadRequest):
 
 
 class WeightResponse(WeightRequest):
-    pass
-
-
-class ObjectiveTypeResponse(ObjectiveTypeRequest):
-    pass
-
-
-class PenaltyTypeResponse(PenaltyTypeRequest):
-    pass
-
-
-class ConstraintFcnResponse(ConstraintFcnRequest):
-    pass
-
-
-class ObjectiveFcnResponse(ObjectiveFcnRequest):
     pass
 
 

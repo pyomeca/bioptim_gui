@@ -3,13 +3,12 @@ from typing import Optional
 from bioptim import QuadratureRule, Node
 from pydantic import BaseModel
 
-from bioptim_gui_api.penalty.enums import ObjectiveType
-
 from bioptim_gui_api.acrobatics_ocp.enums import (
     Position,
     SportType,
     PreferredTwistSide,
 )
+from bioptim_gui_api.penalty.enums import ObjectiveType
 
 
 class NbSomersaultsRequest(BaseModel):
@@ -92,12 +91,12 @@ class PenaltyTypeRequest(BaseModel):
     penalty_type: str
 
 
-class ConstraintFcnRequest(BaseModel):
-    penalty_type: str
+class ConstraintFcnRequest(PenaltyTypeRequest):
+    pass
 
 
-class ObjectiveFcnRequest(BaseModel):
-    penalty_type: str
+class ObjectiveFcnRequest(PenaltyTypeRequest):
+    pass
 
 
 class ArgumentRequest(BaseModel):
