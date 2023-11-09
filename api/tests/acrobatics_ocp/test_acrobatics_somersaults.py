@@ -37,35 +37,29 @@ def test_add_somersault_info_wrong():
         update_phase_info([])
 
 
-@pytest.mark.parametrize("nb_somersaults", [6, 7, 8, 9, 100, 1e9])
-def test_put_nb_somersaults_too_much(nb_somersaults):
+@pytest.mark.parametrize("nb_somersaults", [-1e9, -1000, -1, 0, 6, 7, 8, 9, 100, 1e9])
+def test_put_nb_somersaults_bad(nb_somersaults):
     response = client.put(
         "/acrobatics/nb_somersaults/", json={"nb_somersaults": nb_somersaults}
     )
-    assert response.status_code == 400, response
+    assert response.status_code == 400, f"{nb_somersaults} is not allowed"
 
 
 def test_put_nb_somersault_negative():
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": -10})
-    assert response.status_code == 400, response
+    assert response.status_code == 400, "Negative somersaults is not allowed"
 
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     assert response.json()["nb_somersaults"] == 1
 
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": -1})
-    assert response.status_code == 400, response
+    assert response.status_code == 400, "Negative somersaults is not allowed"
 
 
 def test_put_nb_somersault_zero():
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 0})
-    assert response.status_code == 200, response
-
-    response = client.get("/acrobatics/")
-    assert response.status_code == 200, response
-    data = response.json()
-    assert data["nb_somersaults"] == 0
-    assert data["nb_half_twists"] == []
+    assert response.status_code == 400, "0 somersaults is not allowed"
 
 
 def test_put_nb_somersault():

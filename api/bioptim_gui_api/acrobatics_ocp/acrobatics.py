@@ -35,7 +35,7 @@ def update_nb_somersaults(nb_somersaults: NbSomersaultsRequest):
     old_value = read_acrobatics_data("nb_somersaults")
     new_value = nb_somersaults.nb_somersaults
 
-    if new_value < 0 or new_value > nb_max_somersaults:
+    if new_value <= 0 or new_value > nb_max_somersaults:
         raise HTTPException(status_code=400, detail="nb_somersaults must be positive")
 
     update_acrobatics_data("nb_somersaults", new_value)
