@@ -1,5 +1,6 @@
 import copy
 
+from bioptim_gui_api.penalty.penalty_config import DefaultPenaltyConfig
 from bioptim_gui_api.penalty.penalty_utils import create_objective, create_constraint
 from bioptim_gui_api.variables.pike_acrobatics_variables import PikeAcrobaticsVariables
 from bioptim_gui_api.variables.straight_acrobatics_variables import (
@@ -18,7 +19,9 @@ class DefaultAcrobaticsConfig:
         "objectives": [
             create_objective(
                 objective_type="lagrange",
-                penalty_type="MINIMIZE_CONTROL",
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_CONTROL"
+                ],
                 nodes="all_shooting",
                 weight=1.0,
                 arguments=[
@@ -27,7 +30,9 @@ class DefaultAcrobaticsConfig:
             ),
             create_objective(
                 objective_type="lagrange",
-                penalty_type="MINIMIZE_CONTROL",
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_CONTROL"
+                ],
                 nodes="all_shooting",
                 weight=1.0,
                 derivative=True,
@@ -37,7 +42,7 @@ class DefaultAcrobaticsConfig:
             ),
             create_objective(
                 objective_type="mayer",
-                penalty_type="MINIMIZE_TIME",
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_TIME"],
                 nodes="end",
                 weight=1.0,
                 arguments=[
@@ -69,7 +74,7 @@ class DefaultAcrobaticsConfig:
     base_data["phases_info"][0]["objectives"].append(
         create_objective(
             objective_type="lagrange",
-            penalty_type="MINIMIZE_STATE",
+            penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
             nodes="all_shooting",
             weight=50000.0,
             arguments=[
@@ -85,7 +90,7 @@ class DefaultAcrobaticsConfig:
     base_data["phases_info"][0]["objectives"].append(
         create_objective(
             objective_type="mayer",
-            penalty_type="MINIMIZE_STATE",
+            penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
             nodes="all",
             weight=100.0,
             arguments=[
@@ -103,7 +108,7 @@ class DefaultAcrobaticsConfig:
     base_data["phases_info"][1]["objectives"].append(
         create_objective(
             objective_type="mayer",
-            penalty_type="MINIMIZE_STATE",
+            penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
             nodes="end",
             weight=1000.0,
             arguments=[
@@ -136,6 +141,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
 
     if position in ["pike", "tuck"]:
         res["objectives"][minimize_time_index]["weight"] = -0.01
+        res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
 
     phase_name = phase_names[phase_index]
     res["phase_name"] = phase_name
@@ -148,7 +154,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
             res["objectives"].append(
                 create_objective(
                     objective_type="mayer",
-                    penalty_type="SUPERIMPOSE_MARKERS",
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "SUPERIMPOSE_MARKERS"
+                    ],
                     nodes="end",
                     weight=1.0,
                     arguments=[
@@ -172,7 +180,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
         res["objectives"].append(
             create_objective(
                 objective_type="lagrange",
-                penalty_type="MINIMIZE_STATE",
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
                 nodes="all_shooting",
                 weight=50000.0,
                 arguments=[
@@ -183,6 +193,8 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
         )
     elif phase_name == "Twist":
         res["objectives"][minimize_time_index]["weight"] = -0.01
+        penalty_type = res["objectives"][minimize_time_index]["penalty_type"]
+        res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
         # if there is a twist before piking/tucking the minimize_time weight is set to 1
         if phase_index == 0:
             res["objectives"][minimize_time_index]["weight"] = 1.0
@@ -190,7 +202,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
-                    penalty_type="MINIMIZE_STATE",
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "MINIMIZE_STATE"
+                    ],
                     nodes="all_shooting",
                     weight=50000.0,
                     arguments=[
@@ -204,7 +218,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
-                    penalty_type="MINIMIZE_STATE",
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "MINIMIZE_STATE"
+                    ],
                     nodes="all_shooting",
                     weight=50000.0,
                     arguments=[
@@ -217,7 +233,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
-                    penalty_type="MINIMIZE_STATE",
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "MINIMIZE_STATE"
+                    ],
                     nodes="all_shooting",
                     weight=50000.0,
                     arguments=[
@@ -228,11 +246,14 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
             )
     elif phase_name == "Somersault":
         res["objectives"][minimize_time_index]["weight"] = -0.01
+        res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
         # quick kickout
         res["objectives"].append(
             create_objective(
                 objective_type="lagrange",
-                penalty_type="MINIMIZE_STATE",
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
                 nodes="all_shooting",
                 weight=50000.0,
                 arguments=[
@@ -244,7 +265,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
         for side in "D", "G":
             res["constraints"].append(
                 create_constraint(
-                    penalty_type="SUPERIMPOSE_MARKERS",
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "SUPERIMPOSE_MARKERS"
+                    ],
                     nodes="all_shooting",
                     weight=1.0,
                     arguments=[
@@ -265,12 +288,16 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
             )
     elif phase_name == "Landing":
         res["objectives"][minimize_time_index]["weight"] = -0.01
+        penalty_type = res["objectives"][minimize_time_index]["penalty_type"]
+        res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
 
         if position != "straight":
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
-                    penalty_type="MINIMIZE_STATE",
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "MINIMIZE_STATE"
+                    ],
                     nodes="all_shooting",
                     weight=50000.0,
                     arguments=[
@@ -284,7 +311,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
-                    penalty_type="MINIMIZE_STATE",
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "MINIMIZE_STATE"
+                    ],
                     nodes="all_shooting",
                     weight=50000.0,
                     arguments=[
@@ -298,7 +327,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
         res["objectives"].append(
             create_objective(
                 objective_type="mayer",
-                penalty_type="MINIMIZE_STATE",
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
                 nodes="end",
                 weight=1000.0,
                 arguments=[
@@ -312,7 +343,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
         res["objectives"].append(
             create_objective(
                 objective_type="lagrange",
-                penalty_type="MINIMIZE_STATE",
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
                 nodes="all_shooting",
                 weight=50000.0,
                 arguments=[
@@ -325,7 +358,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
         res["objectives"].append(
             create_objective(
                 objective_type="mayer",
-                penalty_type="MINIMIZE_STATE",
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
                 nodes="all",
                 weight=100.0,
                 arguments=[

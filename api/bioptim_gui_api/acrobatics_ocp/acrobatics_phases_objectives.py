@@ -37,43 +37,12 @@ def add_objective(phase_index: int):
 def get_objective_dropdown_list(phase_index: int, objective_index: int):
     phases_info = read_acrobatics_data("phases_info")
     objective = phases_info[phase_index]["objectives"][objective_index]
-    objective_type = objective["objective_type"]
-    # if objective_type == "mayer":
-    #     enum = ObjectiveFcn.Mayer
-    # elif objective_type == "lagrange":
-    #     enum = ObjectiveFcn.Lagrange
-    # else:
-    #     raise HTTPException(
-    #         status_code=400, detail="objective_type has to be mayer or lagrange"
-    #     )
+    weight = objective["weight"]
 
-    # weight = objective["weight"]
-
-    # we don't implement all the objective functions for now
-    return [
-        "MINIMIZE_ANGULAR_MOMENTUM",
-        "MINIMIZE_COM_POSITION",
-        "MINIMIZE_COM_VELOCITY",
-        "MINIMIZE_CONTROL",
-        "MINIMIZE_LINEAR_MOMENTUM",
-        "MINIMIZE_MARKERS",
-        "MINIMIZE_MARKERS_ACCELERATION",
-        "MINIMIZE_MARKERS_VELOCITY",
-        "MINIMIZE_POWER",
-        "MINIMIZE_QDDOT",
-        "MINIMIZE_SEGMENT_ROTATION",
-        "MINIMIZE_SEGMENT_VELOCITY",
-        "MINIMIZE_STATE",
-        "MINIMIZE_TIME",
-        "PROPORTIONAL_CONTROL",
-        "PROPORTIONAL_STATE",
-        "SUPERIMPOSE_MARKERS",
-        "TRACK_MARKER_WITH_SEGMENT_AXIS",
-        "TRACK_SEGMENT_WITH_CUSTOM_RT",
-        "TRACK_VECTOR_ORIENTATIONS_FROM_MARKERS",
-    ]
-    # return list(min_to_original_dict.keys()) if weight > 0 else list(max_to_original_dict.keys())
-    # return [e.name for e in enum]
+    if weight > 0:
+        return penalty_config.DefaultPenaltyConfig.min_to_original_dict.keys()
+    else:
+        return penalty_config.DefaultPenaltyConfig.max_to_original_dict.keys()
 
 
 @router.delete(
@@ -105,6 +74,18 @@ def put_objective_type(
     penalty_type = phases_info[phase_index]["objectives"][objective_index][
         "penalty_type"
     ]
+
+    weight = phases_info[phase_index]["objectives"][objective_index]["weight"]
+
+    if weight > 0:
+        penalty_type = penalty_config.DefaultPenaltyConfig.min_to_original_dict[
+            penalty_type
+        ]
+    else:
+        penalty_type = penalty_config.DefaultPenaltyConfig.max_to_original_dict[
+            penalty_type
+        ]
+
     arguments = obj_arguments(objective_type_value, penalty_type)
 
     phases_info[phase_index]["objectives"][objective_index]["arguments"] = arguments
@@ -134,6 +115,17 @@ def put_objective_penalty_type(
     objective_type = phases_info[phase_index]["objectives"][objective_index][
         "objective_type"
     ]
+    weight = phases_info[phase_index]["objectives"][objective_index]["weight"]
+
+    if weight > 0:
+        penalty_type_value = penalty_config.DefaultPenaltyConfig.min_to_original_dict[
+            penalty_type_value
+        ]
+    else:
+        penalty_type_value = penalty_config.DefaultPenaltyConfig.max_to_original_dict[
+            penalty_type_value
+        ]
+
     arguments = obj_arguments(
         objective_type=objective_type, penalty_type=penalty_type_value
     )
@@ -247,7 +239,11 @@ def put_objective_multi_thread(
 )
 def put_objective_weight(phase_index: int, objective_index: int, weight: WeightRequest):
     phases_info = read_acrobatics_data("phases_info")
-    phases_info[phase_index]["objectives"][objective_index]["weight"] = weight.weight
+    old_weight = phases_info[phase_index]["objectives"][objective_index]["weight"]
+
+    phases_info[phase_index]["objectives"][objective_index]["weight"] = (
+        weight.weight if old_weight > 0 else -weight.weight
+    )
     update_acrobatics_data("phases_info", phases_info)
     return WeightResponse(weight=weight.weight)
 
@@ -262,6 +258,15 @@ def put_objective_weight_maximize(phase_index: int, objective_index: int):
     new_weight = -abs(old_weight)
 
     phases_info[phase_index]["objectives"][objective_index]["weight"] = new_weight
+    penalty_type = phases_info[phase_index]["objectives"][objective_index][
+        "penalty_type"
+    ]
+
+    if old_weight > 0:
+        phases_info[phase_index]["objectives"][objective_index][
+            "penalty_type"
+        ] = penalty_config.DefaultPenaltyConfig.min_to_max(penalty_type)
+
     update_acrobatics_data("phases_info", phases_info)
     return phases_info[phase_index]["objectives"][objective_index]
 
@@ -276,6 +281,15 @@ def put_objective_weight_minimize(phase_index: int, objective_index: int):
     new_weight = abs(old_weight)
 
     phases_info[phase_index]["objectives"][objective_index]["weight"] = new_weight
+    penalty_type = phases_info[phase_index]["objectives"][objective_index][
+        "penalty_type"
+    ]
+
+    if old_weight < 0:
+        phases_info[phase_index]["objectives"][objective_index][
+            "penalty_type"
+        ] = penalty_config.DefaultPenaltyConfig.max_to_min(penalty_type)
+
     update_acrobatics_data("phases_info", phases_info)
     return phases_info[phase_index]["objectives"][objective_index]
 

@@ -176,6 +176,34 @@ def test_put_weight_minmax():
     assert data[0]["weight"] == 1.0
 
 
+def test_put_weight_after_maximizing():
+    response = client.get("/acrobatics/phases_info/0/objectives")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data[0]["weight"] == 1.0
+
+    response = client.put(
+        f"/acrobatics/phases_info/0/objectives/0/weight/maximize",
+    )
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/phases_info/0/objectives")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data[0]["weight"] == -1.0
+
+    response = client.put(
+        f"/acrobatics/phases_info/0/objectives/0/weight",
+        json={"weight": 10.0},
+    )
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/phases_info/0/objectives")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data[0]["weight"] == -10.0
+
+
 def test_put_weight_minmax_no_change():
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response

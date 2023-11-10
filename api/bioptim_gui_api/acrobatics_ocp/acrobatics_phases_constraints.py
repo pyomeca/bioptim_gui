@@ -74,7 +74,7 @@ def put_constraint_penalty_type(
         "penalty_type"
     ] = penalty_type_value
 
-    arguments = constraint_arguments(penalty_type.penalty_type)
+    arguments = constraint_arguments(penalty_type_value)
     phases_info[phase_index]["constraints"][constraint_index]["arguments"] = arguments
 
     update_acrobatics_data("phases_info", phases_info)
