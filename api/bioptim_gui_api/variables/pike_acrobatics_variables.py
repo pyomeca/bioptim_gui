@@ -111,7 +111,6 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
 
             x_bounds[0]["min"][:, 0] = [0] * cls.nb_q
             x_bounds[0]["min"][: cls.Xrot, 0] = -0.001
-
             # arm position up
             x_bounds[0]["min"][cls.YrotRightUpperArm, 0] = 2.9
             x_bounds[0]["min"][cls.YrotLeftUpperArm, 0] = -2.9
@@ -124,8 +123,15 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
             x_bounds[0]["max"][:, 1] = intermediate_max_bounds
 
             # somersaulting
-            x_bounds[0]["min"][cls.Xrot, 1:] = 0 if is_forward else -2 * np.pi
-            x_bounds[0]["max"][cls.Xrot, 1:] = 2 * np.pi if is_forward else 0
+            x_bounds[0]["min"][cls.Xrot, 1] = 0 if is_forward else -2 * np.pi + 0.1
+            x_bounds[0]["max"][cls.Xrot, 1] = 2 * np.pi + 0.1 if is_forward else 0
+
+            x_bounds[0]["min"][cls.Xrot, 2] = (
+                np.pi / 2 - 0.1 if is_forward else -2 * np.pi + 0.1
+            )
+            x_bounds[0]["max"][cls.Xrot, 2] = (
+                2 * np.pi + 0.1 if is_forward else -np.pi / 2 + 0.1
+            )
 
             # twisting
             x_bounds[0]["min"][cls.Zrot, 1] = (
@@ -181,11 +187,18 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                     x_bounds[0]["max"][:, 1] = intermediate_max_bounds
 
                     # somersaulting
-                    x_bounds[0]["min"][cls.Xrot, 1:] = (
-                        -0.2 if is_forward else -2 * np.pi - 0.2
+                    x_bounds[0]["min"][cls.Xrot, 1] = (
+                        0 if is_forward else -2 * np.pi + 0.1
                     )
-                    x_bounds[0]["max"][cls.Xrot, 1:] = (
-                        2 * np.pi + 0.2 if is_forward else 0.2
+                    x_bounds[0]["max"][cls.Xrot, 1] = (
+                        2 * np.pi + 0.1 if is_forward else 0
+                    )
+
+                    x_bounds[0]["min"][cls.Xrot, 2] = (
+                        np.pi / 2 - 0.1 if is_forward else -2 * np.pi + 0.1
+                    )
+                    x_bounds[0]["max"][cls.Xrot, 2] = (
+                        2 * np.pi + 0.1 if is_forward else -np.pi / 2 + 0.1
                     )
 
                     # twisting
@@ -233,25 +246,49 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
 
                 # somersaulting in pike, for all no-twist somersaults, starting from last pike
                 x_bounds[current_phase]["min"][cls.Xrot, 1] = (
-                    2 * np.pi * (somersault_pike_start + 1) - 0.2
+                    min(
+                        2 * np.pi * somersault_pike_start - 0.2,
+                        2 * np.pi * nb_somersaults - np.pi / 2 - 0.2,
+                    )
                     if is_forward
-                    else -2 * np.pi * (i + 1)
+                    else max(
+                        -2 * np.pi * (i + 1) - 0.2,
+                        -2 * np.pi * nb_somersaults + np.pi / 2 - 0.2,
+                    )
                 )
                 x_bounds[current_phase]["max"][cls.Xrot, 1] = (
-                    2 * np.pi * (i + 1)
+                    min(
+                        2 * np.pi * (i + 1) + 0.2,
+                        2 * np.pi * nb_somersaults - np.pi / 2 + 0.2,
+                    )
                     if is_forward
-                    else -2 * np.pi * somersault_pike_start + 0.2
+                    else max(
+                        -2 * np.pi * somersault_pike_start + 0.2,
+                        -2 * np.pi * nb_somersaults + np.pi / 2 + 0.2,
+                    )
                 )
 
                 x_bounds[current_phase]["min"][cls.Xrot, 2] = (
-                    2 * np.pi * (i + 1) - 0.2
+                    min(
+                        2 * np.pi * (i + 1) - 0.2,
+                        2 * np.pi * nb_somersaults - np.pi / 2 - 0.2,
+                    )
                     if is_forward
-                    else -2 * np.pi * (i + 1) - 0.2
+                    else min(
+                        -2 * np.pi * (i + 1) - 0.2,
+                        -2 * np.pi * nb_somersaults + np.pi / 2 - 0.2,
+                    )
                 )
                 x_bounds[current_phase]["max"][cls.Xrot, 2] = (
-                    2 * np.pi * (i + 1) + 0.2
+                    min(
+                        2 * np.pi * (i + 1) + 0.2,
+                        2 * np.pi * nb_somersaults - np.pi / 2 + 0.2,
+                    )
                     if is_forward
-                    else -2 * np.pi * (i + 1) + 0.2
+                    else min(
+                        -2 * np.pi * (i + 1) + 0.2,
+                        -2 * np.pi * nb_somersaults + np.pi / 2 + 0.2,
+                    )
                 )
 
                 # tilt pi / 8
@@ -287,49 +324,28 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                     ][:, 2]
 
                 # somersaulting
-                if is_last_somersault:
-                    x_bounds[current_phase]["min"][cls.Xrot, 1] = (
-                        2 * np.pi * i - 0.2
-                        if is_forward
-                        else -2 * np.pi * nb_somersaults + np.pi / 2
+                x_bounds[current_phase]["min"][cls.Xrot, 1:] = (
+                    min(
+                        2 * np.pi * somersault_pike_start - 0.2,
+                        2 * np.pi * nb_somersaults - np.pi / 2 - 0.2,
                     )
-                    x_bounds[current_phase]["max"][cls.Xrot, 1] = (
-                        2 * np.pi * nb_somersaults - np.pi / 2
-                        if is_forward
-                        else -2 * np.pi * i + 0.2
+                    if is_forward
+                    else max(
+                        -2 * np.pi * (i + 1) - 0.2,
+                        -2 * np.pi * nb_somersaults + np.pi / 2 - 0.2,
                     )
-                    x_bounds[current_phase]["min"][cls.Xrot, 2] = (
-                        2 * np.pi * nb_somersaults - np.pi / 2 - 0.2
-                        if is_forward
-                        else -2 * np.pi * nb_somersaults + np.pi / 2 - 0.2
+                )
+                x_bounds[current_phase]["max"][cls.Xrot, 1:] = (
+                    min(
+                        2 * np.pi * (i + 1) + 0.2,
+                        2 * np.pi * nb_somersaults - np.pi / 2 + 0.2,
                     )
-                    x_bounds[current_phase]["max"][cls.Xrot, 2] = (
-                        2 * np.pi * nb_somersaults - np.pi / 2 + 0.2
-                        if is_forward
-                        else -2 * np.pi * nb_somersaults + np.pi / 2 + 0.2
+                    if is_forward
+                    else max(
+                        -2 * np.pi * somersault_pike_start + 0.2,
+                        -2 * np.pi * nb_somersaults + np.pi / 2 + 0.2,
                     )
-                else:
-                    x_bounds[current_phase]["min"][cls.Xrot, 1] = (
-                        2 * np.pi * i - 0.2
-                        if is_forward
-                        else -2 * np.pi * (i + 1) - 0.2
-                    )
-                    x_bounds[current_phase]["max"][cls.Xrot, 1] = (
-                        2 * np.pi * (i + 1) + 0.2
-                        if is_forward
-                        else -2 * np.pi * i + 0.2
-                    )
-
-                    x_bounds[current_phase]["min"][cls.Xrot, 2] = (
-                        2 * np.pi * (i + 1) - 0.2
-                        if is_forward
-                        else -2 * np.pi * (i + 1) - 0.2
-                    )
-                    x_bounds[current_phase]["max"][cls.Xrot, 2] = (
-                        2 * np.pi * (i + 1) + 0.2
-                        if is_forward
-                        else -2 * np.pi * (i + 1) + np.pi + 0.2
-                    )
+                )
 
                 # tilt pi / 4
                 x_bounds[current_phase]["min"][cls.Yrot, :] = -np.pi / 4
