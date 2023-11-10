@@ -50,7 +50,7 @@ def test_base_info():
     assert len(data["phases_info"][0]["constraints"]) == 0
 
     assert data["phases_info"][1]["phase_name"] == "Landing"
-    assert len(data["phases_info"][1]["objectives"]) == 5
+    assert len(data["phases_info"][1]["objectives"]) == 4
     assert len(data["phases_info"][1]["constraints"]) == 0
 
 

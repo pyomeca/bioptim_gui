@@ -37,7 +37,7 @@ def test_get_phases_info():
     assert data[0]["duration"] == 1
     assert len(data[0]["objectives"]) == 5
     assert len(data[0]["constraints"]) == 0
-    assert len(data[1]["objectives"]) == 5
+    assert len(data[1]["objectives"]) == 4
     assert len(data[1]["constraints"]) == 0
 
     client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
@@ -50,7 +50,7 @@ def test_get_phases_info():
     assert len(data[0]["constraints"]) == 0
     assert len(data[1]["objectives"]) == 5
     assert len(data[1]["constraints"]) == 0
-    assert len(data[2]["objectives"]) == 5
+    assert len(data[2]["objectives"]) == 4
     assert len(data[2]["constraints"]) == 0
 
 

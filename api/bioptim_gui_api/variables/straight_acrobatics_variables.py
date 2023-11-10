@@ -258,11 +258,10 @@ class StraightAcrobaticsVariables:
     @classmethod
     def get_q_init(
         cls,
+        nb_phases: int,
         half_twists: list,
         prefer_left: bool = True,
     ) -> list:
-        nb_somersaults = len(half_twists)
-        nb_phases = nb_somersaults + 1  # + 1 for landing
         is_forward = sum(half_twists) % 2 != 0
         x_inits = np.zeros((nb_phases, 2, cls.nb_q))
 

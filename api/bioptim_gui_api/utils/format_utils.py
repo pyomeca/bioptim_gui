@@ -1,6 +1,6 @@
 def arg_to_string(argument: dict) -> str:
     name, arg_type, value = argument["name"], argument["type"], argument["value"]
-    if arg_type == "int" or arg_type == "float":
+    if arg_type in ["int", "float", "list"]:
         return f"{name}={value}"
     else:
         return f'{name}="{value}"'

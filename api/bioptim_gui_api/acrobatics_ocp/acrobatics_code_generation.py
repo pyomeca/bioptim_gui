@@ -40,7 +40,7 @@ def get_acrobatics_generated_code():
     q_bounds = acrobatics_variables.get_q_bounds(half_twists, prefer_left)
     nb_phases = len(q_bounds)
 
-    q_init = acrobatics_variables.get_q_init(half_twists, prefer_left)
+    q_init = acrobatics_variables.get_q_init(nb_phases, half_twists, prefer_left)
 
     qdot_bounds = acrobatics_variables.get_qdot_bounds(
         nb_phases, total_time, is_forward
@@ -151,10 +151,12 @@ def prepare_ocp():
         for constraint in phases[i]["constraints"]:
             generated += f"""
     constraints.add(
-        constraint=ConstraintFcn.{constraint["penalty_type"]},"""
+        constraint=ConstraintFcn.{constraint["penalty_type"]},
+"""
+            for argument in constraint["arguments"]:
+                generated += f"        {arg_to_string(argument)},\n"
 
-            generated += f"""
-        node=Node.{constraint["nodes"].upper()},
+            generated += f"""        node=Node.{constraint["nodes"].upper()},
         quadratic={constraint["quadratic"]},
 """
 

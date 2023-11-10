@@ -101,7 +101,7 @@ def test_add_somersault():
     assert len(data["phases_info"][0]["constraints"]) == 0
     assert len(data["phases_info"][1]["objectives"]) == 5
     assert len(data["phases_info"][1]["constraints"]) == 0
-    assert len(data["phases_info"][2]["objectives"]) == 5
+    assert len(data["phases_info"][2]["objectives"]) == 4
     assert len(data["phases_info"][2]["constraints"]) == 0
 
 

@@ -75,7 +75,7 @@ class DefaultAcrobaticsConfig:
             arguments=[
                 {"name": "key", "value": "q", "type": "str"},
                 {
-                    "name": "index,",
+                    "name": "index",
                     "value": StraightAcrobaticsVariables.shoulder_dofs,
                     "type": "list",
                 },
@@ -91,25 +91,8 @@ class DefaultAcrobaticsConfig:
             arguments=[
                 {"name": "key", "value": "q", "type": "str"},
                 {
-                    "name": "index,",
+                    "name": "index",
                     "value": [StraightAcrobaticsVariables.Yrot],
-                    "type": "list",
-                },
-            ],
-        )
-    )
-
-    base_data["phases_info"][1]["objectives"].append(
-        create_objective(
-            objective_type="lagrange",
-            penalty_type="MINIMIZE_STATE",
-            nodes="all_shooting",
-            weight=50000.0,
-            arguments=[
-                {"name": "key", "value": "q", "type": "str"},
-                {
-                    "name": "index,",
-                    "value": StraightAcrobaticsVariables.elbow_dofs,
                     "type": "list",
                 },
             ],
@@ -126,7 +109,7 @@ class DefaultAcrobaticsConfig:
             arguments=[
                 {"name": "key", "value": "q", "type": "str"},
                 {
-                    "name": "index,",
+                    "name": "index",
                     "value": [StraightAcrobaticsVariables.Yrot],
                     "type": "list",
                 },
@@ -194,7 +177,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
                 weight=50000.0,
                 arguments=[
                     {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index,", "value": model.XrotUpperLegs, "type": "list"},
+                    {"name": "index", "value": model.XrotUpperLegs, "type": "list"},
                 ],
             )
         )
@@ -239,7 +222,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
                     weight=50000.0,
                     arguments=[
                         {"name": "key", "value": "q", "type": "str"},
-                        {"name": "index,", "value": model.elbow_dofs, "type": "list"},
+                        {"name": "index", "value": model.elbow_dofs, "type": "list"},
                     ],
                 )
             )
@@ -254,7 +237,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
                 weight=50000.0,
                 arguments=[
                     {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index,", "value": model.XrotUpperLegs, "type": "int"},
+                    {"name": "index", "value": model.XrotUpperLegs, "type": "int"},
                 ],
             )
         )
@@ -283,20 +266,6 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
     elif phase_name == "Landing":
         res["objectives"][minimize_time_index]["weight"] = -0.01
 
-        res["objectives"].append(
-            create_objective(
-                objective_type="lagrange",
-                penalty_type="MINIMIZE_STATE",
-                nodes="all_shooting",
-                weight=50000.0,
-                arguments=[
-                    {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index,", "value": model.elbow_dofs, "type": "list"},
-                ],
-            )
-        )
-
-        # Keeping the body alignement after kick out
         if position != "straight":
             res["objectives"].append(
                 create_objective(
@@ -306,7 +275,21 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
                     weight=50000.0,
                     arguments=[
                         {"name": "key", "value": "q", "type": "str"},
-                        {"name": "index,", "value": model.XrotUpperLegs, "type": "int"},
+                        {"name": "index", "value": model.elbow_dofs, "type": "list"},
+                    ],
+                )
+            )
+
+            # Keeping the body alignement after kick out
+            res["objectives"].append(
+                create_objective(
+                    objective_type="lagrange",
+                    penalty_type="MINIMIZE_STATE",
+                    nodes="all_shooting",
+                    weight=50000.0,
+                    arguments=[
+                        {"name": "key", "value": "q", "type": "str"},
+                        {"name": "index", "value": model.XrotUpperLegs, "type": "int"},
                     ],
                 )
             )
@@ -320,7 +303,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
                 weight=1000.0,
                 arguments=[
                     {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index,", "value": [model.Yrot], "type": "list"},
+                    {"name": "index", "value": [model.Yrot], "type": "list"},
                 ],
             )
         )
@@ -334,7 +317,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
                 weight=50000.0,
                 arguments=[
                     {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index,", "value": model.shoulder_dofs, "type": "list"},
+                    {"name": "index", "value": model.shoulder_dofs, "type": "list"},
                 ],
             )
         )
@@ -347,7 +330,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
                 weight=100.0,
                 arguments=[
                     {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index,", "value": [model.Yrot], "type": "list"},
+                    {"name": "index", "value": [model.Yrot], "type": "list"},
                 ],
             )
         )
