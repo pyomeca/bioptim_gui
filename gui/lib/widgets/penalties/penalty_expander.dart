@@ -234,8 +234,12 @@ class _PathTile extends StatelessWidget {
             penaltyType == Objective
                 ? data
                     .phaseInfo[phaseIndex].objectives[penaltyIndex].penaltyType
-                : data.phaseInfo[phaseIndex].constraints[penaltyIndex]
-                    .penaltyType,
+                    .replaceAll("_", " ")
+                    .capitalize()
+                : data
+                    .phaseInfo[phaseIndex].constraints[penaltyIndex].penaltyType
+                    .replaceAll("_", " ")
+                    .capitalize(),
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
@@ -243,6 +247,7 @@ class _PathTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 12),
             Row(children: [
               SizedBox(
                 width: (penaltyType == Objective)
