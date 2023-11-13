@@ -148,6 +148,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
     if phase_name in ["Pike", "Tuck"]:
         # minimize time weight is set to 100 for pike/tuck and kick out phase
         res["objectives"][minimize_time_index]["weight"] = 100.0
+        res["objectives"][minimize_time_index]["penalty_type"] = "MINIMIZE_TIME"
 
         # Aim to put the hands on the lower legs to grab the pike position
         for side in "D", "G":
@@ -175,6 +176,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
             )
     elif phase_name == "Kick out":
         res["objectives"][minimize_time_index]["weight"] = 100.0
+        res["objectives"][minimize_time_index]["penalty_type"] = "MINIMIZE_TIME"
 
         # Keeping the body alignment after kick out
         res["objectives"].append(
@@ -193,11 +195,11 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
         )
     elif phase_name == "Twist":
         res["objectives"][minimize_time_index]["weight"] = -0.01
-        penalty_type = res["objectives"][minimize_time_index]["penalty_type"]
         res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
         # if there is a twist before piking/tucking the minimize_time weight is set to 1
         if phase_index == 0:
             res["objectives"][minimize_time_index]["weight"] = 1.0
+            res["objectives"][minimize_time_index]["penalty_type"] = "MINIMIZE_TIME"
 
         if position != "straight":
             res["objectives"].append(
@@ -251,9 +253,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
         for side in "D", "G":
             res["constraints"].append(
                 create_constraint(
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                        "SUPERIMPOSE_MARKERS"
-                    ],
+                    penalty_type="SUPERIMPOSE_MARKERS",
                     nodes="all_shooting",
                     weight=1.0,
                     arguments=[
@@ -274,7 +274,6 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
             )
     elif phase_name == "Landing":
         res["objectives"][minimize_time_index]["weight"] = -0.01
-        penalty_type = res["objectives"][minimize_time_index]["penalty_type"]
         res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
 
         if position != "straight":
