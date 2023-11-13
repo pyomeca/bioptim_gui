@@ -77,6 +77,8 @@ from bioptim import (
     Node,
     QuadratureRule,
     ConstraintList,
+    MultinodeConstraintList,
+    MultinodeConstraintFcn,
 )
 
 """
@@ -200,7 +202,6 @@ def prepare_ocp():
         generated += f"""
     dynamics.add(
         DynamicsFcn.TORQUE_DRIVEN,
-        expand=True,
     )
 """
     else:
@@ -208,9 +209,19 @@ def prepare_ocp():
     for i in range(nb_phases):
         dynamics.add(
             DynamicsFcn.TORQUE_DRIVEN,
-            expand=True,
             phase=i,
         )
+"""
+
+    generated += f"""
+    multinode_constraints = MultinodeConstraintList()
+    multinode_constraints.add(
+        MultinodeConstraintFcn.TRACK_TOTAL_TIME,
+        nodes_phase=({", ".join([str(i) for i in range(nb_phases)])}),
+        nodes=({", ".join(["Node.END" for _ in range(nb_phases)])}),
+        min_bound={total_time} - 0.02,
+        max_bound={total_time} + 0.02,
+    )
 """
 
     # PATH CONSTRAINTS
@@ -306,8 +317,8 @@ def prepare_ocp():
         objective_functions=objective_functions,
         variable_mappings=mapping,
         use_sx=False,
-        assume_phase_dynamics=True,
         constraints=constraints,
+        multinode_constraints=multinode_constraints,
     )
 
 
