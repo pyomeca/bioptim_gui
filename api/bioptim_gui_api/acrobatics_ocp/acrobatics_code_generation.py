@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from bioptim_gui_api.acrobatics_ocp.acrobatics_utils import read_acrobatics_data
+from bioptim_gui_api.penalty.penalty_config import DefaultPenaltyConfig
 from bioptim_gui_api.utils.format_utils import format_2d_array, arg_to_string
 from bioptim_gui_api.variables.pike_acrobatics_variables import PikeAcrobaticsVariables
 from bioptim_gui_api.variables.straight_acrobatics_variables import (
@@ -118,9 +119,17 @@ def prepare_ocp():
 
     for i in range(nb_phases):
         for objective in phases[i]["objectives"]:
+            weight = objective["weight"]
+            penalty_type = (
+                DefaultPenaltyConfig.min_to_original_dict[objective["penalty_type"]]
+                if weight > 0
+                else DefaultPenaltyConfig.max_to_original_dict[
+                    objective["penalty_type"]
+                ]
+            )
             generated += f"""
     objective_functions.add(
-        objective=ObjectiveFcn.{objective["objective_type"].capitalize()}.{objective["penalty_type"]},
+        objective=ObjectiveFcn.{objective["objective_type"].capitalize()}.{penalty_type},
 """
             for argument in objective["arguments"]:
                 generated += f"        {arg_to_string(argument)},\n"
