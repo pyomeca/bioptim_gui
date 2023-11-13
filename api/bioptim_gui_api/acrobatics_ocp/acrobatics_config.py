@@ -199,6 +199,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
         if phase_index == 0:
             res["objectives"][minimize_time_index]["weight"] = 1.0
 
+        if position != "straight":
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
@@ -224,23 +225,8 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
                     nodes="all_shooting",
                     weight=50000.0,
                     arguments=[
-                        {"name": "key", "value": "q", "type": "string"},
-                        {"name": "index", "value": model.arm_dofs, "type": "list"},
-                    ],
-                )
-            )
-
-            res["objectives"].append(
-                create_objective(
-                    objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                        "MINIMIZE_STATE"
-                    ],
-                    nodes="all_shooting",
-                    weight=50000.0,
-                    arguments=[
                         {"name": "key", "value": "q", "type": "str"},
-                        {"name": "index", "value": model.elbow_dofs, "type": "list"},
+                        {"name": "index", "value": model.XrotUpperLegs, "type": "list"},
                     ],
                 )
             )
