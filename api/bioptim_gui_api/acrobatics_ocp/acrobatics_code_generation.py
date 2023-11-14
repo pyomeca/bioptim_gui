@@ -26,10 +26,12 @@ def get_acrobatics_generated_code():
     phases = data["phases_info"]
     half_twists = data["nb_half_twists"]
     total_half_twists = sum(half_twists)
+    save_path = "save_path" # TODO
 
     position = data["position"]
     is_forward = (total_half_twists % 2) != 0
-    prefer_left = data["preferred_twist_side"] == "left"
+    side = data["preferred_twist_side"]
+    prefer_left = side == "left"
     total_time = sum([s["duration"] for s in phases])
 
     acrobatics_variables = PikeAcrobaticsVariables
@@ -57,34 +59,42 @@ def get_acrobatics_generated_code():
 
     generated = """\"""This file was automatically generated using BioptimGUI version 0.0.1\"""
 
+import os
 import pickle as pkl
+import sys
 
 import numpy as np
 from bioptim import (
     Axis,
-    BiorbdModel,
-    ConstraintFcn,
-    OptimalControlProgram,
-    DynamicsList,
-    DynamicsFcn,
-    BoundsList,
-    InitialGuessList,
-    ObjectiveList,
-    ObjectiveFcn,
-    InterpolationType,
     BiMappingList,
-    Solver,
-    Node,
-    QuadratureRule,
+    BiorbdModel,
+    BoundsList,
+    ConstraintFcn,
     ConstraintList,
-    MultinodeConstraintList,
+    DynamicsFcn,
+    DynamicsList,
+    InitialGuessList,
+    InterpolationType,
+    MagnitudeType,
     MultinodeConstraintFcn,
+    MultinodeConstraintList,
+    MultiStart,
+    Node,
+    ObjectiveFcn,
+    ObjectiveList,
+    OptimalControlProgram,
+    QuadratureRule,
+    Solution,
+    Solver,
 )
 
 """
 
     generated += """
-def prepare_ocp():
+def prepare_ocp(
+    seed: int = 0,
+    is_multistart: bool = False,
+)-> OptimalControlProgram:
     \"""
     This function build an optimal control program and instantiate it.
     It can be seen as a factory for the OptimalControlProgram class.
@@ -297,6 +307,33 @@ def prepare_ocp():
 """
 
     generated += f"""
+    if is_multistart:
+        for i in range(nb_phases):
+            x_initial_guesses[i]["q"].add_noise(
+                bounds=x_bounds[i]["q"],
+                n_shooting=np.array(n_shooting[i])+1,
+                magnitude=0.2,
+                magnitude_type=MagnitudeType.RELATIVE,
+                seed=seed,
+            )
+            x_initial_guesses[i]["qdot"].add_noise(
+                bounds=x_bounds[i]["qdot"],
+                n_shooting=np.array(n_shooting[i])+1,
+                magnitude=0.2,
+                magnitude_type=MagnitudeType.RELATIVE,
+                seed=seed,
+            )
+    
+            u_initial_guesses[i]["qddot_joints"].add_noise(
+                bounds=u_bounds[i]["tau"],
+                magnitude=0.2,
+                magnitude_type=MagnitudeType.RELATIVE,
+                n_shooting=n_shooting[i],
+                seed=seed,
+            )
+"""
+
+    generated += f"""
     mapping = BiMappingList()
     mapping.add(
         "tau",
@@ -321,35 +358,120 @@ def prepare_ocp():
         multinode_constraints=multinode_constraints,
     )
 
+def construct_filepath(save_path, seed):
+    return f"{{save_path}}/acrobatics_{'_'.join(str(i) for i in half_twists)}_{side}_{position}_{{seed}}.pkl"
 
-if __name__ == "__main__":
-    \"\"\"
-    If this file is run, then it will perform the optimization
+def save_results(
+    sol: Solution,
+    *combinatorial_parameters,
+    **extra_parameters,
+) -> None:
+    \"""
+    Callback of the post_optimization_callback, this can be used to save the results
 
-    \"\"\"
+    Parameters
+    ----------
+    sol: Solution
+        The solution to the ocp at the current pool
+    combinatorial_parameters:
+        The current values of the combinatorial_parameters being treated
+    extra_parameters:
+        All the non-combinatorial parameters sent by the user
+    \"""
 
-    # --- Prepare the ocp --- #
-    ocp = prepare_ocp()
+    seed, is_multistart = combinatorial_parameters
+    save_folder = extra_parameters["save_folder"]
 
-    solver = Solver.IPOPT()
-    # solver = Solver.IPOPT(
-    #     show_online_optim=True, show_options={{"show_bounds": True}}
-    # )  # debug purposes
-    # --- Solve the ocp --- #
-    sol = ocp.solve(solver=solver)
+    file_path = construct_filepath(save_folder, seed)
 
-    out = sol.integrate(merge_phases=True)
-    state, time_vector = out._states["unscaled"], out._time_vector
+    integrated = sol.integrate(merge_phases=True)
+    unscaled_states, time_vector = integrated._states["unscaled"], integrated._time_vector
 
-    save = {{
-        "solution": sol,
-        "unscaled_state": state,
-        "time_vector": time_vector,
+    to_save = {{
+            "solution": sol,
+            "unscaled_states": unscaled_states,
+            "time_vector": time_vector,
     }}
 
-    del sol.ocp
-    with open(f"somersault.pkl", "wb") as f:
-        pkl.dump(save, f)
+    with open(file_path, "wb") as file:
+        pkl.dump(to_save, file)
+
+def should_solve(*combinatorial_parameters, **extra_parameters):
+    \"""
+    Callback of the should_solve_callback, this allows the user to instruct bioptim
+
+    Parameters
+    ----------
+    combinatorial_parameters:
+        The current values of the combinatorial_parameters being treated
+    extra_parameters:
+        All the non-combinatorial parameters sent by the user
+    \"""
+
+    seed, is_multistart = combinatorial_parameters
+    save_folder = extra_parameters["save_folder"]
+
+    file_path = construct_filepath(save_folder, seed)
+    return not os.path.exists(file_path)
+
+def prepare_multi_start(
+    combinatorial_parameters: dict,
+    save_folder: str = None,
+    n_pools: int = 1,
+) -> MultiStart:
+    \"""
+    The initialization of the multi-start
+    \"""
+    if not os.path.exists(save_folder):
+        os.mkdir(save_folder)
+
+    return MultiStart(
+        combinatorial_parameters=combinatorial_parameters,
+        prepare_ocp_callback=prepare_ocp,
+        post_optimization_callback=(save_results, {{"save_folder": save_folder}}),
+        should_solve_callback=(should_solve, {{"save_folder": save_folder}}),
+        solver=Solver.IPOPT(show_online_optim=False),  # You cannot use show_online_optim with multi-start
+        n_pools=n_pools,
+    )
+
+def main(is_multistart: bool = False):
+    # --- Prepare the multi-start and run it --- #
+
+    seed = [0, 1, 2, 3]
+
+    combinatorial_parameters = {{
+        "seed": seed,
+        "is_multistart": is_multistart,
+    }}
+
+    save_folder = "{save_path}"
+
+    if is_multistart:
+        multi_start = prepare_multi_start(
+            combinatorial_parameters=combinatorial_parameters,
+            save_folder=save_folder,
+            n_pools=2,
+        )
+
+        multi_start.solve()
+
+        # Delete the solutions
+        # shutil.rmtree(save_folder) # TODO ?
+    else:
+        ocp = prepare_ocp(**combinatorial_parameters)
+        solver = Solver.IPOPT()
+        sol = ocp.solve(solver=solver)
+
+        save_results(sol, combinatorial_parameters, save_folder=save_folder)
+
+
+if __name__ == "__main__":
+    is_multi = False
+    if len(sys.argv) > 1 and sys.argv[1] == "multistart":
+        is_multi = True
+
+    main(is_multi)   
+
 """
 
     return generated
