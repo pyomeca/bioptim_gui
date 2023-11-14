@@ -525,14 +525,14 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                             else -np.pi * sum(half_twists[:i]) + 0.2
                         )
                         x_bounds[current_phase]["min"][cls.Zrot, 2] = (
-                            np.pi * sum(half_twists[: i + 1]) - 0.2
+                            np.pi * sum(half_twists[: i + 1]) - 0.2 - np.pi / 4
                             if prefer_left
                             else -np.pi * sum(half_twists[: i + 1]) - 0.2
                         )
                         x_bounds[current_phase]["max"][cls.Zrot, 2] = (
                             np.pi * sum(half_twists[: i + 1]) + 0.2
                             if prefer_left
-                            else -np.pi * sum(half_twists[: i + 1]) + 0.2
+                            else -np.pi * sum(half_twists[: i + 1]) + 0.2 + np.pi / 4
                         )
 
                 # Hips flexion
