@@ -233,7 +233,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
                 )
             )
     elif phase_name == "Somersault":
-        res["objectives"][minimize_time_index]["weight"] = -0.01
+        res["objectives"][minimize_time_index]["weight"] = -100.0
         res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
         # quick kickout
         res["objectives"].append(
