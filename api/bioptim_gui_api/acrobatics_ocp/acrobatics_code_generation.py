@@ -8,6 +8,7 @@ from bioptim_gui_api.variables.straight_acrobatics_variables import (
     StraightAcrobaticsVariables,
 )
 from bioptim_gui_api.variables.tuck_acrobatics_variables import TuckAcrobaticsVariables
+from multiprocessing import cpu_count
 
 router = APIRouter()
 
@@ -56,6 +57,8 @@ def get_acrobatics_generated_code():
 
     nb_q = acrobatics_variables.nb_q
     nb_tau = acrobatics_variables.nb_tau
+
+    n_threads = cpu_count() - 2
 
     generated = """\"""This file was automatically generated using BioptimGUI version 0.0.1\"""
 
@@ -324,7 +327,7 @@ def prepare_ocp(
                 seed=seed,
             )
     
-            u_initial_guesses[i]["qddot_joints"].add_noise(
+            u_initial_guesses[i]["tau"].add_noise(
                 bounds=u_bounds[i]["tau"],
                 magnitude=0.2,
                 magnitude_type=MagnitudeType.RELATIVE,
@@ -356,6 +359,7 @@ def prepare_ocp(
         use_sx=False,
         constraints=constraints,
         multinode_constraints=multinode_constraints,
+        n_threads=(1 if is_multistart else {n_threads}),
     )
 
 def construct_filepath(save_path, seed):
@@ -414,6 +418,13 @@ def should_solve(*combinatorial_parameters, **extra_parameters):
     file_path = construct_filepath(save_folder, seed)
     return not os.path.exists(file_path)
 
+def get_solver():
+    solver = Solver.IPOPT(show_online_optim=False, show_options=dict(show_bounds=True))
+    solver.set_linear_solver("ma57")
+    solver.set_maximum_iterations(3000)
+    solver.set_convergence_tolerance(1e-6)
+    return solver
+
 def prepare_multi_start(
     combinatorial_parameters: dict,
     save_folder: str = None,
@@ -430,7 +441,7 @@ def prepare_multi_start(
         prepare_ocp_callback=prepare_ocp,
         post_optimization_callback=(save_results, {{"save_folder": save_folder}}),
         should_solve_callback=(should_solve, {{"save_folder": save_folder}}),
-        solver=Solver.IPOPT(show_online_optim=False),  # You cannot use show_online_optim with multi-start
+        solver=get_solver(),  # You cannot use show_online_optim with multi-start
         n_pools=n_pools,
     )
 
@@ -441,7 +452,7 @@ def main(is_multistart: bool = False):
 
     combinatorial_parameters = {{
         "seed": seed,
-        "is_multistart": is_multistart,
+        "is_multistart": [is_multistart],
     }}
 
     save_folder = "{save_path}"
@@ -454,12 +465,9 @@ def main(is_multistart: bool = False):
         )
 
         multi_start.solve()
-
-        # Delete the solutions
-        # shutil.rmtree(save_folder) # TODO ?
     else:
         ocp = prepare_ocp(**combinatorial_parameters)
-        solver = Solver.IPOPT()
+        solver = get_solver()
         sol = ocp.solve(solver=solver)
 
         save_results(sol, combinatorial_parameters, save_folder=save_folder)
