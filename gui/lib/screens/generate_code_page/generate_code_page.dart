@@ -147,14 +147,28 @@ class _BuildTraillingState extends State<_BuildTrailling> {
       case PythonInterfaceStatus.failedUnknown:
         return Tooltip(
           message: 'Failed to load python.',
-          child:
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
               ElevatedButton(onPressed: null, child: Text('Run $scriptName')),
+              ElevatedButton(
+                  onPressed: null, child: Text('Run $scriptName multistart')),
+            ],
+          ),
         );
       case PythonInterfaceStatus.ready:
         return Tooltip(
           message: 'Run the prepared program.',
-          child: ElevatedButton(
-              onPressed: _onRunScript, child: Text('Run $scriptName')),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                  onPressed: _onRunScript, child: Text('Run $scriptName')),
+              ElevatedButton(
+                  onPressed: () => {_onRunScript(multistart: true)},
+                  child: Text('Run $scriptName multistart')),
+            ],
+          ),
         );
       case PythonInterfaceStatus.isRunning:
         return Tooltip(
@@ -204,7 +218,7 @@ class _BuildTraillingState extends State<_BuildTrailling> {
     setState(() {});
   }
 
-  void _onRunScript() async {
+  void _onRunScript({bool multistart = false}) async {
     final process = await PythonInterface.instance.runFile(_scriptPath!);
     if (process == null) return;
 
