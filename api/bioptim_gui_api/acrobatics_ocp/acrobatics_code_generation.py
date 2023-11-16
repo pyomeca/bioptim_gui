@@ -382,9 +382,15 @@ def save_results(
     extra_parameters:
         All the non-combinatorial parameters sent by the user
     \"""
-
     seed, is_multistart = combinatorial_parameters
     save_folder = extra_parameters["save_folder"]
+    
+    with open(f"{{save_folder}}/log.txt", "a") as f:
+        if sol.status != 0:
+            f.write(f"{{seed}} DVG\n")
+            return # don't save the results if it didn't converge
+        else:
+            f.write(f"{{seed}} CVG\n")
 
     file_path = construct_filepath(save_folder, seed)
 
