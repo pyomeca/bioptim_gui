@@ -63,6 +63,7 @@ class DefaultAcrobaticsConfig:
         "position": "straight",
         "sport_type": "trampoline",
         "preferred_twist_side": "left",
+        "with_visual_criteria": False,
         "phases_info": [
             copy.deepcopy(default_phases_info),
             copy.deepcopy(default_phases_info),

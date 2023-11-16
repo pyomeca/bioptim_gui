@@ -39,6 +39,10 @@ class PreferredTwistSideRequest(BaseModel):
     preferred_twist_side: PreferredTwistSide
 
 
+class VisualCriteriaRequest(BaseModel):
+    with_visual_criteria: bool
+
+
 class NbShootingPointsRequest(BaseModel):
     nb_shooting_points: int
 

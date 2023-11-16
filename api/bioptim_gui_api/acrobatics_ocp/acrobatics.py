@@ -204,3 +204,17 @@ def put_preferred_twist_side(preferred_twist_side: PreferredTwistSideRequest):
 
     update_acrobatics_data("preferred_twist_side", new_value)
     return PreferredTwistSideResponse(preferred_twist_side=new_value)
+
+
+@router.put("/with_visual_criteria", response_model=VisualCriteriaResponse)
+def put_preferred_twist_side(visual_criteria: VisualCriteriaRequest):
+    new_value = visual_criteria.with_visual_criteria
+    old_value = read_acrobatics_data("with_visual_criteria")
+    if old_value == new_value:
+        raise HTTPException(
+            status_code=304,
+            detail=f"with_visual_criteria is already {old_value}",
+        )
+
+    update_acrobatics_data("with_visual_criteria", new_value)
+    return VisualCriteriaResponse(with_visual_criteria=new_value)

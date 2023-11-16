@@ -25,6 +25,9 @@ class PreferredTwistSideResponse(PreferredTwistSideRequest):
     pass
 
 
+class VisualCriteriaResponse(VisualCriteriaRequest):
+    pass
+
 class NbShootingPointsResponse(NbShootingPointsRequest):
     pass
 

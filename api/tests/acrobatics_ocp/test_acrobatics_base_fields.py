@@ -215,3 +215,17 @@ def test_put_preferred_twist_side_wrong():
         "/acrobatics/preferred_twist_side/", json={"preferred_twist_side": "wrong"}
     )
     assert response.status_code == 422, response
+
+
+def test_put_with_visual_criteria():
+    response = client.put(
+        "/acrobatics/with_visual_criteria/", json={"with_visual_criteria": False}
+    )
+    assert response.status_code == 304, response
+
+    response = client.put(
+        "/acrobatics/with_visual_criteria/", json={"with_visual_criteria": True}
+    )
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["with_visual_criteria"]

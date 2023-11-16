@@ -1,6 +1,7 @@
 import 'package:bioptim_gui/models/acrobatics_data.dart';
 import 'package:bioptim_gui/models/acrobatics_request_maker.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
+import 'package:bioptim_gui/widgets/acrobatics/visual_criteria_checkbox.dart';
 import 'package:bioptim_gui/widgets/utils/positive_float_text_field.dart';
 import 'package:bioptim_gui/widgets/utils/positive_integer_text_field.dart';
 import 'package:flutter/material.dart';
@@ -21,25 +22,38 @@ class AcrobaticInformation extends StatelessWidget {
       final acrobaticsData = data as AcrobaticsData;
       return Column(
         children: [
-          SizedBox(
-            width: width,
-            child: PositiveIntegerTextField(
-              label: 'Number of somersaults *',
-              value: acrobaticsData.nbSomersaults.toString(),
-              onSubmitted: (newValue) async {
-                if (newValue.isNotEmpty) {
-                  final response = await AcrobaticsRequestMaker()
-                      .updateField("nb_somersaults", newValue);
+          Row(children: [
+            SizedBox(
+              width: width / 3 * 2,
+              child: PositiveIntegerTextField(
+                label: 'Number of somersaults *',
+                value: acrobaticsData.nbSomersaults.toString(),
+                onSubmitted: (newValue) async {
+                  if (newValue.isNotEmpty) {
+                    final response = await AcrobaticsRequestMaker()
+                        .updateField("nb_somersaults", newValue);
 
-                  final updatedData =
-                      AcrobaticsData.fromJson(json.decode(response.body));
+                    final updatedData =
+                        AcrobaticsData.fromJson(json.decode(response.body));
 
-                  acrobaticsData.updateData(updatedData);
-                }
-              },
+                    acrobaticsData.updateData(updatedData);
+                  }
+                },
+              ),
             ),
-          ),
-          const SizedBox(height: 6),
+            SizedBox(
+              width: width / 3,
+              child: Row(
+                children: [
+                  const SizedBox(width: 4),
+                  VisualCriteriaCheckbox(
+                    defaultValue: acrobaticsData.withVisualCriteria,
+                  ),
+                  const Text("Visual Criteria"),
+                ],
+              ),
+            ),
+          ]),
           const Align(
               alignment: Alignment.centerLeft,
               child: Text(
