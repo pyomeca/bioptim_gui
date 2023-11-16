@@ -52,9 +52,10 @@ def update_phase_info(phase_names: list[str]) -> None:
     n_phases = len(phase_names)
     final_time = data["final_time"]
     position = data["position"]
+    with_visual_criteria = data["with_visual_criteria"]
 
     new_phases = [
-        config.phase_name_to_phase(position, phase_names, i)
+        config.phase_name_to_phase(position, phase_names, i, with_visual_criteria)
         for i, _ in enumerate(phase_names)
     ]
 

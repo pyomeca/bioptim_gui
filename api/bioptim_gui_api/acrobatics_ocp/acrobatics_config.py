@@ -3,11 +3,11 @@ import copy
 from bioptim_gui_api.penalty.penalty_config import DefaultPenaltyConfig
 from bioptim_gui_api.penalty.penalty_utils import create_objective, create_constraint
 from bioptim_gui_api.variables.pike_acrobatics_variables import PikeAcrobaticsVariables
-from bioptim_gui_api.variables.straight_acrobatics_variables import (
-    StraightAcrobaticsVariables,
-)
+from bioptim_gui_api.variables.straight_acrobatics_variables import StraightAcrobaticsVariables
 from bioptim_gui_api.variables.tuck_acrobatics_variables import TuckAcrobaticsVariables
-
+from bioptim_gui_api.variables.straight_with_visual_acrobatics_variables import StraightAcrobaticsWithVisualVariables
+from bioptim_gui_api.variables.tuck_with_visual_acrobatics_variables import TuckAcrobaticsWithVisualVariables
+from bioptim_gui_api.variables.pike_with_visual_acrobatics_variables import PikeAcrobaticsWithVisualVariables
 
 class DefaultAcrobaticsConfig:
     datafile = "acrobatics_data.json"
@@ -124,19 +124,30 @@ class DefaultAcrobaticsConfig:
     )
 
 
-def phase_name_to_phase(position, phase_names: str, phase_index: int):
+def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visual_criteria: bool = False):
     # needed as there are nested list inside it
     # removing the deepcopy will cause issues on the objectives and constraints
     # some will be duplicated on all phases
     minimize_time_index = 2
 
-    model = (
-        StraightAcrobaticsVariables
-        if position == "straight"
-        else TuckAcrobaticsVariables
-        if position == "tuck"
-        else PikeAcrobaticsVariables
-    )
+    model = PikeAcrobaticsVariables
+
+    if with_visual_criteria:
+        model = (
+            StraightAcrobaticsWithVisualVariables
+            if position == "straight"
+            else TuckAcrobaticsWithVisualVariables
+            if position == "tuck"
+            else PikeAcrobaticsWithVisualVariables
+        )
+    else:
+        model = (
+            StraightAcrobaticsVariables
+            if position == "straight"
+            else TuckAcrobaticsVariables
+            if position == "tuck"
+            else PikeAcrobaticsVariables
+        )
 
     res = copy.deepcopy(DefaultAcrobaticsConfig.default_phases_info)
 
@@ -146,6 +157,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
 
     phase_name = phase_names[phase_index]
     res["phase_name"] = phase_name
+
     if phase_name in ["Pike", "Tuck"]:
         # minimize time weight is set to 100 for pike/tuck and kick out phase
         res["objectives"][minimize_time_index]["weight"] = 100.0
@@ -355,5 +367,85 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int):
                 ],
             )
         )
+
+    if with_visual_criteria:
+        # FIRST AND LAST
+        if phase_index == 0 or phase_index == len(phase_names) - 1:
+            # Spotting
+            res["objectives"].append(
+                create_objective(
+                    objective_type="lagrange",
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "MINIMIZE_SEGMENT_VELOCITY"
+                    ],
+                    nodes="default",
+                    weight=10.0,
+                    arguments=[
+                        {"name": "segment", "value": "Head", "type": "string"},
+                    ],
+                )
+            )
+
+        # ALL
+        # Self-motion detection
+        res["objectives"].append(
+            create_objective(
+                objective_type="lagrange",
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
+                nodes="default",
+                weight=1.0,
+                arguments=[
+                    {"name": "key", "value": "qdot", "type": "string"},
+                    {"name": "index", "value": [model.ZrotEyes, model.XrotEyes], "type": "list"},
+                ],
+            )
+        )
+
+        # Avoid extreme eye and neck angles
+        for index, weight in [([model.ZrotEyes, model.XrotEyes, 10.0]), ([model.ZrotHead, model.XrotHead], 100.0)]:
+            res["objectives"].append(
+                create_objective(
+                    objective_type="lagrange",
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "MINIMIZE_STATE"
+                    ],
+                    nodes="default",
+                    weight=weight,
+                    arguments=[
+                        {"name": "key", "value": "q", "type": "string"},
+                        {"name": "index", "value": index, "type": "list"},
+                    ],
+                )
+            )
+
+        # ALL BUT SOMERSAULT
+        if "Somersault" not in phase_name:
+            # Keeping the trampoline bed in the peripheral vision
+            # TODO custom thing
+            pass
+
+        # LAST ONLY
+        if phase_index == len(phase_names) - 1:
+            # quiet eye
+            res["objectives"].append(
+                create_objective(
+                    objective_type="lagrange",
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "TRACK_VECTOR_ORIENTATIONS_FROM_MARKERS"
+                    ],
+                    nodes="default",
+                    weight=1.0,
+                    arguments=[
+                        {"name": "vector_0_marker_0", "value": "eyes_vect_start", "type": "string"},
+                        {"name": "vector_0_marker_1", "value": "eyes_vect_end", "type": "string"},
+                        {"name": "vector_1_marker_0", "value": "eyes_vect_start", "type": "string"},
+                        {"name": "vector_1_marker_1", "value": "fixation_front", "type": "string"},
+                    ],
+                )
+            )
+
+        # SOMERSAULT ONLY
 
     return res
