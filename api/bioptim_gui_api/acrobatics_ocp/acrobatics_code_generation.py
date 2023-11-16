@@ -382,15 +382,19 @@ def save_results(
     extra_parameters:
         All the non-combinatorial parameters sent by the user
     \"""
-    seed, is_multistart = combinatorial_parameters
+    try:
+        seed, is_multistart = combinatorial_parameters
+    except:
+        seed, is_multistart = 0, False
+
     save_folder = extra_parameters["save_folder"]
     
     with open(f"{{save_folder}}/log.txt", "a") as f:
         if sol.status != 0:
-            f.write(f"{{seed}} DVG\n")
+            f.write(f"{{seed}} DVG\\n")
             return # don't save the results if it didn't converge
         else:
-            f.write(f"{{seed}} CVG\n")
+            f.write(f"{{seed}} CVG\\n")
 
     file_path = construct_filepath(save_folder, seed)
 
@@ -472,11 +476,11 @@ def main(is_multistart: bool = False):
 
         multi_start.solve()
     else:
-        ocp = prepare_ocp(**combinatorial_parameters)
+        ocp = prepare_ocp()
         solver = get_solver()
         sol = ocp.solve(solver=solver)
 
-        save_results(sol, combinatorial_parameters, save_folder=save_folder)
+        save_results(sol, save_folder=save_folder)
 
 
 if __name__ == "__main__":
