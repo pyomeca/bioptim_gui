@@ -37,8 +37,12 @@ class PythonInterface {
     }
   }
 
-  Future<Process?> runFile(String path,
-      {bool multistart = false, String? overrideWorkingDirectory}) async {
+  Future<Process?> runFile(
+    String path, {
+    bool multistart = false,
+    int nbSeeds = 1,
+    String? overrideWorkingDirectory,
+  }) async {
     // TODO Better fail if not ready (popup?)
     if (status != PythonInterfaceStatus.ready) return null;
     status = PythonInterfaceStatus.isRunning;
@@ -48,7 +52,13 @@ class PythonInterface {
       status = PythonInterfaceStatus.ready;
     }
 
-    final pathAndArgs = multistart ? [path, 'multistart'] : [path];
+    final pathAndArgs = multistart
+        ? [
+            path,
+            'multistart',
+            nbSeeds.toString(),
+          ]
+        : [path];
 
     final process = await Process.start(
         '${_skipEnvironmentLoading ? '' : _loadEnvironmentCommand}python',

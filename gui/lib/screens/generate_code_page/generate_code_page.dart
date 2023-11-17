@@ -7,6 +7,7 @@ import 'package:bioptim_gui/screens/generate_code_page/acrobatics/acrobatics_men
 import 'package:bioptim_gui/screens/generate_code_page/generic/generic_menu.dart';
 import 'package:bioptim_gui/widgets/console_out.dart';
 import 'package:bioptim_gui/widgets/generic_ocp/optimal_control_program_type_chooser.dart';
+import 'package:bioptim_gui/widgets/utils/positive_integer_text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -129,6 +130,8 @@ class _BuildTraillingState extends State<_BuildTrailling> {
 
     final status = PythonInterface.instance.status;
 
+    final nbSeedsController = TextEditingController(text: '1');
+
     final scriptName = basename(_scriptPath!);
     switch (status) {
       case PythonInterfaceStatus.uninitialized:
@@ -153,6 +156,14 @@ class _BuildTraillingState extends State<_BuildTrailling> {
               ElevatedButton(onPressed: null, child: Text('Run $scriptName')),
               ElevatedButton(
                   onPressed: null, child: Text('Run $scriptName multistart')),
+              SizedBox(
+                width: 120,
+                child: PositiveIntegerTextField(
+                  value: '1',
+                  controller: nbSeedsController,
+                  label: 'Seeds',
+                ),
+              ),
             ],
           ),
         );
@@ -165,8 +176,20 @@ class _BuildTraillingState extends State<_BuildTrailling> {
               ElevatedButton(
                   onPressed: _onRunScript, child: Text('Run $scriptName')),
               ElevatedButton(
-                  onPressed: () => {_onRunScript(multistart: true)},
+                  onPressed: () => {
+                        _onRunScript(
+                            multistart: true,
+                            nbSeedController: nbSeedsController)
+                      },
                   child: Text('Run $scriptName multistart')),
+              SizedBox(
+                width: 120,
+                child: PositiveIntegerTextField(
+                  value: '1',
+                  controller: nbSeedsController,
+                  label: 'Number of seeds',
+                ),
+              ),
             ],
           ),
         );
@@ -218,8 +241,14 @@ class _BuildTraillingState extends State<_BuildTrailling> {
     setState(() {});
   }
 
-  void _onRunScript({bool multistart = false}) async {
-    final process = await PythonInterface.instance.runFile(_scriptPath!);
+  void _onRunScript({
+    bool multistart = false,
+    TextEditingController? nbSeedController,
+  }) async {
+    final process = await PythonInterface.instance.runFile(_scriptPath!,
+        multistart: multistart,
+        nbSeeds:
+            (nbSeedController == null) ? 1 : int.parse(nbSeedController.text));
     if (process == null) return;
 
     setState(() {

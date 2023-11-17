@@ -455,10 +455,10 @@ def prepare_multi_start(
         n_pools=n_pools,
     )
 
-def main(is_multistart: bool = False):
+def main(is_multistart: bool = False, nb_seeds: int = 1):
     # --- Prepare the multi-start and run it --- #
 
-    seed = [0, 1, 2, 3]
+    seed = [i for i in range(nb_seeds)]
 
     combinatorial_parameters = {{
         "seed": seed,
@@ -485,10 +485,12 @@ def main(is_multistart: bool = False):
 
 if __name__ == "__main__":
     is_multi = False
-    if len(sys.argv) > 1 and sys.argv[1] == "multistart":
+    nb_seeds = 1
+    if len(sys.argv) > 2 and sys.argv[1] == "multistart":
         is_multi = True
+        nb_seeds = int(sys.argv[2])
 
-    main(is_multi)   
+    main(is_multi, nb_seeds)   
 
 """
 
