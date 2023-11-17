@@ -52,16 +52,18 @@ class PythonInterface {
       status = PythonInterfaceStatus.ready;
     }
 
+    final parentDir = File(path).absolute.parent.toString();
+
     final pathAndArgs = multistart
         ? [
             path,
-            'save_folder', // TODO
+            parentDir,
             '-m',
             nbSeeds.toString(),
           ]
         : [
             path,
-            'save_folder', // TODO
+            parentDir,
           ];
 
     final process = await Process.start(
