@@ -25,7 +25,7 @@ class _VisualCriteriaCheckboxState extends State<VisualCriteriaCheckbox> {
   }
 
   Future<void> updateVisualCriteria(bool value) async {
-    final url = Uri.parse('${APIConfig.url}/acrobatics/with_visual_criteria/');
+    final url = Uri.parse('${APIConfig.url}/acrobatics/with_visual_criteria');
     final headers = {'Content-Type': 'application/json'};
     final body = json.encode({'with_visual_criteria': value});
 
