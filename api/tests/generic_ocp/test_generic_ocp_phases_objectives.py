@@ -321,7 +321,7 @@ def test_add_objective_check_arguments_changing_penalty_type():
     assert data[0]["objective_type"] == "lagrange"
     assert data[0]["penalty_type"] == "MINIMIZE_STATE"
     assert data[0]["nodes"] == "all_shooting"
-    assert len(data[0]["arguments"]) == 1
+    assert len(data[0]["arguments"]) == 2
 
     assert data[1]["objective_type"] == "mayer"
     assert data[1]["penalty_type"] == "MINIMIZE_TIME"
@@ -390,7 +390,7 @@ def test_add_objective_check_arguments_changing_objective_type():
     assert data[0]["objective_type"] == "lagrange"
     assert data[0]["penalty_type"] == "MINIMIZE_STATE"
     assert data[0]["nodes"] == "all_shooting"
-    assert len(data[0]["arguments"]) == 1
+    assert len(data[0]["arguments"]) == 2
 
     assert data[1]["objective_type"] == "mayer"
     assert data[1]["penalty_type"] == "MINIMIZE_TIME"

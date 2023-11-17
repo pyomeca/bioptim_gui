@@ -12,6 +12,7 @@ class DefaultPenaltyConfig:
         "weight": 1.0,
         "arguments": [
             {"name": "key", "value": "tau", "type": "string"},
+            {"name": "index", "value": None, "type": "list"},
         ],
     }
 
@@ -31,6 +32,7 @@ class DefaultPenaltyConfig:
         "MINIMIZE_ANGULAR_MOMENTUM": "MINIMIZE_ANGULAR_MOMENTUM",
         "MINIMIZE_COM_POSITION": "MINIMIZE_COM_POSITION",
         "MINIMIZE_COM_VELOCITY": "MINIMIZE_COM_VELOCITY",
+        "MINIMIZE_CONTROL": "MINIMIZE_CONTROL",
         "MINIMIZE_LINEAR_MOMENTUM": "MINIMIZE_LINEAR_MOMENTUM",
         "MINIMIZE_MARKERS": "MINIMIZE_MARKERS",
         "MINIMIZE_MARKERS_ACCELERATION": "MINIMIZE_MARKERS_ACCELERATION",
@@ -53,6 +55,7 @@ class DefaultPenaltyConfig:
         "MAXIMIZE_ANGULAR_MOMENTUM": "MINIMIZE_ANGULAR_MOMENTUM",
         "MAXIMIZE_COM_POSITION": "MINIMIZE_COM_POSITION",
         "MAXIMIZE_COM_VELOCITY": "MINIMIZE_COM_VELOCITY",
+        "MAXIMIZE_CONTROL": "MINIMIZE_CONTROL",
         "MAXIMIZE_LINEAR_MOMENTUM": "MINIMIZE_LINEAR_MOMENTUM",
         "MAXIMIZE_MARKERS": "MINIMIZE_MARKERS",
         "MAXIMIZE_MARKERS_ACCELERATION": "MINIMIZE_MARKERS_ACCELERATION",
