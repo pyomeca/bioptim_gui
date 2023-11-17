@@ -382,12 +382,15 @@ def save_results(
     extra_parameters:
         All the non-combinatorial parameters sent by the user
     \"""
+
     try:
         seed, is_multistart = combinatorial_parameters
     except:
         seed, is_multistart = 0, False
 
     save_folder = extra_parameters["save_folder"]
+    if not os.path.exists(save_folder):
+        os.mkdir(save_folder)
     
     with open(f"{{save_folder}}/log.txt", "a") as f:
         if sol.status != 0:
@@ -444,8 +447,6 @@ def prepare_multi_start(
     \"""
     The initialization of the multi-start
     \"""
-    if not os.path.exists(save_folder):
-        os.mkdir(save_folder)
 
     return MultiStart(
         combinatorial_parameters=combinatorial_parameters,
