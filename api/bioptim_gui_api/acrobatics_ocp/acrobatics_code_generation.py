@@ -406,6 +406,7 @@ def save_results(
             "unscaled_states": unscaled_states,
             "time_vector": time_vector,
     }}
+    del sol.ocp
 
     with open(file_path, "wb") as file:
         pkl.dump(to_save, file)
