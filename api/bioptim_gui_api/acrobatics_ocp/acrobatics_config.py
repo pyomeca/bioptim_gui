@@ -423,8 +423,19 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
         # ALL BUT SOMERSAULT
         if "Somersault" not in phase_name:
             # Keeping the trampoline bed in the peripheral vision
-            # TODO custom thing
-            pass
+            res["objectives"].append(
+                create_objective(
+                    objective_type="lagrange",
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "CUSTOM"
+                    ],
+                    nodes="default",
+                    weight=100.0,
+                    arguments=[
+                        {"name": "function", "value": "custom_trampoline_bed_in_peripheral_vision", "type": "function"},
+                    ],
+                )
+            )
 
         # LAST ONLY
         if phase_index == len(phase_names) - 1:

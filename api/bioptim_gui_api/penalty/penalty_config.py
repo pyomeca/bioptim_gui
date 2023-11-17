@@ -49,6 +49,7 @@ class DefaultPenaltyConfig:
         "ALIGN_MARKER_WITH_SEGMENT_AXIS": "TRACK_MARKER_WITH_SEGMENT_AXIS",
         "ALIGN_SEGMENT_WITH_CUSTOM_RT": "TRACK_SEGMENT_WITH_CUSTOM_RT",
         "ALIGN_MARKERS_WITH_VECTOR": "TRACK_VECTOR_ORIENTATIONS_FROM_MARKERS",
+        "CUSTOM": "CUSTOM",
     }
 
     max_to_original_dict = {
@@ -72,6 +73,7 @@ class DefaultPenaltyConfig:
         "MARKER_AWAY_FROM_SEGMENT_AXIS": "TRACK_MARKER_WITH_SEGMENT_AXIS",
         "SEGMENT_PERPENDICULAR_WITH_RT": "TRACK_SEGMENT_WITH_CUSTOM_RT",
         "UNALIGN_MARKERS_WITH_VECTOR": "TRACK_VECTOR_ORIENTATIONS_FROM_MARKERS",
+        "CUSTOM": "CUSTOM",
     }
 
     original_to_min_dict = {v: k for k, v in min_to_original_dict.items()}

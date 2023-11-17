@@ -80,6 +80,15 @@ def obj_arguments(objective_type: str, penalty_type: str) -> list:
     The list of arguments (e.g. [{"name": "state_idx", "value": None, "type": "list"}])
     """
     penalty_type = penalty_type.upper().replace(" ", "_")
+
+    if penalty_type == "CUSTOM":
+        return [{
+            "name": "function",
+            "value": None,
+            "type": "function"
+        }]
+
+
     if objective_type == "mayer":
         penalty_fcn = getattr(ObjectiveFcn.Mayer, penalty_type)
     elif objective_type == "lagrange":
