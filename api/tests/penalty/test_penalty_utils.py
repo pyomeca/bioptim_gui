@@ -74,7 +74,11 @@ def test_format_arg_type(arg_type, expected):
                 {"name": "second_dof_intercept", "value": 0.0, "type": "float"},
             ],
         ),
-        (ConstraintFcn.SUPERIMPOSE_MARKERS, []),
+        (ConstraintFcn.SUPERIMPOSE_MARKERS, [
+            {"name": "first_marker", "value": None, "type": "str | int"},
+            {"name": "second_marker", "value": None, "type": "str | int"},
+            {"name": "axes", "value": None, "type": "tuple | list"},
+        ]),
     ],
 )
 def test_get_args(penalty_fcn, expected):

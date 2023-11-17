@@ -56,7 +56,7 @@ def get_objective_dropdown_list(phase_index: int, objective_index: int):
         "MINIMIZE_ANGULAR_MOMENTUM",
         "MINIMIZE_COM_POSITION",
         "MINIMIZE_COM_VELOCITY",
-        "MINIMIZE_CONTROL",
+        "MINIMIZE_STATE",
         "MINIMIZE_LINEAR_MOMENTUM",
         "MINIMIZE_MARKERS",
         "MINIMIZE_MARKERS_ACCELERATION",

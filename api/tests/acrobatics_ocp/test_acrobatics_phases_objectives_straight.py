@@ -58,7 +58,7 @@ def test_delete_objective_0():
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 4
-    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
     assert data[1]["penalty_type"] == "MINIMIZE_TIME"
 
 
@@ -67,7 +67,7 @@ def test_delete_objective_1():
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 4
-    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
     assert data[1]["penalty_type"] == "MINIMIZE_TIME"
 
 
@@ -107,8 +107,8 @@ def test_multiple_somersaults_add_remove_objective():
         response = client.get(f"/acrobatics/phases_info/{i}/objectives")
         data = response.json()
         assert len(data) == 5
-        assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
-        assert data[1]["penalty_type"] == "MINIMIZE_CONTROL"
+        assert data[0]["penalty_type"] == "MINIMIZE_STATE"
+        assert data[1]["penalty_type"] == "MINIMIZE_STATE"
         assert data[2]["penalty_type"] == "MINIMIZE_TIME"
 
 
@@ -248,7 +248,7 @@ def test_put_weight_minmax_no_change():
     ),
     [
         ("objective_type", "lagrange"),
-        ("penalty_type", "MINIMIZE_CONTROL"),
+        ("penalty_type", "MINIMIZE_STATE"),
         ("nodes", "all"),
         ("quadratic", False),
         ("expand", False),
@@ -295,12 +295,12 @@ def test_add_objective_check_arguments_changing_penalty_type():
     assert len(data) == 5
 
     assert data[0]["objective_type"] == "lagrange"
-    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
     assert data[0]["nodes"] == "all_shooting"
     assert len(data[0]["arguments"]) == 1
 
     assert data[1]["objective_type"] == "lagrange"
-    assert data[1]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[1]["penalty_type"] == "MINIMIZE_STATE"
     assert data[1]["nodes"] == "all_shooting"
     assert data[1]["derivative"] == True
     assert len(data[1]["arguments"]) == 1
@@ -310,7 +310,7 @@ def test_add_objective_check_arguments_changing_penalty_type():
     assert data[2]["nodes"] == "end"
     assert len(data[2]["arguments"]) == 2
 
-    # change the penalty_type of MINIMIZE_CONTROL to PROPORTIONAL_STATE
+    # change the penalty_type of MINIMIZE_STATE to PROPORTIONAL_STATE
     response = client.put(
         "/acrobatics/phases_info/0/objectives/0/penalty_type",
         json={"penalty_type": "PROPORTIONAL_STATE"},
@@ -344,7 +344,7 @@ def test_add_objective_check_arguments_changing_objective_type():
     assert len(data) == 5
 
     assert data[0]["objective_type"] == "lagrange"
-    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
     assert data[0]["nodes"] == "all_shooting"
     assert len(data[0]["arguments"]) == 1
 

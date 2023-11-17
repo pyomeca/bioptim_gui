@@ -52,7 +52,7 @@ def prepare_ocp():
     objective_functions = ObjectiveList()
 
     objective_functions.add(
-        objective=ObjectiveFcn.Lagrange.MINIMIZE_CONTROL,
+        objective=ObjectiveFcn.Lagrange.MINIMIZE_STATE,
         key="tau",
         node=Node.ALL_SHOOTING,
         quadratic=False,

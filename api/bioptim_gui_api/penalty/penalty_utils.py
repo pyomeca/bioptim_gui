@@ -117,7 +117,7 @@ def constraint_arguments(penalty_type: str) -> list:
 def create_objective(**kwargs):
     return {
         "objective_type": kwargs.get("objective_type", "lagrange"),
-        "penalty_type": kwargs.get("penalty_type", "MINIMIZE_CONTROL"),
+        "penalty_type": kwargs.get("penalty_type", "MINIMIZE_STATE"),
         "nodes": kwargs.get("nodes", "all_shooting"),
         "quadratic": kwargs.get("quadratic", True),
         "expand": kwargs.get("expand", True),

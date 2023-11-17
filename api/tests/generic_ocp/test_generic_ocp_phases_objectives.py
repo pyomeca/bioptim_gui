@@ -65,7 +65,7 @@ def test_delete_objective_0():
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 1
-    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
 
 
 def test_delete_objective_1():
@@ -77,7 +77,7 @@ def test_delete_objective_1():
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 1
-    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
 
 
 def test_add_and_remove_objective():
@@ -117,14 +117,14 @@ def test_multiple_phases_add_remove_objective():
     response = client.get("/generic_ocp/phases_info/3/objectives")
     data = response.json()
     assert len(data) == 1
-    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
 
     for i in [0, 1, 2, 4]:
         response = client.get(f"/generic_ocp/phases_info/{i}/objectives")
         data = response.json()
         assert len(data) == 2
-        assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
-        assert data[1]["penalty_type"] == "MINIMIZE_CONTROL"
+        assert data[0]["penalty_type"] == "MINIMIZE_STATE"
+        assert data[1]["penalty_type"] == "MINIMIZE_STATE"
 
 
 @pytest.mark.parametrize(
@@ -135,7 +135,7 @@ def test_multiple_phases_add_remove_objective():
     ),
     [
         ("objective_type", "lagrange", "mayer"),
-        ("penalty_type", "MINIMIZE_CONTROL", "MINIMIZE_TIME"),
+        ("penalty_type", "MINIMIZE_STATE", "MINIMIZE_TIME"),
         ("nodes", "all_shooting", "end"),
         ("quadratic", True, False),
         ("expand", True, False),
@@ -319,7 +319,7 @@ def test_add_objective_check_arguments_changing_penalty_type():
     assert len(data) == 2
 
     assert data[0]["objective_type"] == "lagrange"
-    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
     assert data[0]["nodes"] == "all_shooting"
     assert len(data[0]["arguments"]) == 1
 
@@ -328,7 +328,7 @@ def test_add_objective_check_arguments_changing_penalty_type():
     assert data[1]["nodes"] == "all_shooting"
     assert len(data[1]["arguments"]) == 2
 
-    # change the penalty_type of MINIMIZE_CONTROL to PROPORTIONAL_STATE
+    # change the penalty_type of MINIMIZE_STATE to PROPORTIONAL_STATE
     response = client.put(
         "/generic_ocp/phases_info/0/objectives/0/penalty_type",
         json={"penalty_type": "PROPORTIONAL_STATE"},
@@ -388,7 +388,7 @@ def test_add_objective_check_arguments_changing_objective_type():
     assert len(data) == 2
 
     assert data[0]["objective_type"] == "lagrange"
-    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
     assert data[0]["nodes"] == "all_shooting"
     assert len(data[0]["arguments"]) == 1
 
