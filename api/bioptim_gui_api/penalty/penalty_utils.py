@@ -98,7 +98,7 @@ def constraint_arguments(penalty_type: str) -> list:
     Parameters
     ----------
     penalty_type: str
-        The type of penalty (ConstraintFcn, e.g. "CONTINUITY")
+        The type of penalty (ConstraintFcn, e.g. "SUPERIMPOSE_MARKERS")
 
     Returns
     -------

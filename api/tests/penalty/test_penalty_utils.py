@@ -74,7 +74,7 @@ def test_format_arg_type(arg_type, expected):
                 {"name": "second_dof_intercept", "value": 0.0, "type": "float"},
             ],
         ),
-        (ConstraintFcn.CONTINUITY, []),
+        (ConstraintFcn.SUPERIMPOSE_MARKERS, []),
     ],
 )
 def test_get_args(penalty_fcn, expected):
@@ -107,7 +107,7 @@ def test_obj_arguments(objective_fcn, objective_type, penalty_type):
 @pytest.mark.parametrize(
     "constraint_fcn, penalty_type",
     [
-        (ConstraintFcn.CONTINUITY, "CONTINUITY"),
+        (ConstraintFcn.SUPERIMPOSE_MARKERS, "SUPERIMPOSE_MARKERS"),
     ],
 )
 def test_constraint_arguments(constraint_fcn, penalty_type):

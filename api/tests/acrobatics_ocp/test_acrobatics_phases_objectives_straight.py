@@ -120,7 +120,7 @@ def test_multiple_somersaults_add_remove_objective():
     ),
     [
         ("objective_type", "lagrange", "mayer"),
-        ("penalty_type", "MINIMIZE_CONTROL", "MINIMIZE_TIME"),
+        ("penalty_type", "MINIMIZE_STATE", "MINIMIZE_TIME"),
         ("nodes", "all_shooting", "end"),
         ("quadratic", True, False),
         ("expand", True, False),

@@ -37,7 +37,6 @@ def add_constraint(phase_index: int):
 def get_constraints_dropdown_list():
     # we don't use all the available constraints for now
     return [
-        "CONTINUITY",
         "TIME_CONSTRAINT",
         "SUPERIMPOSE_MARKERS",
     ]

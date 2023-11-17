@@ -91,7 +91,7 @@ def test_delete_constraint_0():
         "new_value",
     ),
     [
-        ("penalty_type", "TIME_CONSTRAINT", "CONTINUITY"),
+        ("penalty_type", "TIME_CONSTRAINT", "SUPERIMPOSE_MARKERS"),
         ("nodes", "end", "all_shooting"),
         ("quadratic", True, False),
         ("expand", True, False),
@@ -130,7 +130,7 @@ def test_remove_constraints_fields_delete():
 
     client.put(
         "/acrobatics/phases_info/0/constraints/0/penalty_type",
-        json={"penalty_type": "CONTINUITY"},
+        json={"penalty_type": "SUPERIMPOSE_MARKERS"},
     )
 
     response = client.delete("/acrobatics/phases_info/0/constraints/0")
@@ -148,7 +148,7 @@ def test_remove_constraints_fields_delete():
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 1
-    assert data[0]["penalty_type"] != "CONTINUITY"
+    assert data[0]["penalty_type"] != "SUPERIMPOSE_MARKERS"
 
 
 def test_add_constraints_check_arguments_changing_penalty_type():
