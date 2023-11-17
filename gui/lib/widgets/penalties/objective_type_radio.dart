@@ -33,13 +33,15 @@ class ObjectiveTypeRadioState extends State<ObjectiveTypeRadio> {
 
     return Consumer<OCPData>(builder: (context, data, child) {
       void updatePenalty(newValue) async {
-        data.updatePenaltyField(widget.phaseIndex, widget.objectiveIndex,
-            "objectives", "objective_type", newValue,
+        final success = await data.updatePenaltyField(widget.phaseIndex,
+            widget.objectiveIndex, "objectives", "objective_type", newValue,
             doUpdate: true);
 
-        setState(() {
-          _selectedValue = newValue;
-        });
+        if (success) {
+          setState(() {
+            _selectedValue = newValue;
+          });
+        }
       }
 
       return Column(

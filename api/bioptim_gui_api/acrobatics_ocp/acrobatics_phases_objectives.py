@@ -126,9 +126,18 @@ def put_objective_penalty_type(
             penalty_type_value
         ]
 
-    arguments = obj_arguments(
-        objective_type=objective_type, penalty_type=penalty_type_value
-    )
+    try:
+        arguments = obj_arguments(
+            objective_type=objective_type, penalty_type=penalty_type_value
+        )
+    except:
+        other_objective_type = "lagrange" if objective_type == "mayer" else "mayer"
+        phases_info[phase_index]["objectives"][objective_index][
+            "objective_type"
+        ] = other_objective_type
+        arguments = obj_arguments(
+            objective_type=other_objective_type, penalty_type=penalty_type_value
+        )
 
     phases_info[phase_index]["objectives"][objective_index]["arguments"] = arguments
 

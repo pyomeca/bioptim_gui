@@ -148,11 +148,15 @@ class GenericOcpData extends ChangeNotifier implements OCPData {
   }
 
   @override
-  void updatePenaltyField(int phaseIndex, int penaltyIndex, String penaltyType,
-      String fieldName, dynamic newValue,
+  Future<bool> updatePenaltyField(int phaseIndex, int penaltyIndex,
+      String penaltyType, String fieldName, dynamic newValue,
       {bool? doUpdate}) async {
     final response = await requestMaker.updatePenaltyField(
         phaseIndex, penaltyType, penaltyIndex, fieldName, newValue);
+
+    if (response.statusCode != 200) {
+      return Future(() => false);
+    }
 
     final isObjective = penaltyType == "objectives";
 
@@ -206,6 +210,8 @@ class GenericOcpData extends ChangeNotifier implements OCPData {
     } else {
       notifyListeners();
     }
+
+    return Future(() => true);
   }
 }
 
