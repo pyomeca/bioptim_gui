@@ -4,11 +4,15 @@ from bioptim_gui_api.acrobatics_ocp.acrobatics_utils import read_acrobatics_data
 from bioptim_gui_api.penalty.penalty_config import DefaultPenaltyConfig
 from bioptim_gui_api.utils.format_utils import format_2d_array, arg_to_string
 from bioptim_gui_api.variables.pike_acrobatics_variables import PikeAcrobaticsVariables
+from bioptim_gui_api.variables.pike_with_visual_acrobatics_variables import PikeAcrobaticsWithVisualVariables
 from bioptim_gui_api.variables.straight_acrobatics_variables import (
     StraightAcrobaticsVariables,
 )
+from bioptim_gui_api.variables.straight_with_visual_acrobatics_variables import StraightAcrobaticsWithVisualVariables
 from bioptim_gui_api.variables.tuck_acrobatics_variables import TuckAcrobaticsVariables
 from multiprocessing import cpu_count
+
+from bioptim_gui_api.variables.tuck_with_visual_acrobatics_variables import TuckAcrobaticsWithVisualVariables
 
 router = APIRouter()
 
@@ -16,7 +20,7 @@ router = APIRouter()
 @router.get("/generate_code", response_model=str)
 def get_acrobatics_generated_code():
     data = read_acrobatics_data()
-    nb_somersaults = data["nb_somersaults"]
+    with_visual_criteria = data["with_visual_criteria"]
 
     model_path = data["model_path"]
     if not model_path:
@@ -35,11 +39,22 @@ def get_acrobatics_generated_code():
     prefer_left = side == "left"
     total_time = sum([s["duration"] for s in phases])
 
-    acrobatics_variables = PikeAcrobaticsVariables
-    if position == "straight":
-        acrobatics_variables = StraightAcrobaticsVariables
-    elif position == "tuck":
-        acrobatics_variables = TuckAcrobaticsVariables
+    if with_visual_criteria:
+        acrobatics_variables = (
+            StraightAcrobaticsWithVisualVariables
+            if position == "straight"
+            else TuckAcrobaticsWithVisualVariables
+            if position == "tuck"
+            else PikeAcrobaticsWithVisualVariables
+        )
+    else:
+        acrobatics_variables = (
+            StraightAcrobaticsVariables
+            if position == "straight"
+            else TuckAcrobaticsVariables
+            if position == "tuck"
+            else PikeAcrobaticsVariables
+        )
 
     q_bounds = acrobatics_variables.get_q_bounds(half_twists, prefer_left)
     nb_phases = len(q_bounds)

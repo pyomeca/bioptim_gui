@@ -15,10 +15,10 @@ class StraightAcrobaticsWithVisualVariables(StraightAcrobaticsVariables):
     XrotEyes = 9
     ZrotRightUpperArm = 10
     YrotRightUpperArm = 11
-    ZrotLeftUpperArm = 14
-    YrotLeftUpperArm = 15
+    ZrotLeftUpperArm = 12
+    YrotLeftUpperArm = 13
 
-    nb_q, nb_qdot, nb_tau = 16, 16, 10
+    nb_q, nb_qdot, nb_tau = 14, 14, 10
     tau_min, tau_max, tau_init = -500, 500, 0
     qdot_min, qdot_max = -10 * np.pi, 10 * np.pi
 

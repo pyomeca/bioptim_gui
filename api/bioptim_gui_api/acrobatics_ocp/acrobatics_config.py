@@ -404,7 +404,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
         )
 
         # Avoid extreme eye and neck angles
-        for index, weight in [([model.ZrotEyes, model.XrotEyes, 10.0]), ([model.ZrotHead, model.XrotHead], 100.0)]:
+        for index, weight in [([model.ZrotEyes, model.XrotEyes], 10.0), ([model.ZrotHead, model.XrotHead], 100.0)]:
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
