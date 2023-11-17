@@ -187,7 +187,7 @@ class _BuildTraillingState extends State<_BuildTrailling> {
                 child: PositiveIntegerTextField(
                   value: '1',
                   controller: nbSeedsController,
-                  label: 'Number of seeds',
+                  label: 'Seeds',
                 ),
               ),
             ],
