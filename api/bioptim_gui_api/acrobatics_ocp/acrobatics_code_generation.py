@@ -362,7 +362,7 @@ def prepare_ocp(
         n_threads=(1 if is_multistart else {n_threads}),
     )
 
-def construct_filepath(save_path, seed):
+def construct_filepath(save_path, seed = 0):
     return f"{{save_path}}/acrobatics_{'_'.join(str(i) for i in half_twists)}_{side}_{position}_{{seed}}.pkl"
 
 def save_results(
