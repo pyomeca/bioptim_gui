@@ -31,7 +31,6 @@ def get_acrobatics_generated_code():
     phases = data["phases_info"]
     half_twists = data["nb_half_twists"]
     total_half_twists = sum(half_twists)
-    save_path = "save_path" # TODO
 
     position = data["position"]
     is_forward = (total_half_twists % 2) != 0
@@ -77,9 +76,9 @@ def get_acrobatics_generated_code():
 
     generated = """\"""This file was automatically generated using BioptimGUI version 0.0.1\"""
 
+import argparse
 import os
 import pickle as pkl
-import sys
 
 import numpy as np
 from bioptim import (
@@ -472,7 +471,7 @@ def prepare_multi_start(
         n_pools=n_pools,
     )
 
-def main(is_multistart: bool = False, nb_seeds: int = 1):
+def main(is_multistart: bool = False, nb_seeds: int = 1, save_folder: str = "save"):
     # --- Prepare the multi-start and run it --- #
 
     seed = [i for i in range(nb_seeds)]
@@ -481,8 +480,6 @@ def main(is_multistart: bool = False, nb_seeds: int = 1):
         "seed": seed,
         "is_multistart": [is_multistart],
     }}
-
-    save_folder = "{save_path}"
 
     if is_multistart:
         multi_start = prepare_multi_start(
@@ -501,13 +498,21 @@ def main(is_multistart: bool = False, nb_seeds: int = 1):
 
 
 if __name__ == "__main__":
-    is_multi = False
-    nb_seeds = 1
-    if len(sys.argv) > 2 and sys.argv[1] == "multistart":
-        is_multi = True
-        nb_seeds = int(sys.argv[2])
+    parser = argparse.ArgumentParser()
 
-    main(is_multi, nb_seeds)   
+    # Required argument for save folder path
+    parser.add_argument('save_folder_path', type=str, help='Path to the save folder')
+
+    # Optional argument for multistart
+    parser.add_argument('-m', '--multistart', type=int, help='Number of seeds for multistart')
+
+    args = parser.parse_args()
+
+    save_folder_path = args.save_folder_path
+    nb_seeds = args.multistart or 1
+    is_multi = args.multistart is not None
+
+    main(is_multi, nb_seeds, save_folder_path) 
 
 """
 

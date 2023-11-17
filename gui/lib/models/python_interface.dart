@@ -55,10 +55,14 @@ class PythonInterface {
     final pathAndArgs = multistart
         ? [
             path,
-            'multistart',
+            'save_folder', // TODO
+            '-m',
             nbSeeds.toString(),
           ]
-        : [path];
+        : [
+            path,
+            'save_folder', // TODO
+          ];
 
     final process = await Process.start(
         '${_skipEnvironmentLoading ? '' : _loadEnvironmentCommand}python',
