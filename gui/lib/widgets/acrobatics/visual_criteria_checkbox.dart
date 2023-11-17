@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:bioptim_gui/models/acrobatics_controllers.dart';
 import 'package:bioptim_gui/models/api_config.dart';
+import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -39,6 +41,10 @@ class _VisualCriteriaCheckboxState extends State<VisualCriteriaCheckbox> {
     setState(() {
       isChecked = value;
     });
+
+    // Alexandre: TODO find a prettier way to reset the export button
+    AcrobaticsControllers.instance.notifyListeners();
+    OptimalControlProgramControllers.instance.notifyListeners();
 
     if (kDebugMode) print('Visual criteria ${value ? 'on' : 'off'}');
   }
