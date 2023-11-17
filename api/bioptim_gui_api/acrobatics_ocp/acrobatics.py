@@ -207,7 +207,7 @@ def put_preferred_twist_side(preferred_twist_side: PreferredTwistSideRequest):
     return PreferredTwistSideResponse(preferred_twist_side=new_value)
 
 
-@router.put("/with_visual_criteria", response_model=VisualCriteriaResponse)
+@router.put("/with_visual_criteria", response_model=list)
 def put_preferred_twist_side(visual_criteria: VisualCriteriaRequest):
     new_value = visual_criteria.with_visual_criteria
     old_value = read_acrobatics_data("with_visual_criteria")
@@ -218,4 +218,14 @@ def put_preferred_twist_side(visual_criteria: VisualCriteriaRequest):
         )
 
     update_acrobatics_data("with_visual_criteria", new_value)
-    return VisualCriteriaResponse(with_visual_criteria=new_value)
+
+    data = read_acrobatics_data()
+    nb_somersaults = data["nb_somersaults"]
+    position = data["position"]
+    half_twists = data["nb_half_twists"]
+
+    new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
+    update_phase_info(new_phase_names)
+
+    phases_info = read_acrobatics_data("phases_info")
+    return phases_info
