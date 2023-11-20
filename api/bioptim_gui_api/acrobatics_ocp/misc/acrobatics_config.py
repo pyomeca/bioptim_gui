@@ -420,7 +420,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
                 create_objective(
                     objective_type="lagrange",
                     penalty_type=DefaultPenaltyConfig.original_to_min_dict["CUSTOM"],
-                    nodes="default",
+                    nodes="all_shooting",
                     weight=100.0,
                     arguments=[
                         {
