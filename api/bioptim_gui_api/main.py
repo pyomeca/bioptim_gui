@@ -2,12 +2,14 @@ import json
 
 from fastapi import FastAPI
 
-import bioptim_gui_api.acrobatics_ocp.acrobatics as acrobatics
-import bioptim_gui_api.generic_ocp.generic_ocp as generic_ocp
-import bioptim_gui_api.penalty.penalty as penalty
-import bioptim_gui_api.variables.variables as variables
-from bioptim_gui_api.acrobatics_ocp.acrobatics_config import DefaultAcrobaticsConfig
-from bioptim_gui_api.generic_ocp.generic_ocp_config import DefaultGenericOCPConfig
+import bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics as acrobatics
+import bioptim_gui_api.generic_ocp.endpoints.generic_ocp as generic_ocp
+import bioptim_gui_api.penalty.endpoints.penalty as penalty
+import bioptim_gui_api.variables.endpoints.variables as variables
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import (
+    DefaultAcrobaticsConfig,
+)
+from bioptim_gui_api.generic_ocp.misc.generic_ocp_config import DefaultGenericOCPConfig
 
 app = FastAPI()
 

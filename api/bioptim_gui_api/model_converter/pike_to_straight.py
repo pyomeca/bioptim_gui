@@ -10,11 +10,7 @@ def pike_to_straight(model_path: str) -> str:
         if line.startswith("segment"):
             segment = line.split(" ")[1]
 
-        if (
-            line.startswith("\trotations")
-            or line.startswith("\trangesQ")
-            or line.startswith("\tcom")
-        ):
+        if line.startswith("\trotations") or line.startswith("\trangesQ") or line.startswith("\tcom"):
             section = line.split(" ")[0]
 
         if segment in ["RightForearm\n", "LeftForearm\n", "UpperLegs\n"]:
