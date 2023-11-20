@@ -210,15 +210,13 @@ def prepare_ocp(
         for objective in phases[i]["objectives"]:
             generated += f"""
     objective_functions.add(
-        {Objective(i, **objective).__str__(nb_phase=nb_phases)}
-    )
+        {Objective(i, **objective).__str__(nb_phase=nb_phases)}    )
 """
 
         for constraint in phases[i]["constraints"]:
             generated += f"""
     constraints.add(
-        {Constraint(i, **constraint).__str__(nb_phase=nb_phases)}
-    )
+        {Constraint(i, **constraint).__str__(nb_phase=nb_phases)}    )
 """
 
     # DYNAMICS
