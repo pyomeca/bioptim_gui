@@ -227,5 +227,7 @@ def test_put_with_visual_criteria():
         "/acrobatics/with_visual_criteria/", json={"with_visual_criteria": True}
     )
     assert response.status_code == 200, response
-    data = response.json()
-    assert data["with_visual_criteria"]
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    assert response.json()["with_visual_criteria"]

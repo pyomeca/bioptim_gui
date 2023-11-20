@@ -1,18 +1,25 @@
+from multiprocessing import cpu_count
+
 from fastapi import APIRouter, HTTPException
 
 from bioptim_gui_api.acrobatics_ocp.acrobatics_utils import read_acrobatics_data
-from bioptim_gui_api.penalty.penalty_config import DefaultPenaltyConfig
-from bioptim_gui_api.utils.format_utils import format_2d_array, arg_to_string
+from bioptim_gui_api.penalty.constraint import Constraint
+from bioptim_gui_api.penalty.objective import Objective
+from bioptim_gui_api.utils.format_utils import format_2d_array
 from bioptim_gui_api.variables.pike_acrobatics_variables import PikeAcrobaticsVariables
-from bioptim_gui_api.variables.pike_with_visual_acrobatics_variables import PikeAcrobaticsWithVisualVariables
+from bioptim_gui_api.variables.pike_with_visual_acrobatics_variables import (
+    PikeAcrobaticsWithVisualVariables,
+)
 from bioptim_gui_api.variables.straight_acrobatics_variables import (
     StraightAcrobaticsVariables,
 )
-from bioptim_gui_api.variables.straight_with_visual_acrobatics_variables import StraightAcrobaticsWithVisualVariables
+from bioptim_gui_api.variables.straight_with_visual_acrobatics_variables import (
+    StraightAcrobaticsWithVisualVariables,
+)
 from bioptim_gui_api.variables.tuck_acrobatics_variables import TuckAcrobaticsVariables
-from multiprocessing import cpu_count
-
-from bioptim_gui_api.variables.tuck_with_visual_acrobatics_variables import TuckAcrobaticsWithVisualVariables
+from bioptim_gui_api.variables.tuck_with_visual_acrobatics_variables import (
+    TuckAcrobaticsWithVisualVariables,
+)
 
 router = APIRouter()
 
@@ -79,6 +86,7 @@ def get_acrobatics_generated_code():
 import argparse
 import os
 import pickle as pkl
+import casadi as cas
 
 import numpy as np
 from bioptim import (
@@ -100,10 +108,60 @@ from bioptim import (
     ObjectiveFcn,
     ObjectiveList,
     OptimalControlProgram,
+    PenaltyController,
     QuadratureRule,
     Solution,
     Solver,
 )
+
+def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) -> cas.MX:
+    \"""
+    This function aims to encourage the avatar to keep the trampoline bed in his peripheral vision.
+    It is done by discretizing the vision cone into vectors and determining if the vector projection of the gaze are inside the trampoline bed.
+    \"""
+
+    a = 1.07  # Trampoline with/2
+    b = 2.14  # Trampoline length/2
+    n = 6  # order of the polynomial for the trampoline bed rectangle equation
+
+    # Get the gaze vector
+    eyes_vect_start_marker_idx = controller.model.marker_index(f'eyes_vect_start')
+    eyes_vect_end_marker_idx = controller.model.marker_index(f'eyes_vect_end')
+    gaze_vector = controller.model.markers(controller.states["q"].mx)[eyes_vect_end_marker_idx] - controller.model.markers(controller.states["q"].mx)[eyes_vect_start_marker_idx]
+
+    point_in_the_plane = np.array([1, 2, -0.83])
+    vector_normal_to_the_plane = np.array([0, 0, 1])
+    obj = 0
+    for i_r in range(11):
+        for i_th in range(10):
+
+            # Get this vector from the vision cone
+            marker_idx = controller.model.marker_index(f'cone_approx_{i_r}_{i_th}')
+            vector_origin = controller.model.markers(controller.states["q"].mx)[eyes_vect_start_marker_idx]
+            vector_end = controller.model.markers(controller.states["q"].mx)[marker_idx]
+            vector = vector_end - vector_origin
+
+            # Get the intersection between the vector and the trampoline plane
+            t = (cas.dot(point_in_the_plane, vector_normal_to_the_plane) - cas.dot(vector_normal_to_the_plane, vector_origin)) / cas.dot(
+                vector, vector_normal_to_the_plane
+            )
+            point_projection = vector_origin + vector * cas.fabs(t)
+
+            # Determine if the point is inside the trampoline bed
+            # Rectangle equation : (x/a)**n + (y/b)**n = 1
+            # The function is convoluted with tanh to make it:
+            # 1. Continuous
+            # 2. Not encourage to look to the middle of the trampoline bed
+            # 3. Largely penalized when outside the trampoline bed
+            # 4. Equaly penalized when looking upward
+            obj += cas.tanh(((point_projection[0]/a)**n + (point_projection[1]/b)**n) - 1) + 1
+
+    val = cas.if_else(gaze_vector[2] > -0.01, 2*10*11,
+                cas.if_else(cas.fabs(gaze_vector[0]/gaze_vector[2]) > np.tan(3*np.pi/8), 2*10*11,
+                            cas.if_else(cas.fabs(gaze_vector[1]/gaze_vector[2]) > np.tan(3*np.pi/8), 2*10*11, obj)))
+    out = controller.mx_to_cx("peripheral_vision", val, controller.states["q"])
+
+    return out
 
 """
 
@@ -148,74 +206,17 @@ def prepare_ocp(
 
     for i in range(nb_phases):
         for objective in phases[i]["objectives"]:
-            weight = objective["weight"]
-            penalty_type = (
-                DefaultPenaltyConfig.min_to_original_dict[objective["penalty_type"]]
-                if weight > 0
-                else DefaultPenaltyConfig.max_to_original_dict[
-                    objective["penalty_type"]
-                ]
-            )
             generated += f"""
     objective_functions.add(
-        objective=ObjectiveFcn.{objective["objective_type"].capitalize()}.{penalty_type},
-"""
-            for argument in objective["arguments"]:
-                generated += f"        {arg_to_string(argument)},\n"
-
-            generated += f"""        node=Node.{objective["nodes"].upper()},
-        quadratic={objective["quadratic"]},
-        weight={objective["weight"]},
-"""
-            if not objective["expand"]:
-                generated += "        expand = False,\n"
-            if objective["target"] is not None:
-                generated += f"        target = {objective['target']},\n"
-            if objective["derivative"]:
-                generated += "        derivative = True,\n"
-            if (
-                objective["objective_type"] == "lagrange"
-                and objective["integration_rule"] != "rectangle_left"
-            ):
-                generated += f"        integration_rule = QuadratureRule.{objective['integration_rule'].upper()},\n"
-            if objective["multi_thread"]:
-                generated += "        multi_thread = True,\n"
-            if nb_phases > 1:
-                generated += f"        phase={i},\n"
-
-            generated += """    )
+        {Objective(i, **objective).__str__(nb_phase=nb_phases)}
+    )
 """
 
         for constraint in phases[i]["constraints"]:
             generated += f"""
     constraints.add(
-        constraint=ConstraintFcn.{constraint["penalty_type"]},
-"""
-            for argument in constraint["arguments"]:
-                generated += f"        {arg_to_string(argument)},\n"
-
-            generated += f"""        node=Node.{constraint["nodes"].upper()},
-        quadratic={constraint["quadratic"]},
-"""
-
-            # we don't have constraints with arguments yet
-            # for argument in constraint["arguments"]:
-            #     generated += f"        {arg_to_string(argument)},\n"
-
-            if not constraint["expand"]:
-                generated += "        expand = False,\n"
-            if constraint["target"] is not None:
-                generated += f"        target = {constraint['target']},\n"
-            if constraint["derivative"]:
-                generated += "        derivative = True,\n"
-            if constraint["integration_rule"] != "rectangle_left":
-                generated += f"        integration_rule = QuadratureRule.{constraint['integration_rule'].upper()},\n"
-            if constraint["multi_thread"]:
-                generated += "        multi_thread = True,\n"
-            if nb_phases > 1:
-                generated += f"        phase={i},\n"
-
-            generated += """    )
+        {Constraint(i, **constraint).__str__(nb_phase=nb_phases)}
+    )
 """
 
     # DYNAMICS
