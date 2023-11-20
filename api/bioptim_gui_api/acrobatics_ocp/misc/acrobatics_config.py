@@ -35,7 +35,7 @@ class DefaultAcrobaticsConfig:
         "objectives": [
             create_objective(
                 objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_CONTROL"],
                 nodes="all_shooting",
                 weight=1.0,
                 arguments=[
@@ -44,7 +44,7 @@ class DefaultAcrobaticsConfig:
             ),
             create_objective(
                 objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_CONTROL"],
                 nodes="all_shooting",
                 weight=1.0,
                 derivative=True,
