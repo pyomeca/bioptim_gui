@@ -11,7 +11,7 @@ class GenericOCPRequestMaker extends OCPRequestMaker<GenericOcpData> {
       : super(prefix: 'generic_ocp', phaseInfoString: 'phases_info');
 
   Future<GenericOcpData> fetchData() async {
-    final url = Uri.parse('${APIConfig.url}/$prefix');
+    final url = Uri.parse('${APIConfig.url}/$prefix/');
     final response = await http.get(url);
 
     if (response.statusCode != 200) throw Exception("Fetch error");

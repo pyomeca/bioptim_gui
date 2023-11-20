@@ -11,7 +11,7 @@ class AcrobaticsRequestMaker extends OCPRequestMaker<AcrobaticsData> {
       : super(prefix: 'acrobatics', phaseInfoString: 'phases_info');
 
   Future<AcrobaticsData> fetchData() async {
-    final url = Uri.parse('${APIConfig.url}/$prefix');
+    final url = Uri.parse('${APIConfig.url}/$prefix/');
     final response = await http.get(url);
 
     if (response.statusCode != 200) throw Exception("Fetch error");
