@@ -237,11 +237,12 @@ class StraightAcrobaticsVariables:
     ) -> list:
         is_forward = sum(half_twists) % 2 != 0
         x_inits = np.zeros((nb_phases, 2, cls.nb_q))
+        nb_somersaults = len(half_twists)
 
         x_inits[0, 0, [cls.YrotRightUpperArm, cls.YrotLeftUpperArm]] = 2.9, -2.9
         x_inits[0, 1, [cls.YrotRightUpperArm, cls.YrotLeftUpperArm]] = 0.0, 0.0
 
-        for phase in range(nb_phases):
+        for phase in range(nb_somersaults):
             if phase != 0:
                 x_inits[phase][0] = x_inits[phase - 1][1]
 
@@ -250,12 +251,21 @@ class StraightAcrobaticsVariables:
             x_inits[phase][1][cls.Zrot] = (
                 np.pi * sum(half_twists[: phase + 1]) if prefer_left else -np.pi * sum(half_twists[: phase + 1])
             )
+
             x_inits[phase][1][[cls.YrotRightUpperArm, cls.YrotLeftUpperArm]] = 0.0, 0.0
 
-        x_inits[-1][1][[cls.YrotRightUpperArm, cls.YrotLeftUpperArm]] = (
-            2.9,
-            -2.9,
+        # before landing keep 1/4 somersault ( = 1/4 of 2 pi = pi / 2)
+        x_inits[-2][1][cls.Xrot] = (
+            2 * np.pi * nb_somersaults - np.pi / 2
+            if is_forward
+            else -2 * np.pi * nb_somersaults + np.pi / 2
         )
+
+        # landing
+        x_inits[-1][0] = x_inits[-2][1]
+        x_inits[-2][1][cls.Xrot] = 2 * np.pi * nb_somersaults if is_forward else -2 * np.pi * nb_somersaults
+
+        x_inits[-1, 1, [cls.YrotRightUpperArm, cls.YrotLeftUpperArm]] = 2.9, -2.9
 
         return x_inits
 
