@@ -49,6 +49,8 @@ class TuckAcrobaticsVariables(StraightAcrobaticsVariables):
         XrotLeftLowerArm,
     ]
 
+    legs_xdofs = [XrotUpperLegs, XrotLowerLegs]
+
     q_min_bounds = np.array(
         [
             [-1, -1, -1],

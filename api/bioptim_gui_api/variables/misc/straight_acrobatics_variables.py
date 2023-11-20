@@ -32,6 +32,7 @@ class StraightAcrobaticsVariables:
     ]
 
     elbow_dofs = []
+    legs_xdofs = []
 
     q_min_bounds = np.array(
         [

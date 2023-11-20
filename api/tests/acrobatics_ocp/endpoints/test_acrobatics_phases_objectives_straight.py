@@ -60,7 +60,7 @@ def test_delete_objective_0():
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 4
-    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
+    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
     assert data[1]["penalty_type"] == "MINIMIZE_TIME"
 
 
@@ -69,7 +69,7 @@ def test_delete_objective_1():
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 4
-    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
+    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
     assert data[1]["penalty_type"] == "MINIMIZE_TIME"
 
 
@@ -109,8 +109,8 @@ def test_multiple_somersaults_add_remove_objective():
         response = client.get(f"/acrobatics/phases_info/{i}/objectives")
         data = response.json()
         assert len(data) == 5
-        assert data[0]["penalty_type"] == "MINIMIZE_STATE"
-        assert data[1]["penalty_type"] == "MINIMIZE_STATE"
+        assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
+        assert data[1]["penalty_type"] == "MINIMIZE_CONTROL"
         assert data[2]["penalty_type"] == "MINIMIZE_TIME"
 
 
@@ -121,8 +121,7 @@ def test_multiple_somersaults_add_remove_objective():
         "new_value",
     ),
     [
-        ("objective_type", "lagrange", "mayer"),
-        ("penalty_type", "MINIMIZE_STATE", "MINIMIZE_TIME"),
+        ("penalty_type", "MINIMIZE_CONTROL", "MINIMIZE_TIME"),
         ("nodes", "all_shooting", "end"),
         ("quadratic", True, False),
         ("expand", True, False),
@@ -295,12 +294,12 @@ def test_add_objective_check_arguments_changing_penalty_type():
     assert len(data) == 5
 
     assert data[0]["objective_type"] == "lagrange"
-    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
+    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
     assert data[0]["nodes"] == "all_shooting"
     assert len(data[0]["arguments"]) == 1
 
     assert data[1]["objective_type"] == "lagrange"
-    assert data[1]["penalty_type"] == "MINIMIZE_STATE"
+    assert data[1]["penalty_type"] == "MINIMIZE_CONTROL"
     assert data[1]["nodes"] == "all_shooting"
     assert data[1]["derivative"] == True
     assert len(data[1]["arguments"]) == 1
@@ -344,7 +343,7 @@ def test_add_objective_check_arguments_changing_objective_type():
     assert len(data) == 5
 
     assert data[0]["objective_type"] == "lagrange"
-    assert data[0]["penalty_type"] == "MINIMIZE_STATE"
+    assert data[0]["penalty_type"] == "MINIMIZE_CONTROL"
     assert data[0]["nodes"] == "all_shooting"
     assert len(data[0]["arguments"]) == 1
 

@@ -48,6 +48,8 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
         XrotLeftLowerArm,
     ]
 
+    legs_xdofs = [XrotUpperLegs]
+
     q_min_bounds = np.array(
         [
             [-1, -1, -1],

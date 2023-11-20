@@ -110,8 +110,10 @@ def test_get_args(penalty_fcn, expected):
 def test_obj_arguments(objective_fcn, objective_type, penalty_type):
     assert obj_arguments(objective_type, penalty_type) == get_args(objective_fcn)
 
+
 def test_objective_custom_arguments():
     assert obj_arguments("lagrange", "CUSTOM") == [{"name": "function", "value": None, "type": "function"}]
+
 
 @pytest.mark.parametrize(
     "constraint_fcn, penalty_type",

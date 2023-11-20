@@ -200,8 +200,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
     elif phase_name == "Kick out":
         res["objectives"][minimize_time_index]["weight"] = 100.0
         res["objectives"][minimize_time_index]["penalty_type"] = "MINIMIZE_TIME"
-
-        # Keeping the body alignment after kick out
+        # quick kickout
         res["objectives"].append(
             create_objective(
                 objective_type="lagrange",
@@ -210,7 +209,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
                 weight=50000.0,
                 arguments=[
                     {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index", "value": model.XrotUpperLegs, "type": "list"},
+                    {"name": "index", "value": model.legs_xdofs, "type": "int"},
                 ],
             )
         )
@@ -235,36 +234,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
                     ],
                 )
             )
-
-        if phase_names[phase_index + 1] == "Landing":
-            res["objectives"].append(
-                create_objective(
-                    objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
-                    nodes="all_shooting",
-                    weight=50000.0,
-                    arguments=[
-                        {"name": "key", "value": "q", "type": "str"},
-                        {"name": "index", "value": model.XrotUpperLegs, "type": "list"},
-                    ],
-                )
-            )
     elif phase_name == "Somersault":
         res["objectives"][minimize_time_index]["weight"] = -100.0
         res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
-        # quick kickout
-        res["objectives"].append(
-            create_objective(
-                objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
-                nodes="all_shooting",
-                weight=50000.0,
-                arguments=[
-                    {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index", "value": model.XrotUpperLegs, "type": "int"},
-                ],
-            )
-        )
         for side in "D", "G":
             res["constraints"].append(
                 create_constraint(
@@ -314,7 +286,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
                     weight=50000.0,
                     arguments=[
                         {"name": "key", "value": "q", "type": "str"},
-                        {"name": "index", "value": model.XrotUpperLegs, "type": "int"},
+                        {"name": "index", "value": model.legs_xdofs, "type": "int"},
                     ],
                 )
             )
