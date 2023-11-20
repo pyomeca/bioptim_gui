@@ -302,6 +302,7 @@ def prepare_ocp(
         "qdot",
         initial_guess={qdot_init},
         interpolation=InterpolationType.CONSTANT,
+        phase=0,
     )
 """
 
@@ -321,6 +322,7 @@ def prepare_ocp(
         "tau",
         initial_guess={tau_init},
         interpolation=InterpolationType.CONSTANT,
+        phase=0,
     )
 """
 
@@ -334,21 +336,21 @@ def prepare_ocp(
                 magnitude_type=MagnitudeType.RELATIVE,
                 seed=seed,
             )
-            x_initial_guesses[i]["qdot"].add_noise(
-                bounds=x_bounds[i]["qdot"],
-                n_shooting=np.array(n_shooting[i])+1,
-                magnitude=0.2,
-                magnitude_type=MagnitudeType.RELATIVE,
-                seed=seed,
-            )
-    
-            u_initial_guesses[i]["tau"].add_noise(
-                bounds=u_bounds[i]["tau"],
-                magnitude=0.2,
-                magnitude_type=MagnitudeType.RELATIVE,
-                n_shooting=n_shooting[i],
-                seed=seed,
-            )
+        x_initial_guesses[0]["qdot"].add_noise(
+            bounds=x_bounds[0]["qdot"],
+            n_shooting=np.array(n_shooting[0])+1,
+            magnitude=0.2,
+            magnitude_type=MagnitudeType.RELATIVE,
+            seed=seed,
+        )
+
+        u_initial_guesses[0]["tau"].add_noise(
+            bounds=u_bounds[0]["tau"],
+            magnitude=0.2,
+            magnitude_type=MagnitudeType.RELATIVE,
+            n_shooting=n_shooting[0],
+            seed=seed,
+        )
 """
 
     generated += f"""
