@@ -502,7 +502,7 @@ def main(is_multistart: bool = False, nb_seeds: int = 1, save_folder: str = "sav
         start_time = time.time()
         sol = ocp.solve(solver=solver)
         with open(f"{{save_folder}}/timelog.txt", "a") as f:
-            f.write(f"acrobatics_{'_'.join(str(i) for i in half_twists)}_{side}_{position}: {{time.time() - start_time}}\n")
+            f.write(f"{{'multi' if is_multistart else ''}}acrobatics_{'_'.join(str(i) for i in half_twists)}_{side}_{position}: {{time.time() - start_time}}\n")
 
         save_results(sol, save_folder=save_folder)
 
