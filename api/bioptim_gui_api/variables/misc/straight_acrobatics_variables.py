@@ -252,9 +252,7 @@ class StraightAcrobaticsVariables:
 
         # before landing keep 1/4 somersault ( = 1/4 of 2 pi = pi / 2)
         x_inits[-2][1][cls.Xrot] = (
-            2 * np.pi * nb_somersaults - np.pi / 2
-            if is_forward
-            else -2 * np.pi * nb_somersaults + np.pi / 2
+            2 * np.pi * nb_somersaults - np.pi / 2 if is_forward else -2 * np.pi * nb_somersaults + np.pi / 2
         )
 
         # landing

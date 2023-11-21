@@ -592,7 +592,7 @@ class TuckAcrobaticsVariables(StraightAcrobaticsVariables):
         x_inits[0, 1, [cls.YrotRightUpperArm, cls.YrotLeftUpperArm]] = 0.0, 0.0
 
         # somersaulting
-        x_inits[0, 1, cls.Xrot] = 5 / 4 * np.pi if is_forward else - 5 / 4 * np.pi
+        x_inits[0, 1, cls.Xrot] = 5 / 4 * np.pi if is_forward else -5 / 4 * np.pi
 
         current_phase = -1
 
@@ -601,9 +601,7 @@ class TuckAcrobaticsVariables(StraightAcrobaticsVariables):
             current_phase += 1
             # twisting
             x_inits[0, 1, cls.Zrot] = (
-                np.pi * half_twists[0] - np.pi / 8
-                if prefer_left
-                else -np.pi * half_twists[0] + np.pi / 8
+                np.pi * half_twists[0] - np.pi / 8 if prefer_left else -np.pi * half_twists[0] + np.pi / 8
             )
 
         last_have_twist = True
@@ -718,17 +716,16 @@ class TuckAcrobaticsVariables(StraightAcrobaticsVariables):
                 x_inits[current_phase, 0, :] = x_inits[current_phase - 1, 1, :]
 
                 if is_last_somersault:
-
                     # somersault 1/4 left at then end
                     x_inits[current_phase, 1, cls.Xrot] = (
-                        2 * np.pi * nb_somersaults - np.pi / 2 if is_forward else -2 * np.pi * nb_somersaults + np.pi / 2
+                        2 * np.pi * nb_somersaults - np.pi / 2
+                        if is_forward
+                        else -2 * np.pi * nb_somersaults + np.pi / 2
                     )
 
                     # finish twist
                     x_inits[current_phase, 1, cls.Zrot] = (
-                        sum(half_twists[:-1]) * np.pi
-                        if prefer_left
-                        else -sum(half_twists) * np.pi
+                        sum(half_twists[:-1]) * np.pi if prefer_left else -sum(half_twists) * np.pi
                     )
 
                     # Right arm
@@ -744,7 +741,7 @@ class TuckAcrobaticsVariables(StraightAcrobaticsVariables):
 
                     # twisting
                     x_inits[current_phase, 1, cls.Zrot] = (
-                        np.pi * sum(half_twists[:i + 1]) - np.pi / 8
+                        np.pi * sum(half_twists[: i + 1]) - np.pi / 8
                         if prefer_left
                         else -np.pi * sum(half_twists[: i + 1]) + np.pi / 8
                     )
@@ -757,14 +754,10 @@ class TuckAcrobaticsVariables(StraightAcrobaticsVariables):
         x_inits[current_phase, 0, :] = x_inits[current_phase - 1, 1, :]
 
         # finish 1/4 somersault
-        x_inits[current_phase, 1, cls.Xrot] = (
-            nb_somersaults * np.pi * 2 if is_forward else -nb_somersaults * np.pi * 2
-        )
+        x_inits[current_phase, 1, cls.Xrot] = nb_somersaults * np.pi * 2 if is_forward else -nb_somersaults * np.pi * 2
 
         # twist finished
-        x_inits[current_phase, 1, cls.Zrot] = (
-            sum(half_twists) * np.pi if prefer_left else -sum(half_twists) * np.pi
-        )
+        x_inits[current_phase, 1, cls.Zrot] = sum(half_twists) * np.pi if prefer_left else -sum(half_twists) * np.pi
 
         # arms
         x_inits[current_phase, 1, cls.YrotRightUpperArm] = 2.9
