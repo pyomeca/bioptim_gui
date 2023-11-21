@@ -579,3 +579,199 @@ class TuckAcrobaticsVariables(StraightAcrobaticsVariables):
         x_bounds[current_phase]["max"][cls.YrotUpperLegs, 2] = 0.1
 
         return x_bounds
+
+    @classmethod
+    def get_q_init(cls, nb_phases: int, half_twists: list, prefer_left: bool = True) -> list:
+        nb_somersaults = len(half_twists)
+        is_forward = sum(half_twists) % 2 != 0
+
+        x_inits = np.zeros((nb_phases, 2, cls.nb_q))
+
+        # arms up
+        x_inits[0, 0, [cls.YrotRightUpperArm, cls.YrotLeftUpperArm]] = 2.9, -2.9
+        x_inits[0, 1, [cls.YrotRightUpperArm, cls.YrotLeftUpperArm]] = 0.0, 0.0
+
+        # somersaulting
+        x_inits[0, 1, cls.Xrot] = 5 / 4 * np.pi if is_forward else - 5 / 4 * np.pi
+
+        current_phase = -1
+
+        # twist start
+        if half_twists[0] > 0:
+            current_phase += 1
+            # twisting
+            x_inits[0, 1, cls.Zrot] = (
+                np.pi * half_twists[0] - np.pi / 8
+                if prefer_left
+                else -np.pi * half_twists[0] + np.pi / 8
+            )
+
+        last_have_twist = True
+        next_have_twist = half_twists[1] > 0
+        somersault_tuck_start = None
+        for i in range(1, nb_somersaults):
+            is_last_somersault = i == nb_somersaults - 1
+            # tucking
+            if last_have_twist:
+                somersault_tuck_start = i
+                current_phase += 1
+
+                # acrobatics doesn't start with tuck
+                if current_phase != 0:
+                    # initial bounds, same as final bounds of previous phase
+                    x_inits[current_phase, 0, :] = x_inits[current_phase - 1, 1, :]
+
+                    half_twists_till_now = sum(half_twists[:i])
+                    if half_twists_till_now != 0:
+                        x_inits[current_phase, 1, cls.Zrot] = (
+                            np.pi * half_twists_till_now if prefer_left else -np.pi * half_twists_till_now
+                        )
+
+                # legs
+                x_inits[current_phase, 1, cls.XrotUpperLegs] = -2.4
+                x_inits[current_phase, 1, cls.XrotLowerLegs] = 2.4
+
+            # somersaulting in tuck
+            if i == nb_somersaults - 1 or next_have_twist:
+                current_phase += 1
+                x_inits[current_phase, 0, :] = x_inits[current_phase - 1, 1, :]
+
+                # somersaulting in tuck, for all no-twist somersaults, starting from last tuck
+                xrot_min_end = (
+                    min(
+                        2 * np.pi * somersault_tuck_start - 0.2 - np.pi,
+                        2 * np.pi * nb_somersaults - np.pi / 2 - 0.2,
+                    )
+                    if is_forward
+                    else max(
+                        -2 * np.pi * (i + 1) - 0.2,
+                        -2 * np.pi * nb_somersaults + np.pi / 2 - 0.2,
+                    )
+                )
+                xrot_max_end = (
+                    min(
+                        2 * np.pi * (i + 1) + 0.2,
+                        2 * np.pi * nb_somersaults - np.pi / 2 + 0.2,
+                    )
+                    if is_forward
+                    else max(
+                        -2 * np.pi * somersault_tuck_start + 0.2 + np.pi,
+                        -2 * np.pi * nb_somersaults + np.pi / 2 + 0.2,
+                    )
+                )
+
+                x_inits[current_phase, 1, cls.Xrot] = (xrot_min_end + xrot_max_end) / 2
+
+                # rot legs, hips
+                x_inits[current_phase, 1, cls.XrotUpperLegs] = -2.4
+                x_inits[current_phase, 1, cls.XrotLowerLegs] = 2.4
+
+            # kick out
+            if next_have_twist or is_last_somersault:
+                current_phase += 1
+
+                x_inits[current_phase, 0, :] = x_inits[current_phase - 1, 1, :]
+
+                # somersaulting
+                xrot_min_end = (
+                    min(
+                        2 * np.pi * somersault_tuck_start - 0.2,
+                        2 * np.pi * nb_somersaults - np.pi / 2 - 0.2,
+                    )
+                    if is_forward
+                    else max(
+                        -2 * np.pi * (i + 1) - 0.2,
+                        -2 * np.pi * nb_somersaults + np.pi / 2 - 0.2,
+                    )
+                )
+                xrot_max_end = (
+                    min(
+                        2 * np.pi * (i + 1) + 0.2,
+                        2 * np.pi * nb_somersaults - np.pi / 2 + 0.2,
+                    )
+                    if is_forward
+                    else max(
+                        -2 * np.pi * somersault_tuck_start + 0.2,
+                        -2 * np.pi * nb_somersaults + np.pi / 2 + 0.2,
+                    )
+                )
+                x_inits[current_phase, 1, cls.Xrot] = (xrot_min_end + xrot_max_end) / 2
+
+                # twisting
+                zrot_min_end = (
+                    np.pi * sum(half_twists[:i]) - 0.2
+                    if prefer_left
+                    else -np.pi * sum(half_twists[: i + 1])
+                    - 0.2
+                    + (np.pi * half_twists[i] / 2 if half_twists[i] != 0 else 0)
+                )
+                zrot_max_end = (
+                    np.pi * sum(half_twists[: i + 1]) + 0.2 - (np.pi * half_twists[i] / 2 if half_twists[i] != 0 else 0)
+                    if prefer_left
+                    else -np.pi * sum(half_twists[:i]) + 0.2
+                )
+                x_inits[current_phase, 1, cls.Zrot] = (zrot_min_end + zrot_max_end) / 2
+
+            # twisting
+            if next_have_twist:
+                current_phase += 1
+                x_inits[current_phase, 0, :] = x_inits[current_phase - 1, 1, :]
+
+                if is_last_somersault:
+
+                    # somersault 1/4 left at then end
+                    x_inits[current_phase, 1, cls.Xrot] = (
+                        2 * np.pi * nb_somersaults - np.pi / 2 if is_forward else -2 * np.pi * nb_somersaults + np.pi / 2
+                    )
+
+                    # finish twist
+                    x_inits[current_phase, 1, cls.Zrot] = (
+                        sum(half_twists[:-1]) * np.pi
+                        if prefer_left
+                        else -sum(half_twists) * np.pi
+                    )
+
+                    # Right arm
+                    x_inits[current_phase, 1, cls.YrotRightUpperArm] = np.pi / 16
+                    # Left arm
+                    x_inits[current_phase, 1, cls.YrotLeftUpperArm] = -np.pi / 16
+
+                else:
+                    # somersaulting
+                    x_inits[current_phase, 1, cls.Xrot] = (
+                        2 * np.pi * (i + 0.5) if is_forward else -2 * np.pi * (i + 0.5)
+                    )
+
+                    # twisting
+                    x_inits[current_phase, 1, cls.Zrot] = (
+                        np.pi * sum(half_twists[:i + 1]) - np.pi / 8
+                        if prefer_left
+                        else -np.pi * sum(half_twists[: i + 1]) + np.pi / 8
+                    )
+
+            last_have_twist = next_have_twist
+            next_have_twist = is_last_somersault or half_twists[i + 1] > 0
+
+        # landing
+        current_phase += 1
+        x_inits[current_phase, 0, :] = x_inits[current_phase - 1, 1, :]
+
+        # finish 1/4 somersault
+        x_inits[current_phase, 1, cls.Xrot] = (
+            nb_somersaults * np.pi * 2 if is_forward else -nb_somersaults * np.pi * 2
+        )
+
+        # twist finished
+        x_inits[current_phase, 1, cls.Zrot] = (
+            sum(half_twists) * np.pi if prefer_left else -sum(half_twists) * np.pi
+        )
+
+        # arms
+        x_inits[current_phase, 1, cls.YrotRightUpperArm] = 2.9
+        # Left arm
+        x_inits[current_phase, 1, cls.YrotLeftUpperArm] = -2.9
+
+        # Hips flexion
+        x_inits[current_phase, 1, cls.XrotUpperLegs] = -0.5
+
+        return x_inits
