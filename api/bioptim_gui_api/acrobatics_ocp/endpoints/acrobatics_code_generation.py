@@ -71,7 +71,9 @@ def get_acrobatics_generated_code():
 
     q_init = acrobatics_variables.get_q_init(nb_phases, half_twists, prefer_left)
 
-    qdot_bounds = acrobatics_variables.get_qdot_bounds(nb_phases, total_time, is_forward)
+    qdot_bounds = acrobatics_variables.get_qdot_bounds(
+        nb_phases, total_time, is_forward
+    )
 
     qdot_init = acrobatics_variables.get_qdot_init()
 
@@ -89,6 +91,7 @@ import argparse
 import os
 import pickle as pkl
 import casadi as cas
+import time
 
 import numpy as np
 from bioptim import (
@@ -495,7 +498,11 @@ def main(is_multistart: bool = False, nb_seeds: int = 1, save_folder: str = "sav
     else:
         ocp = prepare_ocp()
         solver = get_solver()
+        
+        start_time = time.time()
         sol = ocp.solve(solver=solver)
+        with open(f"{{save_folder}}/timelog.txt", "a") as f:
+            f.write(f"acrobatics_{'_'.join(str(i) for i in half_twists)}_{side}_{position}: {{time.time() - start_time}}\n")
 
         save_results(sol, save_folder=save_folder)
 
