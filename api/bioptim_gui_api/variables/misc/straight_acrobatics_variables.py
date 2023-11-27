@@ -263,7 +263,7 @@ class StraightAcrobaticsVariables:
         x_inits = np.zeros((nb_phases, 2, cls.nb_q))
         x_bounds = cls.get_q_bounds(half_twists, prefer_left)
 
-        for phase in range(5):
+        for phase in range(nb_phases):
             x_inits[phase, 0] = (
                 x_bounds[phase]["min"][:, 0] + x_bounds[phase]["max"][:, 0]
             ) / 2
