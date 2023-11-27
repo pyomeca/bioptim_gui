@@ -665,20 +665,3 @@ class TuckAcrobaticsVariables(StraightAcrobaticsVariables):
         x_bounds[current_phase]["max"][cls.YrotUpperLegs, 2] = 0.1
 
         return x_bounds
-
-    @classmethod
-    def get_q_init(
-        cls, nb_phases: int, half_twists: list, prefer_left: bool = True
-    ) -> list:
-        x_inits = np.zeros((nb_phases, 2, cls.nb_q))
-        x_bounds = cls.get_q_bounds(half_twists, prefer_left)
-
-        for phase in range(5):
-            x_inits[phase, 0] = (
-                x_bounds[phase]["min"][:, 0] + x_bounds[phase]["max"][:, 0]
-            ) / 2
-            x_inits[phase, 1] = (
-                x_bounds[phase]["min"][:, 2] + x_bounds[phase]["max"][:, 2]
-            ) / 2
-
-        return x_inits
