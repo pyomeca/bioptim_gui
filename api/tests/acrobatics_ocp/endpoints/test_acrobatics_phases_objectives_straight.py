@@ -40,6 +40,29 @@ def test_get_objectives():
     assert data[1]["weight"] == 1.0
 
 
+def test_get_objectives_dropdown_minimize():
+    response = client.get("/acrobatics/phases_info/0/objectives/0")
+    assert response.status_code == 200, response
+
+    data = response.json()
+    assert type(data) == list
+    assert "MINIMIZE_CONTROL" in data
+    assert "MAXIMIZE_CONTROL" not in data
+
+
+def test_get_objectives_dropdown_maximize():
+    response = client.put("/acrobatics/phases_info/0/objectives/0/weight/maximize")
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/phases_info/0/objectives/0")
+    assert response.status_code == 200, response
+
+    data = response.json()
+    assert type(data) == list
+    assert "MINIMIZE_CONTROL" not in data
+    assert "MAXIMIZE_CONTROL" in data
+
+
 def test_add_objective_simple():
     response = client.post("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response
@@ -430,3 +453,63 @@ def test_get_objective_fcn():
     data = response.json()
     assert type(data) is list
     assert len(data) != 0
+
+
+def test_put_penalty_type_maximize():
+    response = client.put(
+        "/acrobatics/phases_info/0/objectives/0/weight/maximize",
+    )
+    assert response.status_code == 200, response
+
+    response = client.put(
+        "/acrobatics/phases_info/0/objectives/0/penalty_type",
+        json={"penalty_type": "MAXIMIZE_STATE"},
+    )
+    assert response.status_code == 200, response
+
+
+def test_put_objective_type_maximize():
+    response = client.put(
+        "/acrobatics/phases_info/0/objectives/0/weight/maximize",
+    )
+    assert response.status_code == 200, response
+
+    response = client.put(
+        "/acrobatics/phases_info/0/objectives/0/penalty_type",
+        json={"penalty_type": "MAXIMIZE_TIME"},
+    )
+    assert response.status_code == 200, response
+
+    response = client.put(
+        "/acrobatics/phases_info/0/objectives/0/objective_type",
+        json={"objective_type": "mayer"},
+    )
+    assert response.status_code == 200, response
+
+
+def test_changing_penalty_not_exist():
+    # MINIMIZE_CONTROL -> only exists in Lagrange, not in Mayer
+    response = client.put(
+        "/acrobatics/phases_info/0/objectives/0/penalty_type",
+        json={"penalty_type": "MINIMIZE_TIME"},
+    )
+    assert response.status_code == 200, response
+
+    response = client.put(
+        "/acrobatics/phases_info/0/objectives/0/objective_type",
+        json={"objective_type": "mayer"},
+    )
+    assert response.status_code == 200, response
+
+    data = response.json()
+    assert data["objective_type"] == "mayer"
+
+    response = client.put(
+        "/acrobatics/phases_info/0/objectives/0/penalty_type",
+        json={"penalty_type": "MINIMIZE_CONTROL"},
+    )
+    assert response.status_code == 200, response
+
+    data = response.json()
+    assert data["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data["objective_type"] == "lagrange"
