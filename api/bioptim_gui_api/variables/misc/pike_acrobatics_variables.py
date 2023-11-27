@@ -446,9 +446,6 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                     "max"
                 ][:, 2]
 
-            x_bounds[current_phase]["min"][cls.Xrot, 1] = (
-                2 * np.pi * nb_somersaults - np.pi - 0.2
-            )
             x_bounds[current_phase]["max"][cls.Xrot, 1] = (
                 2 * np.pi * nb_somersaults - np.pi / 2 + 0.2
             )
