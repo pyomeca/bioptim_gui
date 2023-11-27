@@ -55,7 +55,8 @@ def update_phase_info(phase_names: list[str]) -> None:
     with_visual_criteria = data["with_visual_criteria"]
 
     new_phases = [
-        config.phase_name_to_phase(position, phase_names, i, with_visual_criteria) for i, _ in enumerate(phase_names)
+        config.phase_name_to_phase(position, phase_names, i, with_visual_criteria)
+        for i, _ in enumerate(phase_names)
     ]
 
     for i in range(n_phases):
@@ -70,7 +71,9 @@ def update_phase_info(phase_names: list[str]) -> None:
         json.dump(data, f)
 
 
-def acrobatics_phase_names(nb_somersaults: int, position: str, half_twists: list[int]) -> list[str]:
+def acrobatics_phase_names(
+    nb_somersaults: int, position: str, half_twists: list[int]
+) -> list[str]:
     if position == "straight":
         return [f"Somersault {i + 1}" for i in range(nb_somersaults)] + ["Landing"]
 
@@ -102,6 +105,10 @@ def acrobatics_phase_names(nb_somersaults: int, position: str, half_twists: list
 
         last_have_twist = next_have_twist
         next_have_twist = is_last_somersault or half_twists[i + 1] > 0
+
+    # nothing phase before landing if no twist
+    if half_twists[-1] == 0:
+        names.append("Decorative")
 
     # landing
     names.append("Landing")

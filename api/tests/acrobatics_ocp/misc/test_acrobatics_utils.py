@@ -7,44 +7,45 @@ from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import acrobatics_phas
 # S somersault
 # K kick out
 # T twist
+# D Decorative
 # L landing
 @pytest.mark.parametrize(
-    ("half_twists", "expected_number_of_phase", "phases_str"),
+    ("half_twists", "phases_str"),
     [
-        ([0, 0], 4, "PSKL"),
-        ([1, 0], 5, "TPSKL"),
-        ([0, 1], 5, "PSKTL"),
-        ([1, 1], 6, "TPSKTL"),
-        ([0, 0, 0], 4, "PSKL"),
-        ([0, 0, 1], 5, "PSKTL"),
-        ([0, 1, 0], 8, "PSKTPSKL"),
-        ([0, 1, 1], 9, "PSKTPSKTL"),
-        ([1, 0, 0], 5, "TPSKL"),
-        ([1, 0, 1], 6, "TPSKTL"),
-        ([1, 1, 0], 9, "TPSKTPSKL"),
-        ([0, 0, 0, 0], 4, "PSKL"),
-        ([0, 0, 0, 1], 5, "PSKTL"),
-        ([0, 0, 1, 0], 8, "PSKTPSKL"),
-        ([0, 0, 1, 1], 9, "PSKTPSKTL"),
-        ([0, 1, 0, 0], 8, "PSKTPSKL"),
-        ([0, 1, 0, 1], 9, "PSKTPSKTL"),
-        ([0, 1, 1, 0], 12, "PSKTPSKTPSKL"),
-        ([0, 1, 1, 1], 13, "PSKTPSKTPSKTL"),
-        ([1, 0, 0, 0], 5, "TPSKL"),
-        ([1, 0, 0, 1], 6, "TPSKTL"),
-        ([1, 0, 1, 0], 9, "TPSKTPSKL"),
-        ([1, 0, 1, 1], 10, "TPSKTPSKTL"),
-        ([1, 1, 0, 0], 9, "TPSKTPSKL"),
-        ([1, 1, 0, 1], 10, "TPSKTPSKTL"),
-        ([1, 1, 1, 0], 13, "TPSKTPSKTPSKL"),
-        ([1, 1, 1, 1], 14, "TPSKTPSKTPSKTL"),
+        ([0, 0], "PSKDL"),
+        ([1, 0], "TPSKDL"),
+        ([0, 1], "PSKTL"),
+        ([1, 1], "TPSKTL"),
+        ([0, 0, 0], "PSKDL"),
+        ([0, 0, 1], "PSKTL"),
+        ([0, 1, 0], "PSKTPSKDL"),
+        ([0, 1, 1], "PSKTPSKTL"),
+        ([1, 0, 0], "TPSKDL"),
+        ([1, 0, 1], "TPSKTL"),
+        ([1, 1, 0], "TPSKTPSKDL"),
+        ([0, 0, 0, 0], "PSKDL"),
+        ([0, 0, 0, 1], "PSKTL"),
+        ([0, 0, 1, 0], "PSKTPSKDL"),
+        ([0, 0, 1, 1], "PSKTPSKTL"),
+        ([0, 1, 0, 0], "PSKTPSKDL"),
+        ([0, 1, 0, 1], "PSKTPSKTL"),
+        ([0, 1, 1, 0], "PSKTPSKTPSKDL"),
+        ([0, 1, 1, 1], "PSKTPSKTPSKTL"),
+        ([1, 0, 0, 0], "TPSKDL"),
+        ([1, 0, 0, 1], "TPSKTL"),
+        ([1, 0, 1, 0], "TPSKTPSKDL"),
+        ([1, 0, 1, 1], "TPSKTPSKTL"),
+        ([1, 1, 0, 0], "TPSKTPSKDL"),
+        ([1, 1, 0, 1], "TPSKTPSKTL"),
+        ([1, 1, 1, 0], "TPSKTPSKTPSKDL"),
+        ([1, 1, 1, 1], "TPSKTPSKTPSKTL"),
     ],
 )
-def test_phases_names_pike(half_twists, expected_number_of_phase, phases_str):
+def test_phases_names_pike(half_twists, phases_str):
     nb_somersaults = len(half_twists)
     position = "pike"
     names = acrobatics_phase_names(nb_somersaults, position, half_twists)
-    assert len(names) == expected_number_of_phase
+    assert len(names) == len(phases_str)
 
     for i, name in enumerate(names):
         assert phases_str[i] == name[0]
