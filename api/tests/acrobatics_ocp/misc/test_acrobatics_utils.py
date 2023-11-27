@@ -7,37 +7,37 @@ from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import acrobatics_phas
 # S somersault
 # K kick out
 # T twist
-# D Decorative
+# W Waiting
 # L landing
 @pytest.mark.parametrize(
     ("half_twists", "phases_str"),
     [
-        ([0, 0], "PSKDL"),
-        ([1, 0], "TPSKDL"),
+        ([0, 0], "PSKWL"),
+        ([1, 0], "TPSKWL"),
         ([0, 1], "PSKTL"),
         ([1, 1], "TPSKTL"),
-        ([0, 0, 0], "PSKDL"),
+        ([0, 0, 0], "PSKWL"),
         ([0, 0, 1], "PSKTL"),
-        ([0, 1, 0], "PSKTPSKDL"),
+        ([0, 1, 0], "PSKTPSKWL"),
         ([0, 1, 1], "PSKTPSKTL"),
-        ([1, 0, 0], "TPSKDL"),
+        ([1, 0, 0], "TPSKWL"),
         ([1, 0, 1], "TPSKTL"),
-        ([1, 1, 0], "TPSKTPSKDL"),
-        ([0, 0, 0, 0], "PSKDL"),
+        ([1, 1, 0], "TPSKTPSKWL"),
+        ([0, 0, 0, 0], "PSKWL"),
         ([0, 0, 0, 1], "PSKTL"),
-        ([0, 0, 1, 0], "PSKTPSKDL"),
+        ([0, 0, 1, 0], "PSKTPSKWL"),
         ([0, 0, 1, 1], "PSKTPSKTL"),
-        ([0, 1, 0, 0], "PSKTPSKDL"),
+        ([0, 1, 0, 0], "PSKTPSKWL"),
         ([0, 1, 0, 1], "PSKTPSKTL"),
-        ([0, 1, 1, 0], "PSKTPSKTPSKDL"),
+        ([0, 1, 1, 0], "PSKTPSKTPSKWL"),
         ([0, 1, 1, 1], "PSKTPSKTPSKTL"),
-        ([1, 0, 0, 0], "TPSKDL"),
+        ([1, 0, 0, 0], "TPSKWL"),
         ([1, 0, 0, 1], "TPSKTL"),
-        ([1, 0, 1, 0], "TPSKTPSKDL"),
+        ([1, 0, 1, 0], "TPSKTPSKWL"),
         ([1, 0, 1, 1], "TPSKTPSKTL"),
-        ([1, 1, 0, 0], "TPSKTPSKDL"),
+        ([1, 1, 0, 0], "TPSKTPSKWL"),
         ([1, 1, 0, 1], "TPSKTPSKTL"),
-        ([1, 1, 1, 0], "TPSKTPSKTPSKDL"),
+        ([1, 1, 1, 0], "TPSKTPSKTPSKWL"),
         ([1, 1, 1, 1], "TPSKTPSKTPSKTL"),
     ],
 )

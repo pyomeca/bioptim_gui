@@ -108,7 +108,7 @@ def acrobatics_phase_names(
 
     # nothing phase before landing if no twist
     if half_twists[-1] == 0:
-        names.append("Decorative")
+        names.append("Waiting")
 
     # landing
     names.append("Landing")
