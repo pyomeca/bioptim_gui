@@ -31,13 +31,6 @@ def run_for_all():
     os.remove(datafile)
 
 
-def test_get_objectives():
-    response = client.get("/acrobatics/phases_info/0/objectives")
-    assert response.status_code == 200, response
-    data = response.json()
-    assert len(data) == 5
-
-
 @pytest.mark.parametrize(
     ("n_somersaults", "half_twists", "n_objectives", "n_constraints"),
     [
@@ -73,9 +66,7 @@ def test_get_objectives(n_somersaults, half_twists, n_objectives, n_constraints)
     response = client.put("/acrobatics/position", json={"position": "pike"})
     assert response.status_code == 200, response
 
-    response = client.put(
-        "/acrobatics/nb_somersaults/", json={"nb_somersaults": n_somersaults}
-    )
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": n_somersaults})
     assert response.status_code == 200, response
 
     for i, half_twist in enumerate(half_twists):
