@@ -35,7 +35,9 @@ class DefaultAcrobaticsConfig:
         "objectives": [
             create_objective(
                 objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_CONTROL"],
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_CONTROL"
+                ],
                 nodes="all_shooting",
                 weight=1.0,
                 arguments=[
@@ -44,7 +46,9 @@ class DefaultAcrobaticsConfig:
             ),
             create_objective(
                 objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_CONTROL"],
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_CONTROL"
+                ],
                 nodes="all_shooting",
                 weight=1.0,
                 derivative=True,
@@ -136,7 +140,9 @@ class DefaultAcrobaticsConfig:
     )
 
 
-def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visual_criteria: bool = False):
+def phase_name_to_phase(
+    position, phase_names: str, phase_index: int, with_visual_criteria: bool = False
+):
     # needed as there are nested list inside it
     # removing the deepcopy will cause issues on the objectives and constraints
     # some will be duplicated on all phases
@@ -180,7 +186,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
             res["objectives"].append(
                 create_objective(
                     objective_type="mayer",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict["SUPERIMPOSE_MARKERS"],
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "SUPERIMPOSE_MARKERS"
+                    ],
                     nodes="end",
                     weight=1.0,
                     arguments=[
@@ -204,7 +212,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
         res["objectives"].append(
             create_objective(
                 objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
                 nodes="all_shooting",
                 weight=50000.0,
                 arguments=[
@@ -225,7 +235,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "MINIMIZE_STATE"
+                    ],
                     nodes="all_shooting",
                     weight=50000.0,
                     arguments=[
@@ -259,6 +271,55 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
                     ],
                 )
             )
+    elif phase_name == "Waiting":
+        res["objectives"][minimize_time_index]["weight"] = -0.01
+        res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
+
+        res["objectives"].append(
+            create_objective(
+                objective_type="lagrange",
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
+                nodes="all_shooting",
+                weight=50000.0,
+                arguments=[
+                    {"name": "key", "value": "q", "type": "str"},
+                    {"name": "index", "value": model.shoulder_dofs, "type": "list"},
+                ],
+            )
+        )
+
+        res["objectives"].append(
+            create_objective(
+                objective_type="lagrange",
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
+                nodes="all_shooting",
+                weight=50000.0,
+                arguments=[
+                    {"name": "key", "value": "q", "type": "str"},
+                    {"name": "index", "value": model.elbow_dofs, "type": "list"},
+                ],
+            )
+        )
+
+        res["objectives"].append(
+            create_objective(
+                objective_type="lagrange",
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
+                nodes="all_shooting",
+                weight=50000.0,
+                arguments=[
+                    {"name": "key", "value": "q", "type": "str"},
+                    {"name": "index", "value": model.legs_xdofs, "type": "list"},
+                ],
+            )
+        )
+
     elif phase_name == "Landing":
         res["objectives"][minimize_time_index]["weight"] = -0.01
         res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
@@ -267,7 +328,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "MINIMIZE_STATE"
+                    ],
                     nodes="all_shooting",
                     weight=50000.0,
                     arguments=[
@@ -281,7 +344,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "MINIMIZE_STATE"
+                    ],
                     nodes="all_shooting",
                     weight=50000.0,
                     arguments=[
@@ -295,7 +360,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
         res["objectives"].append(
             create_objective(
                 objective_type="mayer",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
                 nodes="end",
                 weight=1000.0,
                 arguments=[
@@ -309,7 +376,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
         res["objectives"].append(
             create_objective(
                 objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
                 nodes="all_shooting",
                 weight=50000.0,
                 arguments=[
@@ -322,7 +391,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
         res["objectives"].append(
             create_objective(
                 objective_type="mayer",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
                 nodes="all",
                 weight=100.0,
                 arguments=[
@@ -339,7 +410,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_SEGMENT_VELOCITY"],
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "MINIMIZE_SEGMENT_VELOCITY"
+                    ],
                     nodes="default",
                     weight=10.0,
                     arguments=[
@@ -353,7 +426,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
         res["objectives"].append(
             create_objective(
                 objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
+                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                    "MINIMIZE_STATE"
+                ],
                 nodes="default",
                 weight=1.0,
                 arguments=[
@@ -375,7 +450,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "MINIMIZE_STATE"
+                    ],
                     nodes="default",
                     weight=weight,
                     arguments=[
@@ -410,7 +487,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
             res["objectives"].append(
                 create_objective(
                     objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict["TRACK_VECTOR_ORIENTATIONS_FROM_MARKERS"],
+                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
+                        "TRACK_VECTOR_ORIENTATIONS_FROM_MARKERS"
+                    ],
                     nodes="default",
                     weight=1.0,
                     arguments=[
