@@ -301,9 +301,9 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                 )
 
                 # Hips flexion
-                x_bounds[current_phase]["min"][cls.XrotUpperLegs, 0] = -2.4 + 0.2 - 0.01
+                x_bounds[current_phase]["min"][cls.XrotUpperLegs, 0] = -2.4 - 0.2 - 0.01
                 x_bounds[current_phase]["max"][cls.XrotUpperLegs, 0] = -2.4 + 0.2 + 0.01
-                x_bounds[current_phase]["min"][cls.XrotUpperLegs, 1] = -2.4 + 0.2 - 0.01
+                x_bounds[current_phase]["min"][cls.XrotUpperLegs, 1] = -2.4 - 0.2 - 0.01
                 x_bounds[current_phase]["max"][cls.XrotUpperLegs, 1] = 0.35
                 x_bounds[current_phase]["min"][cls.XrotUpperLegs, 2] = -0.35
                 x_bounds[current_phase]["max"][cls.XrotUpperLegs, 2] = 0.35
