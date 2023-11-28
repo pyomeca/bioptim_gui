@@ -1,6 +1,3 @@
-from abc import ABC, abstractmethod
-
-
 class BioModConverter:
     """
     Base class for bioMod model converters
@@ -59,33 +56,47 @@ class BioModConverter:
         existing_segments = set()
         existing_markers = set()
 
+        skip = False
+
         for line in lines:
-            if line.startswith("segment"):
+            if line.strip().startswith("rangesQ"):
+                skip = True
+                continue
+            if line.strip().startswith("com"):
+                skip = False
+
+            if skip:
+                continue
+
+            if line.strip().startswith("segment"):
                 segment_name = line.strip().split()[1]
 
                 if segment_name in cls.segment_rotation:
                     existing_segments.add(segment_name)
-
                     updated_lines.append(line)
-
-                    updated_lines.append(f"\trotations {cls.segment_rotation[segment_name]}\n")
                     continue
 
                 elif segment_name in cls.segment_translation:
                     existing_segments.add(segment_name)
-
                     updated_lines.append(line)
-
-                    updated_lines.append(f"\ttranslations {cls.segment_translation[segment_name]}\n")
                     continue
 
-            elif line.startswith("marker"):
+            elif line.strip().startswith("marker"):
                 marker_name = line.strip().split()[1]
 
                 if marker_name in cls.markers:
                     existing_markers.add(marker_name)
 
+            if line.strip().startswith("rotations") or line.strip().startswith("translations"):
+                continue
+
             updated_lines.append(line)
+
+            if line.strip().startswith("rt"):
+                if segment_name in cls.segment_translation:
+                    updated_lines.append(f"\ttranslations {cls.segment_translation[segment_name]}\n")
+                if segment_name in cls.segment_rotation:
+                    updated_lines.append(f"\trotations {cls.segment_rotation[segment_name]}\n")
 
         missing_segments = (set(cls.segment_rotation) | set(cls.segment_translation)) - existing_segments
         missing_markers = set(cls.markers) - existing_markers
@@ -99,7 +110,6 @@ class BioModConverter:
 class StraightConverter(BioModConverter):
     segment_rotation = {
         "Pelvis": "xyz",
-        "Thorax": "xyz",
         "RightUpperArm": "zy",
         "LeftUpperArm": "zy",
     }
@@ -110,7 +120,6 @@ class StraightConverter(BioModConverter):
 class PikeConverter(StraightConverter):
     segment_rotation = {
         "Pelvis": "xyz",
-        "Thorax": "xyz",
         "RightUpperArm": "zy",
         "RightForearm": "zx",
         "LeftUpperArm": "zy",
@@ -129,7 +138,6 @@ class PikeConverter(StraightConverter):
 class TuckConverter(PikeConverter):
     segment_rotation = {
         "Pelvis": "xyz",
-        "Thorax": "xyz",
         "RightUpperArm": "zy",
         "RightForearm": "zx",
         "LeftUpperArm": "zy",
@@ -139,28 +147,24 @@ class TuckConverter(PikeConverter):
     }
 
 
-class AcrobaticsWithVisual(ABC):
-    additional_segment_rotation = {"Head": "zx", "Eyes": "zx"}
-    additional_markers = ["eyes_vect_start", "eyes_vect_end", "fixation_front"]
-
-    @property
-    @abstractmethod
-    def segment_rotation(self):
-        return super().segment_rotation | self.additional_segment_rotation
-
-    @property
-    @abstractmethod
-    def markers(self):
-        return super().markers + self.additional_markers
+additional_segment_rotation = {"Head": "zx", "Eyes": "zx"}
+additional_markers = (
+    ["eyes_vect_start", "eyes_vect_end", "fixation_front", "fixation_center"]
+    + [f"Trampo_corner_{n}" for n in range(1, 5)]
+    + [f"cone_approx_{i}_{j}" for i in range(11) for j in range(10)]
+)
 
 
-class StraightWithVisualConverter(StraightConverter, AcrobaticsWithVisual):
-    pass
+class StraightWithVisualConverter(StraightConverter):
+    segment_rotation = StraightConverter.segment_rotation | additional_segment_rotation
+    markers = StraightConverter.markers + additional_markers
 
 
-class PikeWithVisualConverter(PikeConverter, AcrobaticsWithVisual):
-    pass
+class PikeWithVisualConverter(PikeConverter):
+    segment_rotation = PikeConverter.segment_rotation | additional_segment_rotation
+    markers = PikeConverter.markers + additional_markers
 
 
-class TuckWithVisualConverter(TuckConverter, AcrobaticsWithVisual):
-    pass
+class TuckWithVisualConverter(TuckConverter):
+    segment_rotation = TuckConverter.segment_rotation | additional_segment_rotation
+    markers = TuckConverter.markers + additional_markers

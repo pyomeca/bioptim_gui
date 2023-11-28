@@ -165,10 +165,6 @@ marker cone_approx_1_0
 	parent Eyes
 	position 0.12426406871192852 -3 0.0
 endmarker
-marker cone_approx_1_1
-	parent Eyes
-	position 0.10053174337812636 -3 0.07304058697873013
-endmarker
 marker cone_approx_1_2
 	parent Eyes
 	position 0.0383997090221621 -3 0.11818215228982833
@@ -680,6 +676,7 @@ endsegment
 segment LowerLegs
 	parent UpperLegs
 	rt 0.0 0.0 0.0 xyz 0.0 0.0 -0.3775
+	rotations x
 	com 0.0 0.0 -0.17877624969815803
 	mass 6.025039072122063
 	inertia

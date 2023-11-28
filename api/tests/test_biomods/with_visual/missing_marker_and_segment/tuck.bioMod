@@ -549,10 +549,6 @@ marker cone_approx_10_6
 	parent Eyes
 	position -1.0053174337812638 -3 -0.730405869787301
 endmarker
-marker cone_approx_10_7
-	parent Eyes
-	position -0.38399709022162115 -3 -1.1818215228982833
-endmarker
 marker cone_approx_10_8
 	parent Eyes
 	position 0.3839970902216207 -3 -1.1818215228982833
@@ -675,19 +671,6 @@ segment UpperLegs
 		0.0 0.32703062745636713 0.0
 		0.0 0.0 0.1605173999990793
 	meshfile Model_mesh/cuisse.stl
-endsegment
-
-segment LowerLegs
-	parent UpperLegs
-	rt 0.0 0.0 0.0 xyz 0.0 0.0 -0.3775
-	com 0.0 0.0 -0.17877624969815803
-	mass 6.025039072122063
-	inertia
-		0.08169790576444133 0.0 0.0
-		0.0 0.11788579669137447 0.0
-		0.0 0.0 0.04385448191981976
-	meshfile Model_mesh/jambe.stl
-	meshrt pi 0 0 xyz 0 0 0
 endsegment
 
 	marker TargetRightHand

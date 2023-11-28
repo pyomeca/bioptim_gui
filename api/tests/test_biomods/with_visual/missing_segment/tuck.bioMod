@@ -677,9 +677,10 @@ segment UpperLegs
 	meshfile Model_mesh/cuisse.stl
 endsegment
 
-segment LowerLegs
+segment LowerLegso
 	parent UpperLegs
 	rt 0.0 0.0 0.0 xyz 0.0 0.0 -0.3775
+	rotations x
 	com 0.0 0.0 -0.17877624969815803
 	mass 6.025039072122063
 	inertia

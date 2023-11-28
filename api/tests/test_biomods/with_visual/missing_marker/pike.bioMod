@@ -16,11 +16,6 @@ marker Trampo_corner_1
 	position -1.07 -2.14 -0.83
 endmarker
 
-marker Trampo_corner_2
-	parent Trampo_bed
-	position -1.07 2.14 -0.83
-endmarker
-
 marker Trampo_corner_3
 	parent Trampo_bed
 	position 1.07 -2.14 -0.83

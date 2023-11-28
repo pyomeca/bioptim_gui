@@ -42,7 +42,7 @@ marker fixation_center
 endmarker
 
 
-segment Pelvis
+segment Pelvisio
 	rt 0.0 0.0 0.0 xyz 0.0 0.0 0.0
 	translations xyz
 	rotations xyz
@@ -582,7 +582,6 @@ endsegment
 segment RightForearm
 	parent RightUpperArm
 	rt 0.0 0.0 0.0 xyz 0.0 0.0 -0.24350000000000002
-	rotations zx
 	rangesQ
 		-1.8 1.1
 		-2.65 0
@@ -631,7 +630,6 @@ endsegment
 segment LeftForearm
 	parent LeftUpperArm
 	rt 0.0 0.0 0.0 xyz 0.0 0.0 -0.24350000000000002
-	rotations zx
 	rangesQ
 		-1.1 1.8
 		-2.65 0

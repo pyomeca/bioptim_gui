@@ -42,27 +42,6 @@ marker fixation_center
 endmarker
 
 
-segment Pelvis
-	rt 0.0 0.0 0.0 xyz 0.0 0.0 0.0
-	translations xyz
-	rotations xyz
-	rangesQ
-		-0.5 0.5
-		-0.5 0.5
-		0 5
-		-10*3.14 10*3.14
-		-10*3.14 10*3.14
-		-10*3.14 10*3.14
-	com 0.0 0.0 0.0
-	mass 7.675025110374424
-	inertia
-		0.03779648711896561 0.0 0.0
-		0.0 0.07082405858190183 0.0
-		0.0 0.0 0.06049873913533803
-	meshfile Model_mesh/pelvis.stl
-	meshrt -0.175 0 0 xyz 0 0 0
-endsegment
-
 segment Thorax
 	parent Pelvis
 	rt 0.0 0.0 0.0 xyz 0.0 0.0 0.10691934707592193
@@ -224,10 +203,6 @@ endmarker
 marker cone_approx_2_5
 	parent Eyes
 	position -0.24852813742385704 -3 3.0435918799418003e-17
-endmarker
-marker cone_approx_2_6
-	parent Eyes
-	position -0.20106348675625274 -3 -0.14608117395746023
 endmarker
 marker cone_approx_2_7
 	parent Eyes
@@ -582,7 +557,6 @@ endsegment
 segment RightForearm
 	parent RightUpperArm
 	rt 0.0 0.0 0.0 xyz 0.0 0.0 -0.24350000000000002
-	rotations zx
 	rangesQ
 		-1.8 1.1
 		-2.65 0
@@ -631,7 +605,6 @@ endsegment
 segment LeftForearm
 	parent LeftUpperArm
 	rt 0.0 0.0 0.0 xyz 0.0 0.0 -0.24350000000000002
-	rotations zx
 	rangesQ
 		-1.1 1.8
 		-2.65 0

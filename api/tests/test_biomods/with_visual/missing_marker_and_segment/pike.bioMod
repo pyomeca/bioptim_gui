@@ -94,7 +94,7 @@ segment Head
 	meshrt 0 0 pi xyz 0 0 0
 endsegment
 
-segment Eyes
+segment Eyese
 	parent Head
 	rt 0.0 0.0 0.0 xyz 0.0 -0.055 0.085
 	rotations zx
@@ -504,10 +504,6 @@ endmarker
 marker cone_approx_9_5
 	parent Eyes
 	position -1.1183766184073567 -3 1.3696163459738104e-16
-endmarker
-marker cone_approx_9_6
-	parent Eyes
-	position -0.9047856904031374 -3 -0.657365282808571
 endmarker
 marker cone_approx_9_7
 	parent Eyes

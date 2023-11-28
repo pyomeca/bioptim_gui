@@ -31,16 +31,6 @@ marker Trampo_corner_4
 	position 1.07 2.14 -0.83
 endmarker
 
-marker fixation_front
-	parent Trampo_bed
-	position 0 -1.07 -0.83
-endmarker
-
-marker fixation_center
-	parent Trampo_bed
-	position 0 0 -0.83
-endmarker
-
 
 segment Pelvis
 	rt 0.0 0.0 0.0 xyz 0.0 0.0 0.0
@@ -582,7 +572,6 @@ endsegment
 segment RightForearm
 	parent RightUpperArm
 	rt 0.0 0.0 0.0 xyz 0.0 0.0 -0.24350000000000002
-	rotations zx
 	rangesQ
 		-1.8 1.1
 		-2.65 0
@@ -631,7 +620,6 @@ endsegment
 segment LeftForearm
 	parent LeftUpperArm
 	rt 0.0 0.0 0.0 xyz 0.0 0.0 -0.24350000000000002
-	rotations zx
 	rangesQ
 		-1.1 1.8
 		-2.65 0
