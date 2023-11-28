@@ -58,8 +58,8 @@ class DefaultAcrobaticsConfig:
                 nodes="end",
                 weight=1.0,
                 arguments=[
-                    {"name": "min_bound", "value": 0.0, "type": "float"},
-                    {"name": "max_bound", "value": 100.0, "type": "float"},
+                    {"name": "min_bound", "value": 0.1, "type": "float"},
+                    {"name": "max_bound", "value": 2.0, "type": "float"},
                 ],
             ),
         ],
