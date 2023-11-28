@@ -162,13 +162,6 @@ class StraightAcrobaticsVariables:
         x_bounds[-1]["min"][cls.ZrotLeftUpperArm, 2] = -0.1
         x_bounds[-1]["max"][cls.ZrotLeftUpperArm, 2] = 0.1
 
-        # Right elbow
-        x_bounds[-1]["min"][cls.ZrotRightLowerArm : cls.XrotRightLowerArm + 1, 2] = -0.1
-        x_bounds[-1]["max"][cls.ZrotRightLowerArm : cls.XrotRightLowerArm + 1, 2] = 0.1
-        # Left elbow
-        x_bounds[-1]["min"][cls.ZrotLeftLowerArm : cls.XrotLeftLowerArm + 1, 2] = -0.1
-        x_bounds[-1]["max"][cls.ZrotLeftLowerArm : cls.XrotLeftLowerArm + 1, 2] = 0.1
-
         if (not is_forward) or (not prefer_left):
             for i in range(len(x_bounds)):
                 if not is_forward:
