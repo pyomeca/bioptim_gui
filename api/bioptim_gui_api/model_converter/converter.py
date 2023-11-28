@@ -68,9 +68,7 @@ class BioModConverter:
 
                     updated_lines.append(line)
 
-                    updated_lines.append(
-                        f"\trotations {cls.segment_rotation[segment_name]}\n"
-                    )
+                    updated_lines.append(f"\trotations {cls.segment_rotation[segment_name]}\n")
                     continue
 
                 elif segment_name in cls.segment_translation:
@@ -78,9 +76,7 @@ class BioModConverter:
 
                     updated_lines.append(line)
 
-                    updated_lines.append(
-                        f"\ttranslations {cls.segment_translation[segment_name]}\n"
-                    )
+                    updated_lines.append(f"\ttranslations {cls.segment_translation[segment_name]}\n")
                     continue
 
             elif line.startswith("marker"):
@@ -91,15 +87,11 @@ class BioModConverter:
 
             updated_lines.append(line)
 
-        missing_segments = (
-            set(cls.segment_rotation) | set(cls.segment_translation)
-        ) - existing_segments
+        missing_segments = (set(cls.segment_rotation) | set(cls.segment_translation)) - existing_segments
         missing_markers = set(cls.markers) - existing_markers
 
         if missing_segments or missing_markers:
-            raise ValueError(
-                f"Missing markers/segments: {', '.join(missing_segments | missing_markers)}"
-            )
+            raise ValueError(f"Missing markers/segments: {', '.join(missing_segments | missing_markers)}")
 
         return "".join(updated_lines)
 

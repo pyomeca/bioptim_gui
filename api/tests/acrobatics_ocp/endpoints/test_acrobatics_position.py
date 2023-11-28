@@ -78,9 +78,7 @@ def test_1_somersault_to_pike():
     assert response.status_code == 200, response
     data = response.json()
     assert data["nb_somersaults"] == 2
-    assert (
-        len(data["phases_info"]) == 5
-    )  # pike, somersault, kickout, decorative, landing
+    assert len(data["phases_info"]) == 5  # pike, somersault, kickout, decorative, landing
     assert len(data["nb_half_twists"]) == 2
 
 
@@ -114,9 +112,7 @@ def test_pike_to_straight():
     assert response.status_code == 200, response
     data = response.json()
     assert data["nb_somersaults"] == 2
-    assert (
-        len(data["phases_info"]) == 5
-    )  # pike, somersault, kickout, decorative, landing
+    assert len(data["phases_info"]) == 5  # pike, somersault, kickout, decorative, landing
     assert data["nb_half_twists"] == [0, 0]
 
     response = client.put("/acrobatics/position/", json={"position": "straight"})
