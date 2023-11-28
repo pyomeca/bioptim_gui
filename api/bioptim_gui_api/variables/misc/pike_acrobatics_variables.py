@@ -410,8 +410,8 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
         x_bounds[current_phase]["min"][cls.Xrot, 1] = nb_somersaults * np.pi * 2 - np.pi / 2 - 0.1
         x_bounds[current_phase]["max"][cls.Xrot, 1] = nb_somersaults * np.pi * 2
 
-        x_bounds[current_phase]["min"][cls.Xrot, 2] = nb_somersaults * np.pi * 2 - 0.2
-        x_bounds[current_phase]["max"][cls.Xrot, 2] = nb_somersaults * np.pi * 2
+        x_bounds[current_phase]["min"][cls.Xrot, 2] = nb_somersaults * np.pi * 2 - 0.6
+        x_bounds[current_phase]["max"][cls.Xrot, 2] = nb_somersaults * np.pi * 2 - 0.4
 
         # twist finished
         x_bounds[current_phase]["min"][cls.Zrot, 1:] = sum(half_twists) * np.pi - 0.1
