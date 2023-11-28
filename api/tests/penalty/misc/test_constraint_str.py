@@ -105,8 +105,8 @@ def test_regular_str_indent_8_with_phase_all():
         arguments=[
             {"name": "min_bound", "value": -0.05, "type": "float"},
             {"name": "max_bound", "value": 0.05, "type": "float"},
-            {"name": "first_marker", "value": "MidMainG", "type": "string"},
-            {"name": "second_marker", "value": "CibleMainG", "type": "string"},
+            {"name": "first_marker", "value": "MiddleLeftHand", "type": "string"},
+            {"name": "second_marker", "value": "TargetLeftHand", "type": "string"},
         ],
     )
     assert (
@@ -114,8 +114,8 @@ def test_regular_str_indent_8_with_phase_all():
         == """constraint=ConstraintFcn.SUPERIMPOSE_MARKERS,
             min_bound=-0.05,
             max_bound=0.05,
-            first_marker="MidMainG",
-            second_marker="CibleMainG",
+            first_marker="MiddleLeftHand",
+            second_marker="TargetLeftHand",
             node=Node.ALL,
             quadratic=False,
             expand=False,

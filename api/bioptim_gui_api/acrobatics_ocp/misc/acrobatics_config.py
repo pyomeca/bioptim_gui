@@ -176,7 +176,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
         res["objectives"][minimize_time_index]["penalty_type"] = "MINIMIZE_TIME"
 
         # Aim to put the hands on the lower legs to grab the pike position
-        for side in "D", "G":
+        for side in "Right", "Left":
             res["objectives"].append(
                 create_objective(
                     objective_type="mayer",
@@ -186,12 +186,12 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
                     arguments=[
                         {
                             "name": "first_marker",
-                            "value": f"MidMain{side}",
+                            "value": f"Middle{side}Hand",
                             "type": "string",
                         },
                         {
                             "name": "second_marker",
-                            "value": f"CibleMain{side}",
+                            "value": f"Target{side}Hand",
                             "type": "string",
                         },
                     ],
@@ -262,7 +262,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
     elif phase_name == "Somersault":
         res["objectives"][minimize_time_index]["weight"] = -100.0
         res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
-        for side in "D", "G":
+        for side in "Right", "Left":
             res["constraints"].append(
                 create_constraint(
                     penalty_type="SUPERIMPOSE_MARKERS",
@@ -274,12 +274,12 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
                         {"name": "max_bound", "value": 0.05, "type": "float"},
                         {
                             "name": "first_marker",
-                            "value": f"MidMain{side}",
+                            "value": f"Middle{side}Hand",
                             "type": "str",
                         },
                         {
                             "name": "second_marker",
-                            "value": f"CibleMain{side}",
+                            "value": f"Target{side}Hand",
                             "type": "str",
                         },
                     ],
