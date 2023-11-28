@@ -268,6 +268,7 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
                     penalty_type="SUPERIMPOSE_MARKERS",
                     nodes="all_shooting",
                     weight=1.0,
+                    quadratic=False,
                     arguments=[
                         {"name": "min_bound", "value": -0.05, "type": "float"},
                         {"name": "max_bound", "value": 0.05, "type": "float"},
