@@ -71,9 +71,7 @@ def get_acrobatics_generated_code():
 
     q_init = acrobatics_variables.get_q_init(nb_phases, half_twists, prefer_left)
 
-    qdot_bounds = acrobatics_variables.get_qdot_bounds(
-        nb_phases, total_time, is_forward
-    )
+    qdot_bounds = acrobatics_variables.get_qdot_bounds(nb_phases, total_time, is_forward)
 
     qdot_init = acrobatics_variables.get_qdot_init()
 
@@ -487,6 +485,9 @@ def main(is_multistart: bool = False, nb_seeds: int = 1, save_folder: str = "sav
         "is_multistart": [is_multistart],
     }}
 
+    if not os.path.exists(save_folder):
+        os.mkdir(save_folder)
+
     if is_multistart:
         multi_start = prepare_multi_start(
             combinatorial_parameters=combinatorial_parameters,
@@ -494,7 +495,11 @@ def main(is_multistart: bool = False, nb_seeds: int = 1, save_folder: str = "sav
             n_pools=2,
         )
 
+        start_time = time.time()
         multi_start.solve()
+        with open(f"{{save_folder}}/timelog.txt", "a") as f:
+            f.write(f"multi_{{nb_seeds}}_acrobatics_{'_'.join(str(i) for i in half_twists)}_{side}_{position}: {{time.time() - start_time}}\\n")
+            
     else:
         ocp = prepare_ocp()
         solver = get_solver()
@@ -502,7 +507,7 @@ def main(is_multistart: bool = False, nb_seeds: int = 1, save_folder: str = "sav
         start_time = time.time()
         sol = ocp.solve(solver=solver)
         with open(f"{{save_folder}}/timelog.txt", "a") as f:
-            f.write(f"{{'multi' if is_multistart else ''}}acrobatics_{'_'.join(str(i) for i in half_twists)}_{side}_{position}: {{time.time() - start_time}}\\n")
+            f.write(f"acrobatics_{'_'.join(str(i) for i in half_twists)}_{side}_{position}: {{time.time() - start_time}}\\n")
 
         save_results(sol, save_folder=save_folder)
 
