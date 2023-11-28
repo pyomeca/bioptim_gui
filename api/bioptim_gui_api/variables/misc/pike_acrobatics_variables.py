@@ -117,7 +117,8 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
             x_bounds[0]["min"][cls.YrotRightUpperArm, 0] = 2.9
             x_bounds[0]["min"][cls.YrotLeftUpperArm, 0] = -2.9
 
-            x_bounds[0]["max"][:, 0] = -x_bounds[0]["min"][:, 0]
+            x_bounds[0]["max"][:, 0] = [0] * cls.nb_q
+            x_bounds[0]["max"][: cls.Xrot, 0] = 0.001
             x_bounds[0]["max"][cls.YrotRightUpperArm, 0] = 2.9
             x_bounds[0]["max"][cls.YrotLeftUpperArm, 0] = -2.9
 
@@ -160,12 +161,11 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                 if len(x_bounds) == 1:
                     x_bounds[0]["min"][:, 0] = [0] * cls.nb_q
                     x_bounds[0]["min"][: cls.Xrot, 0] = -0.001
-
-                    # arm position up
                     x_bounds[0]["min"][cls.YrotRightUpperArm, 0] = 2.9
                     x_bounds[0]["min"][cls.YrotLeftUpperArm, 0] = -2.9
 
-                    x_bounds[0]["max"][:, 0] = -x_bounds[0]["min"][:, 0]
+                    x_bounds[0]["max"][:, 0] = [0] * cls.nb_q
+                    x_bounds[0]["max"][: cls.Xrot, 0] = 0.001
                     x_bounds[0]["max"][cls.YrotRightUpperArm, 0] = 2.9
                     x_bounds[0]["max"][cls.YrotLeftUpperArm, 0] = -2.9
 
@@ -174,10 +174,10 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
 
                     # somersaulting
                     x_bounds[0]["min"][cls.Xrot, 1] = -0.1
-                    x_bounds[0]["max"][cls.Xrot, 1] = np.pi + 0.1
+                    x_bounds[0]["max"][cls.Xrot, 1] = 3 / 4 * np.pi
 
-                    x_bounds[0]["min"][cls.Xrot, 2] = np.pi / 2 - 0.1
-                    x_bounds[0]["max"][cls.Xrot, 2] = np.pi + 0.1
+                    x_bounds[0]["min"][cls.Xrot, 2] = np.pi / 4 - 0.1
+                    x_bounds[0]["max"][cls.Xrot, 2] = 3 / 4 * np.pi
 
                     # twisting
                     x_bounds[0]["min"][cls.Zrot, 1:] = -0.2
@@ -186,35 +186,24 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                 else:
                     # initial bounds, same as final bounds of previous phase
                     for b in 0, 1, 2:
-                        x_bounds[current_phase]["min"][:, b] = x_bounds[
-                            current_phase - 1
-                        ]["min"][:, 2]
-                        x_bounds[current_phase]["max"][:, b] = x_bounds[
-                            current_phase - 1
-                        ]["max"][:, 2]
+                        x_bounds[current_phase]["min"][:, b] = x_bounds[current_phase - 1]["min"][:, 2]
+                        x_bounds[current_phase]["max"][:, b] = x_bounds[current_phase - 1]["max"][:, 2]
 
                     half_twists_till_now = sum(half_twists[:i])
                     if half_twists_till_now != 0:
-                        x_bounds[current_phase]["min"][cls.Zrot, 2] = (
-                            np.pi * half_twists_till_now - 0.2
-                        )
+                        x_bounds[current_phase]["min"][cls.Zrot, 2] = np.pi * half_twists_till_now - 0.2
 
-                        x_bounds[current_phase]["max"][cls.Zrot, 2] = (
-                            np.pi * half_twists_till_now + 0.2
-                        )
+                        x_bounds[current_phase]["max"][cls.Zrot, 2] = np.pi * half_twists_till_now + 0.2
 
                     if sum(half_twists[: i + 1]) == sum(half_twists):
-                        x_bounds[current_phase]["min"][cls.Zrot, 1] = (
-                            np.pi * half_twists_till_now - 0.2 - np.pi / 4
-                        )
+                        x_bounds[current_phase]["min"][cls.Zrot, 1] = np.pi * half_twists_till_now - 0.2 - np.pi / 4
 
-                        x_bounds[current_phase]["max"][cls.Zrot, 1] = (
-                            np.pi * half_twists_till_now + 0.2
-                        )
+                        x_bounds[current_phase]["max"][cls.Zrot, 1] = np.pi * half_twists_till_now + 0.2
 
-                # legs
-                x_bounds[current_phase]["min"][cls.XrotUpperLegs, 0] = -0.2
-                x_bounds[current_phase]["max"][cls.XrotUpperLegs, 0] = 0.2
+                    # legs
+                    x_bounds[current_phase]["min"][cls.XrotUpperLegs, 0] = -0.2
+                    x_bounds[current_phase]["max"][cls.XrotUpperLegs, 0] = 0.2
+
                 x_bounds[current_phase]["min"][cls.XrotUpperLegs, 1] = -2.4 - 0.2
                 x_bounds[current_phase]["max"][cls.XrotUpperLegs, 1] = 0.2
                 x_bounds[current_phase]["min"][cls.XrotUpperLegs, 2] = -2.4 - 0.2
@@ -234,12 +223,8 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                 current_phase += 1
 
                 for b in 0, 1, 2:
-                    x_bounds[current_phase]["min"][:, b] = x_bounds[current_phase - 1][
-                        "min"
-                    ][:, 2]
-                    x_bounds[current_phase]["max"][:, b] = x_bounds[current_phase - 1][
-                        "max"
-                    ][:, 2]
+                    x_bounds[current_phase]["min"][:, b] = x_bounds[current_phase - 1]["min"][:, 2]
+                    x_bounds[current_phase]["max"][:, b] = x_bounds[current_phase - 1]["max"][:, 2]
 
                 # somersaulting in pike, for all no-twist somersaults, starting from last pike
                 x_bounds[current_phase]["max"][cls.Xrot, 1:] = min(
@@ -273,12 +258,8 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                 current_phase += 1
 
                 for b in 0, 1, 2:
-                    x_bounds[current_phase]["min"][:, b] = x_bounds[current_phase - 1][
-                        "min"
-                    ][:, 2]
-                    x_bounds[current_phase]["max"][:, b] = x_bounds[current_phase - 1][
-                        "max"
-                    ][:, 2]
+                    x_bounds[current_phase]["min"][:, b] = x_bounds[current_phase - 1]["min"][:, 2]
+                    x_bounds[current_phase]["max"][:, b] = x_bounds[current_phase - 1]["max"][:, 2]
 
                 # somersaulting
                 x_bounds[current_phase]["max"][cls.Xrot, 1:] = min(
@@ -291,13 +272,9 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                 x_bounds[current_phase]["max"][cls.Yrot, :] = np.pi / 4
 
                 # twisting
-                x_bounds[current_phase]["min"][cls.Zrot, 1:] = (
-                    np.pi * sum(half_twists[:i]) - 0.2
-                )
+                x_bounds[current_phase]["min"][cls.Zrot, 1:] = np.pi * sum(half_twists[:i]) - 0.2
                 x_bounds[current_phase]["max"][cls.Zrot, 1:] = (
-                    np.pi * sum(half_twists[: i + 1])
-                    + 0.2
-                    - (np.pi * half_twists[i] / 2 if half_twists[i] != 0 else 0)
+                    np.pi * sum(half_twists[: i + 1]) + 0.2 - (np.pi * half_twists[i] / 2 if half_twists[i] != 0 else 0)
                 )
 
                 # Hips flexion
@@ -319,12 +296,8 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                 current_phase += 1
 
                 for b in 0, 1, 2:
-                    x_bounds[current_phase]["min"][:, b] = x_bounds[current_phase - 1][
-                        "min"
-                    ][:, 2]
-                    x_bounds[current_phase]["max"][:, b] = x_bounds[current_phase - 1][
-                        "max"
-                    ][:, 2]
+                    x_bounds[current_phase]["min"][:, b] = x_bounds[current_phase - 1]["min"][:, 2]
+                    x_bounds[current_phase]["max"][:, b] = x_bounds[current_phase - 1]["max"][:, 2]
 
                 if is_last_somersault:
                     # tilt pi /8
@@ -332,29 +305,15 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                     x_bounds[current_phase]["max"][cls.Yrot, :] = np.pi / 8
 
                     # somersault 1/4 left at then end
-                    x_bounds[current_phase]["max"][cls.Xrot, 1] = (
-                        2 * np.pi * nb_somersaults - np.pi / 2 + 0.2
-                    )
-                    x_bounds[current_phase]["min"][cls.Xrot, 2] = (
-                        2 * np.pi * nb_somersaults - np.pi / 2 - 0.2
-                    )
-                    x_bounds[current_phase]["max"][cls.Xrot, 2] = (
-                        2 * np.pi * nb_somersaults - np.pi / 2 + 0.2
-                    )
+                    x_bounds[current_phase]["max"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults - np.pi / 2 + 0.2
+                    x_bounds[current_phase]["min"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - np.pi / 2 - 0.2
+                    x_bounds[current_phase]["max"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - np.pi / 2 + 0.2
 
                     # finish twist
-                    x_bounds[current_phase]["min"][cls.Zrot, 1] = (
-                        sum(half_twists[:-1]) * np.pi - 0.2
-                    )
-                    x_bounds[current_phase]["max"][cls.Zrot, 1] = (
-                        sum(half_twists) * np.pi + 0.2
-                    )
-                    x_bounds[current_phase]["min"][cls.Zrot, 2] = (
-                        sum(half_twists) * np.pi - 0.2
-                    )
-                    x_bounds[current_phase]["max"][cls.Zrot, 2] = (
-                        sum(half_twists) * np.pi + 0.2
-                    )
+                    x_bounds[current_phase]["min"][cls.Zrot, 1] = sum(half_twists[:-1]) * np.pi - 0.2
+                    x_bounds[current_phase]["max"][cls.Zrot, 1] = sum(half_twists) * np.pi + 0.2
+                    x_bounds[current_phase]["min"][cls.Zrot, 2] = sum(half_twists) * np.pi - 0.2
+                    x_bounds[current_phase]["max"][cls.Zrot, 2] = sum(half_twists) * np.pi + 0.2
 
                     # Right arm
                     x_bounds[current_phase]["min"][cls.YrotRightUpperArm, 2] = 0
@@ -364,30 +323,18 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                     x_bounds[current_phase]["max"][cls.YrotLeftUpperArm, 2] = 0
 
                     # Right elbow
-                    x_bounds[current_phase]["min"][
-                        cls.ZrotRightLowerArm : cls.XrotRightLowerArm + 1, 2
-                    ] = -0.1
-                    x_bounds[current_phase]["max"][
-                        cls.ZrotRightLowerArm : cls.XrotRightLowerArm + 1, 2
-                    ] = 0.1
+                    x_bounds[current_phase]["min"][cls.ZrotRightLowerArm : cls.XrotRightLowerArm + 1, 2] = -0.1
+                    x_bounds[current_phase]["max"][cls.ZrotRightLowerArm : cls.XrotRightLowerArm + 1, 2] = 0.1
                     # Left elbow
-                    x_bounds[current_phase]["min"][
-                        cls.ZrotLeftLowerArm : cls.XrotLeftLowerArm + 1, 2
-                    ] = -0.1
-                    x_bounds[current_phase]["max"][
-                        cls.ZrotLeftLowerArm : cls.XrotLeftLowerArm + 1, 2
-                    ] = 0.1
+                    x_bounds[current_phase]["min"][cls.ZrotLeftLowerArm : cls.XrotLeftLowerArm + 1, 2] = -0.1
+                    x_bounds[current_phase]["max"][cls.ZrotLeftLowerArm : cls.XrotLeftLowerArm + 1, 2] = 0.1
 
                 else:
                     # somersaulting
-                    x_bounds[current_phase]["max"][cls.Xrot, 1] = (
-                        2 * np.pi * (i + 1) + 0.2
-                    )
+                    x_bounds[current_phase]["max"][cls.Xrot, 1] = 2 * np.pi * (i + 1) + 0.2
 
                     x_bounds[current_phase]["min"][cls.Xrot, 2] = 2 * np.pi * i - 0.2
-                    x_bounds[current_phase]["max"][cls.Xrot, 2] = (
-                        2 * np.pi * (i + 1) + 0.2
-                    )
+                    x_bounds[current_phase]["max"][cls.Xrot, 2] = 2 * np.pi * (i + 1) + 0.2
 
                     # tilt pi / 4
                     x_bounds[current_phase]["min"][cls.Yrot, :] = -np.pi / 4
@@ -396,31 +343,19 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
                     # twisting
                     half_twist_till_now = sum(half_twists[:i])
                     if half_twist_till_now != 0:
-                        x_bounds[current_phase]["min"][cls.Zrot, 1] = (
-                            np.pi * sum(half_twists[:i]) - 0.2
-                        )
-                        x_bounds[current_phase]["max"][cls.Zrot, 1] = (
-                            np.pi * sum(half_twists[: i + 1]) + 0.2
-                        )
+                        x_bounds[current_phase]["min"][cls.Zrot, 1] = np.pi * sum(half_twists[:i]) - 0.2
+                        x_bounds[current_phase]["max"][cls.Zrot, 1] = np.pi * sum(half_twists[: i + 1]) + 0.2
                         x_bounds[current_phase]["min"][cls.Zrot, 2] = (
                             np.pi * sum(half_twists[: i + 1]) - 0.2 - np.pi / 4
                         )
-                        x_bounds[current_phase]["max"][cls.Zrot, 2] = (
-                            np.pi * sum(half_twists[: i + 1]) + 0.2
-                        )
+                        x_bounds[current_phase]["max"][cls.Zrot, 2] = np.pi * sum(half_twists[: i + 1]) + 0.2
                     else:
-                        x_bounds[current_phase]["min"][cls.Zrot, 1] = (
-                            np.pi * sum(half_twists[:i]) - 0.2
-                        )
-                        x_bounds[current_phase]["max"][cls.Zrot, 1] = (
-                            np.pi * sum(half_twists[: i + 1]) + 0.2
-                        )
+                        x_bounds[current_phase]["min"][cls.Zrot, 1] = np.pi * sum(half_twists[:i]) - 0.2
+                        x_bounds[current_phase]["max"][cls.Zrot, 1] = np.pi * sum(half_twists[: i + 1]) + 0.2
                         x_bounds[current_phase]["min"][cls.Zrot, 2] = (
                             np.pi * sum(half_twists[: i + 1]) - 0.2 - np.pi / 4
                         )
-                        x_bounds[current_phase]["max"][cls.Zrot, 2] = (
-                            np.pi * sum(half_twists[: i + 1]) + 0.2
-                        )
+                        x_bounds[current_phase]["max"][cls.Zrot, 2] = np.pi * sum(half_twists[: i + 1]) + 0.2
 
                 # Hips flexion
                 x_bounds[current_phase]["min"][cls.XrotUpperLegs, :] = -0.35
@@ -429,7 +364,7 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
             last_have_twist = next_have_twist
             next_have_twist = is_last_somersault or half_twists[i + 1] > 0
 
-        # decorative phase
+        # waiting phase
         if half_twists[-1] == 0:
             x_bounds.append(
                 {
@@ -439,22 +374,22 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
             )
             current_phase += 1
             for b in 0, 1, 2:
-                x_bounds[current_phase]["min"][:, b] = x_bounds[current_phase - 1][
-                    "min"
-                ][:, 2]
-                x_bounds[current_phase]["max"][:, b] = x_bounds[current_phase - 1][
-                    "max"
-                ][:, 2]
+                x_bounds[current_phase]["min"][:, b] = x_bounds[current_phase - 1]["min"][:, 2]
+                x_bounds[current_phase]["max"][:, b] = x_bounds[current_phase - 1]["max"][:, 2]
 
-            x_bounds[current_phase]["max"][cls.Xrot, 1] = (
-                2 * np.pi * nb_somersaults - np.pi / 2 + 0.2
-            )
-            x_bounds[current_phase]["min"][cls.Xrot, 2] = (
-                2 * np.pi * nb_somersaults - np.pi / 2 - 0.2
-            )
-            x_bounds[current_phase]["max"][cls.Xrot, 2] = (
-                2 * np.pi * nb_somersaults - np.pi / 2 + 0.2
-            )
+            # arms
+            x_bounds[current_phase]["min"][cls.YrotLeftUpperArm, 1] = -np.pi / 4
+            x_bounds[current_phase]["max"][cls.YrotRightUpperArm, 1] = np.pi / 4
+
+            x_bounds[current_phase]["min"][cls.ZrotLeftUpperArm, 1] = -np.pi / 4
+            x_bounds[current_phase]["max"][cls.ZrotLeftUpperArm, 1] = np.pi / 4
+            x_bounds[current_phase]["min"][cls.ZrotRightUpperArm, 1] = -np.pi / 4
+            x_bounds[current_phase]["max"][cls.ZrotRightUpperArm, 1] = np.pi / 4
+
+            # somersaulting
+            x_bounds[current_phase]["max"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults - np.pi / 2 + 0.2
+            x_bounds[current_phase]["min"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - np.pi / 2 - 0.2
+            x_bounds[current_phase]["max"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - np.pi / 2 + 0.2
 
         # landing
         x_bounds.append(
@@ -472,13 +407,11 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
         x_bounds[current_phase]["max"][[cls.X, cls.Y, cls.Z], 2] = [0.01, 0.01, 0.01]
 
         # finish 1/4 somersault
-        x_bounds[current_phase]["min"][cls.Xrot, 1] = (
-            nb_somersaults * np.pi * 2 - np.pi / 2 - 0.2
-        )
-        x_bounds[current_phase]["max"][cls.Xrot, 1] = nb_somersaults * np.pi * 2 + 0.2
+        x_bounds[current_phase]["min"][cls.Xrot, 1] = nb_somersaults * np.pi * 2 - np.pi / 2 - 0.1
+        x_bounds[current_phase]["max"][cls.Xrot, 1] = nb_somersaults * np.pi * 2 + 0.1
 
-        x_bounds[current_phase]["min"][cls.Xrot, 2] = nb_somersaults * np.pi * 2 - 0.2
-        x_bounds[current_phase]["max"][cls.Xrot, 2] = nb_somersaults * np.pi * 2 + 0.2
+        x_bounds[current_phase]["min"][cls.Xrot, 2] = nb_somersaults * np.pi * 2 - 0.1
+        x_bounds[current_phase]["max"][cls.Xrot, 2] = nb_somersaults * np.pi * 2 + 0.1
 
         # twist finished
         x_bounds[current_phase]["min"][cls.Zrot, 1:] = sum(half_twists) * np.pi - 0.2
@@ -504,19 +437,11 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
         x_bounds[current_phase]["max"][cls.ZrotLeftUpperArm, 2] = 0.1
 
         # Right elbow
-        x_bounds[current_phase]["min"][
-            cls.ZrotRightLowerArm : cls.XrotRightLowerArm + 1, 2
-        ] = -0.1
-        x_bounds[current_phase]["max"][
-            cls.ZrotRightLowerArm : cls.XrotRightLowerArm + 1, 2
-        ] = 0.1
+        x_bounds[current_phase]["min"][cls.ZrotRightLowerArm : cls.XrotRightLowerArm + 1, 2] = -0.1
+        x_bounds[current_phase]["max"][cls.ZrotRightLowerArm : cls.XrotRightLowerArm + 1, 2] = 0.1
         # Left elbow
-        x_bounds[current_phase]["min"][
-            cls.ZrotLeftLowerArm : cls.XrotLeftLowerArm + 1, 2
-        ] = -0.1
-        x_bounds[current_phase]["max"][
-            cls.ZrotLeftLowerArm : cls.XrotLeftLowerArm + 1, 2
-        ] = 0.1
+        x_bounds[current_phase]["min"][cls.ZrotLeftLowerArm : cls.XrotLeftLowerArm + 1, 2] = -0.1
+        x_bounds[current_phase]["max"][cls.ZrotLeftLowerArm : cls.XrotLeftLowerArm + 1, 2] = 0.1
 
         # Hips flexion
         x_bounds[current_phase]["min"][cls.XrotUpperLegs, :] = -0.60
