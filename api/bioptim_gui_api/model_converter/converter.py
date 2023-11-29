@@ -71,12 +71,12 @@ class BioModConverter:
             if line.strip().startswith("segment"):
                 segment_name = line.strip().split()[1]
 
-                if segment_name in cls.segment_rotation:
+                if segment_name in cls.segment_translation:
                     existing_segments.add(segment_name)
                     updated_lines.append(line)
                     continue
 
-                elif segment_name in cls.segment_translation:
+                elif segment_name in cls.segment_rotation:
                     existing_segments.add(segment_name)
                     updated_lines.append(line)
                     continue
