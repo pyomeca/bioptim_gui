@@ -77,7 +77,7 @@ class TuckAcrobaticsVariables(PikeAcrobaticsVariables):
         [
             [1, 1, 1],
             [1, 1, 1],
-            [10, 10, 10],
+            [15, 15, 15],
             [0, 0, 0],
             [np.pi / 4, np.pi / 4, np.pi / 4],
             [0, 0, 0],
