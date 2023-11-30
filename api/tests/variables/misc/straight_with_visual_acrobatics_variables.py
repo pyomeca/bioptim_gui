@@ -1,6 +1,6 @@
 import numpy as np
 
-from bioptim_gui_api.variables.misc.straight_acrobatics_variables import (
+from tests.variables.misc.straight_acrobatics_variables import (
     StraightAcrobaticsVariables,
 )
 

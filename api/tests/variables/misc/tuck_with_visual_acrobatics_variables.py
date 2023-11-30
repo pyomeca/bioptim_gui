@@ -1,6 +1,6 @@
 import numpy as np
 
-from bioptim_gui_api.variables.misc.tuck_acrobatics_variables import (
+from tests.variables.misc.tuck_acrobatics_variables import (
     TuckAcrobaticsVariables,
 )
 

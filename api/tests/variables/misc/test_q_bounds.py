@@ -9,18 +9,18 @@ from bioptim_gui_api.variables.misc.straight_with_visual_acrobatics_variables im
 )
 from bioptim_gui_api.variables.misc.tuck_acrobatics_variables import TuckAcrobaticsVariables
 from bioptim_gui_api.variables.misc.tuck_with_visual_acrobatics_variables import TuckAcrobaticsWithVisualVariables
-from tests.variables.baseline.pike_acrobatics_variables import PikeAcrobaticsVariables as BasePikeAcrobaticsVariables
-from tests.variables.baseline.pike_with_visual_acrobatics_variables import (
+from tests.variables.misc.pike_acrobatics_variables import PikeAcrobaticsVariables as BasePikeAcrobaticsVariables
+from tests.variables.misc.pike_with_visual_acrobatics_variables import (
     PikeAcrobaticsWithVisualVariables as BasePikeAcrobaticsWithVisualVariables,
 )
-from tests.variables.baseline.straight_acrobatics_variables import (
+from tests.variables.misc.straight_acrobatics_variables import (
     StraightAcrobaticsVariables as BaseStraightAcrobaticsVariables,
 )
-from tests.variables.baseline.straight_with_visual_acrobatics_variables import (
+from tests.variables.misc.straight_with_visual_acrobatics_variables import (
     StraightAcrobaticsWithVisualVariables as BaseStraightAcrobaticsWithVisualVariables,
 )
-from tests.variables.baseline.tuck_acrobatics_variables import TuckAcrobaticsVariables as BaseTuckAcrobaticsVariables
-from tests.variables.baseline.tuck_with_visual_acrobatics_variables import (
+from tests.variables.misc.tuck_acrobatics_variables import TuckAcrobaticsVariables as BaseTuckAcrobaticsVariables
+from tests.variables.misc.tuck_with_visual_acrobatics_variables import (
     TuckAcrobaticsWithVisualVariables as BaseTuckAcrobaticsWithVisualVariables,
 )
 
