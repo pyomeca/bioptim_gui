@@ -1,5 +1,7 @@
 import json
 
+import numpy as np
+
 import bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config as config
 
 
@@ -70,20 +72,23 @@ def update_phase_info(phase_names: list[str]) -> None:
         json.dump(data, f)
 
 
+def calculate_n_tuck(half_twists):
+    # the number of tuck is at least 1, every twists that are not the
+    # first phase or last phase before landing have a tuck phase
+    return sum(np.array(half_twists[1:-1]) > 0) + 1
+
+
 def acrobatics_phase_names(nb_somersaults: int, position: str, half_twists: list[int]) -> list[str]:
     if position == "straight":
         return [f"Somersault {i + 1}" for i in range(nb_somersaults)] + ["Landing"]
 
-    names = []
+    n_tucks = calculate_n_tuck(half_twists)
 
-    if half_twists[0] > 0:
-        names.append("Twist")
-    names.extend([position.capitalize(), "Somersault", "Kick out"])
+    names = ["Twist"] if half_twists[0] > 0 else []
+    names += [position.capitalize(), "Somersault", "Kick out", "Twist"] * n_tucks
 
-    for half_twist in half_twists[1:-1]:
-        if half_twist > 0:
-            names.extend(["Twist", position.capitalize(), "Somersault", "Kick out"])
+    if half_twists[-1] == 0:
+        names[-1] = "Waiting"
 
-    names.append("Waiting" if half_twists[-1] == 0 else "Twist")
     names.append("Landing")
     return names
