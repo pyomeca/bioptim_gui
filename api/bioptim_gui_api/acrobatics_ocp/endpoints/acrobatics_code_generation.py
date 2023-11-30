@@ -166,9 +166,6 @@ def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) ->
 
     return out
 
-"""
-
-    generated += """
 def prepare_ocp(
     seed: int = 0,
     is_multistart: bool = False,
@@ -225,24 +222,13 @@ def prepare_ocp(
     generated += f"""
     # Declaration of the dynamics function used during integration
     dynamics = DynamicsList()
-"""
 
-    if nb_phases == 1:
-        generated += f"""
-    dynamics.add(
-        DynamicsFcn.TORQUE_DRIVEN,
-    )
-"""
-    else:
-        generated += f"""
     for i in range(nb_phases):
         dynamics.add(
             DynamicsFcn.TORQUE_DRIVEN,
             phase=i,
         )
-"""
 
-    generated += f"""
     multinode_constraints = MultinodeConstraintList()
     multinode_constraints.add(
         MultinodeConstraintFcn.TRACK_TOTAL_TIME,
@@ -251,11 +237,7 @@ def prepare_ocp(
         min_bound={total_time} - 0.02,
         max_bound={total_time} + 0.02,
     )
-"""
-
-    # PATH CONSTRAINTS
-
-    generated += f"""
+    
     # Declaration of optimization variables bounds and initial guesses
     # Path constraint
     x_bounds = BoundsList()
@@ -305,9 +287,7 @@ def prepare_ocp(
         interpolation=InterpolationType.CONSTANT,
         phase=0,
     )
-"""
 
-    generated += f"""
     for phase in range(nb_phases):
         u_bounds.add(
             "tau",
@@ -316,18 +296,14 @@ def prepare_ocp(
             interpolation=InterpolationType.CONSTANT,
             phase=phase,
         )
-"""
 
-    generated += f"""
     u_initial_guesses.add(
         "tau",
         initial_guess={tau_init},
         interpolation=InterpolationType.CONSTANT,
         phase=0,
     )
-"""
 
-    generated += f"""
     if is_multistart:
         for i in range(nb_phases):
             x_initial_guesses[i]["q"].add_noise(
@@ -352,9 +328,7 @@ def prepare_ocp(
             n_shooting=n_shooting[0],
             seed=seed,
         )
-"""
-
-    generated += f"""
+        
     mapping = BiMappingList()
     mapping.add(
         "tau",
