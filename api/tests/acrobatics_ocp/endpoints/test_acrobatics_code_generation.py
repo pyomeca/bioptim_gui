@@ -38,11 +38,16 @@ def test_generate_code_no_model():
 
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
-def test_generate_code_simple_position(position):
+@pytest.mark.parametrize("with_visuals", [True, False])
+def test_generate_code_simple_position(position, with_visuals):
     # using base data and a position model (16 degrees of freedom)
     model_path = Path(f"test_biomods/{position}.bioMod").absolute()
     response = client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
     assert response.status_code == 200, response
+
+    if with_visuals:
+        response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
+        assert response.status_code == 200, response
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
     assert response.status_code != 400, response
@@ -65,11 +70,16 @@ def test_generate_code_simple_position(position):
 
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
-def test_generate_code_position_no_objective_no_constraint(position):
+@pytest.mark.parametrize("with_visuals", [True, False])
+def test_generate_code_position_no_objective_no_constraint(position, with_visuals):
     # using base data and a position model (16 degrees of freedom)
     model_path = Path(f"test_biomods/{position}.bioMod").absolute()
     response = client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
     assert response.status_code == 200, response
+
+    if with_visuals:
+        response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
+        assert response.status_code == 200, response
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
     assert response.status_code != 400, response
@@ -98,13 +108,18 @@ def test_generate_code_position_no_objective_no_constraint(position):
 
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
-def test_generate_code_position_objective_and_constraint(position):
+@pytest.mark.parametrize("with_visuals", [True, False])
+def test_generate_code_position_objective_and_constraint(position, with_visuals):
     # using base data and a position model (16 degrees of freedom)
     model_path = Path(f"test_biomods/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
     assert response.status_code != 400, response
+
+    if with_visuals:
+        response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
+        assert response.status_code == 200, response
 
     client.post("/acrobatics/phases_info/0/constraints")
     client.post("/acrobatics/phases_info/0/constraints")
@@ -130,10 +145,15 @@ def test_generate_code_position_objective_and_constraint(position):
 
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
-def test_generate_code_2_phase_position_objective_and_constraint(position):
+@pytest.mark.parametrize("with_visuals", [True, False])
+def test_generate_code_2_phase_position_objective_and_constraint(position, with_visuals):
     # using base data and a position model (16 degrees of freedom)
     model_path = Path(f"test_biomods/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
+
+    if with_visuals:
+        response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
+        assert response.status_code == 200, response
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
     assert response.status_code != 400, response
@@ -166,10 +186,15 @@ def test_generate_code_2_phase_position_objective_and_constraint(position):
 
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
-def test_generate_code_modified_objective_and_constraint(position):
+@pytest.mark.parametrize("with_visuals", [True, False])
+def test_generate_code_modified_objective_and_constraint(position, with_visuals):
     # using base data and a position model (16 degrees of freedom)
     model_path = Path(f"test_biomods/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
+
+    if with_visuals:
+        response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
+        assert response.status_code == 200, response
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
     assert response.status_code != 400, response
