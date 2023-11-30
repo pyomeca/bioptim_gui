@@ -76,37 +76,14 @@ def acrobatics_phase_names(nb_somersaults: int, position: str, half_twists: list
 
     names = []
 
-    # twist start
     if half_twists[0] > 0:
         names.append("Twist")
+    names.extend([position.capitalize(), "Somersault", "Kick out"])
 
-    last_have_twist = True
-    next_have_twist = half_twists[1] > 0
-    for i in range(1, nb_somersaults):
-        is_last_somersault = i == nb_somersaults - 1
-        # piking/tuck
-        if last_have_twist:
-            names.append("Pike" if position == "pike" else "Tuck")
+    for half_twist in half_twists[1:-1]:
+        if half_twist > 0:
+            names.extend(["Twist", position.capitalize(), "Somersault", "Kick out"])
 
-        # somersaulting in pike
-        if i == nb_somersaults - 1 or next_have_twist:
-            names.append("Somersault")
-
-        # kick out
-        if next_have_twist or is_last_somersault:
-            names.append("Kick out")
-
-        # twisting
-        if next_have_twist:
-            names.append("Twist")
-
-        last_have_twist = next_have_twist
-        next_have_twist = is_last_somersault or half_twists[i + 1] > 0
-
-    # nothing phase before landing if no twist
-    if half_twists[-1] == 0:
-        names.append("Waiting")
-
-    # landing
+    names.append("Waiting" if half_twists[-1] == 0 else "Twist")
     names.append("Landing")
     return names
