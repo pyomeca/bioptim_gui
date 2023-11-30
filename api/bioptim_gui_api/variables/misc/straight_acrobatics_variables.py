@@ -189,12 +189,7 @@ class StraightAcrobaticsVariables:
         return x_inits
 
     @classmethod
-    def get_qdot_bounds(
-        cls,
-        nb_phases: int,
-        final_time: float,
-        is_forward: bool,
-    ) -> dict:
+    def get_qdot_bounds(cls, nb_phases: int, final_time: float, is_forward: bool) -> dict:
         vzinit = 9.81 / 2 * final_time  # vitesse initiale en z du CoM pour revenir a terre au temps final
 
         x_bounds = [
@@ -207,13 +202,16 @@ class StraightAcrobaticsVariables:
 
         # Initial bounds
         x_bounds[0]["min"][:, 0] = [0] * cls.nb_qdot
-        x_bounds[0]["min"][: cls.Z, 0] = -0.5
-        x_bounds[0]["min"][cls.Z, 0] = vzinit - 2
-        x_bounds[0]["min"][cls.Xrot, 0] = 0.5 if is_forward else -20
+        x_bounds[0]["max"][:, 0] = [0] * cls.nb_qdot
 
-        x_bounds[0]["max"][:, 0] = -x_bounds[0]["min"][:, 0]
+        x_bounds[0]["min"][: cls.Z, 0] = -0.5
+        x_bounds[0]["max"][: cls.Z, 0] = 0.5
+
+        x_bounds[0]["min"][cls.Z, 0] = vzinit - 2
         x_bounds[0]["max"][cls.Z, 0] = vzinit + 2
-        x_bounds[0]["max"][cls.Xrot, 0] = 20 if is_forward else -0.5
+
+        x_bounds[0]["min"][cls.Xrot, 0] = 0.5
+        x_bounds[0]["max"][cls.Xrot, 0] = 20
 
         for phase in range(nb_phases):
             if phase != 0:
@@ -221,18 +219,20 @@ class StraightAcrobaticsVariables:
                 x_bounds[phase]["min"][:, 0] = x_bounds[phase - 1]["min"][:, 2]
                 x_bounds[phase]["max"][:, 0] = x_bounds[phase - 1]["max"][:, 2]
 
-            # Intermediate bounds
-            x_bounds[phase]["min"][:, 1] = [-100] * cls.nb_qdot
-            x_bounds[phase]["min"][: cls.Z, 1] = -10
-            x_bounds[phase]["min"][cls.Xrot, 1] = 0.5 if is_forward else -20
+            x_bounds[phase]["min"][:, 1:] = -100
+            x_bounds[phase]["max"][:, 1:] = 100
 
-            x_bounds[phase]["max"][:, 1] = [100] * cls.nb_qdot
-            x_bounds[phase]["max"][: cls.Z, 1] = 10
-            x_bounds[phase]["max"][cls.Xrot, 1] = 20 if is_forward else -0.5
+            x_bounds[phase]["min"][: cls.Z, 1:] = -10
+            x_bounds[phase]["max"][: cls.Z, 1:] = 10
 
-            # Final bounds, same as intermediate
-            x_bounds[phase]["min"][:, 2] = x_bounds[phase]["min"][:, 1]
-            x_bounds[phase]["max"][:, 2] = x_bounds[phase]["max"][:, 1]
+            x_bounds[phase]["min"][cls.Xrot, 1:] = 0.5
+            x_bounds[phase]["max"][cls.Xrot, 1:] = 20
+
+        if not is_forward:
+            for i in range(len(x_bounds)):
+                tmp = x_bounds[i]["min"][cls.Xrot].copy()
+                x_bounds[i]["min"][cls.Xrot] = -x_bounds[i]["max"][cls.Xrot]
+                x_bounds[i]["max"][cls.Xrot] = -tmp
 
         return x_bounds
 
