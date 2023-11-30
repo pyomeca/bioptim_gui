@@ -53,14 +53,19 @@ class Objective:
 """
         if not self.expand:
             ret += f"{' ' * indent}expand=False,\n"
+
         if self.target is not None:
             ret += f"{' ' * indent}target={self.target},\n"
+
         if self.derivative:
             ret += f"{' ' * indent}derivative=True,\n"
+
         if self.objective_type == "lagrange" and self.integration_rule != "rectangle_left":
             ret += f"{' ' * indent}integration_rule=QuadratureRule.{self.integration_rule.upper()},\n"
+
         if self.multi_thread:
             ret += f"{' ' * indent}multi_thread=True,\n"
+
         if nb_phase > 1:
             ret += f"{' ' * indent}phase={self.phase},\n"
 
