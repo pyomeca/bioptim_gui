@@ -97,71 +97,42 @@ class TuckAcrobaticsVariables(PikeAcrobaticsVariables):
 
     @classmethod
     def get_q_bounds(cls, half_twists: list, prefer_left: bool) -> dict:
-        nb_somersaults = len(half_twists)
-
         x_bounds = super().get_q_bounds(half_twists, prefer_left)
+        nb_phases = len(x_bounds)
 
-        for i in range(len(x_bounds)):
+        # the number of tuck is at least 1, every twists that are not the
+        # first phase or last phase before landing have a tuck phase
+        n_tucks = sum(np.array(half_twists[1:-1]) > 0) + 1
+
+        # every tuck phases are 4 phases apart
+        tuck_phase_idx = np.array([i * 4 for i in range(n_tucks)])
+
+        # if the first phase is not a pike (if it is a twist) the tuck phases
+        # are shifted by 1
+        if half_twists[0] > 0:
+            tuck_phase_idx += 1
+
+        for i in range(nb_phases):
             x_bounds[i]["min"][cls.XrotLowerLegs, :] = -0.15
             x_bounds[i]["max"][cls.XrotLowerLegs, :] = 0.15
 
-        current_phase = -1
-
-        # twist start
-        if half_twists[0] > 0:
-            current_phase += 1
-
-        last_have_twist = True
-        next_have_twist = half_twists[1] > 0
-        for i in range(1, nb_somersaults):
-            is_last_somersault = i == nb_somersaults - 1
+        for idx in tuck_phase_idx:
             # tucking
-            if last_have_twist:
-                current_phase += 1
-
-                x_bounds[current_phase]["min"][cls.XrotLowerLegs, 0] = -0.2
-                x_bounds[current_phase]["max"][cls.XrotLowerLegs, 0] = 0.2
-                x_bounds[current_phase]["min"][cls.XrotLowerLegs, 1] = -0.2
-                x_bounds[current_phase]["max"][cls.XrotLowerLegs, 1] = 2.4 + 0.2
-                x_bounds[current_phase]["min"][cls.XrotLowerLegs, 2] = 2.4 - 0.2
-                x_bounds[current_phase]["max"][cls.XrotLowerLegs, 2] = 2.4 + 0.2
+            x_bounds[idx]["min"][cls.XrotLowerLegs, 0] = -0.2
+            x_bounds[idx]["max"][cls.XrotLowerLegs, 0] = 0.2
+            x_bounds[idx]["min"][cls.XrotLowerLegs, 1] = -0.2
+            x_bounds[idx]["max"][cls.XrotLowerLegs, 1] = 2.4 + 0.2
+            x_bounds[idx]["min"][cls.XrotLowerLegs, 2] = 2.4 - 0.2
+            x_bounds[idx]["max"][cls.XrotLowerLegs, 2] = 2.4 + 0.2
 
             # somersaulting in tuck
-            if i == nb_somersaults - 1 or next_have_twist:
-                current_phase += 1
-
-                x_bounds[current_phase]["min"][cls.XrotLowerLegs, :] = 2.4 - 0.2
-                x_bounds[current_phase]["max"][cls.XrotLowerLegs, :] = 2.4 + 0.2
+            x_bounds[idx + 1]["min"][cls.XrotLowerLegs, :] = 2.4 - 0.2
+            x_bounds[idx + 1]["max"][cls.XrotLowerLegs, :] = 2.4 + 0.2
 
             # kick out
-            if next_have_twist or is_last_somersault:
-                current_phase += 1
-
-                x_bounds[current_phase]["min"][cls.XrotLowerLegs, 0] = 2.4 - 0.2 - 0.01
-                x_bounds[current_phase]["max"][cls.XrotLowerLegs, 0] = 2.4 + 0.2 + 0.01
-                x_bounds[current_phase]["min"][cls.XrotLowerLegs, 1] = -0.2 - 0.01
-                x_bounds[current_phase]["max"][cls.XrotLowerLegs, 1] = 2.4 + 0.2 + 0.01
-                x_bounds[current_phase]["min"][cls.XrotLowerLegs, 2] = -0.15
-                x_bounds[current_phase]["max"][cls.XrotLowerLegs, 2] = 0.15
-
-            # twisting
-            if next_have_twist:
-                current_phase += 1
-
-                x_bounds[current_phase]["min"][cls.XrotLowerLegs, :] = -0.15
-                x_bounds[current_phase]["max"][cls.XrotLowerLegs, :] = 0.15
-
-            last_have_twist = next_have_twist
-            next_have_twist = is_last_somersault or half_twists[i + 1] > 0
-
-        # decorative
-        if half_twists[-1] == 0:
-            current_phase += 1
-
-        # landing
-        current_phase += 1
-
-        x_bounds[current_phase]["min"][cls.XrotLowerLegs, :] = -0.15
-        x_bounds[current_phase]["max"][cls.XrotLowerLegs, :] = 0.15
+            x_bounds[idx + 2]["min"][cls.XrotLowerLegs, 0] = 2.4 - 0.21
+            x_bounds[idx + 2]["max"][cls.XrotLowerLegs, 0] = 2.4 + 0.21
+            x_bounds[idx + 2]["min"][cls.XrotLowerLegs, 1] = -0.21
+            x_bounds[idx + 2]["max"][cls.XrotLowerLegs, 1] = 2.4 + 0.21
 
         return x_bounds
