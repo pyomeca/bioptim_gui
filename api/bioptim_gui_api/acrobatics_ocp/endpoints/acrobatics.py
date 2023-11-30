@@ -33,33 +33,26 @@ def update_nb_somersaults(nb_somersaults: NbSomersaultsRequest):
     """
     nb_max_somersaults = 5
     old_value = read_acrobatics_data("nb_somersaults")
-    new_value = nb_somersaults.nb_somersaults
+    new_nb_somersaults = nb_somersaults.nb_somersaults
 
-    if new_value <= 0 or new_value > nb_max_somersaults:
+    if new_nb_somersaults <= 0 or new_nb_somersaults > nb_max_somersaults:
         raise HTTPException(status_code=400, detail="nb_somersaults must be positive")
 
-    update_acrobatics_data("nb_somersaults", new_value)
-
     data = read_acrobatics_data()
-    nb_somersaults = new_value
     position = data["position"]
-    half_twists = data["nb_half_twists"]
-
-    half_twists = half_twists[:nb_somersaults]
-    for i in range(old_value, new_value):
-        half_twists.append(0)
+    updated_half_twists = data["nb_half_twists"][:new_nb_somersaults] + [0] * (new_nb_somersaults - old_value)
 
     # 1 somersault tuck/pike are not allowed, set the position to straight
-    new_phases_names = []
-    if position != "straight" and nb_somersaults == 1:
+    if new_nb_somersaults == 1 and position != "straight":
         update_acrobatics_data("position", "straight")
-        new_phase_names = acrobatics_phase_names(nb_somersaults, "straight", half_twists)
+        new_phase_names = acrobatics_phase_names(new_nb_somersaults, "straight", updated_half_twists)
     else:
-        new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
+        new_phase_names = acrobatics_phase_names(new_nb_somersaults, position, updated_half_twists)
 
+    update_acrobatics_data("nb_somersaults", new_nb_somersaults)
+    update_acrobatics_data("nb_half_twists", updated_half_twists)
     update_phase_info(new_phase_names)
 
-    update_acrobatics_data("nb_half_twists", half_twists)
     return read_acrobatics_data()
 
 
