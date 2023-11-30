@@ -24,3 +24,10 @@ def variables_zeros(dimension: int, interpolation_type: str) -> list:
         return np.zeros((dimension, 3)).tolist()
     else:
         raise ValueError(f"Interpolation type {interpolation_type} not implemented")
+
+
+def invert_min_max(bounds: list, index: int) -> None:
+    for i in range(len(bounds)):
+        tmp = bounds[i]["min"][index].copy()
+        bounds[i]["min"][index] = -bounds[i]["max"][index]
+        bounds[i]["max"][index] = -tmp

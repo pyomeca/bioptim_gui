@@ -1,5 +1,7 @@
 import numpy as np
 
+from bioptim_gui_api.variables.misc.variables_utils import invert_min_max
+
 
 class StraightAcrobaticsVariables:
     X = 0
@@ -203,18 +205,9 @@ class StraightAcrobaticsVariables:
         return x_inits
 
     @classmethod
-    def get_qdot_bounds(cls, nb_phases: int, final_time: float, is_forward: bool) -> dict:
+    def _fill_qdot_initial(cls, x_bounds: np.ndarray, final_time: float) -> None:
         vzinit = 9.81 / 2 * final_time  # vitesse initiale en z du CoM pour revenir a terre au temps final
 
-        x_bounds = [
-            {
-                "min": np.zeros((cls.nb_qdot, 3)) + cls.qdot_min,
-                "max": np.zeros((cls.nb_qdot, 3)) + cls.qdot_max,
-            }
-            for _ in range(nb_phases)
-        ]
-
-        # Initial bounds
         x_bounds[0]["min"][:, 0] = [0] * cls.nb_qdot
         x_bounds[0]["max"][:, 0] = [0] * cls.nb_qdot
 
@@ -227,6 +220,9 @@ class StraightAcrobaticsVariables:
         x_bounds[0]["min"][cls.Xrot, 0] = 0.5
         x_bounds[0]["max"][cls.Xrot, 0] = 20
 
+    @classmethod
+    def _fill_qdot_intermediary(cls, x_bounds: np.ndarray) -> None:
+        nb_phases = len(x_bounds)
         for phase in range(nb_phases):
             if phase != 0:
                 # initial bounds, same as final bounds of previous phase
@@ -242,11 +238,23 @@ class StraightAcrobaticsVariables:
             x_bounds[phase]["min"][cls.Xrot, 1:] = 0.5
             x_bounds[phase]["max"][cls.Xrot, 1:] = 20
 
+    @classmethod
+    def get_qdot_bounds(cls, nb_phases: int, final_time: float, is_forward: bool) -> dict:
+        x_bounds = [
+            {
+                "min": np.zeros((cls.nb_qdot, 3)) + cls.qdot_min,
+                "max": np.zeros((cls.nb_qdot, 3)) + cls.qdot_max,
+            }
+            for _ in range(nb_phases)
+        ]
+
+        # Initial bounds
+        cls._fill_qdot_initial(x_bounds, final_time)
+
+        cls._fill_qdot_intermediary(x_bounds)
+
         if not is_forward:
-            for i in range(len(x_bounds)):
-                tmp = x_bounds[i]["min"][cls.Xrot].copy()
-                x_bounds[i]["min"][cls.Xrot] = -x_bounds[i]["max"][cls.Xrot]
-                x_bounds[i]["max"][cls.Xrot] = -tmp
+            invert_min_max(x_bounds, cls.Xrot)
 
         return x_bounds
 

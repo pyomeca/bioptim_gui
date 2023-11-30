@@ -3,6 +3,7 @@ import numpy as np
 from bioptim_gui_api.variables.misc.straight_acrobatics_variables import (
     StraightAcrobaticsVariables,
 )
+from bioptim_gui_api.variables.misc.variables_utils import invert_min_max
 
 
 class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
@@ -447,15 +448,9 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
         add_phase_bounds()
         cls._fill_landing_phase(x_bounds, nb_somersaults, half_twists)
 
-        if (not is_forward) or (not prefer_left):
-            for i in range(len(x_bounds)):
-                if not is_forward:
-                    tmp = x_bounds[i]["min"][cls.Xrot].copy()
-                    x_bounds[i]["min"][cls.Xrot] = -x_bounds[i]["max"][cls.Xrot]
-                    x_bounds[i]["max"][cls.Xrot] = -tmp
-                if not prefer_left:
-                    tmp = x_bounds[i]["min"][cls.Zrot].copy()
-                    x_bounds[i]["min"][cls.Zrot] = -x_bounds[i]["max"][cls.Zrot]
-                    x_bounds[i]["max"][cls.Zrot] = -tmp
+        if not is_forward:
+            invert_min_max(x_bounds, cls.Xrot)
+        if not prefer_left:
+            invert_min_max(x_bounds, cls.Zrot)
 
         return x_bounds
