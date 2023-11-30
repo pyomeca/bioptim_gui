@@ -58,7 +58,7 @@ from tests.variables.misc.tuck_with_visual_acrobatics_variables import (
 def test_q_init(variable_compute, baseline, position, prefer_left, half_twist):
     nb_phases = len(acrobatics_phase_names(len(half_twist), position, half_twist))
     expected = baseline.get_q_init(nb_phases, half_twist, prefer_left)
-    actual = variable_compute.get_q_init(nb_phases, half_twist, prefer_left)
+    actual = variable_compute.get_q_init(half_twist, prefer_left)
 
     assert len(expected) == len(actual)
     assert np.allclose(expected, actual)
