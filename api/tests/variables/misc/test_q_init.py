@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import acrobatics_phase_names
 from bioptim_gui_api.variables.misc.pike_acrobatics_variables import PikeAcrobaticsVariables
 from bioptim_gui_api.variables.misc.pike_with_visual_acrobatics_variables import PikeAcrobaticsWithVisualVariables
 from bioptim_gui_api.variables.misc.straight_acrobatics_variables import StraightAcrobaticsVariables
@@ -27,14 +26,14 @@ from tests.variables.misc.tuck_with_visual_acrobatics_variables import (
 
 
 @pytest.mark.parametrize(
-    ("variable_compute", "baseline", "position"),
+    ("variable_compute", "baseline"),
     [
-        (StraightAcrobaticsVariables, BaseStraightAcrobaticsVariables, "straight"),
-        (PikeAcrobaticsVariables, BasePikeAcrobaticsVariables, "pike"),
-        (TuckAcrobaticsVariables, BaseTuckAcrobaticsVariables, "tuck"),
-        (StraightAcrobaticsWithVisualVariables, BaseStraightAcrobaticsWithVisualVariables, "straight"),
-        (PikeAcrobaticsWithVisualVariables, BasePikeAcrobaticsWithVisualVariables, "pike"),
-        (TuckAcrobaticsWithVisualVariables, BaseTuckAcrobaticsWithVisualVariables, "tuck"),
+        (StraightAcrobaticsVariables, BaseStraightAcrobaticsVariables),
+        (PikeAcrobaticsVariables, BasePikeAcrobaticsVariables),
+        (TuckAcrobaticsVariables, BaseTuckAcrobaticsVariables),
+        (StraightAcrobaticsWithVisualVariables, BaseStraightAcrobaticsWithVisualVariables),
+        (PikeAcrobaticsWithVisualVariables, BasePikeAcrobaticsWithVisualVariables),
+        (TuckAcrobaticsWithVisualVariables, BaseTuckAcrobaticsWithVisualVariables),
     ],
 )
 @pytest.mark.parametrize("prefer_left", [True, False])
@@ -55,9 +54,8 @@ from tests.variables.misc.tuck_with_visual_acrobatics_variables import (
         [1, 1, 1],
     ],
 )
-def test_q_init(variable_compute, baseline, position, prefer_left, half_twist):
-    nb_phases = len(acrobatics_phase_names(len(half_twist), position, half_twist))
-    expected = baseline.get_q_init(nb_phases, half_twist, prefer_left)
+def test_q_init(variable_compute, baseline, prefer_left, half_twist):
+    expected = baseline.get_q_init(half_twist, prefer_left)
     actual = variable_compute.get_q_init(half_twist, prefer_left)
 
     assert len(expected) == len(actual)
