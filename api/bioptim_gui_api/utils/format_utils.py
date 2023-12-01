@@ -12,3 +12,10 @@ def format_2d_array(array, indent: int = 8) -> str:
         res += f"{' ' * (indent + 4)}[{', '.join([str(round(value, 2)) for value in arr])}],\n"
     res += f"{' ' * indent}]"
     return res
+
+
+def invert_min_max(bounds: list, index: int) -> None:
+    for i in range(len(bounds)):
+        tmp = bounds[i]["min"][index].copy()
+        bounds[i]["min"][index] = -bounds[i]["max"][index]
+        bounds[i]["max"][index] = -tmp

@@ -1,9 +1,9 @@
 import numpy as np
 
+from bioptim_gui_api.utils.format_utils import invert_min_max
 from bioptim_gui_api.variables.misc.straight_acrobatics_variables import (
     StraightAcrobaticsVariables,
 )
-from bioptim_gui_api.variables.misc.variables_utils import invert_min_max
 
 
 class PikeAcrobaticsVariables(StraightAcrobaticsVariables):

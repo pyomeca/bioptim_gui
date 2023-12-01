@@ -1,5 +1,14 @@
 import numpy as np
 
+from bioptim_gui_api.variables.misc.pike_acrobatics_variables import PikeAcrobaticsVariables
+from bioptim_gui_api.variables.misc.pike_with_visual_acrobatics_variables import PikeAcrobaticsWithVisualVariables
+from bioptim_gui_api.variables.misc.straight_acrobatics_variables import StraightAcrobaticsVariables
+from bioptim_gui_api.variables.misc.straight_with_visual_acrobatics_variables import (
+    StraightAcrobaticsWithVisualVariables,
+)
+from bioptim_gui_api.variables.misc.tuck_acrobatics_variables import TuckAcrobaticsVariables
+from bioptim_gui_api.variables.misc.tuck_with_visual_acrobatics_variables import TuckAcrobaticsWithVisualVariables
+
 
 def variables_zeros(dimension: int, interpolation_type: str) -> list:
     """
@@ -26,8 +35,21 @@ def variables_zeros(dimension: int, interpolation_type: str) -> list:
         raise ValueError(f"Interpolation type {interpolation_type} not implemented")
 
 
-def invert_min_max(bounds: list, index: int) -> None:
-    for i in range(len(bounds)):
-        tmp = bounds[i]["min"][index].copy()
-        bounds[i]["min"][index] = -bounds[i]["max"][index]
-        bounds[i]["max"][index] = -tmp
+def get_variable_computer(position: str = "straight", with_visual_criteria: bool = False):
+    if with_visual_criteria:
+        model = (
+            StraightAcrobaticsWithVisualVariables
+            if position == "straight"
+            else TuckAcrobaticsWithVisualVariables
+            if position == "tuck"
+            else PikeAcrobaticsWithVisualVariables
+        )
+    else:
+        model = (
+            StraightAcrobaticsVariables
+            if position == "straight"
+            else TuckAcrobaticsVariables
+            if position == "tuck"
+            else PikeAcrobaticsVariables
+        )
+    return model
