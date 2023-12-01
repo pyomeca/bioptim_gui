@@ -1,28 +1,21 @@
 import copy
 
+from bioptim_gui_api.acrobatics_ocp.misc.penalties.common import common_objectives
+from bioptim_gui_api.acrobatics_ocp.misc.penalties.kickout import kickout_objectives
+from bioptim_gui_api.acrobatics_ocp.misc.penalties.landing import landing_objectives
+from bioptim_gui_api.acrobatics_ocp.misc.penalties.pike_tuck import pike_tuck_objectives
+from bioptim_gui_api.acrobatics_ocp.misc.penalties.somersault import somersault_constraints, somersault_objectives
+from bioptim_gui_api.acrobatics_ocp.misc.penalties.twist import twist_objectives
+from bioptim_gui_api.acrobatics_ocp.misc.penalties.waiting import waiting_objectives
+from bioptim_gui_api.acrobatics_ocp.misc.penalties.with_visual_criteria import with_visual_criteria_objectives
 from bioptim_gui_api.penalty.misc.penalty_config import DefaultPenaltyConfig
 from bioptim_gui_api.penalty.misc.penalty_utils import (
     create_objective,
-    create_constraint,
-)
-from bioptim_gui_api.variables.misc.pike_acrobatics_variables import (
-    PikeAcrobaticsVariables,
-)
-from bioptim_gui_api.variables.misc.pike_with_visual_acrobatics_variables import (
-    PikeAcrobaticsWithVisualVariables,
 )
 from bioptim_gui_api.variables.misc.straight_acrobatics_variables import (
     StraightAcrobaticsVariables,
 )
-from bioptim_gui_api.variables.misc.straight_with_visual_acrobatics_variables import (
-    StraightAcrobaticsWithVisualVariables,
-)
-from bioptim_gui_api.variables.misc.tuck_acrobatics_variables import (
-    TuckAcrobaticsVariables,
-)
-from bioptim_gui_api.variables.misc.tuck_with_visual_acrobatics_variables import (
-    TuckAcrobaticsWithVisualVariables,
-)
+from bioptim_gui_api.variables.misc.variables_utils import get_variable_computer
 
 
 class DefaultAcrobaticsConfig:
@@ -32,41 +25,7 @@ class DefaultAcrobaticsConfig:
         "phase_name": None,
         "nb_shooting_points": 40,
         "duration": 1.0,
-        "objectives": [
-            create_objective(
-                objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                    "MINIMIZE_CONTROL"
-                ],
-                nodes="all_shooting",
-                weight=1.0,
-                arguments=[
-                    {"name": "key", "value": "tau", "type": "string"},
-                ],
-            ),
-            create_objective(
-                objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                    "MINIMIZE_CONTROL"
-                ],
-                nodes="all_shooting",
-                weight=1.0,
-                derivative=True,
-                arguments=[
-                    {"name": "key", "value": "tau", "type": "string"},
-                ],
-            ),
-            create_objective(
-                objective_type="mayer",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_TIME"],
-                nodes="end",
-                weight=1.0,
-                arguments=[
-                    {"name": "min_bound", "value": 0.1, "type": "float"},
-                    {"name": "max_bound", "value": 2.0, "type": "float"},
-                ],
-            ),
-        ],
+        "objectives": common_objectives(default=True),
         "constraints": [],
     }
 
@@ -140,413 +99,40 @@ class DefaultAcrobaticsConfig:
     )
 
 
-def phase_name_to_phase(
-    position, phase_names: str, phase_index: int, with_visual_criteria: bool = False
-):
+def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visual_criteria: bool = False):
+    model = get_variable_computer(position, with_visual_criteria)
+
     # needed as there are nested list inside it
     # removing the deepcopy will cause issues on the objectives and constraints
     # some will be duplicated on all phases
-    minimize_time_index = 2
-
-    model = PikeAcrobaticsVariables
-
-    if with_visual_criteria:
-        model = (
-            StraightAcrobaticsWithVisualVariables
-            if position == "straight"
-            else TuckAcrobaticsWithVisualVariables
-            if position == "tuck"
-            else PikeAcrobaticsWithVisualVariables
-        )
-    else:
-        model = (
-            StraightAcrobaticsVariables
-            if position == "straight"
-            else TuckAcrobaticsVariables
-            if position == "tuck"
-            else PikeAcrobaticsVariables
-        )
-
     res = copy.deepcopy(DefaultAcrobaticsConfig.default_phases_info)
 
-    if position in ["pike", "tuck"]:
-        res["objectives"][minimize_time_index]["weight"] = -0.01
-        res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
+    objectives = common_objectives(phase_name=phase_names[phase_index], position=position, phase_index=phase_index)
+    constraints = []
 
     phase_name = phase_names[phase_index]
     res["phase_name"] = phase_name
 
     if phase_name in ["Pike", "Tuck"]:
-        # minimize time weight is set to 100 for pike/tuck and kick out phase
-        res["objectives"][minimize_time_index]["weight"] = 100000.0
-        res["objectives"][minimize_time_index]["penalty_type"] = "MINIMIZE_TIME"
-
-        # Aim to put the hands on the lower legs to grab the pike position
-        for side in "Right", "Left":
-            res["objectives"].append(
-                create_objective(
-                    objective_type="mayer",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                        "SUPERIMPOSE_MARKERS"
-                    ],
-                    nodes="end",
-                    weight=1.0,
-                    arguments=[
-                        {
-                            "name": "first_marker",
-                            "value": f"Middle{side}Hand",
-                            "type": "string",
-                        },
-                        {
-                            "name": "second_marker",
-                            "value": f"Target{side}Hand",
-                            "type": "string",
-                        },
-                    ],
-                )
-            )
-
-        res["objectives"].append(
-            create_objective(
-                objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                    "MINIMIZE_STATE"
-                ],
-                nodes="all_shooting",
-                weight=50000.0,
-                arguments=[
-                    {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index", "value": model.elbow_dofs, "type": "list"},
-                ],
-            )
-        )
+        objectives += pike_tuck_objectives(phase_name, model)
     elif phase_name == "Kick out":
-        res["objectives"][minimize_time_index]["weight"] = 100000.0
-        res["objectives"][minimize_time_index]["penalty_type"] = "MINIMIZE_TIME"
-        # quick kickout
-        res["objectives"].append(
-            create_objective(
-                objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                    "MINIMIZE_STATE"
-                ],
-                nodes="all_shooting",
-                weight=50000.0,
-                arguments=[
-                    {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index", "value": model.legs_xdofs, "type": "list"},
-                ],
-            )
-        )
-        res["objectives"].append(
-            create_objective(
-                objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                    "MINIMIZE_STATE"
-                ],
-                nodes="all_shooting",
-                weight=50000.0,
-                arguments=[
-                    {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index", "value": model.elbow_dofs, "type": "list"},
-                ],
-            )
-        )
+        objectives += kickout_objectives(phase_name, model)
     elif phase_name == "Twist":
-        res["objectives"][minimize_time_index]["weight"] = -0.01
-        res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
-        # if there is a twist before piking/tucking the minimize_time weight is set to 1
-        if phase_index == 0:
-            res["objectives"][minimize_time_index]["weight"] = 1.0
-            res["objectives"][minimize_time_index]["penalty_type"] = "MINIMIZE_TIME"
-
-        if position != "straight":
-            res["objectives"].append(
-                create_objective(
-                    objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                        "MINIMIZE_STATE"
-                    ],
-                    nodes="all_shooting",
-                    weight=50000.0,
-                    arguments=[
-                        {"name": "key", "value": "q", "type": "string"},
-                        {"name": "index", "value": model.elbow_dofs, "type": "list"},
-                    ],
-                )
-            )
+        objectives += twist_objectives(phase_name, model)
     elif phase_name == "Somersault":
-        res["objectives"][minimize_time_index]["weight"] = -100.0
-        res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
-        for side in "Right", "Left":
-            res["constraints"].append(
-                create_constraint(
-                    penalty_type="SUPERIMPOSE_MARKERS",
-                    nodes="all_shooting",
-                    weight=1.0,
-                    quadratic=False,
-                    arguments=[
-                        {"name": "min_bound", "value": -0.05, "type": "float"},
-                        {"name": "max_bound", "value": 0.05, "type": "float"},
-                        {
-                            "name": "first_marker",
-                            "value": f"Middle{side}Hand",
-                            "type": "str",
-                        },
-                        {
-                            "name": "second_marker",
-                            "value": f"Target{side}Hand",
-                            "type": "str",
-                        },
-                    ],
-                )
-            )
+        constraints += somersault_constraints(phase_name, model, position)
     elif phase_name == "Waiting":
-        res["objectives"][minimize_time_index]["weight"] = -0.01
-        res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
-
-        res["objectives"].append(
-            create_objective(
-                objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                    "MINIMIZE_STATE"
-                ],
-                nodes="all_shooting",
-                weight=50000.0,
-                arguments=[
-                    {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index", "value": model.shoulder_dofs, "type": "list"},
-                ],
-            )
-        )
-
-        res["objectives"].append(
-            create_objective(
-                objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                    "MINIMIZE_STATE"
-                ],
-                nodes="all_shooting",
-                weight=50000.0,
-                arguments=[
-                    {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index", "value": model.elbow_dofs, "type": "list"},
-                ],
-            )
-        )
-
-        res["objectives"].append(
-            create_objective(
-                objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                    "MINIMIZE_STATE"
-                ],
-                nodes="all_shooting",
-                weight=50000.0,
-                arguments=[
-                    {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index", "value": model.legs_xdofs, "type": "list"},
-                ],
-            )
-        )
-
+        objectives += waiting_objectives(phase_name, model)
     elif phase_name == "Landing":
-        res["objectives"][minimize_time_index]["weight"] = -0.01
-        res["objectives"][minimize_time_index]["penalty_type"] = "MAXIMIZE_TIME"
-
-        if position != "straight":
-            res["objectives"].append(
-                create_objective(
-                    objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                        "MINIMIZE_STATE"
-                    ],
-                    nodes="all_shooting",
-                    weight=50000.0,
-                    arguments=[
-                        {"name": "key", "value": "q", "type": "str"},
-                        {"name": "index", "value": model.elbow_dofs, "type": "list"},
-                    ],
-                )
-            )
-
-            # Keeping the body alignement after kick out
-            res["objectives"].append(
-                create_objective(
-                    objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                        "MINIMIZE_STATE"
-                    ],
-                    nodes="all_shooting",
-                    weight=50000.0,
-                    arguments=[
-                        {"name": "key", "value": "q", "type": "str"},
-                        {"name": "index", "value": model.legs_xdofs, "type": "list"},
-                    ],
-                )
-            )
-
-        # land safely
-        res["objectives"].append(
-            create_objective(
-                objective_type="mayer",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                    "MINIMIZE_STATE"
-                ],
-                nodes="end",
-                weight=1000.0,
-                arguments=[
-                    {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index", "value": [model.Yrot], "type": "list"},
-                ],
-            )
-        )
+        objectives += landing_objectives(phase_name, model, position)
 
     if "Somersault" in phase_name:
-        res["objectives"].append(
-            create_objective(
-                objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                    "MINIMIZE_STATE"
-                ],
-                nodes="all_shooting",
-                weight=50000.0,
-                arguments=[
-                    {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index", "value": model.shoulder_dofs, "type": "list"},
-                ],
-            )
-        )
-        # minimize wobbling
-        res["objectives"].append(
-            create_objective(
-                objective_type="mayer",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                    "MINIMIZE_STATE"
-                ],
-                nodes="all",
-                weight=100.0,
-                arguments=[
-                    {"name": "key", "value": "q", "type": "str"},
-                    {"name": "index", "value": [model.Yrot], "type": "list"},
-                ],
-            )
-        )
+        objectives += somersault_objectives(phase_name, model, position)
 
     if with_visual_criteria:
-        # FIRST AND LAST
-        if phase_index == 0 or phase_index == len(phase_names) - 1:
-            # Spotting
-            res["objectives"].append(
-                create_objective(
-                    objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                        "MINIMIZE_SEGMENT_VELOCITY"
-                    ],
-                    nodes="default",
-                    weight=10.0,
-                    arguments=[
-                        {"name": "segment", "value": "Head", "type": "string"},
-                    ],
-                )
-            )
+        objectives += with_visual_criteria_objectives(phase_names, phase_index, model)
 
-        # ALL
-        # Self-motion detection
-        res["objectives"].append(
-            create_objective(
-                objective_type="lagrange",
-                penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                    "MINIMIZE_STATE"
-                ],
-                nodes="default",
-                weight=1.0,
-                arguments=[
-                    {"name": "key", "value": "qdot", "type": "string"},
-                    {
-                        "name": "index",
-                        "value": [model.ZrotEyes, model.XrotEyes],
-                        "type": "list",
-                    },
-                ],
-            )
-        )
-
-        # Avoid extreme eye and neck angles
-        for index, weight in [
-            ([model.ZrotEyes, model.XrotEyes], 10.0),
-            ([model.ZrotHead, model.XrotHead], 100.0),
-        ]:
-            res["objectives"].append(
-                create_objective(
-                    objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                        "MINIMIZE_STATE"
-                    ],
-                    nodes="default",
-                    weight=weight,
-                    arguments=[
-                        {"name": "key", "value": "q", "type": "string"},
-                        {"name": "index", "value": index, "type": "list"},
-                    ],
-                )
-            )
-
-        # ALL BUT SOMERSAULT
-        if "Somersault" not in phase_name:
-            # Keeping the trampoline bed in the peripheral vision
-            res["objectives"].append(
-                create_objective(
-                    objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict["CUSTOM"],
-                    nodes="all_shooting",
-                    weight=100.0,
-                    arguments=[
-                        {
-                            "name": "function",
-                            "value": "custom_trampoline_bed_in_peripheral_vision",
-                            "type": "function",
-                        },
-                    ],
-                )
-            )
-
-        # LAST ONLY
-        if phase_index == len(phase_names) - 1:
-            # quiet eye
-            res["objectives"].append(
-                create_objective(
-                    objective_type="lagrange",
-                    penalty_type=DefaultPenaltyConfig.original_to_min_dict[
-                        "TRACK_VECTOR_ORIENTATIONS_FROM_MARKERS"
-                    ],
-                    nodes="default",
-                    weight=1.0,
-                    arguments=[
-                        {
-                            "name": "vector_0_marker_0",
-                            "value": "eyes_vect_start",
-                            "type": "string",
-                        },
-                        {
-                            "name": "vector_0_marker_1",
-                            "value": "eyes_vect_end",
-                            "type": "string",
-                        },
-                        {
-                            "name": "vector_1_marker_0",
-                            "value": "eyes_vect_start",
-                            "type": "string",
-                        },
-                        {
-                            "name": "vector_1_marker_1",
-                            "value": "fixation_front",
-                            "type": "string",
-                        },
-                    ],
-                )
-            )
-
-        # SOMERSAULT ONLY
+    res["objectives"] = objectives
+    res["constraints"] = constraints
 
     return res
