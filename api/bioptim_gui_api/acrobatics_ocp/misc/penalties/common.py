@@ -67,6 +67,7 @@ def common_objectives(
             ],
         )
     )
+
     objectives.append(
         create_objective(
             objective_type="mayer",
