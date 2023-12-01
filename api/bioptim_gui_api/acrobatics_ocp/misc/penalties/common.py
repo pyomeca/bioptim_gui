@@ -42,7 +42,9 @@ def common_objectives(
 
     penalty_type = "MINIMIZE_TIME" if weight > 0 else "MAXIMIZE_TIME"
 
-    return [
+    objectives = []
+
+    objectives.append(
         create_objective(
             objective_type="lagrange",
             penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_CONTROL"],
@@ -51,7 +53,9 @@ def common_objectives(
             arguments=[
                 {"name": "key", "value": "tau", "type": "string"},
             ],
-        ),
+        )
+    )
+    objectives.append(
         create_objective(
             objective_type="lagrange",
             penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_CONTROL"],
@@ -61,7 +65,9 @@ def common_objectives(
             arguments=[
                 {"name": "key", "value": "tau", "type": "string"},
             ],
-        ),
+        )
+    )
+    objectives.append(
         create_objective(
             objective_type="mayer",
             penalty_type=penalty_type,
@@ -71,5 +77,7 @@ def common_objectives(
                 {"name": "min_bound", "value": 0.1, "type": "float"},
                 {"name": "max_bound", "value": 2.0, "type": "float"},
             ],
-        ),
-    ]
+        )
+    )
+
+    return objectives
