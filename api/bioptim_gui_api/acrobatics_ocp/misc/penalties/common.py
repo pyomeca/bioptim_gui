@@ -25,10 +25,10 @@ def common_objectives(
     # only for tuck/pike acrobatics
     phase_name_to_minimize_time_weight = {
         "Twist": -0.01,
-        "Pike": 100_000,
-        "Tuck": 100_000,
-        "Somersault": -100,
-        "Kick out": 100_000,
+        "Pike": 100_000.0,
+        "Tuck": 100_000.0,
+        "Somersault": -100.0,
+        "Kick out": 100_000.0,
         "Waiting": -0.01,
         "Landing": -0.01,
     }
