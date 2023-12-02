@@ -83,7 +83,7 @@ def get_acrobatics_generated_code():
 
     n_threads = cpu_count() - 2
 
-    generated = """\"""This file was automatically generated using BioptimGUI version 0.0.1\"""
+    generated = f"""\"""This file was automatically generated using BioptimGUI version 0.0.1\"""
 
 import argparse
 import os
@@ -117,6 +117,8 @@ from bioptim import (
     Solver,
 )
 
+BIOMODEL_PATH = "{model_path}"
+
 def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) -> cas.MX:
     \"""
     This function aims to encourage the avatar to keep the trampoline bed in his peripheral vision.
@@ -139,7 +141,7 @@ def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) ->
         for i_th in range(10):
 
             # Get this vector from the vision cone
-            marker_idx = controller.model.marker_index(f'cone_approx_{i_r}_{i_th}')
+            marker_idx = controller.model.marker_index(f'cone_approx_{{i_r}}_{{i_th}}')
             vector_origin = controller.model.markers(controller.states["q"].mx)[eyes_vect_start_marker_idx]
             vector_end = controller.model.markers(controller.states["q"].mx)[marker_idx]
             vector = vector_end - vector_origin
