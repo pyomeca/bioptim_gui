@@ -24,7 +24,7 @@ def common_objectives(
     """
     # only for tuck/pike acrobatics
     phase_name_to_minimize_time_weight = {
-        "Twist": -0.01,
+        "Twist": 1.0 if phase_index == 0 else -0.01,
         "Pike": 100_000.0,
         "Tuck": 100_000.0,
         "Somersault": -100.0,
@@ -32,15 +32,6 @@ def common_objectives(
         "Waiting": -0.01,
         "Landing": -0.01,
     }
-
-    if default or position == "straight":
-        weight = 1.0
-    elif phase_index == 0 and phase_name == "Twist":
-        weight = 1.0
-    else:
-        weight = phase_name_to_minimize_time_weight[phase_name]
-
-    penalty_type = "MINIMIZE_TIME" if weight > 0 else "MAXIMIZE_TIME"
 
     objectives = []
 
@@ -55,6 +46,7 @@ def common_objectives(
             ],
         )
     )
+
     objectives.append(
         create_objective(
             objective_type="lagrange",
@@ -67,6 +59,12 @@ def common_objectives(
             ],
         )
     )
+
+    weight = 1.0
+    if not default and position != "straight":
+        weight = phase_name_to_minimize_time_weight[phase_name]
+
+    penalty_type = "MINIMIZE_TIME" if weight > 0 else "MAXIMIZE_TIME"
 
     objectives.append(
         create_objective(
