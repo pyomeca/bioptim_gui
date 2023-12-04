@@ -20,8 +20,11 @@ async def handle_pkl(file: UploadFile) -> (bool, float):
     pickle_data = await file.read()
     loaded_data = pkl.loads(pickle_data)
 
-    integrated_state = loaded_data["integrated_states"][-1]["q"][:, -1]
-    sol_states = loaded_data["solution"].states[-1]["q"][:, -1]
+    try:
+        integrated_state = loaded_data["integrated_states"][-1]["q"][:, -1]
+        sol_states = loaded_data["solution"].states[-1]["q"][:, -1]
+    except KeyError:
+        raise HTTPException(400, f"Pickle doesn't contain the right data")
 
     to_discard = False
     cost = loaded_data["solution"].cost
