@@ -73,3 +73,9 @@ class ArgumentResponse(BaseModel):
     key: str
     type: str
     value: Union[int, float, str, list, None, Axis]
+
+
+class CodeGenerationResponse(BaseModel):
+    generated_code: str
+    new_model: str
+    new_model_path: str

@@ -33,7 +33,7 @@ def run_for_all():
 
 
 def test_generate_code_no_model():
-    response = client.get("/acrobatics/generate_code")
+    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
     assert response.status_code == 400
 
 
@@ -41,7 +41,8 @@ def test_generate_code_no_model():
 @pytest.mark.parametrize("with_visuals", [True, False])
 def test_generate_code_simple_position(position, with_visuals):
     # using base data and a position model (16 degrees of freedom)
-    model_path = Path(f"test_biomods/{position}.bioMod").absolute()
+    visual_path = "with_visual" if with_visuals else "without_visual"
+    model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
     response = client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
     assert response.status_code == 200, response
 
@@ -55,8 +56,11 @@ def test_generate_code_simple_position(position, with_visuals):
     with open(f"acrobatics_ocp/generated_examples/{position}/base_{position}.txt", "r") as f:
         base_position_content = f.read()
 
-    response = client.get("/acrobatics/generate_code")
+    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
     assert response.status_code == 200, response
+    data = response.json()
+    assert data["new_model_path"] == f"saver/{position}-{position}.bioMod"
+    assert data["new_model_path"] in data["generated_code"]
 
     # data = response.json()
     #
@@ -73,7 +77,8 @@ def test_generate_code_simple_position(position, with_visuals):
 @pytest.mark.parametrize("with_visuals", [True, False])
 def test_generate_code_position_no_objective_no_constraint(position, with_visuals):
     # using base data and a position model (16 degrees of freedom)
-    model_path = Path(f"test_biomods/{position}.bioMod").absolute()
+    visual_path = "with_visual" if with_visuals else "without_visual"
+    model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
     response = client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
     assert response.status_code == 200, response
 
@@ -93,8 +98,11 @@ def test_generate_code_position_no_objective_no_constraint(position, with_visual
     ) as f:
         base_position_content = f.read()
 
-    response = client.get("/acrobatics/generate_code")
+    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
     assert response.status_code == 200, response
+    data = response.json()
+    assert data["new_model_path"] == f"saver/{position}-{position}.bioMod"
+    assert data["new_model_path"] in data["generated_code"]
 
     # data = response.json()
     #
@@ -111,7 +119,8 @@ def test_generate_code_position_no_objective_no_constraint(position, with_visual
 @pytest.mark.parametrize("with_visuals", [True, False])
 def test_generate_code_position_objective_and_constraint(position, with_visuals):
     # using base data and a position model (16 degrees of freedom)
-    model_path = Path(f"test_biomods/{position}.bioMod").absolute()
+    visual_path = "with_visual" if with_visuals else "without_visual"
+    model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
@@ -130,8 +139,11 @@ def test_generate_code_position_objective_and_constraint(position, with_visuals)
     ) as f:
         base_position_content = f.read()
 
-    response = client.get("/acrobatics/generate_code")
+    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
     assert response.status_code == 200, response
+    data = response.json()
+    assert data["new_model_path"] == f"saver/{position}-{position}.bioMod"
+    assert data["new_model_path"] in data["generated_code"]
 
     # data = response.json()
     #
@@ -148,7 +160,8 @@ def test_generate_code_position_objective_and_constraint(position, with_visuals)
 @pytest.mark.parametrize("with_visuals", [True, False])
 def test_generate_code_2_phase_position_objective_and_constraint(position, with_visuals):
     # using base data and a position model (16 degrees of freedom)
-    model_path = Path(f"test_biomods/{position}.bioMod").absolute()
+    visual_path = "with_visual" if with_visuals else "without_visual"
+    model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
 
     if with_visuals:
@@ -171,8 +184,11 @@ def test_generate_code_2_phase_position_objective_and_constraint(position, with_
     ) as f:
         base_position_content = f.read()
 
-    response = client.get("/acrobatics/generate_code")
+    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
     assert response.status_code == 200, response
+    data = response.json()
+    assert data["new_model_path"] == f"saver/{position}-{position}.bioMod"
+    assert data["new_model_path"] in data["generated_code"]
 
     # data = response.json()
     #
@@ -189,7 +205,8 @@ def test_generate_code_2_phase_position_objective_and_constraint(position, with_
 @pytest.mark.parametrize("with_visuals", [True, False])
 def test_generate_code_modified_objective_and_constraint(position, with_visuals):
     # using base data and a position model (16 degrees of freedom)
-    model_path = Path(f"test_biomods/{position}.bioMod").absolute()
+    visual_path = "with_visual" if with_visuals else "without_visual"
+    model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
 
     if with_visuals:
@@ -260,8 +277,11 @@ def test_generate_code_modified_objective_and_constraint(position, with_visuals)
     ) as f:
         base_position_content = f.read()
 
-    response = client.get("/acrobatics/generate_code")
+    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
     assert response.status_code == 200, response
+    data = response.json()
+    assert data["new_model_path"] == f"saver/{position}-{position}.bioMod"
+    assert data["new_model_path"] in data["generated_code"]
 
     # data = response.json()
     #
