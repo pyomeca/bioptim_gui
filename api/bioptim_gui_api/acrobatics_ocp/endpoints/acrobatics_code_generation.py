@@ -1,70 +1,48 @@
 from multiprocessing import cpu_count
+from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 
+from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import CodeGenerationRequest
+from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import CodeGenerationResponse
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import read_acrobatics_data
+from bioptim_gui_api.model_converter.utils import get_converter
 from bioptim_gui_api.penalty.misc.constraint import Constraint
 from bioptim_gui_api.penalty.misc.objective import Objective
 from bioptim_gui_api.utils.format_utils import format_2d_array
-from bioptim_gui_api.variables.misc.pike_acrobatics_variables import (
-    PikeAcrobaticsVariables,
-)
-from bioptim_gui_api.variables.misc.pike_with_visual_acrobatics_variables import (
-    PikeAcrobaticsWithVisualVariables,
-)
-from bioptim_gui_api.variables.misc.straight_acrobatics_variables import (
-    StraightAcrobaticsVariables,
-)
-from bioptim_gui_api.variables.misc.straight_with_visual_acrobatics_variables import (
-    StraightAcrobaticsWithVisualVariables,
-)
-from bioptim_gui_api.variables.misc.tuck_acrobatics_variables import (
-    TuckAcrobaticsVariables,
-)
-from bioptim_gui_api.variables.misc.tuck_with_visual_acrobatics_variables import (
-    TuckAcrobaticsWithVisualVariables,
-)
+from bioptim_gui_api.variables.misc.variables_utils import get_variable_computer
 
 router = APIRouter()
 
 
-@router.get("/generate_code", response_model=str)
-def get_acrobatics_generated_code():
+@router.post("/generate_code", response_model=CodeGenerationResponse)
+def get_acrobatics_generated_code(req: CodeGenerationRequest):
     data = read_acrobatics_data()
     with_visual_criteria = data["with_visual_criteria"]
-
     model_path = data["model_path"]
+    position = data["position"]
+
+    save_path = req.save_path
+    save_folder = Path(save_path).parent
+    original_filename = Path(model_path).name.split(".")[0]
+    new_model_path = save_folder / f"{original_filename}-{position}.bioMod"
+
     if not model_path:
         raise HTTPException(status_code=400, detail="No model path provided")
 
-    # TODO generate a file with the correct DoF with model_converter
+    converter = get_converter(data["position"], with_visual_criteria)
+    new_bio_model = converter.convert(model_path)
 
     phases = data["phases_info"]
     half_twists = data["nb_half_twists"]
     total_half_twists = sum(half_twists)
 
-    position = data["position"]
     is_forward = (total_half_twists % 2) != 0
     side = data["preferred_twist_side"]
     prefer_left = side == "left"
     total_time = sum([s["duration"] for s in phases])
 
-    if with_visual_criteria:
-        acrobatics_variables = (
-            StraightAcrobaticsWithVisualVariables
-            if position == "straight"
-            else TuckAcrobaticsWithVisualVariables
-            if position == "tuck"
-            else PikeAcrobaticsWithVisualVariables
-        )
-    else:
-        acrobatics_variables = (
-            StraightAcrobaticsVariables
-            if position == "straight"
-            else TuckAcrobaticsVariables
-            if position == "tuck"
-            else PikeAcrobaticsVariables
-        )
+    acrobatics_variables = get_variable_computer(position, with_visual_criteria)
 
     q_bounds = acrobatics_variables.get_q_bounds(half_twists, prefer_left)
     nb_phases = len(q_bounds)
@@ -117,7 +95,7 @@ from bioptim import (
     Solver,
 )
 
-BIOMODEL_PATH = "{model_path}"
+BIOMODEL_PATH = "{new_model_path}"
 
 def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) -> cas.MX:
     \"""
@@ -193,7 +171,7 @@ def prepare_ocp(
     phase_time = [{", ".join([str(s["duration"]) for s in phases])}]
     nb_phases = {nb_phases}
 
-    bio_model = [BiorbdModel(r"{model_path}") for _ in range(nb_phases)]
+    bio_model = [BiorbdModel(r"{new_model_path}") for _ in range(nb_phases)]
     # can't use * to have multiple, needs duplication
 
 """
@@ -513,4 +491,8 @@ if __name__ == "__main__":
 
 """
 
-    return generated
+    return CodeGenerationResponse(
+        generated_code=generated,
+        new_model=new_bio_model,
+        new_model_path=str(new_model_path),
+    )
