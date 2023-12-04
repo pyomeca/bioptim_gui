@@ -15,11 +15,16 @@ class AcrobaticsOCPProgram {
 
   Future<void> exportScript(String path) async {
     _hasPendingChangesToBeExported = false;
-    final file = File(path);
 
     Future<String> getGeneratedContent() async {
       final url = Uri.parse('${APIConfig.url}/acrobatics/generate_code');
-      final response = await http.get(url);
+      final body = json.encode({
+        "model_path":
+            "", // TODO useless for now but might be used in the future
+        "save_path": path,
+      });
+      final response =
+          await http.post(url, body: body, headers: APIConfig.headers);
       if (response.statusCode == 200) {
         return response.body;
       } else {
@@ -27,8 +32,15 @@ class AcrobaticsOCPProgram {
       }
     }
 
-    final generatedContent = json.decode(await getGeneratedContent());
+    final responseData = json.decode(await getGeneratedContent());
+    final generatedContent = responseData['generated_code'];
+    final generatedModel = responseData['new_model'];
+    final newModelPath = responseData['new_model_path'];
 
-    file.writeAsStringSync(generatedContent);
+    final codeFile = File(path);
+    codeFile.writeAsStringSync(generatedContent);
+
+    final modelFile = File(newModelPath);
+    modelFile.writeAsStringSync(generatedModel);
   }
 }
