@@ -3,13 +3,16 @@ from bioptim_gui_api.model_converter.converter import *
 
 def get_converter(position: str = "straight", with_visual_criteria: bool = False):
     if with_visual_criteria:
-        model = (
-            StraightWithVisualConverter
-            if position == "straight"
-            else TuckWithVisualConverter
-            if position == "tuck"
-            else PikeWithVisualConverter
-        )
+        if position == "straight":
+            return StraightWithVisualConverter
+        elif position == "tuck":
+            return TuckWithVisualConverter
+        elif position == "pike":
+            return PikeWithVisualConverter
     else:
-        model = StraightConverter if position == "straight" else TuckConverter if position == "tuck" else PikeConverter
-    return model
+        if position == "straight":
+            return StraightConverter
+        elif position == "tuck":
+            return TuckConverter
+        elif position == "pike":
+            return PikeConverter

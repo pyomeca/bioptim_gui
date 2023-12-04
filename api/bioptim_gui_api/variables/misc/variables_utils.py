@@ -37,19 +37,16 @@ def variables_zeros(dimension: int, interpolation_type: str) -> list:
 
 def get_variable_computer(position: str = "straight", with_visual_criteria: bool = False):
     if with_visual_criteria:
-        model = (
-            StraightAcrobaticsWithVisualVariables
-            if position == "straight"
-            else TuckAcrobaticsWithVisualVariables
-            if position == "tuck"
-            else PikeAcrobaticsWithVisualVariables
-        )
+        if position == "straight":
+            return StraightAcrobaticsWithVisualVariables
+        elif position == "tuck":
+            return TuckAcrobaticsWithVisualVariables
+        elif position == "pike":
+            return PikeAcrobaticsWithVisualVariables
     else:
-        model = (
-            StraightAcrobaticsVariables
-            if position == "straight"
-            else TuckAcrobaticsVariables
-            if position == "tuck"
-            else PikeAcrobaticsVariables
-        )
-    return model
+        if position == "straight":
+            return StraightAcrobaticsVariables
+        elif position == "tuck":
+            return TuckAcrobaticsVariables
+        elif position == "pike":
+            return PikeAcrobaticsVariables
