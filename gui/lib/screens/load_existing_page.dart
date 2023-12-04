@@ -5,7 +5,6 @@ import 'package:bioptim_gui/models/api_config.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:http/http.dart' as http;
 
 class LoadExisting extends StatefulWidget {
@@ -28,7 +27,7 @@ class _LoadExistingState extends State<LoadExisting> {
     request.files.addAll(pickedFiles.map((file) => http.MultipartFile.fromBytes(
           'files',
           file.readAsBytesSync(),
-          filename: basename(file.path),
+          filename: file.path,
         )));
 
     request.send().then((response) async {
@@ -62,6 +61,8 @@ class _LoadExistingState extends State<LoadExisting> {
     });
 
     requestBestAndDiscard();
+
+    // TODO delete files in toDiscard
   }
 
   @override
@@ -77,6 +78,8 @@ class _LoadExistingState extends State<LoadExisting> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Text('Select the pickle(s) to load and compare:'),
+                  const SizedBox(height: 12),
                   ElevatedButton(
                     onPressed: handleFilePickerOnPressed,
                     child: const Row(
@@ -94,13 +97,12 @@ class _LoadExistingState extends State<LoadExisting> {
                       children: [
                         const Text('Loaded files:'),
                         const SizedBox(height: 12),
-                        for (final file in pickedFiles)
-                          Text(basename(file.path)),
+                        for (final file in pickedFiles) Text(file.path),
                         const SizedBox(height: 12),
                         // Best
                         const Text('Best solution:'),
                         const SizedBox(height: 12),
-                        Text(basename(bestFile)),
+                        Text(bestFile),
                         const SizedBox(height: 12),
                         // To discard
                         const Text('To discard:'),
