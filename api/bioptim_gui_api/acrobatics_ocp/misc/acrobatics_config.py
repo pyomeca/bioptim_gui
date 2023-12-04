@@ -25,7 +25,7 @@ class DefaultAcrobaticsConfig:
         "phase_name": None,
         "nb_shooting_points": 40,
         "duration": 1.0,
-        "objectives": common_objectives(default=True),
+        "objectives": common_objectives(),
         "constraints": [],
     }
 
@@ -107,7 +107,9 @@ def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visua
     # some will be duplicated on all phases
     res = copy.deepcopy(DefaultAcrobaticsConfig.default_phases_info)
 
-    objectives = common_objectives(phase_name=phase_names[phase_index], position=position, phase_index=phase_index)
+    objectives = common_objectives(
+        phase_name=phase_names[phase_index], position=position, phase_index=phase_index, model=model
+    )
     constraints = []
 
     phase_name = phase_names[phase_index]

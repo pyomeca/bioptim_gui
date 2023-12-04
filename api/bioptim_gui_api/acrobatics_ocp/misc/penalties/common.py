@@ -4,9 +4,7 @@ from bioptim_gui_api.penalty.misc.penalty_utils import (
 )
 
 
-def common_objectives(
-    default: bool = False, phase_name: str = None, position: str = "straight", phase_index: int = 0
-) -> list:
+def common_objectives(phase_name: str = None, position: str = "straight", phase_index: int = 0, model=None) -> list:
     """
     Objectives that are common regardless of the phase and position
 
@@ -61,7 +59,7 @@ def common_objectives(
     )
 
     weight = 1.0
-    if not default and position != "straight":
+    if phase_name is not None and position != "straight":
         weight = phase_name_to_minimize_time_weight[phase_name]
 
     penalty_type = "MINIMIZE_TIME" if weight > 0 else "MAXIMIZE_TIME"
@@ -78,5 +76,19 @@ def common_objectives(
             ],
         )
     )
+
+    if position == "tuck" and phase_name != "Somersault":
+        objectives.append(
+            create_objective(
+                objective_type="lagrange",
+                penalty_type="MINIMIZE_STATE",
+                nodes="all_shooting",
+                weight=50000.0,
+                arguments=[
+                    {"name": "key", "value": "q", "type": "str"},
+                    {"name": "index", "value": model.legs_xdofs, "type": "list"},
+                ],
+            )
+        )
 
     return objectives
