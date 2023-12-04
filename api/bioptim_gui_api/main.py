@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 import bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics as acrobatics
 import bioptim_gui_api.generic_ocp.endpoints.generic_ocp as generic_ocp
+import bioptim_gui_api.load_existing.endpoints.load_existing as load_existing
 import bioptim_gui_api.penalty.endpoints.penalty as penalty
 import bioptim_gui_api.variables.endpoints.variables as variables
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import (
@@ -18,6 +19,8 @@ app.include_router(generic_ocp.router)
 
 app.include_router(penalty.router)
 app.include_router(variables.router)
+
+app.include_router(load_existing.router)
 
 
 @app.on_event("startup")
