@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from bioptim_gui_api.variables.misc.variables_utils import variables_zeros, maximum_fig_arms_angle
+from bioptim_gui_api.variables.misc.variables_utils import variables_zeros, maximum_fig_arms_angle, define_loose_bounds
 
 
 @pytest.mark.parametrize(
@@ -85,3 +85,15 @@ def test_fig_max_arms_angle_45(half_twists):
 )
 def test_fig_max_arms_angle_90(half_twists):
     maximum_fig_arms_angle(half_twists) == np.deg2rad(90)
+
+
+def test_define_loose():
+    bound = [
+        {
+            "min": np.zeros((10, 3)),
+            "max": np.zeros((10, 3)),
+        }
+    ]
+    define_loose_bounds(bound[0], 5, 2, 0.9, 0.1)
+    assert bound[0]["min"][5, 2] == 0.8
+    assert bound[0]["max"][5, 2] == 1.0

@@ -41,3 +41,12 @@ def maximum_fig_arms_angle(half_twists: list) -> float:
         return np.deg2rad(90)
     else:
         return np.deg2rad(45)
+
+
+def define_loose_bounds(bound: np.ndarray, dof: int, node: int, bound_value: float, looseness: float = 0.0) -> None:
+    if node is None:
+        bound["min"][dof, :] = bound_value - looseness
+        bound["max"][dof, :] = bound_value + looseness
+    else:
+        bound["min"][dof, node] = bound_value - looseness
+        bound["max"][dof, node] = bound_value + looseness

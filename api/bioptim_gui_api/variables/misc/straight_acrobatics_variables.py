@@ -1,7 +1,7 @@
 import numpy as np
 
 from bioptim_gui_api.utils.format_utils import invert_min_max
-from bioptim_gui_api.variables.misc.variables_utils import maximum_fig_arms_angle
+from bioptim_gui_api.variables.misc.variables_utils import maximum_fig_arms_angle, define_loose_bounds
 
 
 class StraightAcrobaticsVariables:
@@ -98,26 +98,22 @@ class StraightAcrobaticsVariables:
         # somersaulting
         x_bounds[phase]["min"][cls.Xrot, 1] = 2 * np.pi * phase - 0.1
         x_bounds[phase]["max"][cls.Xrot, 1] = 2 * np.pi * (phase + 1) + 0.1
-        x_bounds[phase]["min"][cls.Xrot, 2] = 2 * np.pi * (phase + 1) - 0.1
-        x_bounds[phase]["max"][cls.Xrot, 2] = 2 * np.pi * (phase + 1) + 0.1
+        define_loose_bounds(x_bounds[phase], cls.Xrot, 2, 2 * np.pi * (phase + 1), 0.1)
 
         # twisting
         x_bounds[phase]["min"][cls.Zrot, 1] = np.pi * sum(half_twists[:phase]) - np.pi / 4 - 0.2
         x_bounds[phase]["max"][cls.Zrot, 1] = np.pi * sum(half_twists[: phase + 1]) + np.pi / 4 + 0.2
-        x_bounds[phase]["min"][cls.Zrot, 2] = np.pi * sum(half_twists[: phase + 1]) - np.pi / 4 - 0.2
-        x_bounds[phase]["max"][cls.Zrot, 2] = np.pi * sum(half_twists[: phase + 1]) + np.pi / 4 + 0.2
+        define_loose_bounds(x_bounds[phase], cls.Zrot, 2, np.pi * sum(half_twists[: phase + 1]), np.pi / 4 + 0.2)
 
         if phase == nb_somersaults - 1:
             # bounds for last_somersault
             # keep 1/2 somersault before landing phase
             x_bounds[nb_somersaults - 1]["min"][cls.Xrot, 1] = 2 * np.pi * (nb_somersaults - 1) - 0.1
             x_bounds[nb_somersaults - 1]["max"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults - np.pi / 2 + 0.1
-            x_bounds[nb_somersaults - 1]["min"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - np.pi / 2 - 0.1
-            x_bounds[nb_somersaults - 1]["max"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - np.pi / 2 + 0.1
+            define_loose_bounds(x_bounds[nb_somersaults - 1], cls.Xrot, 2, 2 * np.pi * nb_somersaults - np.pi / 2, 0.1)
 
             # twists must be done before landing
-            x_bounds[nb_somersaults - 1]["min"][cls.Zrot, 2] = np.pi * sum(half_twists) - 0.1
-            x_bounds[nb_somersaults - 1]["max"][cls.Zrot, 2] = np.pi * sum(half_twists) + 0.1
+            define_loose_bounds(x_bounds[nb_somersaults - 1], cls.Zrot, 2, np.pi * sum(half_twists), 0.1)
 
     @classmethod
     def _fill_landing_phase(cls, x_bounds, nb_somersaults: int, half_twists: list) -> dict:
@@ -134,33 +130,27 @@ class StraightAcrobaticsVariables:
         # finish last half-somersault
         x_bounds[-1]["min"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults - np.pi / 2 - 0.1
         x_bounds[-1]["max"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults + 0.1
-        x_bounds[-1]["min"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - 0.1
-        x_bounds[-1]["max"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults + 0.1
+        define_loose_bounds(x_bounds[-1], cls.Xrot, 2, 2 * np.pi * nb_somersaults, 0.1)
 
         # keep twists finished
-        x_bounds[-1]["min"][cls.Zrot, :] = np.pi * sum(half_twists) - 0.1
-        x_bounds[-1]["max"][cls.Zrot, :] = np.pi * sum(half_twists) + 0.1
+        define_loose_bounds(x_bounds[-1], cls.Zrot, None, np.pi * sum(half_twists), 0.1)
 
         # tilt pi / 16
-        x_bounds[-1]["min"][cls.Yrot, :] = -np.pi / 16
-        x_bounds[-1]["max"][cls.Yrot, :] = np.pi / 16
+        define_loose_bounds(x_bounds[-1], cls.Yrot, None, 0.0, np.pi / 16)
 
         # FIG Code of Points 14.5, arms to stop twisting rotation
         max_angle = maximum_fig_arms_angle(half_twists)
         # Right arm
         x_bounds[-1]["min"][cls.YrotRightUpperArm, 0] = 0
         x_bounds[-1]["max"][cls.YrotRightUpperArm, 0] = max_angle
-        x_bounds[-1]["min"][cls.YrotRightUpperArm, 2] = 2.9 - 0.1
-        x_bounds[-1]["max"][cls.YrotRightUpperArm, 2] = 2.9 + 0.1
-        x_bounds[-1]["min"][cls.ZrotRightUpperArm, 2] = -0.1
-        x_bounds[-1]["max"][cls.ZrotRightUpperArm, 2] = 0.1
+        define_loose_bounds(x_bounds[-1], cls.YrotRightUpperArm, 2, 2.9, 0.1)
+        define_loose_bounds(x_bounds[-1], cls.ZrotRightUpperArm, 2, 0.0, 0.1)
+
         # Left arm
         x_bounds[-1]["min"][cls.YrotLeftUpperArm, 0] = -max_angle
         x_bounds[-1]["max"][cls.YrotLeftUpperArm, 0] = 0
-        x_bounds[-1]["min"][cls.YrotLeftUpperArm, 2] = -2.9 - 0.1
-        x_bounds[-1]["max"][cls.YrotLeftUpperArm, 2] = -2.9 + 0.1
-        x_bounds[-1]["min"][cls.ZrotLeftUpperArm, 2] = -0.1
-        x_bounds[-1]["max"][cls.ZrotLeftUpperArm, 2] = 0.1
+        define_loose_bounds(x_bounds[-1], cls.YrotLeftUpperArm, 2, -2.9, 0.1)
+        define_loose_bounds(x_bounds[-1], cls.ZrotLeftUpperArm, 2, 0.0, 0.1)
 
     @classmethod
     def get_q_bounds(cls, half_twists: list, prefer_left: bool) -> dict:
