@@ -1,18 +1,12 @@
 from bioptim_gui_api.penalty.misc.penalty_config import DefaultPenaltyConfig
+from bioptim_gui_api.penalty.misc.penalty_printer import PenaltyPrinter
 from bioptim_gui_api.utils.format_utils import arg_to_string
 
 
-class Objective:
+class ObjectivePrinter(PenaltyPrinter):
     def __init__(self, phase: int = 0, **kwargs):
-        self.phase = phase
+        super().__init__(phase, **kwargs)
         self.objective_type = kwargs["objective_type"]
-        self.nodes = kwargs["nodes"]
-        self.quadratic = kwargs["quadratic"]
-        self.expand = kwargs["expand"]
-        self.target = kwargs["target"]
-        self.derivative = kwargs["derivative"]
-        self.integration_rule = kwargs["integration_rule"]
-        self.multi_thread = kwargs["multi_thread"]
         self.weight = kwargs["weight"]
         self.arguments = kwargs["arguments"]
 
@@ -29,26 +23,22 @@ class Objective:
 
         ret = f"""{self.arguments[0]["value"]},
 custom_type=ObjectiveFcn.{self.objective_type.capitalize()},\n"""
+        ret += f"weight={self.weight},\n"
 
         return ret
 
     def _regular_str(self, indent: int = 8) -> str:
         ret = f"objective=ObjectiveFcn.{self.objective_type.capitalize()}.{self.penalty_type},\n"
+        ret += f"weight={self.weight},\n"
         for argument in self.arguments:
             ret += f"{arg_to_string(argument)},\n"
 
         return ret
 
-    def __str__(self, indent: int = 8, nb_phase: int = 1) -> str:
-        space_indent = " " * indent
-        if self.penalty_type == "CUSTOM":
-            ret = self._custom_str(indent)
-        else:
-            ret = self._regular_str(indent)
-
+    def __common__args__(self, nb_phase: int = 1) -> str:
+        ret = ""
         ret += f"node=Node.{self.nodes.upper()},\n"
         ret += f"quadratic={self.quadratic},\n"
-        ret += f"weight={self.weight},\n"
 
         if not self.expand:
             ret += f"expand=False,\n"
@@ -67,6 +57,17 @@ custom_type=ObjectiveFcn.{self.objective_type.capitalize()},\n"""
 
         if nb_phase > 1:
             ret += f"phase={self.phase},\n"
+
+        return ret
+
+    def __str__(self, indent: int = 8, nb_phase: int = 1) -> str:
+        space_indent = " " * indent
+        if self.penalty_type == "CUSTOM":
+            ret = self._custom_str(indent)
+        else:
+            ret = self._regular_str(indent)
+
+        ret += self.__common__args__(nb_phase)
 
         # indent the whole string
         # strip to remove excess spaces at the end of the string

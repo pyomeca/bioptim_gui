@@ -7,8 +7,8 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import CodeGen
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import CodeGenerationResponse
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import read_acrobatics_data
 from bioptim_gui_api.model_converter.utils import get_converter
-from bioptim_gui_api.penalty.misc.constraint import Constraint
-from bioptim_gui_api.penalty.misc.objective import Objective
+from bioptim_gui_api.penalty.misc.constraint_printer import ConstraintPrinter
+from bioptim_gui_api.penalty.misc.objective_printer import ObjectivePrinter
 from bioptim_gui_api.utils.format_utils import format_2d_array
 from bioptim_gui_api.variables.misc.variables_config import get_variable_computer
 
@@ -189,13 +189,13 @@ def prepare_ocp(
         for objective in phases[i]["objectives"]:
             generated += f"""
     objective_functions.add(
-        {Objective(i, **objective).__str__(nb_phase=nb_phases)}    )
+        {ObjectivePrinter(i, **objective).__str__(nb_phase=nb_phases)}    )
 """
 
         for constraint in phases[i]["constraints"]:
             generated += f"""
     constraints.add(
-        {Constraint(i, **constraint).__str__(nb_phase=nb_phases)}    )
+        {ConstraintPrinter(i, **constraint).__str__(nb_phase=nb_phases)}    )
 """
 
     # DYNAMICS

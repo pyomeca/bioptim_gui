@@ -1,10 +1,10 @@
 import pytest
 
-from bioptim_gui_api.penalty.misc.objective import Objective
+from bioptim_gui_api.penalty.misc.objective_printer import ObjectivePrinter
 
 
 def test_custom_str_simple():
-    objective = Objective(
+    objective = ObjectivePrinter(
         phase=0,
         objective_type="lagrange",
         penalty_type="CUSTOM",
@@ -22,15 +22,15 @@ def test_custom_str_simple():
         str(objective)
         == """my_func,
         custom_type=ObjectiveFcn.Lagrange,
+        weight=1.0,
         node=Node.ALL,
         quadratic=False,
-        weight=1.0,
 """
     )
 
 
 def test_custom_str_simple_phase():
-    objective = Objective(
+    objective = ObjectivePrinter(
         phase=30,
         objective_type="lagrange",
         penalty_type="CUSTOM",
@@ -48,16 +48,16 @@ def test_custom_str_simple_phase():
         objective.__str__(nb_phase=36)
         == """my_func,
         custom_type=ObjectiveFcn.Lagrange,
+        weight=1.0,
         node=Node.ALL,
         quadratic=False,
-        weight=1.0,
         phase=30,
 """
     )
 
 
 def test_custom_str_indent_8():
-    objective = Objective(
+    objective = ObjectivePrinter(
         phase=0,
         objective_type="lagrange",
         penalty_type="CUSTOM",
@@ -75,15 +75,15 @@ def test_custom_str_indent_8():
         objective.__str__(indent=12, nb_phase=1)
         == """my_func,
             custom_type=ObjectiveFcn.Lagrange,
+            weight=1.0,
             node=Node.ALL,
             quadratic=False,
-            weight=1.0,
 """
     )
 
 
 def test_custom_str_indent_8_with_phase():
-    objective = Objective(
+    objective = ObjectivePrinter(
         phase=30,
         objective_type="lagrange",
         penalty_type="CUSTOM",
@@ -101,16 +101,16 @@ def test_custom_str_indent_8_with_phase():
         objective.__str__(indent=12, nb_phase=36)
         == """my_func,
             custom_type=ObjectiveFcn.Lagrange,
+            weight=1.0,
             node=Node.ALL,
             quadratic=False,
-            weight=1.0,
             phase=30,
 """
     )
 
 
 def test_custom_str_indent_8_with_phase_all():
-    objective = Objective(
+    objective = ObjectivePrinter(
         phase=30,
         objective_type="lagrange",
         penalty_type="CUSTOM",
@@ -128,9 +128,9 @@ def test_custom_str_indent_8_with_phase_all():
         objective.__str__(indent=12, nb_phase=36)
         == """my_func,
             custom_type=ObjectiveFcn.Lagrange,
+            weight=-10.0,
             node=Node.ALL,
             quadratic=False,
-            weight=-10.0,
             expand=False,
             target=[1, 2],
             derivative=True,
@@ -169,7 +169,7 @@ def test_custom_str_indent_8_with_phase_all():
     ],
 )
 def test_custom_str_assert_error(penalty_type, arguments):
-    objective = Objective(
+    objective = ObjectivePrinter(
         phase=0,
         objective_type="lagrange",
         penalty_type=penalty_type,

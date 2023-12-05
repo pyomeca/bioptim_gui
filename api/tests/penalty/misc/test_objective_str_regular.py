@@ -1,8 +1,8 @@
-from bioptim_gui_api.penalty.misc.objective import Objective
+from bioptim_gui_api.penalty.misc.objective_printer import ObjectivePrinter
 
 
 def test_regular_str_simple():
-    objective = Objective(
+    objective = ObjectivePrinter(
         phase=0,
         objective_type="lagrange",
         penalty_type="MINIMIZE_STATE",
@@ -22,17 +22,17 @@ def test_regular_str_simple():
     assert (
         str(objective)
         == """objective=ObjectiveFcn.Lagrange.MINIMIZE_STATE,
+        weight=1.0,
         key="q",
         index=[1, 2],
         node=Node.ALL,
         quadratic=False,
-        weight=1.0,
 """
     )
 
 
 def test_mayer_no_integration_rule():
-    objective = Objective(
+    objective = ObjectivePrinter(
         phase=0,
         objective_type="mayer",
         penalty_type="MINIMIZE_STATE",
@@ -52,17 +52,17 @@ def test_mayer_no_integration_rule():
     assert (
         str(objective)
         == """objective=ObjectiveFcn.Mayer.MINIMIZE_STATE,
+        weight=1.0,
         key="q",
         index=[1, 2],
         node=Node.ALL,
         quadratic=False,
-        weight=1.0,
 """
     )
 
 
 def test_regular_str_simple_phase():
-    objective = Objective(
+    objective = ObjectivePrinter(
         phase=30,
         objective_type="mayer",
         penalty_type="MINIMIZE_STATE",
@@ -82,18 +82,18 @@ def test_regular_str_simple_phase():
     assert (
         objective.__str__(nb_phase=36)
         == """objective=ObjectiveFcn.Mayer.MINIMIZE_STATE,
+        weight=1.0,
         key="q",
         index=[1, 2],
         node=Node.ALL,
         quadratic=False,
-        weight=1.0,
         phase=30,
 """
     )
 
 
 def test_regular_str_indent_8():
-    objective = Objective(
+    objective = ObjectivePrinter(
         phase=0,
         objective_type="lagrange",
         penalty_type="MINIMIZE_STATE",
@@ -113,17 +113,17 @@ def test_regular_str_indent_8():
     assert (
         objective.__str__(indent=12, nb_phase=1)
         == """objective=ObjectiveFcn.Lagrange.MINIMIZE_STATE,
+            weight=1.0,
             key="q",
             index=[1, 2],
             node=Node.ALL,
             quadratic=False,
-            weight=1.0,
 """
     )
 
 
 def test_regular_str_indent_8_with_phase():
-    objective = Objective(
+    objective = ObjectivePrinter(
         phase=30,
         objective_type="lagrange",
         penalty_type="MINIMIZE_STATE",
@@ -143,18 +143,18 @@ def test_regular_str_indent_8_with_phase():
     assert (
         objective.__str__(indent=12, nb_phase=36)
         == """objective=ObjectiveFcn.Lagrange.MINIMIZE_STATE,
+            weight=1.0,
             key="q",
             index=[1, 2],
             node=Node.ALL,
             quadratic=False,
-            weight=1.0,
             phase=30,
 """
     )
 
 
 def test_regular_str_indent_8_with_phase_all():
-    objective = Objective(
+    objective = ObjectivePrinter(
         phase=30,
         objective_type="lagrange",
         penalty_type="MAXIMIZE_STATE",
@@ -174,11 +174,11 @@ def test_regular_str_indent_8_with_phase_all():
     assert (
         objective.__str__(indent=12, nb_phase=36)
         == """objective=ObjectiveFcn.Lagrange.MINIMIZE_STATE,
+            weight=-10.0,
             key="q",
             index=[1, 2],
             node=Node.ALL,
             quadratic=False,
-            weight=-10.0,
             expand=False,
             target=[1, 2],
             derivative=True,

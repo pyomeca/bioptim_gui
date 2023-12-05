@@ -1,8 +1,8 @@
-from bioptim_gui_api.penalty.misc.constraint import Constraint
+from bioptim_gui_api.penalty.misc.constraint_printer import ConstraintPrinter
 
 
 def test_regular_str_simple():
-    constraint = Constraint(
+    constraint = ConstraintPrinter(
         phase=0,
         penalty_type="TIME_CONSTRAINT",
         nodes="all",
@@ -24,7 +24,7 @@ def test_regular_str_simple():
 
 
 def test_regular_str_simple_phase():
-    constraint = Constraint(
+    constraint = ConstraintPrinter(
         phase=30,
         penalty_type="TIME_CONSTRAINT",
         nodes="all",
@@ -47,7 +47,7 @@ def test_regular_str_simple_phase():
 
 
 def test_regular_str_indent_8():
-    constraint = Constraint(
+    constraint = ConstraintPrinter(
         phase=0,
         penalty_type="TIME_CONSTRAINT",
         nodes="all",
@@ -69,7 +69,7 @@ def test_regular_str_indent_8():
 
 
 def test_regular_str_indent_8_with_phase():
-    constraint = Constraint(
+    constraint = ConstraintPrinter(
         phase=30,
         penalty_type="TIME_CONSTRAINT",
         nodes="all",
@@ -92,7 +92,7 @@ def test_regular_str_indent_8_with_phase():
 
 
 def test_regular_str_indent_8_with_phase_all():
-    constraint = Constraint(
+    constraint = ConstraintPrinter(
         phase=30,
         penalty_type="SUPERIMPOSE_MARKERS",
         nodes="all",

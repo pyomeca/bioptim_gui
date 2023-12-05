@@ -1,7 +1,4 @@
-from bioptim_gui_api.utils.format_utils import arg_to_string
-
-
-class Constraint:
+class PenaltyPrinter:
     def __init__(self, phase: int = 0, **kwargs):
         self.phase = phase
         self.penalty_type = kwargs["penalty_type"]
@@ -12,16 +9,9 @@ class Constraint:
         self.derivative = kwargs["derivative"]
         self.integration_rule = kwargs["integration_rule"]
         self.multi_thread = kwargs["multi_thread"]
-        self.arguments = kwargs["arguments"]
 
-    def __str__(self, indent: int = 8, nb_phase: int = 1) -> str:
-        space_indent = " " * indent
-
-        ret = f"constraint=ConstraintFcn.{self.penalty_type},\n"
-
-        for argument in self.arguments:
-            ret += f"{arg_to_string(argument)},\n"
-
+    def __common__args__(self, nb_phase: int = 1) -> str:
+        ret = ""
         ret += f"node=Node.{self.nodes.upper()},\n"
         ret += f"quadratic={self.quadratic},\n"
         if not self.expand:
@@ -41,9 +31,5 @@ class Constraint:
 
         if nb_phase > 1:
             ret += f"phase={self.phase},\n"
-
-        # indent the whole string
-        # strip to remove excess spaces at the end of the string
-        ret = ret.replace("\n", "\n" + space_indent).strip(" ")
 
         return ret
