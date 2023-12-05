@@ -19,6 +19,58 @@ class BioModConverter:
     markers = list()
 
     @classmethod
+    def _skip_ranges_q(cls, lines: list[str], current_index: int) -> int:
+        """ """
+        stripped = lines[current_index].strip()
+
+        if not stripped.startswith("rangesQ"):
+            return current_index
+
+        while not lines[current_index].strip().startswith("com"):
+            current_index += 1
+        return current_index
+
+    @classmethod
+    def _handle_segments(cls, lines: list[str], current_index: int, existing_segments: set, segment_name: str):
+        line = lines[current_index]
+        stripped = line.strip()
+        if not stripped.startswith("segment"):
+            return segment_name
+
+        segment_name = stripped.split()[1]
+
+        if segment_name in cls.segment_translation | cls.segment_rotation:
+            existing_segments.add(segment_name)
+
+        return segment_name
+
+    @classmethod
+    def _handle_markers(
+        cls, lines: list[str], current_index: int, existing_markers: set, updated_lines: list[str]
+    ) -> None:
+        stripped = lines[current_index].strip()
+        if stripped.startswith("marker"):
+            marker_name = stripped.split()[1]
+            if marker_name in cls.markers:
+                existing_markers.add(marker_name)
+
+    @classmethod
+    def _ignore_dofs_lines(cls, lines: list[str], current_index: int) -> int:
+        stripped = lines[current_index].strip()
+        if stripped.startswith("rotations") or stripped.startswith("translations"):
+            return current_index + 1
+
+        return current_index
+
+    @classmethod
+    def _add_dofs(cls, segment_name: str, updated_lines: list[str], stripped: str):
+        if stripped.startswith("rt"):
+            if segment_name in cls.segment_translation:
+                updated_lines.append(f"\ttranslations {cls.segment_translation[segment_name]}\n")
+            if segment_name in cls.segment_rotation:
+                updated_lines.append(f"\trotations {cls.segment_rotation[segment_name]}\n")
+
+    @classmethod
     def convert(cls, model_path: str) -> str:
         """
         'Convert' a bioptim model
@@ -52,55 +104,29 @@ class BioModConverter:
         with open(model_path, "r") as f:
             lines = f.readlines()
 
+        n_lines = len(lines)
         updated_lines = []
-        existing_segments = set()
-        existing_markers = set()
+        existing_segments, existing_markers = set(), set()
+        segment_name = ""
 
-        skip = False
+        i = 0
+        while i < n_lines:
+            segment_name = cls._handle_segments(lines, i, existing_segments, segment_name)
+            cls._handle_markers(lines, i, existing_markers, updated_lines)
 
-        for line in lines:
-            if line.strip().startswith("rangesQ"):
-                skip = True
-                continue
-            if line.strip().startswith("com"):
-                skip = False
+            i = cls._ignore_dofs_lines(lines, i)
+            i = cls._skip_ranges_q(lines, i)
 
-            if skip:
-                continue
+            stripped = lines[i].strip()
+            if not stripped.startswith("rotations") and not stripped.startswith("translations"):
+                updated_lines.append(lines[i])
 
-            if line.strip().startswith("segment"):
-                segment_name = line.strip().split()[1]
+            cls._add_dofs(segment_name, updated_lines, stripped)
 
-                if segment_name in cls.segment_translation:
-                    existing_segments.add(segment_name)
-                    updated_lines.append(line)
-                    continue
-
-                elif segment_name in cls.segment_rotation:
-                    existing_segments.add(segment_name)
-                    updated_lines.append(line)
-                    continue
-
-            elif line.strip().startswith("marker"):
-                marker_name = line.strip().split()[1]
-
-                if marker_name in cls.markers:
-                    existing_markers.add(marker_name)
-
-            if line.strip().startswith("rotations") or line.strip().startswith("translations"):
-                continue
-
-            updated_lines.append(line)
-
-            if line.strip().startswith("rt"):
-                if segment_name in cls.segment_translation:
-                    updated_lines.append(f"\ttranslations {cls.segment_translation[segment_name]}\n")
-                if segment_name in cls.segment_rotation:
-                    updated_lines.append(f"\trotations {cls.segment_rotation[segment_name]}\n")
+            i += 1
 
         missing_segments = (set(cls.segment_rotation) | set(cls.segment_translation)) - existing_segments
         missing_markers = set(cls.markers) - existing_markers
-
         if missing_segments or missing_markers:
             raise ValueError(f"Missing markers/segments: {', '.join(missing_segments | missing_markers)}")
 
