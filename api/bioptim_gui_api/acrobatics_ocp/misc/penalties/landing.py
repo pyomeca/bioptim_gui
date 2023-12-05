@@ -11,6 +11,9 @@ def landing_objectives(phase_name: str, model, position: str):
     ALL:
         MINIMIZE_STATE mayer: q, Yrot, end, weight=1000.0
     """
+    if phase_name != "Landing":
+        return []
+
     objectives = []
     if position != "straight":
         objectives.append(

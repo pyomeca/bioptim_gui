@@ -7,6 +7,9 @@ def somersault_objectives(phase_name: str, model, position: str) -> list:
     MINIMIZE_STATE lagrange: q, shoulder_dofs, all_shooting, weight=50000.0
     MINIMIZE_STATE mayer: q, Yrot, all, weight=100.0
     """
+    if "Somersault" not in phase_name:
+        return []
+
     objectives = []
 
     objectives.append(
@@ -42,6 +45,9 @@ def somersault_constraints(phase_name: str, model, position: str) -> list:
     SUPERIMPOSE_MARKERS: all_shooting, weight=1.0, quadratic=False, MiddleRightHand, TargetRightHand
     SUPERIMPOSE_MARKERS: all_shooting, weight=1.0, quadratic=False, MiddleLeftHand, TargetLeftHand
     """
+    if phase_name != "Somersault":
+        return []
+
     constraints = []
     if position in ["pike", "tuck"]:
         for side in "Right", "Left":

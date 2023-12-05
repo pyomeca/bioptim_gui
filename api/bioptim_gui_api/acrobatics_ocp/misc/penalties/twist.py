@@ -6,6 +6,9 @@ def twist_objectives(phase_name: str, model):
     """
     MINIMIZE_STATE lagrange: q, elbow_dofs, all_shooting, weight=50000.0
     """
+    if phase_name != "Twist":
+        return []
+
     objectives = []
     objectives.append(
         create_objective(

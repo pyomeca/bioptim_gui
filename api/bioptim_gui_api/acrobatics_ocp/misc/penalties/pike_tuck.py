@@ -9,6 +9,9 @@ def pike_tuck_objectives(phase_name: str, model) -> list:
     MINIMIZE_STATE lagrange: q, elbow_dofs, all_shooting, weight=50000.0
     """
     # Aim to put the hands on the lower legs to grab the pike position
+    if phase_name not in ["Pike", "Tuck"]:
+        return []
+
     objectives = []
     for side in "Right", "Left":
         objectives.append(
