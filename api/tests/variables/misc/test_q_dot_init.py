@@ -22,24 +22,6 @@ from tests.variables.misc.tuck_with_visual_acrobatics_variables import (
 )
 
 
-def test_qdot_init_straight():
-    expected = [0.0] * 10
-    actual = StraightAcrobaticsVariables.get_qdot_init()
-    assert actual == expected
-
-
-def test_qdot_init_pike():
-    expected = [0.0] * 17
-    actual = TuckAcrobaticsVariables.get_qdot_init()
-    assert actual == expected
-
-
-def test_qdot_init_tuck():
-    expected = [0.0] * 16
-    actual = PikeAcrobaticsVariables.get_qdot_init()
-    assert actual == expected
-
-
 @pytest.mark.parametrize(
     ("variable_compute", "baseline"),
     [
@@ -51,7 +33,8 @@ def test_qdot_init_tuck():
         (TuckAcrobaticsWithVisualVariables, BaseTuckAcrobaticsWithVisualVariables),
     ],
 )
-def test_qdot_init_same_as_baseline(variable_compute, baseline):
-    expected = baseline.get_qdot_init()
-    actual = variable_compute.get_qdot_init()
+@pytest.mark.parametrize("nb_somersaults", [2, 3, 4])
+def test_qdot_init_same_as_baseline(variable_compute, baseline, nb_somersaults):
+    expected = baseline.get_qdot_init(nb_somersaults)
+    actual = variable_compute.get_qdot_init(nb_somersaults)
     assert actual == expected

@@ -36,6 +36,7 @@ def get_acrobatics_generated_code(req: CodeGenerationRequest):
     phases = data["phases_info"]
     half_twists = data["nb_half_twists"]
     total_half_twists = sum(half_twists)
+    nb_somersaults = data["nb_somersaults"]
 
     is_forward = (total_half_twists % 2) != 0
     side = data["preferred_twist_side"]
@@ -51,7 +52,7 @@ def get_acrobatics_generated_code(req: CodeGenerationRequest):
 
     qdot_bounds = acrobatics_variables.get_qdot_bounds(nb_phases, total_time, is_forward)
 
-    qdot_init = acrobatics_variables.get_qdot_init()
+    qdot_init = acrobatics_variables.get_qdot_init(nb_somersaults)
 
     tau_bounds = acrobatics_variables.get_tau_bounds()
     tau_init = acrobatics_variables.get_tau_init()

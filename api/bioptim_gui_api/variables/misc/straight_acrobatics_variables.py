@@ -218,7 +218,7 @@ class StraightAcrobaticsVariables:
         x_bounds[0]["max"][cls.Z, 0] = vzinit + 2
 
         x_bounds[0]["min"][cls.Xrot, 0] = 0.5
-        x_bounds[0]["max"][cls.Xrot, 0] = 20
+        x_bounds[0]["max"][cls.Xrot, 0] = 200.0
 
     @classmethod
     def _fill_qdot_intermediary(cls, x_bounds: np.ndarray) -> None:
@@ -236,7 +236,7 @@ class StraightAcrobaticsVariables:
             x_bounds[phase]["max"][: cls.Z, 1:] = 10
 
             x_bounds[phase]["min"][cls.Xrot, 1:] = 0.5
-            x_bounds[phase]["max"][cls.Xrot, 1:] = 20
+            x_bounds[phase]["max"][cls.Xrot, 1:] = 200.0
 
     @classmethod
     def get_qdot_bounds(cls, nb_phases: int, final_time: float, is_forward: bool) -> dict:
@@ -259,8 +259,10 @@ class StraightAcrobaticsVariables:
         return x_bounds
 
     @classmethod
-    def get_qdot_init(cls) -> list:
-        return [0.0] * cls.nb_qdot
+    def get_qdot_init(cls, nb_somersaults: int) -> list:
+        qdot_init = [0.0] * cls.nb_qdot
+        qdot_init[cls.Xrot] = 2 * np.pi * nb_somersaults
+        return qdot_init
 
     @classmethod
     def get_tau_bounds(cls) -> dict:
