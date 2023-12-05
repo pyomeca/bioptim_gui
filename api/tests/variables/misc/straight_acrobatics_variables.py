@@ -1,5 +1,8 @@
 import numpy as np
 
+from bioptim_gui_api.utils.format_utils import invert_min_max
+from bioptim_gui_api.variables.misc.variables_utils import maximum_fig_arms_angle
+
 
 class StraightAcrobaticsVariables:
     X = 0
@@ -65,17 +68,7 @@ class StraightAcrobaticsVariables:
     )
 
     @classmethod
-    def get_q_bounds(cls, half_twists: list, prefer_left: bool) -> dict:
-        nb_somersaults = len(half_twists)
-        is_forward = sum(half_twists) % 2 != 0
-        x_bounds = [
-            {
-                "min": cls.q_min_bounds.copy(),
-                "max": cls.q_max_bounds.copy(),
-            }
-            for _ in range(nb_somersaults + 1)  # + 1 for landing
-        ]
-
+    def _fill_init_phase(cls, x_bounds: np.ndarray) -> None:
         x_bounds[0]["min"][:, 0] = [0] * cls.nb_q
         x_bounds[0]["min"][: cls.Xrot, 0] = -0.001
         x_bounds[0]["min"][[cls.YrotRightUpperArm, cls.YrotLeftUpperArm], 0] = 2.9, -2.9
@@ -84,45 +77,50 @@ class StraightAcrobaticsVariables:
         x_bounds[0]["max"][: cls.Xrot, 0] = 0.001
         x_bounds[0]["max"][[cls.YrotRightUpperArm, cls.YrotLeftUpperArm], 0] = 2.9, -2.9
 
+    @classmethod
+    def _fill_somersault_phase(cls, x_bounds: np.ndarray, phase: int, half_twists: list) -> None:
+        nb_somersaults = len(half_twists)
+
+        if phase != 0:
+            # initial bounds, same as final bounds of previous phase
+            x_bounds[phase]["min"][:, 0] = x_bounds[phase - 1]["min"][:, 2]
+            x_bounds[phase]["max"][:, 0] = x_bounds[phase - 1]["max"][:, 2]
+
         intermediate_min_bounds = cls.q_min_bounds.copy()[:, 0]
         intermediate_max_bounds = cls.q_max_bounds.copy()[:, 0]
 
-        for phase in range(nb_somersaults):
-            if phase != 0:
-                # initial bounds, same as final bounds of previous phase
-                x_bounds[phase]["min"][:, 0] = x_bounds[phase - 1]["min"][:, 2]
-                x_bounds[phase]["max"][:, 0] = x_bounds[phase - 1]["max"][:, 2]
+        # Intermediate bounds, same for every phase
+        x_bounds[phase]["min"][:, 1] = intermediate_min_bounds
+        x_bounds[phase]["max"][:, 1] = intermediate_max_bounds
+        x_bounds[phase]["min"][:, 2] = intermediate_min_bounds
+        x_bounds[phase]["max"][:, 2] = intermediate_max_bounds
 
-            # Intermediate bounds, same for every phase
-            x_bounds[phase]["min"][:, 1] = intermediate_min_bounds
-            x_bounds[phase]["max"][:, 1] = intermediate_max_bounds
-            x_bounds[phase]["min"][:, 2] = intermediate_min_bounds
-            x_bounds[phase]["max"][:, 2] = intermediate_max_bounds
+        # somersaulting
+        x_bounds[phase]["min"][cls.Xrot, 1] = 2 * np.pi * phase - 0.1
+        x_bounds[phase]["max"][cls.Xrot, 1] = 2 * np.pi * (phase + 1) + 0.1
+        x_bounds[phase]["min"][cls.Xrot, 2] = 2 * np.pi * (phase + 1) - 0.1
+        x_bounds[phase]["max"][cls.Xrot, 2] = 2 * np.pi * (phase + 1) + 0.1
 
-            # somersaulting
-            x_bounds[phase]["min"][cls.Xrot, 1] = 2 * np.pi * phase - 0.1
-            x_bounds[phase]["max"][cls.Xrot, 1] = 2 * np.pi * (phase + 1) + 0.1
-            x_bounds[phase]["min"][cls.Xrot, 2] = 2 * np.pi * (phase + 1) - 0.1
-            x_bounds[phase]["max"][cls.Xrot, 2] = 2 * np.pi * (phase + 1) + 0.1
+        # twisting
+        x_bounds[phase]["min"][cls.Zrot, 1] = np.pi * sum(half_twists[:phase]) - np.pi / 4 - 0.2
+        x_bounds[phase]["max"][cls.Zrot, 1] = np.pi * sum(half_twists[: phase + 1]) + np.pi / 4 + 0.2
+        x_bounds[phase]["min"][cls.Zrot, 2] = np.pi * sum(half_twists[: phase + 1]) - np.pi / 4 - 0.2
+        x_bounds[phase]["max"][cls.Zrot, 2] = np.pi * sum(half_twists[: phase + 1]) + np.pi / 4 + 0.2
 
-            # twisting
-            x_bounds[phase]["min"][cls.Zrot, 1] = np.pi * sum(half_twists[:phase]) - np.pi / 4 - 0.2
-            x_bounds[phase]["max"][cls.Zrot, 1] = np.pi * sum(half_twists[: phase + 1]) + np.pi / 4 + 0.2
-            x_bounds[phase]["min"][cls.Zrot, 2] = np.pi * sum(half_twists[: phase + 1]) - np.pi / 4 - 0.2
-            x_bounds[phase]["max"][cls.Zrot, 2] = np.pi * sum(half_twists[: phase + 1]) + np.pi / 4 + 0.2
+        if phase == nb_somersaults - 1:
+            # bounds for last_somersault
+            # keep 1/2 somersault before landing phase
+            x_bounds[nb_somersaults - 1]["min"][cls.Xrot, 1] = 2 * np.pi * (nb_somersaults - 1) - 0.1
+            x_bounds[nb_somersaults - 1]["max"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults - np.pi / 2 + 0.1
+            x_bounds[nb_somersaults - 1]["min"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - np.pi / 2 - 0.1
+            x_bounds[nb_somersaults - 1]["max"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - np.pi / 2 + 0.1
 
-        # bounds for last_somersault
+            # twists must be done before landing
+            x_bounds[nb_somersaults - 1]["min"][cls.Zrot, 2] = np.pi * sum(half_twists) - 0.1
+            x_bounds[nb_somersaults - 1]["max"][cls.Zrot, 2] = np.pi * sum(half_twists) + 0.1
 
-        # keep 1/2 somersault before landing phase
-        x_bounds[nb_somersaults - 1]["min"][cls.Xrot, 1] = 2 * np.pi * (nb_somersaults - 1) - 0.1
-        x_bounds[nb_somersaults - 1]["max"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults - np.pi / 2 + 0.1
-        x_bounds[nb_somersaults - 1]["min"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - np.pi / 2 - 0.1
-        x_bounds[nb_somersaults - 1]["max"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - np.pi / 2 + 0.1
-
-        # twists must be done before landing
-        x_bounds[nb_somersaults - 1]["min"][cls.Zrot, 2] = np.pi * sum(half_twists) - 0.1
-        x_bounds[nb_somersaults - 1]["max"][cls.Zrot, 2] = np.pi * sum(half_twists) + 0.1
-
+    @classmethod
+    def _fill_landing_phase(cls, x_bounds, nb_somersaults: int, half_twists: list) -> dict:
         # landing
         x_bounds[-1]["min"][:, 0] = x_bounds[-2]["min"][:, 2]
         x_bounds[-1]["max"][:, 0] = x_bounds[-2]["max"][:, 2]
@@ -147,20 +145,41 @@ class StraightAcrobaticsVariables:
         x_bounds[-1]["min"][cls.Yrot, :] = -np.pi / 16
         x_bounds[-1]["max"][cls.Yrot, :] = np.pi / 16
 
-        # arms
+        # FIG Code of Points 14.5, arms to stop twisting rotation
+        max_angle = maximum_fig_arms_angle(half_twists)
+        # Right arm
         x_bounds[-1]["min"][cls.YrotRightUpperArm, 0] = 0
-        x_bounds[-1]["max"][cls.YrotRightUpperArm, 0] = np.pi / 8
+        x_bounds[-1]["max"][cls.YrotRightUpperArm, 0] = max_angle
         x_bounds[-1]["min"][cls.YrotRightUpperArm, 2] = 2.9 - 0.1
         x_bounds[-1]["max"][cls.YrotRightUpperArm, 2] = 2.9 + 0.1
         x_bounds[-1]["min"][cls.ZrotRightUpperArm, 2] = -0.1
         x_bounds[-1]["max"][cls.ZrotRightUpperArm, 2] = 0.1
         # Left arm
-        x_bounds[-1]["min"][cls.YrotLeftUpperArm, 0] = -np.pi / 8
+        x_bounds[-1]["min"][cls.YrotLeftUpperArm, 0] = -max_angle
         x_bounds[-1]["max"][cls.YrotLeftUpperArm, 0] = 0
         x_bounds[-1]["min"][cls.YrotLeftUpperArm, 2] = -2.9 - 0.1
         x_bounds[-1]["max"][cls.YrotLeftUpperArm, 2] = -2.9 + 0.1
         x_bounds[-1]["min"][cls.ZrotLeftUpperArm, 2] = -0.1
         x_bounds[-1]["max"][cls.ZrotLeftUpperArm, 2] = 0.1
+
+    @classmethod
+    def get_q_bounds(cls, half_twists: list, prefer_left: bool) -> dict:
+        nb_somersaults = len(half_twists)
+        is_forward = sum(half_twists) % 2 != 0
+        x_bounds = [
+            {
+                "min": cls.q_min_bounds.copy(),
+                "max": cls.q_max_bounds.copy(),
+            }
+            for _ in range(nb_somersaults + 1)  # + 1 for landing
+        ]
+
+        cls._fill_init_phase(x_bounds)
+
+        for phase in range(nb_somersaults):
+            cls._fill_somersault_phase(x_bounds, phase, half_twists)
+
+        cls._fill_landing_phase(x_bounds, nb_somersaults, half_twists)
 
         if (not is_forward) or (not prefer_left):
             for i in range(len(x_bounds)):
@@ -189,14 +208,41 @@ class StraightAcrobaticsVariables:
         return x_inits
 
     @classmethod
-    def get_qdot_bounds(
-        cls,
-        nb_phases: int,
-        final_time: float,
-        is_forward: bool,
-    ) -> dict:
+    def _fill_qdot_initial(cls, x_bounds: np.ndarray, final_time: float) -> None:
         vzinit = 9.81 / 2 * final_time  # vitesse initiale en z du CoM pour revenir a terre au temps final
 
+        x_bounds[0]["min"][:, 0] = [0] * cls.nb_qdot
+        x_bounds[0]["max"][:, 0] = [0] * cls.nb_qdot
+
+        x_bounds[0]["min"][: cls.Z, 0] = -0.5
+        x_bounds[0]["max"][: cls.Z, 0] = 0.5
+
+        x_bounds[0]["min"][cls.Z, 0] = vzinit - 2
+        x_bounds[0]["max"][cls.Z, 0] = vzinit + 2
+
+        x_bounds[0]["min"][cls.Xrot, 0] = 0.5
+        x_bounds[0]["max"][cls.Xrot, 0] = 200.0
+
+    @classmethod
+    def _fill_qdot_intermediary(cls, x_bounds: np.ndarray) -> None:
+        nb_phases = len(x_bounds)
+        for phase in range(nb_phases):
+            if phase != 0:
+                # initial bounds, same as final bounds of previous phase
+                x_bounds[phase]["min"][:, 0] = x_bounds[phase - 1]["min"][:, 2]
+                x_bounds[phase]["max"][:, 0] = x_bounds[phase - 1]["max"][:, 2]
+
+            x_bounds[phase]["min"][:, 1:] = -100
+            x_bounds[phase]["max"][:, 1:] = 100
+
+            x_bounds[phase]["min"][: cls.Z, 1:] = -10
+            x_bounds[phase]["max"][: cls.Z, 1:] = 10
+
+            x_bounds[phase]["min"][cls.Xrot, 1:] = 0.5
+            x_bounds[phase]["max"][cls.Xrot, 1:] = 200.0
+
+    @classmethod
+    def get_qdot_bounds(cls, nb_phases: int, final_time: float, is_forward: bool) -> dict:
         x_bounds = [
             {
                 "min": np.zeros((cls.nb_qdot, 3)) + cls.qdot_min,
@@ -206,41 +252,20 @@ class StraightAcrobaticsVariables:
         ]
 
         # Initial bounds
-        x_bounds[0]["min"][:, 0] = [0] * cls.nb_qdot
-        x_bounds[0]["min"][: cls.Z, 0] = -0.5
-        x_bounds[0]["min"][cls.Z, 0] = vzinit - 2
-        x_bounds[0]["min"][cls.Xrot, 0] = 0.5 if is_forward else -200
+        cls._fill_qdot_initial(x_bounds, final_time)
 
-        x_bounds[0]["max"][:, 0] = -x_bounds[0]["min"][:, 0]
-        x_bounds[0]["max"][cls.Z, 0] = vzinit + 2
-        x_bounds[0]["max"][cls.Xrot, 0] = 200 if is_forward else -0.5
+        cls._fill_qdot_intermediary(x_bounds)
 
-        for phase in range(nb_phases):
-            if phase != 0:
-                # initial bounds, same as final bounds of previous phase
-                x_bounds[phase]["min"][:, 0] = x_bounds[phase - 1]["min"][:, 2]
-                x_bounds[phase]["max"][:, 0] = x_bounds[phase - 1]["max"][:, 2]
-
-            # Intermediate bounds
-            x_bounds[phase]["min"][:, 1] = [-100] * cls.nb_qdot
-            x_bounds[phase]["min"][: cls.Z, 1] = -10
-            x_bounds[phase]["min"][cls.Xrot, 1] = 0.5 if is_forward else -200
-
-            x_bounds[phase]["max"][:, 1] = [100] * cls.nb_qdot
-            x_bounds[phase]["max"][: cls.Z, 1] = 10
-            x_bounds[phase]["max"][cls.Xrot, 1] = 200 if is_forward else -0.5
-
-            # Final bounds, same as intermediate
-            x_bounds[phase]["min"][:, 2] = x_bounds[phase]["min"][:, 1]
-            x_bounds[phase]["max"][:, 2] = x_bounds[phase]["max"][:, 1]
+        if not is_forward:
+            invert_min_max(x_bounds, cls.Xrot)
 
         return x_bounds
 
     @classmethod
     def get_qdot_init(cls, nb_somersaults: int) -> list:
-        q_init = [0.0] * cls.nb_qdot
-        q_init[cls.Xrot] = 2 * np.pi * nb_somersaults
-        return q_init
+        qdot_init = [0.0] * cls.nb_qdot
+        qdot_init[cls.Xrot] = 2 * np.pi * nb_somersaults
+        return qdot_init
 
     @classmethod
     def get_tau_bounds(cls) -> dict:

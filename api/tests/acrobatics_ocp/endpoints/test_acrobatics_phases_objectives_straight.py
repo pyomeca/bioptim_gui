@@ -295,9 +295,7 @@ def test_actually_deleted_fields_objective(key, new_value):
     data = response.json()
     assert len(data) == 6
 
-    response = client.put(
-        f"/acrobatics/phases_info/0/objectives/5/{key}", json={key: new_value}
-    )
+    response = client.put(f"/acrobatics/phases_info/0/objectives/5/{key}", json={key: new_value})
     assert response.status_code == 200, response
 
     response = client.delete("/acrobatics/phases_info/0/objectives/5")

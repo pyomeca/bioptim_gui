@@ -1,6 +1,7 @@
 import numpy as np
 
 from bioptim_gui_api.utils.format_utils import invert_min_max
+from bioptim_gui_api.variables.misc.variables_utils import maximum_fig_arms_angle
 
 
 class StraightAcrobaticsVariables:
@@ -144,15 +145,17 @@ class StraightAcrobaticsVariables:
         x_bounds[-1]["min"][cls.Yrot, :] = -np.pi / 16
         x_bounds[-1]["max"][cls.Yrot, :] = np.pi / 16
 
-        # arms
+        # FIG Code of Points 14.5, arms to stop twisting rotation
+        max_angle = maximum_fig_arms_angle(half_twists)
+        # Right arm
         x_bounds[-1]["min"][cls.YrotRightUpperArm, 0] = 0
-        x_bounds[-1]["max"][cls.YrotRightUpperArm, 0] = np.pi / 8
+        x_bounds[-1]["max"][cls.YrotRightUpperArm, 0] = max_angle
         x_bounds[-1]["min"][cls.YrotRightUpperArm, 2] = 2.9 - 0.1
         x_bounds[-1]["max"][cls.YrotRightUpperArm, 2] = 2.9 + 0.1
         x_bounds[-1]["min"][cls.ZrotRightUpperArm, 2] = -0.1
         x_bounds[-1]["max"][cls.ZrotRightUpperArm, 2] = 0.1
         # Left arm
-        x_bounds[-1]["min"][cls.YrotLeftUpperArm, 0] = -np.pi / 8
+        x_bounds[-1]["min"][cls.YrotLeftUpperArm, 0] = -max_angle
         x_bounds[-1]["max"][cls.YrotLeftUpperArm, 0] = 0
         x_bounds[-1]["min"][cls.YrotLeftUpperArm, 2] = -2.9 - 0.1
         x_bounds[-1]["max"][cls.YrotLeftUpperArm, 2] = -2.9 + 0.1

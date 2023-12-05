@@ -1,14 +1,5 @@
 import numpy as np
 
-from bioptim_gui_api.variables.misc.pike_acrobatics_variables import PikeAcrobaticsVariables
-from bioptim_gui_api.variables.misc.pike_with_visual_acrobatics_variables import PikeAcrobaticsWithVisualVariables
-from bioptim_gui_api.variables.misc.straight_acrobatics_variables import StraightAcrobaticsVariables
-from bioptim_gui_api.variables.misc.straight_with_visual_acrobatics_variables import (
-    StraightAcrobaticsWithVisualVariables,
-)
-from bioptim_gui_api.variables.misc.tuck_acrobatics_variables import TuckAcrobaticsVariables
-from bioptim_gui_api.variables.misc.tuck_with_visual_acrobatics_variables import TuckAcrobaticsWithVisualVariables
-
 
 def variables_zeros(dimension: int, interpolation_type: str) -> list:
     """
@@ -35,20 +26,18 @@ def variables_zeros(dimension: int, interpolation_type: str) -> list:
         raise ValueError(f"Interpolation type {interpolation_type} not implemented")
 
 
-def get_variable_computer(position: str = "straight", with_visual_criteria: bool = False):
-    with_visual = {
-        "straight": StraightAcrobaticsWithVisualVariables,
-        "tuck": TuckAcrobaticsWithVisualVariables,
-        "pike": PikeAcrobaticsWithVisualVariables,
-    }
+def maximum_fig_arms_angle(half_twists: list) -> float:
+    """
+    # FIG Code of Points 14.5, arms to stop twisting rotation
+    Moving arms away from the body is acceptable to stop a twisting rotation. The maximum of the angle
+    between the trunk and the arms should be:
+    Barani, Full, multiple somersaults with ½ out movements 45°
+    More than full twist and all other multiple twisting somersaults 90°
+    """
+    nb_somersaults = len(half_twists)
+    half_twist_out = half_twists[-1]
 
-    without_visual = {
-        "straight": StraightAcrobaticsVariables,
-        "tuck": TuckAcrobaticsVariables,
-        "pike": PikeAcrobaticsVariables,
-    }
-
-    if with_visual_criteria:
-        return with_visual[position]
+    if (nb_somersaults == 1 and half_twist_out > 2) or (nb_somersaults > 1 and half_twist_out >= 2):
+        return np.deg2rad(90)
     else:
-        return without_visual[position]
+        return np.deg2rad(45)

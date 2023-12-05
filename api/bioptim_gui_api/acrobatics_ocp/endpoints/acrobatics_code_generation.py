@@ -10,7 +10,7 @@ from bioptim_gui_api.model_converter.utils import get_converter
 from bioptim_gui_api.penalty.misc.constraint import Constraint
 from bioptim_gui_api.penalty.misc.objective import Objective
 from bioptim_gui_api.utils.format_utils import format_2d_array
-from bioptim_gui_api.variables.misc.variables_utils import get_variable_computer
+from bioptim_gui_api.variables.misc.variables_config import get_variable_computer
 
 router = APIRouter()
 

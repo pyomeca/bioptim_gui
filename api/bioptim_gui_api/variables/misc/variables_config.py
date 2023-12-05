@@ -1,5 +1,13 @@
 import copy
 
+from bioptim_gui_api.variables.misc.pike_acrobatics_variables import PikeAcrobaticsVariables
+from bioptim_gui_api.variables.misc.pike_with_visual_acrobatics_variables import PikeAcrobaticsWithVisualVariables
+from bioptim_gui_api.variables.misc.straight_acrobatics_variables import StraightAcrobaticsVariables
+from bioptim_gui_api.variables.misc.straight_with_visual_acrobatics_variables import (
+    StraightAcrobaticsWithVisualVariables,
+)
+from bioptim_gui_api.variables.misc.tuck_acrobatics_variables import TuckAcrobaticsVariables
+from bioptim_gui_api.variables.misc.tuck_with_visual_acrobatics_variables import TuckAcrobaticsWithVisualVariables
 from bioptim_gui_api.variables.misc.variables_utils import variables_zeros
 
 
@@ -41,3 +49,22 @@ class DefaultVariablesConfig:
             default_bounds_initial_guess("tau"),
         ],
     }
+
+
+def get_variable_computer(position: str = "straight", with_visual_criteria: bool = False):
+    with_visual = {
+        "straight": StraightAcrobaticsWithVisualVariables,
+        "tuck": TuckAcrobaticsWithVisualVariables,
+        "pike": PikeAcrobaticsWithVisualVariables,
+    }
+
+    without_visual = {
+        "straight": StraightAcrobaticsVariables,
+        "tuck": TuckAcrobaticsVariables,
+        "pike": PikeAcrobaticsVariables,
+    }
+
+    if with_visual_criteria:
+        return with_visual[position]
+    else:
+        return without_visual[position]

@@ -15,7 +15,7 @@ from bioptim_gui_api.penalty.misc.penalty_utils import (
 from bioptim_gui_api.variables.misc.straight_acrobatics_variables import (
     StraightAcrobaticsVariables,
 )
-from bioptim_gui_api.variables.misc.variables_utils import get_variable_computer
+from bioptim_gui_api.variables.misc.variables_config import get_variable_computer
 
 
 class DefaultAcrobaticsConfig:
