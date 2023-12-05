@@ -8,6 +8,9 @@ def waiting_objectives(phase_name: str, model):
     MINIMIZE_STATE lagrange: q, elbow_dofs, all_shooting, weight=50000.0
     MINIMIZE_STATE lagrange: q, legs_xdofs, all_shooting, weight=50000.0
     """
+    if phase_name != "Waiting":
+        return []
+
     objectives = []
 
     objectives.append(

@@ -8,6 +8,9 @@ def kickout_objectives(phase_name: str, model) -> list:
     MINIMIZE_STATE lagrange: q, legs_xdofs, all_shooting, weight=50000.0
     """
     # quick kickout
+    if phase_name != "Kick out":
+        return []
+
     objectives = []
     objectives.append(
         create_objective(

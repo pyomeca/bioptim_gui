@@ -99,42 +99,43 @@ class DefaultAcrobaticsConfig:
     )
 
 
-def phase_name_to_phase(position, phase_names: str, phase_index: int, with_visual_criteria: bool = False):
+def get_phase_objectives(phase_names: list[str], phase_index: int, position: str, with_visual_criteria: bool):
+    phase_name = phase_names[phase_index]
     model = get_variable_computer(position, with_visual_criteria)
-
-    # needed as there are nested list inside it
-    # removing the deepcopy will cause issues on the objectives and constraints
-    # some will be duplicated on all phases
-    res = copy.deepcopy(DefaultAcrobaticsConfig.default_phases_info)
 
     objectives = common_objectives(
         phase_name=phase_names[phase_index], position=position, phase_index=phase_index, model=model
     )
-    constraints = []
 
-    phase_name = phase_names[phase_index]
-    res["phase_name"] = phase_name
-
-    if phase_name in ["Pike", "Tuck"]:
-        objectives += pike_tuck_objectives(phase_name, model)
-    elif phase_name == "Kick out":
-        objectives += kickout_objectives(phase_name, model)
-    elif phase_name == "Twist":
-        objectives += twist_objectives(phase_name, model)
-    elif phase_name == "Somersault":
-        constraints += somersault_constraints(phase_name, model, position)
-    elif phase_name == "Waiting":
-        objectives += waiting_objectives(phase_name, model)
-    elif phase_name == "Landing":
-        objectives += landing_objectives(phase_name, model, position)
-
-    if "Somersault" in phase_name:
-        objectives += somersault_objectives(phase_name, model, position)
+    objectives += pike_tuck_objectives(phase_name, model)
+    objectives += kickout_objectives(phase_name, model)
+    objectives += twist_objectives(phase_name, model)
+    objectives += waiting_objectives(phase_name, model)
+    objectives += landing_objectives(phase_name, model, position)
+    objectives += somersault_objectives(phase_name, model, position)
 
     if with_visual_criteria:
         objectives += with_visual_criteria_objectives(phase_names, phase_index, model)
 
-    res["objectives"] = objectives
-    res["constraints"] = constraints
+    return objectives
+
+
+def get_phase_constraints(phase_name: str, position: str, with_visual_criteria: bool):
+    model = get_variable_computer(position, with_visual_criteria)
+    constraints = []
+    constraints += somersault_constraints(phase_name, model, position)
+
+    return constraints
+
+
+def phase_name_to_info(position, phase_names: str, phase_index: int, with_visual_criteria: bool = False):
+    phase_name = phase_names[phase_index]
+
+    # need to deepcopy or else there will be unwanted modification due to addresses
+    res = copy.deepcopy(DefaultAcrobaticsConfig.default_phases_info)
+    res["phase_name"] = phase_name
+
+    res["objectives"] = get_phase_objectives(phase_names, phase_index, position, with_visual_criteria)
+    res["constraints"] = get_phase_constraints(phase_name, position, with_visual_criteria)
 
     return res
