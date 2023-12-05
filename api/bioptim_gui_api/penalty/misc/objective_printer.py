@@ -27,7 +27,7 @@ custom_type=ObjectiveFcn.{self.objective_type.capitalize()},\n"""
 
         return ret
 
-    def _regular_str(self, indent: int = 8) -> str:
+    def _regular_str(self) -> str:
         ret = f"objective=ObjectiveFcn.{self.objective_type.capitalize()}.{self.penalty_type},\n"
         ret += f"weight={self.weight},\n"
         for argument in self.arguments:
@@ -35,29 +35,10 @@ custom_type=ObjectiveFcn.{self.objective_type.capitalize()},\n"""
 
         return ret
 
-    def __common__args__(self, nb_phase: int = 1) -> str:
+    def _integration_rule_str(self) -> str:
         ret = ""
-        ret += f"node=Node.{self.nodes.upper()},\n"
-        ret += f"quadratic={self.quadratic},\n"
-
-        if not self.expand:
-            ret += f"expand=False,\n"
-
-        if self.target is not None:
-            ret += f"target={self.target},\n"
-
-        if self.derivative:
-            ret += f"derivative=True,\n"
-
         if self.objective_type == "lagrange" and self.integration_rule != "rectangle_left":
             ret += f"integration_rule=QuadratureRule.{self.integration_rule.upper()},\n"
-
-        if self.multi_thread:
-            ret += f"multi_thread=True,\n"
-
-        if nb_phase > 1:
-            ret += f"phase={self.phase},\n"
-
         return ret
 
     def __str__(self, indent: int = 8, nb_phase: int = 1) -> str:
@@ -65,7 +46,7 @@ custom_type=ObjectiveFcn.{self.objective_type.capitalize()},\n"""
         if self.penalty_type == "CUSTOM":
             ret = self._custom_str(indent)
         else:
-            ret = self._regular_str(indent)
+            ret = self._regular_str()
 
         ret += self.__common__args__(nb_phase)
 
