@@ -15,30 +15,35 @@ class Constraint:
         self.arguments = kwargs["arguments"]
 
     def __str__(self, indent: int = 8, nb_phase: int = 1) -> str:
-        ret = f"""constraint=ConstraintFcn.{self.penalty_type},
-"""
-        for argument in self.arguments:
-            ret += f"{' ' * indent}{arg_to_string(argument)},\n"
+        space_indent = " " * indent
 
-        ret += f"""{' ' * indent}node=Node.{self.nodes.upper()},
-{' ' * indent}quadratic={self.quadratic},
-"""
+        ret = f"constraint=ConstraintFcn.{self.penalty_type},\n"
+
+        for argument in self.arguments:
+            ret += f"{arg_to_string(argument)},\n"
+
+        ret += f"node=Node.{self.nodes.upper()},\n"
+        ret += f"quadratic={self.quadratic},\n"
         if not self.expand:
-            ret += f"{' ' * indent}expand=False,\n"
+            ret += f"expand=False,\n"
 
         if self.target is not None:
-            ret += f"{' ' * indent}target={self.target},\n"
+            ret += f"target={self.target},\n"
 
         if self.derivative:
-            ret += f"{' ' * indent}derivative=True,\n"
+            ret += f"derivative=True,\n"
 
         if self.integration_rule != "rectangle_left":
-            ret += f"{' ' * indent}integration_rule=QuadratureRule.{self.integration_rule.upper()},\n"
+            ret += f"integration_rule=QuadratureRule.{self.integration_rule.upper()},\n"
 
         if self.multi_thread:
-            ret += f"{' ' * indent}multi_thread=True,\n"
+            ret += f"multi_thread=True,\n"
 
         if nb_phase > 1:
-            ret += f"{' ' * indent}phase={self.phase},\n"
+            ret += f"phase={self.phase},\n"
+
+        # indent the whole string
+        # strip to remove excess spaces at the end of the string
+        ret = ret.replace("\n", "\n" + space_indent).strip(" ")
 
         return ret

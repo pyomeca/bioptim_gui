@@ -28,45 +28,48 @@ class Objective:
         assert self.arguments[0]["name"] == "function", "Custom penalty must have only one argument 'funtion'"
 
         ret = f"""{self.arguments[0]["value"]},
-{' ' * indent}custom_type=ObjectiveFcn.{self.objective_type.capitalize()},
-"""
+custom_type=ObjectiveFcn.{self.objective_type.capitalize()},\n"""
 
         return ret
 
     def _regular_str(self, indent: int = 8) -> str:
-        ret = f"""objective=ObjectiveFcn.{self.objective_type.capitalize()}.{self.penalty_type},
-"""
+        ret = f"objective=ObjectiveFcn.{self.objective_type.capitalize()}.{self.penalty_type},\n"
         for argument in self.arguments:
-            ret += f"{' ' * indent}{arg_to_string(argument)},\n"
+            ret += f"{arg_to_string(argument)},\n"
 
         return ret
 
     def __str__(self, indent: int = 8, nb_phase: int = 1) -> str:
+        space_indent = " " * indent
         if self.penalty_type == "CUSTOM":
             ret = self._custom_str(indent)
         else:
             ret = self._regular_str(indent)
 
-        ret += f"""{' ' * indent}node=Node.{self.nodes.upper()},
-{' ' * indent}quadratic={self.quadratic},
-{' ' * indent}weight={self.weight},
-"""
+        ret += f"node=Node.{self.nodes.upper()},\n"
+        ret += f"quadratic={self.quadratic},\n"
+        ret += f"weight={self.weight},\n"
+
         if not self.expand:
-            ret += f"{' ' * indent}expand=False,\n"
+            ret += f"expand=False,\n"
 
         if self.target is not None:
-            ret += f"{' ' * indent}target={self.target},\n"
+            ret += f"target={self.target},\n"
 
         if self.derivative:
-            ret += f"{' ' * indent}derivative=True,\n"
+            ret += f"derivative=True,\n"
 
         if self.objective_type == "lagrange" and self.integration_rule != "rectangle_left":
-            ret += f"{' ' * indent}integration_rule=QuadratureRule.{self.integration_rule.upper()},\n"
+            ret += f"integration_rule=QuadratureRule.{self.integration_rule.upper()},\n"
 
         if self.multi_thread:
-            ret += f"{' ' * indent}multi_thread=True,\n"
+            ret += f"multi_thread=True,\n"
 
         if nb_phase > 1:
-            ret += f"{' ' * indent}phase={self.phase},\n"
+            ret += f"phase={self.phase},\n"
+
+        # indent the whole string
+        # strip to remove excess spaces at the end of the string
+        ret = ret.replace("\n", "\n" + space_indent).strip(" ")
 
         return ret
