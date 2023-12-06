@@ -120,7 +120,8 @@ class StraightAcrobaticsVariables:
             define_loose_bounds(x_bounds[nb_somersaults - 1], cls.Zrot, 2, LooseValue(np.pi * sum(half_twists), 0.1))
 
     @classmethod
-    def _fill_landing_phase(cls, x_bounds, nb_somersaults: int, half_twists: list) -> dict:
+    def _fill_landing_phase(cls, x_bounds, half_twists: list) -> dict:
+        nb_somersaults = len(half_twists)
         # landing
         x_bounds[-1]["min"][:, 0] = x_bounds[-2]["min"][:, 2]
         x_bounds[-1]["max"][:, 0] = x_bounds[-2]["max"][:, 2]
@@ -173,7 +174,7 @@ class StraightAcrobaticsVariables:
         for phase in range(nb_somersaults):
             cls._fill_somersault_phase(x_bounds, phase, half_twists)
 
-        cls._fill_landing_phase(x_bounds, nb_somersaults, half_twists)
+        cls._fill_landing_phase(x_bounds, half_twists)
 
         if not is_forward:
             invert_min_max(x_bounds, cls.Xrot)
