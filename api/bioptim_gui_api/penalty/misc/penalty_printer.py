@@ -1,3 +1,6 @@
+from bioptim_gui_api.utils.format_utils import arg_to_string
+
+
 class PenaltyPrinter:
     def __init__(self, phase: int = 0, **kwargs):
         self.phase = phase
@@ -9,6 +12,31 @@ class PenaltyPrinter:
         self.derivative = kwargs["derivative"]
         self.integration_rule = kwargs["integration_rule"]
         self.multi_thread = kwargs["multi_thread"]
+        self.arguments = kwargs["arguments"]
+
+    def _custom_function_name(self) -> str:
+        for argument in self.arguments:
+            if argument["name"] == "function":
+                return argument["value"]
+
+        return None
+
+    def _specific_custom_first_line(self) -> str:
+        function_name = self._custom_function_name()
+        assert function_name is not None, "The function argument is missing"
+
+        return f"{function_name},\n"
+
+    def _custom_str(self) -> str:
+        assert self.penalty_type == "CUSTOM", "This function should only be called for custom penalty"
+
+        ret = self._specific_custom_first_line()
+
+        for argument in self.arguments:
+            if argument["name"] != "function":
+                ret += f"{arg_to_string(argument)},\n"
+
+        return ret
 
     def _expand_str(self) -> str:
         ret = ""
@@ -56,5 +84,20 @@ class PenaltyPrinter:
         ret += self._integration_rule_str()
         ret += self._multi_thread_str()
         ret += self._phase_str()
+
+        return ret
+
+    def __str__(self, indent: int = 8, nb_phase: int = 1) -> str:
+        space_indent = " " * indent
+        if self.penalty_type == "CUSTOM":
+            ret = self._custom_str()
+        else:
+            ret = self._regular_str()
+
+        ret += self.__common__args__(nb_phase)
+
+        # indent the whole string
+        # strip to remove excess spaces at the end of the string
+        ret = ret.replace("\n", "\n" + space_indent).strip(" ")
 
         return ret
