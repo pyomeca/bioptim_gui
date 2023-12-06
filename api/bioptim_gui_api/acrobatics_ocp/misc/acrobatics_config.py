@@ -2,6 +2,7 @@ import copy
 
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.collision_constraint import (
     collision_constraint_constraints,
+    collision_constraint_objectives,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.common import common_objectives
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.kickout import kickout_objectives
@@ -124,7 +125,7 @@ def get_phase_objectives(
         objectives += with_visual_criteria_objectives(phase_names, phase_index, model)
 
     if collision_constraint:
-        objectives += collision_constraint_constraints(phase_name, model)
+        objectives += collision_constraint_objectives(phase_names, phase_index, model)
 
     return objectives
 
@@ -133,7 +134,9 @@ def get_phase_constraints(phase_name: str, position: str, with_visual_criteria: 
     model = get_variable_computer(position, with_visual_criteria)
     constraints = []
     constraints += somersault_constraints(phase_name, model, position)
-    constraints += collision_constraint_constraints(phase_name, model)
+
+    if collision_constraint:
+        constraints += collision_constraint_constraints(phase_name, model)
 
     return constraints
 

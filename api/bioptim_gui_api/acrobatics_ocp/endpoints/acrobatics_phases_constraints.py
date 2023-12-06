@@ -39,6 +39,7 @@ def get_constraints_dropdown_list():
     return [
         "TIME_CONSTRAINT",
         "SUPERIMPOSE_MARKERS",
+        "CUSTOM",
     ]
     # if all constraints have to be implemented
     # return [e.name for e in ConstraintFcn]
