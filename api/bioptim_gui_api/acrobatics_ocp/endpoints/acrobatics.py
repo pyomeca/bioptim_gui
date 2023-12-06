@@ -71,12 +71,15 @@ def put_nb_half_twist(somersault_index: int, half_twists_request: NbHalfTwistsRe
     nb_somersaults = data["nb_somersaults"]
     position = data["position"]
     half_twists = data["nb_half_twists"]
-    with_visual_criteria = data["with_visual_criteria"]
+
+    additional_criteria = config.AdditionalCriteria(
+        with_visual_criteria=data["with_visual_criteria"], collision_constraint=data["collision_constraint"]
+    )
 
     new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
 
     new_phases = [
-        config.phase_name_to_info(position, new_phase_names, i, with_visual_criteria)
+        config.phase_name_to_info(position, new_phase_names, i, additional_criteria)
         for i, _ in enumerate(new_phase_names)
     ]
 

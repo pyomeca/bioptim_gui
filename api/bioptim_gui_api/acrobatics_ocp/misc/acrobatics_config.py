@@ -1,4 +1,5 @@
 import copy
+from typing import NamedTuple
 
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.collision_constraint import (
     collision_constraint_constraints,
@@ -104,9 +105,17 @@ class DefaultAcrobaticsConfig:
     )
 
 
+class AdditionalCriteria(NamedTuple):
+    with_visual_criteria: bool = False
+    collision_constraint: bool = False
+
+
 def get_phase_objectives(
-    phase_names: list[str], phase_index: int, position: str, with_visual_criteria: bool, collision_constraint: bool
+    phase_names: list[str], phase_index: int, position: str, additional_criteria: AdditionalCriteria
 ):
+    with_visual_criteria = additional_criteria.with_visual_criteria
+    collision_constraint = additional_criteria.collision_constraint
+
     phase_name = phase_names[phase_index]
     model = get_variable_computer(position, with_visual_criteria)
 
@@ -130,7 +139,10 @@ def get_phase_objectives(
     return objectives
 
 
-def get_phase_constraints(phase_name: str, position: str, with_visual_criteria: bool, collision_constraint: bool):
+def get_phase_constraints(phase_name: str, position: str, additional_criteria: AdditionalCriteria):
+    with_visual_criteria = additional_criteria.with_visual_criteria
+    collision_constraint = additional_criteria.collision_constraint
+
     model = get_variable_computer(position, with_visual_criteria)
     constraints = []
     constraints += somersault_constraints(phase_name, model, position)
@@ -141,18 +153,14 @@ def get_phase_constraints(phase_name: str, position: str, with_visual_criteria: 
     return constraints
 
 
-def phase_name_to_info(
-    position, phase_names: str, phase_index: int, with_visual_criteria: bool = False, collision_constraint: bool = False
-):
+def phase_name_to_info(position, phase_names: str, phase_index: int, additional_criteria: AdditionalCriteria):
     phase_name = phase_names[phase_index]
 
     # need to deepcopy or else there will be unwanted modification due to addresses
     res = copy.deepcopy(DefaultAcrobaticsConfig.default_phases_info)
     res["phase_name"] = phase_name
 
-    res["objectives"] = get_phase_objectives(
-        phase_names, phase_index, position, with_visual_criteria, collision_constraint
-    )
-    res["constraints"] = get_phase_constraints(phase_name, position, with_visual_criteria, collision_constraint)
+    res["objectives"] = get_phase_objectives(phase_names, phase_index, position, additional_criteria)
+    res["constraints"] = get_phase_constraints(phase_name, position, additional_criteria)
 
     return res
