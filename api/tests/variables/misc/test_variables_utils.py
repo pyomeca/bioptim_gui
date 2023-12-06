@@ -1,7 +1,12 @@
 import numpy as np
 import pytest
 
-from bioptim_gui_api.variables.misc.variables_utils import variables_zeros, maximum_fig_arms_angle, define_loose_bounds
+from bioptim_gui_api.variables.misc.variables_utils import (
+    variables_zeros,
+    maximum_fig_arms_angle,
+    define_loose_bounds,
+    LooseValue,
+)
 
 
 @pytest.mark.parametrize(
@@ -94,6 +99,6 @@ def test_define_loose():
             "max": np.zeros((10, 3)),
         }
     ]
-    define_loose_bounds(bound[0], 5, 2, 0.9, 0.1)
+    define_loose_bounds(bound[0], 5, 2, LooseValue(0.9, 0.1))
     assert bound[0]["min"][5, 2] == 0.8
     assert bound[0]["max"][5, 2] == 1.0
