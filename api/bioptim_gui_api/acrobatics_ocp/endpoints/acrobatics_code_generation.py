@@ -66,6 +66,7 @@ def get_acrobatics_generated_code(req: CodeGenerationRequest):
     generated = f"""\"""This file was automatically generated using BioptimGUI version 0.0.1\"""
 
 import argparse
+import biorbd
 import os
 import pickle as pkl
 import casadi as cas
@@ -98,6 +99,69 @@ from bioptim import (
 )
 
 BIOMODEL_PATH = "{new_model_path}"
+
+def closestDistanceBetweenLines(a0, a1, b0, b1):
+    # addapté de https://stackoverflow.com/questions/2824478/shortest-distance-between-two-line-segments
+
+    # Calculate denomitator
+    VectA = a1 - a0
+    VectB = b1 - b0
+    norm_A = cas.norm_2(VectA)
+    norm_B = cas.norm_2(VectB)
+
+    Unit_A = VectA / norm_A
+    Unit_B = VectB / norm_B
+
+    cross = cas.cross(Unit_A, Unit_B)
+    norm_cross = cas.norm_2(cross)**2
+
+    # Lines criss-cross: Calculate the projected closest points
+    t = (b0 - a0)
+    A_mat = cas.horzcat(t, cas.horzcat(Unit_B, cross))
+    B_mat = cas.horzcat(t, cas.horzcat(Unit_A, cross))
+    A_Q, A_R = cas.qr(A_mat)
+    B_Q, B_R = cas.qr(B_mat)
+    detA = A_R[0, 0] * A_R[1, 1] * A_R[2, 2]
+    detB = B_R[0, 0] * B_R[1, 1] * B_R[2, 2]
+
+    t0 = cas.if_else(cas.fabs(norm_cross) < 0.0000001, 1000, detA / norm_cross)
+    t1 = cas.if_else(cas.fabs(norm_cross) < 0.0000001, 1000, detB / norm_cross)
+    # t0 = detA / norm_cross
+    # t1 = detB / norm_cross
+
+    pA = cas.if_else(t0 > norm_A, a1, cas.if_else(t0 < 0, a0, a0 + (Unit_A * t0)))
+    pB = cas.if_else(t1 > norm_B, b1, cas.if_else(t1 < 0, b0, b0 + (Unit_B * t1)))
+
+    Distance2 = cas.norm_2(pA - pB)
+
+    Func = cas.Function('Distance', [a0, a1, b0, b1], [Distance2])
+
+    return Func
+
+def custom_noncrossing_const(ocp, nlp, t, x, u, p, closestDistanceBetweenLines_func, marker_idx1, marker_idx2, marker_idx3, marker_idx4, rayon1, rayon2):
+    nq = int(nlp.nx / 2)
+    Markers_func = biorbd.to_casadi_func("markers", nlp.model.markers, nlp.q)
+    val_contrainte = []
+    for v in x:
+        q = v[:nq]
+        Markers = Markers_func(q)
+        Distance = closestDistanceBetweenLines_func(Markers[:, marker_idx1], Markers[:, marker_idx2], Markers[:, marker_idx3], Markers[:, marker_idx4])
+        val_contrainte = cas.vertcat(val_contrainte, Distance - (rayon1 + rayon2))
+    return val_contrainte
+
+
+def custom_noncrossing_obj(ocp, nlp, t, x, u, p, closestDistanceBetweenLines_func, marker_idx1, marker_idx2, marker_idx3, marker_idx4, rayon1, rayon2):
+    nq = int(nlp.nx/2)
+    Markers_func = biorbd.to_casadi_func("markers", nlp.model.markers, nlp.q)
+    val_objectif = []
+    for v in x:
+        q = v[:nq]
+        Markers = Markers_func(q)
+        Distance = closestDistanceBetweenLines_func(Markers[:, marker_idx1], Markers[:, marker_idx2], Markers[:, marker_idx3], Markers[:, marker_idx4])
+        val_tempo = 4 * 0.5 ** ((Distance - (rayon1 + rayon2)) - 1)
+        obj = cas.if_else(Distance > 4 * (rayon1+rayon2), 0, val_tempo)
+        val_objectif = cas.vertcat(val_objectif, obj)
+    return val_objectif
 
 def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) -> cas.MX:
     \"""
