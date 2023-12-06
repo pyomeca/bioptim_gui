@@ -1,12 +1,11 @@
 import pytest
 
-from bioptim_gui_api.penalty.misc.objective_printer import ObjectivePrinter
+from bioptim_gui_api.penalty.misc.constraint_printer import ConstraintPrinter
 
 
 def test_custom_str_simple():
-    objective = ObjectivePrinter(
+    constraint = ConstraintPrinter(
         phase=0,
-        objective_type="lagrange",
         penalty_type="CUSTOM",
         nodes="all",
         quadratic=False,
@@ -15,14 +14,11 @@ def test_custom_str_simple():
         derivative=False,
         integration_rule="rectangle_left",
         multi_thread=False,
-        weight=1.0,
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        str(objective)
+        str(constraint)
         == """my_func,
-        custom_type=ObjectiveFcn.Lagrange,
-        weight=1.0,
         node=Node.ALL,
         quadratic=False,
 """
@@ -30,9 +26,8 @@ def test_custom_str_simple():
 
 
 def test_custom_str_simple_phase():
-    objective = ObjectivePrinter(
+    constraint = ConstraintPrinter(
         phase=30,
-        objective_type="lagrange",
         penalty_type="CUSTOM",
         nodes="all",
         quadratic=False,
@@ -41,14 +36,11 @@ def test_custom_str_simple_phase():
         derivative=False,
         integration_rule="rectangle_left",
         multi_thread=False,
-        weight=1.0,
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        objective.__str__(nb_phase=36)
+        constraint.__str__(nb_phase=36)
         == """my_func,
-        custom_type=ObjectiveFcn.Lagrange,
-        weight=1.0,
         node=Node.ALL,
         quadratic=False,
         phase=30,
@@ -57,9 +49,8 @@ def test_custom_str_simple_phase():
 
 
 def test_custom_str_indent_8():
-    objective = ObjectivePrinter(
+    constraint = ConstraintPrinter(
         phase=0,
-        objective_type="lagrange",
         penalty_type="CUSTOM",
         nodes="all",
         quadratic=False,
@@ -68,14 +59,11 @@ def test_custom_str_indent_8():
         derivative=False,
         integration_rule="rectangle_left",
         multi_thread=False,
-        weight=1.0,
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        objective.__str__(indent=12, nb_phase=1)
+        constraint.__str__(indent=12, nb_phase=1)
         == """my_func,
-            custom_type=ObjectiveFcn.Lagrange,
-            weight=1.0,
             node=Node.ALL,
             quadratic=False,
 """
@@ -83,9 +71,8 @@ def test_custom_str_indent_8():
 
 
 def test_custom_str_indent_8_with_phase():
-    objective = ObjectivePrinter(
+    constraint = ConstraintPrinter(
         phase=30,
-        objective_type="lagrange",
         penalty_type="CUSTOM",
         nodes="all",
         quadratic=False,
@@ -94,14 +81,11 @@ def test_custom_str_indent_8_with_phase():
         derivative=False,
         integration_rule="rectangle_left",
         multi_thread=False,
-        weight=1.0,
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        objective.__str__(indent=12, nb_phase=36)
+        constraint.__str__(indent=12, nb_phase=36)
         == """my_func,
-            custom_type=ObjectiveFcn.Lagrange,
-            weight=1.0,
             node=Node.ALL,
             quadratic=False,
             phase=30,
@@ -110,9 +94,8 @@ def test_custom_str_indent_8_with_phase():
 
 
 def test_custom_str_indent_8_with_phase_all():
-    objective = ObjectivePrinter(
+    constraint = ConstraintPrinter(
         phase=30,
-        objective_type="lagrange",
         penalty_type="CUSTOM",
         nodes="all",
         quadratic=False,
@@ -121,14 +104,11 @@ def test_custom_str_indent_8_with_phase_all():
         derivative=True,
         integration_rule="rectangle_right",
         multi_thread=True,
-        weight=-10.0,
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        objective.__str__(indent=12, nb_phase=36)
+        constraint.__str__(indent=12, nb_phase=36)
         == """my_func,
-            custom_type=ObjectiveFcn.Lagrange,
-            weight=-10.0,
             node=Node.ALL,
             quadratic=False,
             expand=False,
@@ -145,15 +125,14 @@ def test_custom_str_indent_8_with_phase_all():
     ("penalty_type", "arguments"),
     [
         (
-            "MINIMIZE_STATE",
+            "SUPERIMPOSE_MARKERS",
             [{"name": "function", "value": "my_func", "type": "function"}],
         ),  # bad penalty_type
     ],
 )
 def test_custom_str_assert_error(penalty_type, arguments):
-    objective = ObjectivePrinter(
+    constraint = ConstraintPrinter(
         phase=0,
-        objective_type="lagrange",
         penalty_type=penalty_type,
         nodes="all",
         quadratic=False,
@@ -162,18 +141,16 @@ def test_custom_str_assert_error(penalty_type, arguments):
         derivative=False,
         integration_rule="rectangle_left",
         multi_thread=False,
-        weight=1.0,
         arguments=arguments,
     )
 
     with pytest.raises(AssertionError):
-        objective._custom_str()
+        constraint._custom_str()
 
 
 def test_custom_multiple_arguments():
-    objective = ObjectivePrinter(
+    objective = ConstraintPrinter(
         phase=30,
-        objective_type="lagrange",
         penalty_type="CUSTOM",
         nodes="all",
         quadratic=False,
@@ -182,7 +159,6 @@ def test_custom_multiple_arguments():
         derivative=True,
         integration_rule="rectangle_right",
         multi_thread=True,
-        weight=10.0,
         arguments=[
             {"name": "function2", "value": "haha", "type": "str"},
             {"name": "function", "value": "my_func", "type": "function"},
@@ -192,8 +168,6 @@ def test_custom_multiple_arguments():
     assert (
         objective.__str__(indent=12, nb_phase=36)
         == """my_func,
-            custom_type=ObjectiveFcn.Lagrange,
-            weight=10.0,
             function2="haha",
             additional=1,
             node=Node.ALL,

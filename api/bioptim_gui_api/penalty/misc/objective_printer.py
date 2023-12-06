@@ -18,12 +18,20 @@ class ObjectivePrinter(PenaltyPrinter):
 
     def _custom_str(self, indent: int = 8) -> str:
         assert self.penalty_type == "CUSTOM", "This function is only for custom penalty"
-        assert len(self.arguments) == 1, "Custom penalty must have only one argument 'funtion'"
-        assert self.arguments[0]["name"] == "function", "Custom penalty must have only one argument 'funtion'"
 
-        ret = f"""{self.arguments[0]["value"]},
-custom_type=ObjectiveFcn.{self.objective_type.capitalize()},\n"""
+        ret = None
+        for argument in self.arguments:
+            if argument["name"] == "function":
+                ret = f"{argument['value']},\n"
+                ret += f"custom_type=ObjectiveFcn.{self.objective_type.capitalize()},\n"
+
+        assert ret is not None, "The function argument is missing"
+
         ret += f"weight={self.weight},\n"
+
+        for argument in self.arguments:
+            if argument["name"] != "function":
+                ret += f"{arg_to_string(argument)},\n"
 
         return ret
 
