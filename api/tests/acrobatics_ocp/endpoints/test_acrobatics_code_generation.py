@@ -39,7 +39,8 @@ def test_generate_code_no_model():
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
 @pytest.mark.parametrize("with_visuals", [True, False])
-def test_generate_code_simple_position(position, with_visuals):
+@pytest.mark.parametrize("collision_constraint", [True, False])
+def test_generate_code_simple_position(position, with_visuals, collision_constraint):
     # using base data and a position model (16 degrees of freedom)
     visual_path = "with_visual" if with_visuals else "without_visual"
     model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
@@ -48,6 +49,10 @@ def test_generate_code_simple_position(position, with_visuals):
 
     if with_visuals:
         response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
+        assert response.status_code == 200, response
+
+    if collision_constraint:
+        response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
         assert response.status_code == 200, response
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
@@ -75,7 +80,8 @@ def test_generate_code_simple_position(position, with_visuals):
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
 @pytest.mark.parametrize("with_visuals", [True, False])
-def test_generate_code_position_no_objective_no_constraint(position, with_visuals):
+@pytest.mark.parametrize("collision_constraint", [True, False])
+def test_generate_code_position_no_objective_no_constraint(position, with_visuals, collision_constraint):
     # using base data and a position model (16 degrees of freedom)
     visual_path = "with_visual" if with_visuals else "without_visual"
     model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
@@ -84,6 +90,10 @@ def test_generate_code_position_no_objective_no_constraint(position, with_visual
 
     if with_visuals:
         response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
+        assert response.status_code == 200, response
+
+    if collision_constraint:
+        response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
         assert response.status_code == 200, response
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
@@ -117,7 +127,8 @@ def test_generate_code_position_no_objective_no_constraint(position, with_visual
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
 @pytest.mark.parametrize("with_visuals", [True, False])
-def test_generate_code_position_objective_and_constraint(position, with_visuals):
+@pytest.mark.parametrize("collision_constraint", [True, False])
+def test_generate_code_position_objective_and_constraint(position, with_visuals, collision_constraint):
     # using base data and a position model (16 degrees of freedom)
     visual_path = "with_visual" if with_visuals else "without_visual"
     model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
@@ -128,6 +139,10 @@ def test_generate_code_position_objective_and_constraint(position, with_visuals)
 
     if with_visuals:
         response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
+        assert response.status_code == 200, response
+
+    if collision_constraint:
+        response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
         assert response.status_code == 200, response
 
     client.post("/acrobatics/phases_info/0/constraints")
@@ -158,7 +173,8 @@ def test_generate_code_position_objective_and_constraint(position, with_visuals)
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
 @pytest.mark.parametrize("with_visuals", [True, False])
-def test_generate_code_2_phase_position_objective_and_constraint(position, with_visuals):
+@pytest.mark.parametrize("collision_constraint", [True, False])
+def test_generate_code_2_phase_position_objective_and_constraint(position, with_visuals, collision_constraint):
     # using base data and a position model (16 degrees of freedom)
     visual_path = "with_visual" if with_visuals else "without_visual"
     model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
@@ -166,6 +182,10 @@ def test_generate_code_2_phase_position_objective_and_constraint(position, with_
 
     if with_visuals:
         response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
+        assert response.status_code == 200, response
+
+    if collision_constraint:
+        response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
         assert response.status_code == 200, response
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
@@ -203,7 +223,8 @@ def test_generate_code_2_phase_position_objective_and_constraint(position, with_
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
 @pytest.mark.parametrize("with_visuals", [True, False])
-def test_generate_code_modified_objective_and_constraint(position, with_visuals):
+@pytest.mark.parametrize("collision_constraint", [True, False])
+def test_generate_code_modified_objective_and_constraint(position, with_visuals, collision_constraint):
     # using base data and a position model (16 degrees of freedom)
     visual_path = "with_visual" if with_visuals else "without_visual"
     model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
@@ -211,6 +232,10 @@ def test_generate_code_modified_objective_and_constraint(position, with_visuals)
 
     if with_visuals:
         response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
+        assert response.status_code == 200, response
+
+    if collision_constraint:
+        response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
         assert response.status_code == 200, response
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})

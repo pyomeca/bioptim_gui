@@ -19,6 +19,7 @@ router = APIRouter()
 def get_acrobatics_generated_code(req: CodeGenerationRequest):
     data = read_acrobatics_data()
     with_visual_criteria = data["with_visual_criteria"]
+    collision_constraint = data["collision_constraint"]
     model_path = data["model_path"]
     position = data["position"]
 
@@ -30,7 +31,7 @@ def get_acrobatics_generated_code(req: CodeGenerationRequest):
     if not model_path:
         raise HTTPException(status_code=400, detail="No model path provided")
 
-    converter = get_converter(data["position"], with_visual_criteria)
+    converter = get_converter(data["position"], with_visual_criteria, collision_constraint)
     new_bio_model = converter.convert(model_path)
 
     phases = data["phases_info"]

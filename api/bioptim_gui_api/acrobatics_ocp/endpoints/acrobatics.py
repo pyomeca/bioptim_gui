@@ -216,3 +216,27 @@ def put_preferred_twist_side(visual_criteria: VisualCriteriaRequest):
 
     phases_info = read_acrobatics_data("phases_info")
     return phases_info
+
+
+@router.put("/collision_constraint", response_model=list)
+def put_preferred_twist_side(collision_constraint: CollisionConstraintRequest):
+    new_value = collision_constraint.collision_constraint
+    old_value = read_acrobatics_data("collision_constraint")
+    if old_value == new_value:
+        raise HTTPException(
+            status_code=304,
+            detail=f"collision_constraint is already {old_value}",
+        )
+
+    update_acrobatics_data("collision_constraint", new_value)
+
+    data = read_acrobatics_data()
+    nb_somersaults = data["nb_somersaults"]
+    position = data["position"]
+    half_twists = data["nb_half_twists"]
+
+    new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
+    update_phase_info(new_phase_names)
+
+    phases_info = read_acrobatics_data("phases_info")
+    return phases_info

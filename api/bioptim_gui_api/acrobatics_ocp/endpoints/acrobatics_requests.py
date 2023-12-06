@@ -43,6 +43,10 @@ class VisualCriteriaRequest(BaseModel):
     with_visual_criteria: bool
 
 
+class CollisionConstraintRequest(BaseModel):
+    collision_constraint: bool
+
+
 class NbShootingPointsRequest(BaseModel):
     nb_shooting_points: int
 

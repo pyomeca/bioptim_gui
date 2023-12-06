@@ -1,5 +1,8 @@
 import copy
 
+from bioptim_gui_api.acrobatics_ocp.misc.penalties.collision_constraint import (
+    collision_constraint_constraints,
+)
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.common import common_objectives
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.kickout import kickout_objectives
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.landing import landing_objectives
@@ -39,6 +42,7 @@ class DefaultAcrobaticsConfig:
         "sport_type": "trampoline",
         "preferred_twist_side": "left",
         "with_visual_criteria": False,
+        "collision_constraint": False,
         "phases_info": [
             copy.deepcopy(default_phases_info),
             copy.deepcopy(default_phases_info),
@@ -99,7 +103,9 @@ class DefaultAcrobaticsConfig:
     )
 
 
-def get_phase_objectives(phase_names: list[str], phase_index: int, position: str, with_visual_criteria: bool):
+def get_phase_objectives(
+    phase_names: list[str], phase_index: int, position: str, with_visual_criteria: bool, collision_constraint: bool
+):
     phase_name = phase_names[phase_index]
     model = get_variable_computer(position, with_visual_criteria)
 
@@ -117,25 +123,33 @@ def get_phase_objectives(phase_names: list[str], phase_index: int, position: str
     if with_visual_criteria:
         objectives += with_visual_criteria_objectives(phase_names, phase_index, model)
 
+    if collision_constraint:
+        objectives += collision_constraint_constraints(phase_name, model)
+
     return objectives
 
 
-def get_phase_constraints(phase_name: str, position: str, with_visual_criteria: bool):
+def get_phase_constraints(phase_name: str, position: str, with_visual_criteria: bool, collision_constraint: bool):
     model = get_variable_computer(position, with_visual_criteria)
     constraints = []
     constraints += somersault_constraints(phase_name, model, position)
+    constraints += collision_constraint_constraints(phase_name, model)
 
     return constraints
 
 
-def phase_name_to_info(position, phase_names: str, phase_index: int, with_visual_criteria: bool = False):
+def phase_name_to_info(
+    position, phase_names: str, phase_index: int, with_visual_criteria: bool = False, collision_constraint: bool = False
+):
     phase_name = phase_names[phase_index]
 
     # need to deepcopy or else there will be unwanted modification due to addresses
     res = copy.deepcopy(DefaultAcrobaticsConfig.default_phases_info)
     res["phase_name"] = phase_name
 
-    res["objectives"] = get_phase_objectives(phase_names, phase_index, position, with_visual_criteria)
-    res["constraints"] = get_phase_constraints(phase_name, position, with_visual_criteria)
+    res["objectives"] = get_phase_objectives(
+        phase_names, phase_index, position, with_visual_criteria, collision_constraint
+    )
+    res["constraints"] = get_phase_constraints(phase_name, position, with_visual_criteria, collision_constraint)
 
     return res

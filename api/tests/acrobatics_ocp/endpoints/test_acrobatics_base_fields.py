@@ -215,3 +215,15 @@ def test_put_with_visual_criteria():
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     assert response.json()["with_visual_criteria"]
+
+
+def test_put_collision_constraint():
+    response = client.put("/acrobatics/collision_constraint/", json={"collision_constraint": False})
+    assert response.status_code == 304, response
+
+    response = client.put("/acrobatics/collision_constraint/", json={"collision_constraint": True})
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    assert response.json()["collision_constraint"]

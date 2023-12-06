@@ -1,7 +1,7 @@
 from bioptim_gui_api.model_converter.converter import *
 
 
-def get_converter(position: str = "straight", with_visual_criteria: bool = False):
+def get_converter(position: str = "straight", with_visual_criteria: bool = False, collision_constraint: bool = False):
     visual_converter = {
         "straight": StraightWithVisualConverter,
         "tuck": TuckWithVisualConverter,

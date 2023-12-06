@@ -55,9 +55,11 @@ def update_phase_info(phase_names: list[str]) -> None:
     final_time = data["final_time"]
     position = data["position"]
     with_visual_criteria = data["with_visual_criteria"]
+    collision_constraint = data["collision_constraint"]
 
     new_phases = [
-        config.phase_name_to_info(position, phase_names, i, with_visual_criteria) for i, _ in enumerate(phase_names)
+        config.phase_name_to_info(position, phase_names, i, with_visual_criteria, collision_constraint)
+        for i, _ in enumerate(phase_names)
     ]
 
     for i in range(n_phases):

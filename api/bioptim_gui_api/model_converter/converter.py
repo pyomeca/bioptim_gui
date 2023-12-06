@@ -194,9 +194,9 @@ class TuckConverter(PikeConverter):
 
 additional_segment_rotation = {"Head": "zx", "Eyes": "zx"}
 additional_markers = (
-        ["eyes_vect_start", "eyes_vect_end", "fixation_front", "fixation_center"]
-        + [f"Trampo_corner_{n}" for n in range(1, 5)]
-        + [f"cone_approx_{i}_{j}" for i in range(11) for j in range(10)]
+    ["eyes_vect_start", "eyes_vect_end", "fixation_front", "fixation_center"]
+    + [f"Trampo_corner_{n}" for n in range(1, 5)]
+    + [f"cone_approx_{i}_{j}" for i in range(11) for j in range(10)]
 )
 
 
