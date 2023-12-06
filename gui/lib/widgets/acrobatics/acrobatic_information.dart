@@ -1,6 +1,7 @@
 import 'package:bioptim_gui/models/acrobatics_data.dart';
 import 'package:bioptim_gui/models/acrobatics_request_maker.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
+import 'package:bioptim_gui/widgets/acrobatics/collision_checkbox.dart';
 import 'package:bioptim_gui/widgets/acrobatics/visual_criteria_checkbox.dart';
 import 'package:bioptim_gui/widgets/utils/positive_float_text_field.dart';
 import 'package:bioptim_gui/widgets/utils/positive_integer_text_field.dart';
@@ -43,15 +44,26 @@ class AcrobaticInformation extends StatelessWidget {
             ),
             SizedBox(
               width: width / 3,
-              child: Row(
-                children: [
-                  const SizedBox(width: 4),
-                  VisualCriteriaCheckbox(
-                    defaultValue: acrobaticsData.withVisualCriteria,
-                  ),
-                  const Text("Visual Criteria"),
-                ],
-              ),
+              child: Column(children: [
+                Row(
+                  children: [
+                    const SizedBox(width: 4),
+                    CollisionCheckbox(
+                      defaultValue: acrobaticsData.collisionConstraint,
+                    ),
+                    const Text("Collision"),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const SizedBox(width: 4),
+                    VisualCriteriaCheckbox(
+                      defaultValue: acrobaticsData.withVisualCriteria,
+                    ),
+                    const Text("Visual Criteria"),
+                  ],
+                ),
+              ]),
             ),
           ]),
           const Align(
