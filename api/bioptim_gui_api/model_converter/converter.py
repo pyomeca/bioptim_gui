@@ -31,28 +31,23 @@ class BioModConverter:
         return current_index
 
     @classmethod
-    def _handle_segments(cls, lines: list[str], current_index: int, existing_segments: set, segment_name: str):
+    def _get_segment_name(cls, lines: list[str], current_index: int, segment_name: str) -> str:
         line = lines[current_index]
         stripped = line.strip()
         if not stripped.startswith("segment"):
             return segment_name
 
         segment_name = stripped.split()[1]
-
-        if segment_name in cls.segment_translation | cls.segment_rotation:
-            existing_segments.add(segment_name)
-
         return segment_name
 
     @classmethod
-    def _handle_markers(
-        cls, lines: list[str], current_index: int, existing_markers: set, updated_lines: list[str]
-    ) -> None:
-        stripped = lines[current_index].strip()
+    def _get_marker_name(cls, line: str) -> str:
+        stripped = line.strip()
+
+        marker_name = ""
         if stripped.startswith("marker"):
             marker_name = stripped.split()[1]
-            if marker_name in cls.markers:
-                existing_markers.add(marker_name)
+        return marker_name
 
     @classmethod
     def _ignore_dofs_lines(cls, lines: list[str], current_index: int) -> int:
@@ -69,6 +64,32 @@ class BioModConverter:
                 updated_lines.append(f"\ttranslations {cls.segment_translation[segment_name]}\n")
             if segment_name in cls.segment_rotation:
                 updated_lines.append(f"\trotations {cls.segment_rotation[segment_name]}\n")
+
+    @classmethod
+    def _check_missing_segments(cls, lines: list[str]) -> None:
+        existing_segments = set()
+        segment_name = ""
+        for i, line in enumerate(lines):
+            segment_name = cls._get_segment_name(lines, i, segment_name)
+            if segment_name in cls.segment_rotation or segment_name in cls.segment_translation:
+                existing_segments.add(segment_name)
+
+        missing_segments = (set(cls.segment_rotation) | set(cls.segment_translation)) - existing_segments
+
+        if missing_segments:
+            raise ValueError(f"Missing segments: {', '.join(missing_segments)}")
+
+    @classmethod
+    def _check_missing_markers(cls, lines: list[str]) -> None:
+        existing_markers = set()
+        for i, line in enumerate(lines):
+            marker_name = cls._get_marker_name(line)
+            if marker_name in cls.markers:
+                existing_markers.add(marker_name)
+
+        missing_markers = set(cls.markers) - existing_markers
+        if missing_markers:
+            raise ValueError(f"Missing markers: {', '.join(missing_markers)}")
 
     @classmethod
     def convert(cls, model_path: str) -> str:
@@ -104,31 +125,29 @@ class BioModConverter:
         with open(model_path, "r") as f:
             lines = f.readlines()
 
+        cls._check_missing_segments(lines)
+        cls._check_missing_markers(lines)
+
         n_lines = len(lines)
         updated_lines = []
-        existing_segments, existing_markers = set(), set()
         segment_name = ""
 
         i = 0
         while i < n_lines:
-            segment_name = cls._handle_segments(lines, i, existing_segments, segment_name)
-            cls._handle_markers(lines, i, existing_markers, updated_lines)
+            segment_name = cls._get_segment_name(lines, i, segment_name)
 
             i = cls._ignore_dofs_lines(lines, i)
+            # rangesQ tends to be just after the dofs
             i = cls._skip_ranges_q(lines, i)
 
             stripped = lines[i].strip()
+            # if condition in the case of dofs being after rangesQ
             if not stripped.startswith("rotations") and not stripped.startswith("translations"):
                 updated_lines.append(lines[i])
 
             cls._add_dofs(segment_name, updated_lines, stripped)
 
             i += 1
-
-        missing_segments = (set(cls.segment_rotation) | set(cls.segment_translation)) - existing_segments
-        missing_markers = set(cls.markers) - existing_markers
-        if missing_segments or missing_markers:
-            raise ValueError(f"Missing markers/segments: {', '.join(missing_segments | missing_markers)}")
 
         return "".join(updated_lines)
 
@@ -175,9 +194,9 @@ class TuckConverter(PikeConverter):
 
 additional_segment_rotation = {"Head": "zx", "Eyes": "zx"}
 additional_markers = (
-    ["eyes_vect_start", "eyes_vect_end", "fixation_front", "fixation_center"]
-    + [f"Trampo_corner_{n}" for n in range(1, 5)]
-    + [f"cone_approx_{i}_{j}" for i in range(11) for j in range(10)]
+        ["eyes_vect_start", "eyes_vect_end", "fixation_front", "fixation_center"]
+        + [f"Trampo_corner_{n}" for n in range(1, 5)]
+        + [f"cone_approx_{i}_{j}" for i in range(11) for j in range(10)]
 )
 
 
