@@ -44,9 +44,6 @@ class BioModConverter:
         while not lines[current_index].strip().startswith("endmarker"):
             current_index += 1
 
-        while lines[current_index] == "\n":
-            current_index += 1
-
         return current_index + 1
 
     @classmethod

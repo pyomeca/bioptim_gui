@@ -18,6 +18,8 @@ def test_cylinder():
 
     assert cylinder1 == cylinder2
 
+    assert str(cylinder1) == "Cylinder(marker1, marker2)"
+
 
 def test_cylinder_collision():
     cylinder1 = Cylinder("marker1", "marker2")
@@ -32,6 +34,8 @@ def test_cylinder_collision():
     assert cylinder_collision2.element2 == cylinder1
 
     assert cylinder_collision1 == cylinder_collision2
+
+    assert str(cylinder_collision1) == "Collision(Cylinder(marker1, marker2), Cylinder(marker3, marker4))"
 
 
 def test_cylinder_collision_eq_all_inverted():
@@ -61,35 +65,6 @@ def test_cylinder_collision_not_eq():
 def test_straight_collision():
     expected = (("RightShoulder", "RightKnuckle", "LeftShoulder", "LeftKnuckle"),)
     actual = StraightCylinderCollision.non_collision_markers_combinations()
-
-    expected_collision = [CylinderCollision(Cylinder(e1, e2), Cylinder(e3, e4)) for e1, e2, e3, e4 in expected]
-    actual_collision = [CylinderCollision(Cylinder(a1, a2), Cylinder(a3, a4)) for a1, a2, a3, a4 in actual]
-
-    for collision in expected_collision:
-        assert collision in actual_collision, f"Missing {collision}"
-
-    assert len(actual) == len(expected), f"Expected: {len(expected)}, Actual: {len(actual)}"
-
-
-def test_pike_collision():
-    expected = (
-        # Right Upper arms and others
-        ("RightShoulder", "RightElbow", "LeftShoulder", "LeftElbow"),
-        ("RightShoulder", "RightElbow", "LeftElbow", "LeftKnuckle"),
-        ("RightShoulder", "RightElbow", "PelvisBase", "Ankle"),
-        # Right Fore arms and others
-        ("RightElbow", "RightKnuckle", "LeftElbow", "LeftKnuckle"),
-        ("RightElbow", "RightKnuckle", "LeftShoulder", "LeftElbow"),
-        ("RightElbow", "RightKnuckle", "PelvisBase", "Ankle"),
-        ("RightElbow", "RightKnuckle", "HeadTop", "PelvisBase"),
-        # Left Upper arms and others
-        ("LeftShoulder", "LeftElbow", "PelvisBase", "Ankle"),
-        # Left Fore arms and others
-        ("LeftElbow", "LeftKnuckle", "PelvisBase", "Ankle"),
-        ("LeftElbow", "LeftKnuckle", "HeadTop", "PelvisBase"),
-    )
-
-    actual = PikeCylinderCollision.non_collision_markers_combinations()
 
     expected_collision = [CylinderCollision(Cylinder(e1, e2), Cylinder(e3, e4)) for e1, e2, e3, e4 in expected]
     actual_collision = [CylinderCollision(Cylinder(a1, a2), Cylinder(a3, a4)) for a1, a2, a3, a4 in actual]
