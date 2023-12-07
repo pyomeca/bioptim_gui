@@ -134,7 +134,7 @@ def get_phase_objectives(
         objectives += with_visual_criteria_objectives(phase_names, phase_index, model)
 
     if collision_constraint:
-        objectives += collision_constraint_objectives(phase_names, phase_index, model)
+        objectives += collision_constraint_objectives(phase_names, phase_index, position)
 
     return objectives
 
@@ -148,7 +148,7 @@ def get_phase_constraints(phase_name: str, position: str, additional_criteria: A
     constraints += somersault_constraints(phase_name, model, position)
 
     if collision_constraint:
-        constraints += collision_constraint_constraints(phase_name, model)
+        constraints += collision_constraint_constraints(phase_name, position)
 
     return constraints
 
