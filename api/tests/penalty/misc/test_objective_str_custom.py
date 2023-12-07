@@ -148,6 +148,10 @@ def test_custom_str_indent_8_with_phase_all():
             "MINIMIZE_STATE",
             [{"name": "function", "value": "my_func", "type": "function"}],
         ),  # bad penalty_type
+        (
+            "CUSTOM",
+            [{"name": "not_function", "value": "my_func", "type": "function"}],
+        ),  # missing funtion field
     ],
 )
 def test_custom_str_assert_error(penalty_type, arguments):

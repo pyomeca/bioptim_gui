@@ -128,6 +128,10 @@ def test_custom_str_indent_8_with_phase_all():
             "SUPERIMPOSE_MARKERS",
             [{"name": "function", "value": "my_func", "type": "function"}],
         ),  # bad penalty_type
+        (
+            "CUSTOM",
+            [{"name": "not_function", "value": "my_func", "type": "function"}],
+        ),
     ],
 )
 def test_custom_str_assert_error(penalty_type, arguments):
