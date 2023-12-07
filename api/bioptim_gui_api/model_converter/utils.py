@@ -8,8 +8,18 @@ with_visual_markers = (
     + [f"cone_approx_{i}_{j}" for i in range(11) for j in range(10)]
 )
 
-non_collision_segment = dict()
-non_collision_markers = list()
+non_collision_markers = [
+    "HeadTop",
+    "RightShoulder",
+    "RightElbow",
+    "RightKnuckle",
+    "LeftShoulder",
+    "LeftElbow",
+    "LeftKnuckle",
+    "PelvisBase",
+    "Knee",
+    "Ankle",
+]
 
 
 def get_converter(position: str = "straight", with_visual_criteria: bool = False, collision_constraint: bool = False):
@@ -31,7 +41,6 @@ def get_converter(position: str = "straight", with_visual_criteria: bool = False
         new_markers += with_visual_markers
 
     if collision_constraint:
-        new_segment_rotation.update(non_collision_segment)
         new_markers += non_collision_markers
 
     class SubConverter(BioModConverter):
