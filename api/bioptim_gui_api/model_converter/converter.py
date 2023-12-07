@@ -1,3 +1,6 @@
+from bioptim_gui_api.model_converter.converter_utils import BioModConverterUtils
+
+
 class BioModConverter:
     """
     Base class for bioMod model converters
@@ -19,45 +22,6 @@ class BioModConverter:
     markers = list()
 
     @classmethod
-    def _skip_ranges_q(cls, lines: list[str], current_index: int) -> int:
-        """ """
-        stripped = lines[current_index].strip()
-
-        if not stripped.startswith("rangesQ"):
-            return current_index
-
-        while not lines[current_index].strip().startswith("com"):
-            current_index += 1
-        return current_index
-
-    @classmethod
-    def _get_segment_name(cls, lines: list[str], current_index: int, segment_name: str) -> str:
-        line = lines[current_index]
-        stripped = line.strip()
-        if not stripped.startswith("segment"):
-            return segment_name
-
-        segment_name = stripped.split()[1]
-        return segment_name
-
-    @classmethod
-    def _get_marker_name(cls, line: str) -> str:
-        stripped = line.strip()
-
-        marker_name = ""
-        if stripped.startswith("marker"):
-            marker_name = stripped.split()[1]
-        return marker_name
-
-    @classmethod
-    def _ignore_dofs_lines(cls, lines: list[str], current_index: int) -> int:
-        stripped = lines[current_index].strip()
-        if stripped.startswith("rotations") or stripped.startswith("translations"):
-            return current_index + 1
-
-        return current_index
-
-    @classmethod
     def _add_dofs(cls, segment_name: str, updated_lines: list[str], stripped: str):
         if stripped.startswith("rt"):
             if segment_name in cls.segment_translation:
@@ -67,10 +31,11 @@ class BioModConverter:
 
     @classmethod
     def _check_missing_segments(cls, lines: list[str]) -> None:
+        utils = BioModConverterUtils(lines)
         existing_segments = set()
         segment_name = ""
         for i, line in enumerate(lines):
-            segment_name = cls._get_segment_name(lines, i, segment_name)
+            segment_name = utils.get_segment_name(i, segment_name)
             if segment_name in cls.segment_rotation or segment_name in cls.segment_translation:
                 existing_segments.add(segment_name)
 
@@ -81,9 +46,10 @@ class BioModConverter:
 
     @classmethod
     def _check_missing_markers(cls, lines: list[str]) -> None:
+        utils = BioModConverterUtils(lines)
         existing_markers = set()
         for i, line in enumerate(lines):
-            marker_name = cls._get_marker_name(line)
+            marker_name = utils.get_marker_name(line)
             if marker_name in cls.markers:
                 existing_markers.add(marker_name)
 
@@ -125,6 +91,7 @@ class BioModConverter:
         with open(model_path, "r") as f:
             lines = f.readlines()
 
+        utils = BioModConverterUtils(lines)
         cls._check_missing_segments(lines)
         cls._check_missing_markers(lines)
 
@@ -133,12 +100,13 @@ class BioModConverter:
         segment_name = ""
 
         i = 0
-        while i < n_lines:
-            segment_name = cls._get_segment_name(lines, i, segment_name)
 
-            i = cls._ignore_dofs_lines(lines, i)
+        while i < n_lines:
+            segment_name = utils.get_segment_name(i, segment_name)
+
+            i = utils.ignore_dofs_lines(i)
             # rangesQ tends to be just after the dofs
-            i = cls._skip_ranges_q(lines, i)
+            i = utils.skip_ranges_q(i)
 
             stripped = lines[i].strip()
             # if condition in the case of dofs being after rangesQ
