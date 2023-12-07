@@ -84,10 +84,6 @@ segment RightHand
 	meshfile Model_mesh/main.stl
 endsegment
 
-	marker MiddleRightHand
-		parent RightHand
-		position 0 0 -0.1
-	endmarker
 
 segment LeftUpperArm
 	parent Thorax
@@ -126,10 +122,6 @@ segment LeftHand
 	meshfile Model_mesh/main.stl
 endsegment
 
-	marker MiddleLeftHand
-		parent LeftHand
-		position 0 0 -0.1
-	endmarker
 
 segment UpperLegs
 	parent Pelvis
@@ -156,15 +148,7 @@ segment LowerLegs
 	meshrt pi 0 0 xyz 0 0 0
 endsegment
 
-	marker TargetRightHand
-		parent LowerLegs
-		position -0.1 0 -0.22
-	endmarker
 
-	marker TargetLeftHand
-		parent LowerLegs
-		position 0.1 0 -0.22
-	endmarker
 
 segment Feet
 	parent LowerLegs

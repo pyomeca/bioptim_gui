@@ -5,7 +5,7 @@ import pytest
 from bioptim_gui_api.model_converter.converter import *
 from bioptim_gui_api.model_converter.utils import get_converter
 
-BIOMODS_PATH = "test_biomods"  # to change depending on from where you run the test
+BIOMODS_PATH = "../test_biomods"  # to change depending on from where you run the test
 
 WITHOUT_VISUAL_BASE_PATH = f"{BIOMODS_PATH}/without_visual/without_visual_base.bioMod"
 WITH_VISUAL_BASE_PATH = f"{BIOMODS_PATH}/with_visual/with_visual_base.bioMod"

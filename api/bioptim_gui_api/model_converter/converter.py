@@ -30,6 +30,26 @@ class BioModConverter:
                 updated_lines.append(f"\trotations {cls.segment_rotation[segment_name]}\n")
 
     @classmethod
+    def _ignore_unused_markers(cls, lines: list[str], current_index: int) -> int:
+        """ """
+        stripped = lines[current_index].strip()
+
+        if not stripped.startswith("marker"):
+            return current_index
+
+        marker_name = stripped.split()[1]
+        if marker_name in cls.markers:
+            return current_index
+
+        while not lines[current_index].strip().startswith("endmarker"):
+            current_index += 1
+
+        while lines[current_index] == "\n":
+            current_index += 1
+
+        return current_index + 1
+
+    @classmethod
     def _check_missing_segments(cls, lines: list[str]) -> None:
         utils = BioModConverterUtils(lines)
         existing_segments = set()
@@ -64,8 +84,8 @@ class BioModConverter:
 
         - Checking that it contains all the required markers/segments according to the converter class attributes.
         - Missing markers/segments will raise a ValueError.
-        - Not used markers/segments will be ignored but will stay in the model (removing them would remove some
-        segments that are required for the visual (e.g. the head is not needed but is better for the visual)).
+        - Not used segments will be ignored but will stay in the model (removing them would alter the inertia and mass).
+        - Not used markers will be removed from the model.
         - Rotations and translations will be updated if needed:
             - If a segment rotation/translation is 'xzy' in the converter class and 'zx' in the model, it will be
             updated to 'xzy'.
@@ -103,6 +123,8 @@ class BioModConverter:
 
         while i < n_lines:
             segment_name = utils.get_segment_name(i, segment_name)
+
+            i = cls._ignore_unused_markers(lines, i)
 
             i = utils.ignore_dofs_lines(i)
             # rangesQ tends to be just after the dofs
