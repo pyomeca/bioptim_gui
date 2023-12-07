@@ -1,4 +1,4 @@
-from bioptim_gui_api.model_converter.converter_utils import BioModConverterUtils
+from bioptim_gui_api.model_converter.converter_str_utils import BioModConverterUtils
 
 
 class BioModConverter:
@@ -158,26 +158,3 @@ class TuckConverter(PikeConverter):
         "UpperLegs": "xy",
         "LowerLegs": "x",
     }
-
-
-additional_segment_rotation = {"Head": "zx", "Eyes": "zx"}
-additional_markers = (
-    ["eyes_vect_start", "eyes_vect_end", "fixation_front", "fixation_center"]
-    + [f"Trampo_corner_{n}" for n in range(1, 5)]
-    + [f"cone_approx_{i}_{j}" for i in range(11) for j in range(10)]
-)
-
-
-class StraightWithVisualConverter(StraightConverter):
-    segment_rotation = StraightConverter.segment_rotation | additional_segment_rotation
-    markers = StraightConverter.markers + additional_markers
-
-
-class PikeWithVisualConverter(PikeConverter):
-    segment_rotation = PikeConverter.segment_rotation | additional_segment_rotation
-    markers = PikeConverter.markers + additional_markers
-
-
-class TuckWithVisualConverter(TuckConverter):
-    segment_rotation = TuckConverter.segment_rotation | additional_segment_rotation
-    markers = TuckConverter.markers + additional_markers
