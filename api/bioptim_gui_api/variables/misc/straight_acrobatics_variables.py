@@ -251,9 +251,13 @@ class StraightAcrobaticsVariables:
         return x_bounds
 
     @classmethod
-    def get_qdot_init(cls, nb_somersaults: int) -> list:
+    def get_qdot_init(cls, nb_somersaults: int, final_time: float) -> list:
+        vzinit = 9.81 / 2 * final_time
+
         qdot_init = [0.0] * cls.nb_qdot
         qdot_init[cls.Xrot] = 2 * np.pi * nb_somersaults
+        qdot_init[cls.Z] = vzinit
+
         return qdot_init
 
     @classmethod

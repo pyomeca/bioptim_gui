@@ -81,8 +81,10 @@ class AcrobaticsGenerationBounds:
 
     @staticmethod
     def add_qdot_init(data: dict, model) -> str:
+        phases = data["phases_info"]
+        final_time = sum([s["duration"] for s in phases])
         nb_somersaults = data["nb_somersaults"]
-        qdot_init = model.get_qdot_init(nb_somersaults)
+        qdot_init = model.get_qdot_init(nb_somersaults, final_time)
 
         return f"""
     x_initial_guesses.add(

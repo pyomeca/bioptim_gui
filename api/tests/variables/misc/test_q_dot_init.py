@@ -35,6 +35,6 @@ from tests.variables.misc.tuck_with_visual_acrobatics_variables import (
 )
 @pytest.mark.parametrize("nb_somersaults", [2, 3, 4])
 def test_qdot_init_same_as_baseline(variable_compute, baseline, nb_somersaults):
-    expected = baseline.get_qdot_init(nb_somersaults)
-    actual = variable_compute.get_qdot_init(nb_somersaults)
+    expected = baseline.get_qdot_init(nb_somersaults, 1.7)
+    actual = variable_compute.get_qdot_init(nb_somersaults, 1.7)
     assert actual == expected
