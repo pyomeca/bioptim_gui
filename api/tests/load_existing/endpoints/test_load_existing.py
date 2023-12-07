@@ -41,6 +41,16 @@ def test_load_not_pkl():
         assert response.json() == {"detail": "File must be a pickle file"}
 
 
+def test_load_missing_field():
+    pkl_path = f"{path_to_tests_pkl}/bad_pickle.pkl"
+
+    with open(pkl_path, "rb") as f:
+        files = [("files", f)]
+        response = client.post("/load_existing/load", files=files)
+        assert response.status_code == 400
+        assert response.json() == {"detail": "Pickle doesn't contain the right data"}
+
+
 def test_load_best_pkl():
     pkls = [
         "test0.pkl",
