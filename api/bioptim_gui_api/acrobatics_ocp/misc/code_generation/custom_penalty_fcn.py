@@ -1,8 +1,7 @@
 class AcrobaticsGenerationCustomPenalties:
     @staticmethod
     def custom_trampoline_bed_in_peripheral_vision():
-        return f"""
-def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) -> cas.MX:
+        return f"""def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) -> cas.MX:
     \"""
     This function aims to encourage the avatar to keep the trampoline bed in his peripheral vision.
     It is done by discretizing the vision cone into vectors and determining if the vector projection of the gaze are inside the trampoline bed.
@@ -45,8 +44,7 @@ def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) ->
 
     @staticmethod
     def closest_distance_between_lines() -> str:
-        return """
-def closestDistanceBetweenLines(a0, a1, b0, b1):
+        return """def closestDistanceBetweenLines(a0, a1, b0, b1):
     # addapté de https://stackoverflow.com/questions/2824478/shortest-distance-between-two-line-segments
 
     # Calculate denomitator
@@ -87,8 +85,7 @@ def closestDistanceBetweenLines(a0, a1, b0, b1):
 
     @staticmethod
     def custom_noncrossing_const() -> str:
-        return """
-def custom_noncrossing_const(ocp, nlp, t, x, u, p, closestDistanceBetweenLines_func, marker_idx1, marker_idx2, marker_idx3, marker_idx4, rayon1, rayon2):
+        return """def custom_noncrossing_const(controller: PenaltyController, marker_idx1, marker_idx2, marker_idx3, marker_idx4, rayon1, rayon2):
     nq = int(nlp.nx / 2)
     Markers_func = biorbd.to_casadi_func("markers", nlp.model.markers, nlp.q)
     val_contrainte = []
@@ -102,8 +99,7 @@ def custom_noncrossing_const(ocp, nlp, t, x, u, p, closestDistanceBetweenLines_f
 
     @staticmethod
     def custom_noncrossing_obj() -> str:
-        return """
-def custom_noncrossing_obj(ocp, nlp, t, x, u, p, closestDistanceBetweenLines_func, marker_idx1, marker_idx2, marker_idx3, marker_idx4, rayon1, rayon2):
+        return """def custom_noncrossing_obj(controller: PenaltyController, marker_idx1, marker_idx2, marker_idx3, marker_idx4, rayon1, rayon2):
     nq = int(nlp.nx/2)
     Markers_func = biorbd.to_casadi_func("markers", nlp.model.markers, nlp.q)
     val_objectif = []
