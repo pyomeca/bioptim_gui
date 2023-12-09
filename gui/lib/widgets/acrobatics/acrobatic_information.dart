@@ -51,7 +51,7 @@ class AcrobaticInformation extends StatelessWidget {
                     CollisionCheckbox(
                       defaultValue: acrobaticsData.collisionConstraint,
                     ),
-                    const Text("Collision"),
+                    const Text("Non-collision"),
                   ],
                 ),
                 Row(
