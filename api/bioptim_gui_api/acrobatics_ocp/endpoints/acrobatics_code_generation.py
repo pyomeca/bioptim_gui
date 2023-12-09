@@ -4,6 +4,7 @@ from fastapi import APIRouter, HTTPException
 
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import CodeGenerationRequest
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import CodeGenerationResponse
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import AdditionalCriteria
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import read_acrobatics_data
 from bioptim_gui_api.acrobatics_ocp.misc.code_generation.common import AcrobaticsGenerationCommon
 from bioptim_gui_api.acrobatics_ocp.misc.code_generation.custom_penalty_fcn import AcrobaticsGenerationCustomPenalties
@@ -32,7 +33,7 @@ def converted_model(save_path: str, data: dict) -> tuple:
     save_folder = Path(save_path).parent
     original_filename = Path(model_path).name.split(".")[0]
     new_model_path = save_folder / f"{original_filename}-{position}.bioMod"
-    converter = get_converter(data["position"], with_visual_criteria, collision_constraint)
+    converter = get_converter(data["position"], AdditionalCriteria(with_visual_criteria, collision_constraint))
     new_bio_model = converter.convert(model_path)
 
     return new_bio_model, new_model_path

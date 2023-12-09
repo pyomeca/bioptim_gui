@@ -44,7 +44,7 @@ class BioModConverter:
         while not lines[current_index].strip().startswith("endmarker"):
             current_index += 1
 
-        return current_index + 1
+        return cls._ignore_unused_markers(lines, current_index + 1)
 
     @classmethod
     def _check_missing_segments(cls, lines: list[str]) -> None:

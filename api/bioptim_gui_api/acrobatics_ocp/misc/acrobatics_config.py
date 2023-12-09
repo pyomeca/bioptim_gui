@@ -108,6 +108,7 @@ class DefaultAcrobaticsConfig:
 class AdditionalCriteria(NamedTuple):
     with_visual_criteria: bool = False
     collision_constraint: bool = False
+    without_cone: bool = False
 
 
 def get_phase_objectives(

@@ -2,6 +2,7 @@ import os
 
 import pytest
 
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import AdditionalCriteria
 from bioptim_gui_api.model_converter.utils import get_converter
 
 BIOMODS_PATH = "test_biomods"  # to change depending on from where you run the test
@@ -16,16 +17,18 @@ BIOMODS_PATH = "test_biomods"  # to change depending on from where you run the t
     ],
 )
 @pytest.mark.parametrize(
-    ("with_visual_criteria", "non_collision", "folder"),
+    ("with_visual_criteria", "non_collision", "without_cone", "folder"),
     [
-        (True, True, "with_collision_and_visual"),
-        (True, False, "with_visual"),
-        (False, True, "with_collision"),
-        (False, False, "vanilla"),
+        (True, True, False, "with_collision_and_visual"),
+        (True, True, True, "with_collision_and_visual_coneless"),
+        (True, False, False, "with_visual"),
+        (True, False, True, "with_visual_coneless"),
+        (False, True, False, "with_collision"),
+        (False, False, False, "vanilla"),
     ],
 )
-def test_good(position, with_visual_criteria, non_collision, folder):
-    converter = get_converter(position, with_visual_criteria, non_collision)
+def test_good(position, with_visual_criteria, non_collision, without_cone, folder):
+    converter = get_converter(position, AdditionalCriteria(with_visual_criteria, non_collision, without_cone))
     actual = converter.convert(f"{BIOMODS_PATH}/{folder}/{folder}_base.bioMod")
     with open(f"{BIOMODS_PATH}/{folder}/good/{position}.bioMod", "r") as f:
         expected = f.read()
@@ -41,12 +44,14 @@ def test_good(position, with_visual_criteria, non_collision, folder):
     ],
 )
 @pytest.mark.parametrize(
-    ("with_visual_criteria", "non_collision", "folder"),
+    ("with_visual_criteria", "non_collision", "without_cone", "folder"),
     [
-        (True, True, "with_collision_and_visual"),
-        (True, False, "with_visual"),
-        (False, True, "with_collision"),
-        (False, False, "vanilla"),
+        (True, True, False, "with_collision_and_visual"),
+        (True, True, True, "with_collision_and_visual_coneless"),
+        (True, False, False, "with_visual"),
+        (True, False, True, "with_visual_coneless"),
+        (False, True, False, "with_collision"),
+        (False, False, False, "vanilla"),
     ],
 )
 @pytest.mark.parametrize(
@@ -57,8 +62,8 @@ def test_good(position, with_visual_criteria, non_collision, folder):
         "missing_marker_and_segment",
     ],
 )
-def test_bad(position, with_visual_criteria, non_collision, folder, reason):
-    converter = get_converter(position, with_visual_criteria, non_collision)
+def test_bad(position, with_visual_criteria, non_collision, without_cone, folder, reason):
+    converter = get_converter(position, AdditionalCriteria(with_visual_criteria, non_collision, without_cone))
     filepath = f"{BIOMODS_PATH}/{folder}/{reason}/{position}.bioMod"
 
     if os.path.exists(filepath):

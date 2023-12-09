@@ -1,7 +1,8 @@
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import AdditionalCriteria
 from bioptim_gui_api.model_converter.converter import *
 
 
-def get_converter(position: str = "straight", with_visual_criteria: bool = False, collision_constraint: bool = False):
+def get_converter(position: str = "straight", additional_criteria: AdditionalCriteria = None) -> BioModConverter:
     base_converters = {
         "straight": StraightConverter,
         "tuck": TuckConverter,
@@ -9,11 +10,10 @@ def get_converter(position: str = "straight", with_visual_criteria: bool = False
     }
 
     with_visual_segment_rotations = {"Head": "zx", "Eyes": "zx"}
-    with_visual_markers = (
-        ["eyes_vect_start", "eyes_vect_end", "fixation_front", "fixation_center"]
-        + [f"Trampo_corner_{n}" for n in range(1, 5)]
-        + [f"cone_approx_{i}_{j}" for i in range(11) for j in range(10)]
-    )
+    with_visual_markers = ["eyes_vect_start", "eyes_vect_end", "fixation_front", "fixation_center"] + [
+        f"Trampo_corner_{n}" for n in range(1, 5)
+    ]
+    cones = [f"cone_approx_{i}_{j}" for i in range(11) for j in range(10)]
 
     straight_collision_markers = ["HeadTop", "Ankle", "RightShoulder", "RightKnuckle", "LeftShoulder", "LeftKnuckle"]
     pike_collision_markers = straight_collision_markers + ["RightElbow", "LeftElbow", "PelvisBase"]
@@ -32,11 +32,14 @@ def get_converter(position: str = "straight", with_visual_criteria: bool = False
     new_segment_translation = base.segment_translation.copy()
     new_markers = base.markers.copy()
 
-    if with_visual_criteria:
+    if additional_criteria.with_visual_criteria:
         new_segment_rotation.update(with_visual_segment_rotations)
         new_markers += with_visual_markers
 
-    if collision_constraint:
+        if not additional_criteria.without_cone:
+            new_markers += cones
+
+    if additional_criteria.collision_constraint:
         new_markers += collision_markers[position]
 
     class SubConverter(BioModConverter):
