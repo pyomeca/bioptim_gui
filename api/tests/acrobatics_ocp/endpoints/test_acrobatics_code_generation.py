@@ -38,20 +38,26 @@ def test_generate_code_no_model():
 
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
-@pytest.mark.parametrize("with_visuals", [True, False])
-@pytest.mark.parametrize("collision_constraint", [True, False])
-def test_generate_code_simple_position(position, with_visuals, collision_constraint):
+@pytest.mark.parametrize(
+    ("with_visual_criteria", "non_collision", "folder"),
+    [
+        (True, True, "with_collision_and_visual"),
+        (True, False, "with_visual"),
+        (False, True, "with_collision"),
+        (False, False, "vanilla"),
+    ],
+)
+def test_generate_code_simple_position(position, with_visual_criteria, non_collision, folder):
     # using base data and a position model (16 degrees of freedom)
-    visual_path = "with_visual" if with_visuals else "without_visual"
-    model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
+    model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
     response = client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
     assert response.status_code == 200, response
 
-    if with_visuals:
+    if with_visual_criteria:
         response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
         assert response.status_code == 200, response
 
-    if collision_constraint:
+    if non_collision:
         response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
         assert response.status_code == 200, response
 
@@ -79,20 +85,26 @@ def test_generate_code_simple_position(position, with_visuals, collision_constra
 
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
-@pytest.mark.parametrize("with_visuals", [True, False])
-@pytest.mark.parametrize("collision_constraint", [True, False])
-def test_generate_code_position_no_objective_no_constraint(position, with_visuals, collision_constraint):
+@pytest.mark.parametrize(
+    ("with_visual_criteria", "non_collision", "folder"),
+    [
+        (True, True, "with_collision_and_visual"),
+        (True, False, "with_visual"),
+        (False, True, "with_collision"),
+        (False, False, "vanilla"),
+    ],
+)
+def test_generate_code_position_no_objective_no_constraint(position, with_visual_criteria, non_collision, folder):
     # using base data and a position model (16 degrees of freedom)
-    visual_path = "with_visual" if with_visuals else "without_visual"
-    model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
+    model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
     response = client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
     assert response.status_code == 200, response
 
-    if with_visuals:
+    if with_visual_criteria:
         response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
         assert response.status_code == 200, response
 
-    if collision_constraint:
+    if non_collision:
         response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
         assert response.status_code == 200, response
 
@@ -126,22 +138,28 @@ def test_generate_code_position_no_objective_no_constraint(position, with_visual
 
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
-@pytest.mark.parametrize("with_visuals", [True, False])
-@pytest.mark.parametrize("collision_constraint", [True, False])
-def test_generate_code_position_objective_and_constraint(position, with_visuals, collision_constraint):
+@pytest.mark.parametrize(
+    ("with_visual_criteria", "non_collision", "folder"),
+    [
+        (True, True, "with_collision_and_visual"),
+        (True, False, "with_visual"),
+        (False, True, "with_collision"),
+        (False, False, "vanilla"),
+    ],
+)
+def test_generate_code_position_objective_and_constraint(position, with_visual_criteria, non_collision, folder):
     # using base data and a position model (16 degrees of freedom)
-    visual_path = "with_visual" if with_visuals else "without_visual"
-    model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
+    model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
     assert response.status_code != 400, response
 
-    if with_visuals:
+    if with_visual_criteria:
         response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
         assert response.status_code == 200, response
 
-    if collision_constraint:
+    if non_collision:
         response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
         assert response.status_code == 200, response
 
@@ -172,19 +190,25 @@ def test_generate_code_position_objective_and_constraint(position, with_visuals,
 
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
-@pytest.mark.parametrize("with_visuals", [True, False])
-@pytest.mark.parametrize("collision_constraint", [True, False])
-def test_generate_code_2_phase_position_objective_and_constraint(position, with_visuals, collision_constraint):
+@pytest.mark.parametrize(
+    ("with_visual_criteria", "non_collision", "folder"),
+    [
+        (True, True, "with_collision_and_visual"),
+        (True, False, "with_visual"),
+        (False, True, "with_collision"),
+        (False, False, "vanilla"),
+    ],
+)
+def test_generate_code_2_phase_position_objective_and_constraint(position, with_visual_criteria, non_collision, folder):
     # using base data and a position model (16 degrees of freedom)
-    visual_path = "with_visual" if with_visuals else "without_visual"
-    model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
+    model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
 
-    if with_visuals:
+    if with_visual_criteria:
         response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
         assert response.status_code == 200, response
 
-    if collision_constraint:
+    if non_collision:
         response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
         assert response.status_code == 200, response
 
@@ -222,19 +246,25 @@ def test_generate_code_2_phase_position_objective_and_constraint(position, with_
 
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
-@pytest.mark.parametrize("with_visuals", [True, False])
-@pytest.mark.parametrize("collision_constraint", [True, False])
-def test_generate_code_modified_objective_and_constraint(position, with_visuals, collision_constraint):
+@pytest.mark.parametrize(
+    ("with_visual_criteria", "non_collision", "folder"),
+    [
+        (True, True, "with_collision_and_visual"),
+        (True, False, "with_visual"),
+        (False, True, "with_collision"),
+        (False, False, "vanilla"),
+    ],
+)
+def test_generate_code_modified_objective_and_constraint(position, with_visual_criteria, non_collision, folder):
     # using base data and a position model (16 degrees of freedom)
-    visual_path = "with_visual" if with_visuals else "without_visual"
-    model_path = Path(f"test_biomods/{visual_path}/good/{position}.bioMod").absolute()
+    model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
 
-    if with_visuals:
+    if with_visual_criteria:
         response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
         assert response.status_code == 200, response
 
-    if collision_constraint:
+    if non_collision:
         response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
         assert response.status_code == 200, response
 
