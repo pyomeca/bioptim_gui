@@ -3,7 +3,6 @@ from typing import NamedTuple
 
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.collision_constraint import (
     collision_constraint_constraints,
-    collision_constraint_objectives,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.common import common_objectives
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.kickout import kickout_objectives
@@ -133,9 +132,6 @@ def get_phase_objectives(
 
     if with_visual_criteria:
         objectives += with_visual_criteria_objectives(phase_names, phase_index, model)
-
-    if collision_constraint:
-        objectives += collision_constraint_objectives(phase_names, phase_index, position)
 
     return objectives
 
