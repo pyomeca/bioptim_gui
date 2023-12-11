@@ -5,7 +5,7 @@ class AcrobaticsGenerationImport:
 
     @staticmethod
     def generate_imports() -> str:
-        return f"""\"""This file was automatically generated using BioptimGUI version 0.0.1\"""
+        return """\"""This file was automatically generated using BioptimGUI version 0.0.1\"""
 
 import argparse
 import biorbd

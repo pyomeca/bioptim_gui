@@ -1,9 +1,43 @@
 from fastapi import APIRouter, HTTPException
 
-import bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_code_generation as acrobatics_code_generation
-import bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_phases as acrobatics_somersaults
-from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import *
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import *
+from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_code_generation import (
+    router as acrobatics_code_generation_router,
+)
+from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_phases import router as acrobatics_somersaults_router
+from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import (
+    CollisionConstraintRequest,
+    FinalTimeMarginRequest,
+    FinalTimeRequest,
+    ModelPathRequest,
+    NbHalfTwistsRequest,
+    NbSomersaultsRequest,
+    PositionRequest,
+    PreferredTwistSideRequest,
+    SportTypeRequest,
+    VisualCriteriaRequest,
+)
+from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import (
+    FinalTimeMarginResponse,
+    FinalTimeResponse,
+    ModelPathResponse,
+    PreferredTwistSideResponse,
+    SportTypeResponse,
+)
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import (
+    AdditionalCriteria,
+    phase_name_to_info,
+)
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import (
+    acrobatics_phase_names,
+    read_acrobatics_data,
+    update_acrobatics_data,
+    update_phase_info,
+)
+from bioptim_gui_api.acrobatics_ocp.misc.enums import (
+    Position,
+    PreferredTwistSide,
+    SportType,
+)
 
 router = APIRouter(
     prefix="/acrobatics",
@@ -11,11 +45,11 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 router.include_router(
-    acrobatics_somersaults.router,
+    acrobatics_somersaults_router,
     prefix="/phases_info",
     responses={404: {"description": "Not found"}},
 )
-router.include_router(acrobatics_code_generation.router)
+router.include_router(acrobatics_code_generation_router)
 
 
 @router.get("/", response_model=dict)
@@ -56,10 +90,7 @@ def update_nb_somersaults(nb_somersaults: NbSomersaultsRequest):
     return read_acrobatics_data()
 
 
-@router.put(
-    "/nb_half_twists/{somersault_index}",
-    response_model=list,
-)
+@router.put("/nb_half_twists/{somersault_index}", response_model=list)
 def put_nb_half_twist(somersault_index: int, half_twists_request: NbHalfTwistsRequest):
     if half_twists_request.nb_half_twists < 0:
         raise HTTPException(status_code=400, detail="nb_half_twists must be positive or zero")
@@ -72,15 +103,15 @@ def put_nb_half_twist(somersault_index: int, half_twists_request: NbHalfTwistsRe
     position = data["position"]
     half_twists = data["nb_half_twists"]
 
-    additional_criteria = config.AdditionalCriteria(
-        with_visual_criteria=data["with_visual_criteria"], collision_constraint=data["collision_constraint"]
+    additional_criteria = AdditionalCriteria(
+        with_visual_criteria=data["with_visual_criteria"],
+        collision_constraint=data["collision_constraint"],
     )
 
     new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
 
     new_phases = [
-        config.phase_name_to_info(position, new_phase_names, i, additional_criteria)
-        for i, _ in enumerate(new_phase_names)
+        phase_name_to_info(position, new_phase_names, i, additional_criteria) for i, _ in enumerate(new_phase_names)
     ]
 
     data["phases_info"] = new_phases
@@ -116,10 +147,6 @@ def put_final_time_margin(final_time_margin: FinalTimeMarginRequest):
 
 @router.get("/position", response_model=list)
 def get_position():
-    # TODO implement with frontend
-    # nb_somersaults = read_acrobatics_data("nb_somersaults")
-    # if nb_somersaults == 1:
-    #     return [Position.STRAIGHT.capitalize()]
     return [side.capitalize() for side in Position]
 
 
@@ -136,7 +163,6 @@ def put_position(position: PositionRequest):
 
     update_acrobatics_data("position", new_value)
 
-    # TODO update phases
     data = read_acrobatics_data()
     nb_somersaults = data["nb_somersaults"]
     half_twists = data["nb_half_twists"]
@@ -159,7 +185,7 @@ def put_position(position: PositionRequest):
 
 
 @router.get("/sport_type", response_model=list)
-def put_sport_type():
+def get_sport_type():
     return [side.capitalize() for side in SportType]
 
 
@@ -198,7 +224,7 @@ def put_preferred_twist_side(preferred_twist_side: PreferredTwistSideRequest):
 
 
 @router.put("/with_visual_criteria", response_model=list)
-def put_preferred_twist_side(visual_criteria: VisualCriteriaRequest):
+def put_with_visual_criteria(visual_criteria: VisualCriteriaRequest):
     new_value = visual_criteria.with_visual_criteria
     old_value = read_acrobatics_data("with_visual_criteria")
     if old_value == new_value:
@@ -222,7 +248,7 @@ def put_preferred_twist_side(visual_criteria: VisualCriteriaRequest):
 
 
 @router.put("/collision_constraint", response_model=list)
-def put_preferred_twist_side(collision_constraint: CollisionConstraintRequest):
+def put_collision_constraint(collision_constraint: CollisionConstraintRequest):
     new_value = collision_constraint.collision_constraint
     old_value = read_acrobatics_data("collision_constraint")
     if old_value == new_value:

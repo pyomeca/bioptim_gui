@@ -1,6 +1,7 @@
 class InterchangingPair:
     """
-    This class is used to define a pair of elements that can be interchanged (e.g. cylinder markers, cylinder collisions, etc.)
+    This class is used to define a pair of elements that can be interchanged
+    (e.g. cylinder markers, cylinder collisions, etc.)
 
     Attributes
     ----------

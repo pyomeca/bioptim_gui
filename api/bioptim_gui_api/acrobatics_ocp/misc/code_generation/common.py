@@ -35,7 +35,7 @@ def save_results(sol: Solution, *combinatorial_parameters, **extra_parameters) -
     save_folder = extra_parameters["save_folder"]
     if not os.path.exists(save_folder):
         os.mkdir(save_folder)
-    
+
     with open(f"{save_folder}/log.txt", "a") as f:
         if sol.status != 0:
             f.write(f"{seed} DVG\\n")
@@ -47,7 +47,7 @@ def save_results(sol: Solution, *combinatorial_parameters, **extra_parameters) -
 
     integrated = sol.integrate(merge_phases=True)
     integrated_states, time_vector = integrated._states["unscaled"], integrated._time_vector
-    
+
     time_parameters = sol.parameters["time"]
     fps = 25
     n_frames = [round(time_parameters[i][0] * fps) for i in range(len(time_parameters))]
@@ -122,6 +122,7 @@ def prepare_multi_start(
 
     @staticmethod
     def main_function(half_twists: list[int], side: str, position: str) -> str:
+        file_addon = f"{'_'.join(str(i) for i in half_twists)}_{side}_{position}"
         return f"""
 def main(is_multistart: bool = False, nb_seeds: int = 1, save_folder: str = "save"):
     # --- Prepare the multi-start and run it --- #
@@ -146,16 +147,16 @@ def main(is_multistart: bool = False, nb_seeds: int = 1, save_folder: str = "sav
         start_time = time.time()
         multi_start.solve()
         with open(f"{{save_folder}}/timelog.txt", "a") as f:
-            f.write(f"multi_{{nb_seeds}}_acrobatics_{'_'.join(str(i) for i in half_twists)}_{side}_{position}: {{time.time() - start_time}}\\n")
-            
+            f.write(f"multi_{{nb_seeds}}_acrobatics_{file_addon}: {{time.time() - start_time}}\\n")
+
     else:
         ocp = prepare_ocp()
         solver = get_solver()
-        
+
         start_time = time.time()
         sol = ocp.solve(solver=solver)
         with open(f"{{save_folder}}/timelog.txt", "a") as f:
-            f.write(f"acrobatics_{'_'.join(str(i) for i in half_twists)}_{side}_{position}: {{time.time() - start_time}}\\n")
+            f.write(f"acrobatics_{file_addon}: {{time.time() - start_time}}\\n")
 
         save_results(sol, save_folder=save_folder)
 """
@@ -178,7 +179,7 @@ if __name__ == "__main__":
     nb_seeds = args.multistart or 1
     is_multi = args.multistart is not None
 
-    main(is_multi, nb_seeds, save_folder_path) 
+    main(is_multi, nb_seeds, save_folder_path)
 
 """
 

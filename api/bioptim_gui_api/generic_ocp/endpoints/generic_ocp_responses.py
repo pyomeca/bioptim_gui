@@ -1,8 +1,26 @@
 from typing import Union
 
 from bioptim import Axis
+from pydantic import BaseModel
 
-from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import *
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
+    ConstraintFcnRequest,
+    ExpandRequest,
+    DerivativeRequest,
+    IntegrationRuleRequest,
+    ModelPathRequest,
+    MultiThreadRequest,
+    NbShootingPointsRequest,
+    NbPhasesRequest,
+    NodesRequest,
+    ObjectiveFcnRequest,
+    ObjectiveTypeRequest,
+    PenaltyTypeRequest,
+    PhaseDurationRequest,
+    QuadraticRequest,
+    TargetRequest,
+    WeightRequest,
+)
 
 
 class NbPhasesResponse(NbPhasesRequest):

@@ -17,9 +17,9 @@ class BioModConverter:
         A list of markers names that the model should contain
     """
 
-    segment_rotation = dict
-    segment_translation = dict
-    markers = list()
+    segment_rotation = {}
+    segment_translation = {}
+    markers = []
 
     @classmethod
     def _add_dofs(cls, segment_name: str, updated_lines: list[str], stripped: str):
@@ -63,7 +63,7 @@ class BioModConverter:
         utils = BioModConverterUtils(lines)
         existing_segments = set()
         segment_name = ""
-        for i, line in enumerate(lines):
+        for i, _ in enumerate(lines):
             segment_name = utils.get_segment_name(i, segment_name)
             if segment_name in cls.segment_rotation or segment_name in cls.segment_translation:
                 existing_segments.add(segment_name)
@@ -80,7 +80,7 @@ class BioModConverter:
         """
         utils = BioModConverterUtils(lines)
         existing_markers = set()
-        for i, line in enumerate(lines):
+        for line in lines:
             marker_name = utils.get_marker_name(line)
             if marker_name in cls.markers:
                 existing_markers.add(marker_name)

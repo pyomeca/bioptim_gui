@@ -1,11 +1,31 @@
 from fastapi import APIRouter, HTTPException
 
-import bioptim_gui_api.penalty.misc.penalty_config as penalty_config
-from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_responses import *
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
+    ArgumentRequest,
+    ConstraintFcnRequest,
+    DerivativeRequest,
+    ExpandRequest,
+    IntegrationRuleRequest,
+    MultiThreadRequest,
+    NodesRequest,
+    QuadraticRequest,
+    TargetRequest,
+)
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_responses import (
+    ArgumentResponse,
+    DerivativeResponse,
+    ExpandResponse,
+    IntegrationRuleResponse,
+    MultiThreadResponse,
+    NodesResponse,
+    QuadraticResponse,
+    TargetResponse,
+)
 from bioptim_gui_api.generic_ocp.misc.generic_ocp_utils import (
     read_generic_ocp_data,
     update_generic_ocp_data,
 )
+from bioptim_gui_api.penalty.misc.penalty_config import DefaultPenaltyConfig
 from bioptim_gui_api.penalty.misc.penalty_utils import constraint_arguments
 
 router = APIRouter()
@@ -24,7 +44,7 @@ def get_constraints(phase_index: int):
 def add_constraint(phase_index: int):
     phases_info = read_generic_ocp_data("phases_info")
     constraints = phases_info[phase_index]["constraints"]
-    constraints.append(penalty_config.DefaultPenaltyConfig.default_constraint)
+    constraints.append(DefaultPenaltyConfig.default_constraint)
     phases_info[phase_index]["constraints"] = constraints
     update_generic_ocp_data("phases_info", phases_info)
     return constraints

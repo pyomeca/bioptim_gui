@@ -173,17 +173,18 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
         define_loose_bounds(x_bounds[-1], cls.YrotUpperLegs, 2, LooseValue(0.0, 0.1))
 
     @classmethod
-    def _fill_somersault_phase(cls, x_bounds: list, i: int, nb_somersaults: int) -> None:
+    def _fill_somersault_phase(cls, x_bounds: list, phase: int, half_twists: list) -> None:
+        nb_somersaults = len(half_twists)
         for b in 0, 1, 2:
             x_bounds[-1]["min"][:, b] = x_bounds[-2]["min"][:, 2]
             x_bounds[-1]["max"][:, b] = x_bounds[-2]["max"][:, 2]
 
         # somersaulting in pike, for all no-twist somersaults, starting from last pike
         x_bounds[-1]["max"][cls.Xrot, 1:] = min(
-            2 * np.pi * (i + 1) + 0.2,
+            2 * np.pi * (phase + 1) + 0.2,
             2 * np.pi * nb_somersaults - np.pi + 0.2,
         )
-        x_bounds[-1]["min"][cls.Xrot, 2] = 2 * np.pi * i - 0.2
+        x_bounds[-1]["min"][cls.Xrot, 2] = 2 * np.pi * phase - 0.2
 
         # tilt pi / 8
         define_loose_bounds(x_bounds[-1], cls.Yrot, None, LooseValue(0.0, np.pi / 8))
@@ -385,7 +386,7 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
             if is_last_somersault or next_have_twist:
                 # somersaulting in pike
                 add_phase_bounds()
-                cls._fill_somersault_phase(x_bounds, i, nb_somersaults)
+                cls._fill_somersault_phase(x_bounds, i, half_twists)
 
                 # kick out
                 add_phase_bounds()

@@ -48,7 +48,7 @@ def test_load_missing_field():
         files = [("files", f)]
         response = client.post("/load_existing/load", files=files)
         assert response.status_code == 400
-        assert response.json() == {"detail": "Pickle doesn't contain the right data"}
+        assert response.json() == {"detail": "Pickle doesn't contain the right data from 'integrated_states'"}
 
 
 def test_load_best_pkl():

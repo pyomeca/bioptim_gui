@@ -1,7 +1,11 @@
 import numpy as np
 from fastapi import APIRouter
 
-from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import *
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
+    DimensionRequest,
+    InterpolationTypeRequest,
+    VariableUpdateRequest,
+)
 from bioptim_gui_api.generic_ocp.misc.generic_ocp_utils import (
     read_generic_ocp_data,
     update_generic_ocp_data,

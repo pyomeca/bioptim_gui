@@ -2,7 +2,7 @@ from bioptim_gui_api.penalty.misc.penalty_config import DefaultPenaltyConfig
 from bioptim_gui_api.penalty.misc.penalty_utils import create_constraint, create_objective
 
 
-def somersault_objectives(phase_name: str, model, position: str) -> list:
+def somersault_objectives(phase_name: str, model) -> list:
     """
     MINIMIZE_STATE lagrange: q, shoulder_dofs, all_shooting, weight=50000.0
     MINIMIZE_STATE mayer: q, Yrot, all, weight=100.0
@@ -40,7 +40,7 @@ def somersault_objectives(phase_name: str, model, position: str) -> list:
     return objectives
 
 
-def somersault_constraints(phase_name: str, model, position: str) -> list:
+def somersault_constraints(phase_name: str, position: str) -> list:
     """
     SUPERIMPOSE_MARKERS: all_shooting, weight=1.0, quadratic=False, MiddleRightHand, TargetRightHand
     SUPERIMPOSE_MARKERS: all_shooting, weight=1.0, quadratic=False, MiddleLeftHand, TargetLeftHand

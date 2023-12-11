@@ -1,8 +1,26 @@
 from typing import Union
 
 from bioptim import Axis
+from pydantic import BaseModel
 
-from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import *
+from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import (
+    ExpandRequest,
+    DerivativeRequest,
+    FinalTimeMarginRequest,
+    FinalTimeRequest,
+    IntegrationRuleRequest,
+    ModelPathRequest,
+    MultiThreadRequest,
+    NbShootingPointsRequest,
+    NodesRequest,
+    PreferredTwistSideRequest,
+    QuadraticRequest,
+    SomersaultDurationRequest,
+    SportTypeRequest,
+    TargetRequest,
+    VisualCriteriaRequest,
+    WeightRequest,
+)
 
 
 class ModelPathResponse(ModelPathRequest):

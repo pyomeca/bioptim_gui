@@ -152,7 +152,6 @@ def get_phase_objectives(
         The list of objectives (e.g. [{penalty_type, nodes, target, arguments, weight, ...} ...])
     """
     with_visual_criteria = additional_criteria.with_visual_criteria
-    collision_constraint = additional_criteria.collision_constraint
 
     phase_name = phase_names[phase_index]
     model = get_variable_computer(position, with_visual_criteria)
@@ -166,7 +165,7 @@ def get_phase_objectives(
     objectives += twist_objectives(phase_name, model)
     objectives += waiting_objectives(phase_name, model)
     objectives += landing_objectives(phase_name, model, position)
-    objectives += somersault_objectives(phase_name, model, position)
+    objectives += somersault_objectives(phase_name, model)
 
     if with_visual_criteria:
         objectives += with_visual_criteria_objectives(phase_names, phase_index, model)
@@ -192,12 +191,10 @@ def get_phase_constraints(phase_name: str, position: str, additional_criteria: A
     list[dict]
         The list of constraints (e.g. [{penalty_type, nodes, target, arguments, ...} ...])
     """
-    with_visual_criteria = additional_criteria.with_visual_criteria
     collision_constraint = additional_criteria.collision_constraint
 
-    model = get_variable_computer(position, with_visual_criteria)
     constraints = []
-    constraints += somersault_constraints(phase_name, model, position)
+    constraints += somersault_constraints(phase_name, position)
 
     if collision_constraint:
         constraints += collision_constraint_constraints(phase_name, position)

@@ -20,12 +20,11 @@ def variables_zeros(dimension: int, interpolation_type: str) -> list:
     """
     if interpolation_type == "LINEAR":
         return np.zeros((dimension, 2)).tolist()
-    elif interpolation_type == "CONSTANT":
+    if interpolation_type == "CONSTANT":
         return np.zeros((dimension, 1)).tolist()
-    elif interpolation_type == "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT":
+    if interpolation_type == "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT":
         return np.zeros((dimension, 3)).tolist()
-    else:
-        raise ValueError(f"Interpolation type {interpolation_type} not implemented")
+    raise ValueError(f"Interpolation type {interpolation_type} not implemented")
 
 
 def maximum_fig_arms_angle(half_twists: list) -> float:
@@ -41,8 +40,7 @@ def maximum_fig_arms_angle(half_twists: list) -> float:
 
     if (nb_somersaults == 1 and half_twist_out > 2) or (nb_somersaults > 1 and half_twist_out >= 2):
         return np.deg2rad(90)
-    else:
-        return np.deg2rad(45)
+    return np.deg2rad(45)
 
 
 class LooseValue(NamedTuple):

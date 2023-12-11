@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 
-import bioptim_gui_api.variables.misc.variables_config as variables_config
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases_constraints import (
     router as constraints_router,
 )
@@ -13,11 +12,20 @@ from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases_objectives import 
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases_state_variables import (
     router as state_variables_router,
 )
-from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_responses import *
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
+    DynamicsRequest,
+    NbShootingPointsRequest,
+    PhaseDurationRequest,
+)
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_responses import (
+    NbShootingPointsResponse,
+    PhaseDurationResponse,
+)
 from bioptim_gui_api.generic_ocp.misc.generic_ocp_utils import (
     read_generic_ocp_data,
     update_generic_ocp_data,
 )
+from bioptim_gui_api.variables.misc.variables_config import DefaultVariablesConfig
 
 router = APIRouter()
 router.include_router(state_variables_router)
@@ -36,7 +44,7 @@ def get_phases_info():
 
 
 @router.get("/{phase_index}", response_model=dict)
-def get_phases_info(phase_index: int):
+def get_phase_info(phase_index: int):
     n_phases = read_generic_ocp_data("nb_phases")
     if phase_index < 0 or phase_index >= n_phases:
         raise HTTPException(
@@ -88,17 +96,15 @@ def put_dynamics_list(phase_index: int, dynamic_req: DynamicsRequest):
     phases_info[phase_index]["dynamics"] = new_dynamic
 
     if new_dynamic == "TORQUE_DRIVEN":
-        phases_info[phase_index][
-            "state_variables"
-        ] = variables_config.DefaultVariablesConfig.default_torque_driven_variables["state_variables"]
-        phases_info[phase_index][
-            "control_variables"
-        ] = variables_config.DefaultVariablesConfig.default_torque_driven_variables["control_variables"]
-    else:
-        phases_info[phase_index]["state_variables"] = variables_config.DefaultVariablesConfig.default_dummy_variables[
+        phases_info[phase_index]["state_variables"] = DefaultVariablesConfig.default_torque_driven_variables[
             "state_variables"
         ]
-        phases_info[phase_index]["control_variables"] = variables_config.DefaultVariablesConfig.default_dummy_variables[
+        phases_info[phase_index]["control_variables"] = DefaultVariablesConfig.default_torque_driven_variables[
+            "control_variables"
+        ]
+    else:
+        phases_info[phase_index]["state_variables"] = DefaultVariablesConfig.default_dummy_variables["state_variables"]
+        phases_info[phase_index]["control_variables"] = DefaultVariablesConfig.default_dummy_variables[
             "control_variables"
         ]
     update_generic_ocp_data("phases_info", phases_info)

@@ -46,7 +46,7 @@ class AcrobaticsGenerationBounds:
         is_forward = data["position"] == "straight"
 
         nb_phases = len(phases)
-        total_time = sum([s["duration"] for s in phases])
+        total_time = sum(s["duration"] for s in phases)
         qdot_bounds = model.get_qdot_bounds(nb_phases, total_time, is_forward)
 
         ret = ""
@@ -86,7 +86,7 @@ class AcrobaticsGenerationBounds:
     @staticmethod
     def add_qdot_init(data: dict, model) -> str:
         phases = data["phases_info"]
-        final_time = sum([s["duration"] for s in phases])
+        final_time = sum(s["duration"] for s in phases)
         nb_somersaults = data["nb_somersaults"]
         qdot_init = model.get_qdot_init(nb_somersaults, final_time)
 

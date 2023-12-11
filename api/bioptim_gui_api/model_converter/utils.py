@@ -1,5 +1,10 @@
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import AdditionalCriteria
-from bioptim_gui_api.model_converter.converter import *
+from bioptim_gui_api.model_converter.converter import (
+    BioModConverter,
+    PikeConverter,
+    StraightConverter,
+    TuckConverter,
+)
 
 
 def get_converter(position: str = "straight", additional_criteria: AdditionalCriteria = None) -> BioModConverter:

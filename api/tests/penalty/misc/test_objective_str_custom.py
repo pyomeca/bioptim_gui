@@ -19,7 +19,7 @@ def test_custom_str_simple():
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        str(objective)
+        objective.stringify()
         == """my_func,
         custom_type=ObjectiveFcn.Lagrange,
         weight=1.0,
@@ -45,7 +45,7 @@ def test_custom_str_simple_phase():
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        objective.__str__(nb_phase=36)
+        objective.stringify()
         == """my_func,
         custom_type=ObjectiveFcn.Lagrange,
         weight=1.0,
@@ -72,7 +72,7 @@ def test_custom_str_indent_8():
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        objective.__str__(indent=12, nb_phase=1)
+        objective.stringify(indent=12)
         == """my_func,
             custom_type=ObjectiveFcn.Lagrange,
             weight=1.0,
@@ -98,7 +98,7 @@ def test_custom_str_indent_8_with_phase():
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        objective.__str__(indent=12, nb_phase=36)
+        objective.stringify(indent=12)
         == """my_func,
             custom_type=ObjectiveFcn.Lagrange,
             weight=1.0,
@@ -125,7 +125,7 @@ def test_custom_str_indent_8_with_phase_all():
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        objective.__str__(indent=12, nb_phase=36)
+        objective.stringify(indent=12)
         == """my_func,
             custom_type=ObjectiveFcn.Lagrange,
             weight=-10.0,
@@ -194,7 +194,7 @@ def test_custom_multiple_arguments():
         ],
     )
     assert (
-        objective.__str__(indent=12, nb_phase=36)
+        objective.stringify(indent=12)
         == """my_func,
             custom_type=ObjectiveFcn.Lagrange,
             weight=10.0,

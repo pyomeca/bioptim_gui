@@ -61,13 +61,13 @@ def prepare_ocp(
             for objective in phases[i]["objectives"]:
                 ret += f"""
     objective_functions.add(
-        {ObjectivePrinter(i, **objective).__str__(nb_phase=nb_phases)}    )
+        {ObjectivePrinter(i, **objective).stringify()}    )
 """
 
             for constraint in phases[i]["constraints"]:
                 ret += f"""
     constraints.add(
-        {ConstraintPrinter(i, **constraint).__str__(nb_phase=nb_phases)}    )
+        {ConstraintPrinter(i, **constraint).stringify()}    )
 """
         return ret
 
@@ -88,7 +88,7 @@ def prepare_ocp(
     def multinode_constraints(data) -> str:
         phases = data["phases_info"]
         nb_phases = len(phases)
-        total_time = sum([s["duration"] for s in phases])
+        total_time = sum(s["duration"] for s in phases)
 
         return f"""
     multinode_constraints = MultinodeConstraintList()

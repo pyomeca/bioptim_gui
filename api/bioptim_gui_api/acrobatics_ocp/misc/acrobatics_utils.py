@@ -48,13 +48,13 @@ def read_acrobatics_data(key: str = None):
 def update_phase_info(phase_names: list[str]) -> None:
     """
     Update the phases_info of the acrobatics, given a list of phase names
-    It will update the phase_name, duration and objectives and constraints according to the new phase names, the existing
-    position, with_visual_criteria and collision_constraint.
+    It will update the phase_name, duration and objectives and constraints according to the new phase names, the
+    existing position, with_visual_criteria and collision_constraint.
 
     - The phase names are updated in the order they are given.
     - The new durations for each phase is calculated by dividing the final_time by the number of phases.
-    - The phase's objectives and constraints are updated according to the new phase name, existing position, and additional
-    criteria (with_visual_criteria and collision_constraint)
+    - The phase's objectives and constraints are updated according to the new phase name, existing position, and
+    additional criteria (with_visual_criteria and collision_constraint)
 
 
     Parameters

@@ -84,10 +84,6 @@ class InterpolationTypeRequest(BaseModel):
     interpolation_type: str
 
 
-class DynamicsRequest(BaseModel):
-    dynamics: str
-
-
 class DimensionRequest(BaseModel):
     dimension: int
 

@@ -15,7 +15,7 @@ def test_regular_str_simple():
         arguments=[],
     )
     assert (
-        str(constraint)
+        constraint.stringify()
         == """constraint=ConstraintFcn.TIME_CONSTRAINT,
         node=Node.ALL,
         quadratic=False,
@@ -37,7 +37,7 @@ def test_regular_str_simple_phase():
         arguments=[],
     )
     assert (
-        constraint.__str__(nb_phase=36)
+        constraint.stringify()
         == """constraint=ConstraintFcn.TIME_CONSTRAINT,
         node=Node.ALL,
         quadratic=False,
@@ -60,7 +60,9 @@ def test_regular_str_indent_8():
         arguments=[],
     )
     assert (
-        constraint.__str__(indent=12, nb_phase=1)
+        constraint.stringify(
+            indent=12,
+        )
         == """constraint=ConstraintFcn.TIME_CONSTRAINT,
             node=Node.ALL,
             quadratic=False,
@@ -82,7 +84,7 @@ def test_regular_str_indent_8_with_phase():
         arguments=[],
     )
     assert (
-        constraint.__str__(indent=12, nb_phase=36)
+        constraint.stringify(indent=12)
         == """constraint=ConstraintFcn.TIME_CONSTRAINT,
             node=Node.ALL,
             quadratic=False,
@@ -110,7 +112,7 @@ def test_regular_str_indent_8_with_phase_all():
         ],
     )
     assert (
-        constraint.__str__(indent=12, nb_phase=36)
+        constraint.stringify(indent=12)
         == """constraint=ConstraintFcn.SUPERIMPOSE_MARKERS,
             min_bound=-0.05,
             max_bound=0.05,

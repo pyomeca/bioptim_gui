@@ -20,7 +20,7 @@ def test_regular_str_simple():
         ],
     )
     assert (
-        str(objective)
+        objective.stringify()
         == """objective=ObjectiveFcn.Lagrange.MINIMIZE_STATE,
         weight=1.0,
         key="q",
@@ -50,7 +50,7 @@ def test_mayer_no_integration_rule():
         ],
     )
     assert (
-        str(objective)
+        objective.stringify()
         == """objective=ObjectiveFcn.Mayer.MINIMIZE_STATE,
         weight=1.0,
         key="q",
@@ -80,7 +80,7 @@ def test_regular_str_simple_phase():
         ],
     )
     assert (
-        objective.__str__(nb_phase=36)
+        objective.stringify()
         == """objective=ObjectiveFcn.Mayer.MINIMIZE_STATE,
         weight=1.0,
         key="q",
@@ -111,7 +111,7 @@ def test_regular_str_indent_8():
         ],
     )
     assert (
-        objective.__str__(indent=12, nb_phase=1)
+        objective.stringify(indent=12)
         == """objective=ObjectiveFcn.Lagrange.MINIMIZE_STATE,
             weight=1.0,
             key="q",
@@ -141,7 +141,7 @@ def test_regular_str_indent_8_with_phase():
         ],
     )
     assert (
-        objective.__str__(indent=12, nb_phase=36)
+        objective.stringify(indent=12)
         == """objective=ObjectiveFcn.Lagrange.MINIMIZE_STATE,
             weight=1.0,
             key="q",
@@ -172,7 +172,7 @@ def test_regular_str_indent_8_with_phase_all():
         ],
     )
     assert (
-        objective.__str__(indent=12, nb_phase=36)
+        objective.stringify(indent=12)
         == """objective=ObjectiveFcn.Lagrange.MINIMIZE_STATE,
             weight=-10.0,
             key="q",

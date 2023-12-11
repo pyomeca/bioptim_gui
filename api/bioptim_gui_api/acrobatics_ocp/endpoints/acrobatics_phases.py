@@ -6,7 +6,14 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_phases_constraints impo
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_phases_objectives import (
     router as objectives_router,
 )
-from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import *
+from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import (
+    NbShootingPointsRequest,
+    SomersaultDurationRequest,
+)
+from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import (
+    NbShootingPointsResponse,
+    SomersaultDurationResponse,
+)
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import (
     read_acrobatics_data,
     update_acrobatics_data,
@@ -27,7 +34,7 @@ def get_phases_info():
 
 
 @router.get("/{phase_index}", response_model=dict)
-def get_phases_info(phase_index: int):
+def get_phase_info(phase_index: int):
     n_somersaults = read_acrobatics_data("nb_somersaults")
     if phase_index < 0 or phase_index >= n_somersaults:
         raise HTTPException(
@@ -38,10 +45,7 @@ def get_phases_info(phase_index: int):
     return phases_info[phase_index]
 
 
-@router.put(
-    "/{phase_index}/nb_shooting_points",
-    response_model=NbShootingPointsResponse,
-)
+@router.put("/{phase_index}/nb_shooting_points", response_model=NbShootingPointsResponse)
 def put_nb_shooting_points(phase_index: int, nb_shooting_points: NbShootingPointsRequest):
     if nb_shooting_points.nb_shooting_points <= 0:
         raise HTTPException(status_code=400, detail="nb_shooting_points must be positive")
@@ -51,10 +55,7 @@ def put_nb_shooting_points(phase_index: int, nb_shooting_points: NbShootingPoint
     return NbShootingPointsResponse(nb_shooting_points=nb_shooting_points.nb_shooting_points)
 
 
-@router.put(
-    "/{phase_index}/duration",
-    response_model=SomersaultDurationResponse,
-)
+@router.put("/{phase_index}/duration", response_model=SomersaultDurationResponse)
 def put_duration(phase_index: int, duration: SomersaultDurationRequest):
     if duration.duration <= 0:
         raise HTTPException(status_code=400, detail="duration must be positive")

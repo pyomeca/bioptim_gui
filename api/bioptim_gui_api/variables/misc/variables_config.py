@@ -97,5 +97,4 @@ def get_variable_computer(position: str = "straight", with_visual_criteria: bool
 
     if with_visual_criteria:
         return with_visual[position]
-    else:
-        return without_visual[position]
+    return without_visual[position]

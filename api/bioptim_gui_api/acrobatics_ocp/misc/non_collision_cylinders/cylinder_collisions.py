@@ -9,9 +9,6 @@ class Cylinder(InterchangingPair):
     It is derived from InterchangingPair, because the order of the markers does not matter.
     """
 
-    def __init__(self, marker1: str, marker2: str):
-        super().__init__(marker1, marker2)
-
     def __repr__(self):
         return f"Cylinder({self.element1}, {self.element2})"
 
@@ -21,9 +18,6 @@ class CylinderCollision(InterchangingPair):
     This class is used to define a cylinder collision made out of two cylinders.
     It is derived from InterchangingPair, because the order of the cylinders does not matter.
     """
-
-    def __init__(self, cylinder1: Cylinder, cylinder2: Cylinder):
-        super().__init__(cylinder1, cylinder2)
 
     def __repr__(self):
         return f"Collision({self.element1}, {self.element2})"
@@ -45,11 +39,12 @@ class CollisionComputer:
     cylinders: dict
         The cylinder made out of two markers for each body part {"Name of cylinder": ("Marker 1", "Marker 2")}
     exceptions: tuple
-        The cylinder collision pairs that are not physically possible, or allowed (e.g. trunk and arms as one is the parent of the other)
+        The cylinder collision pairs that are not physically possible, or allowed (e.g. trunk and arms as one is the
+        parent of the other)
 
     """
 
-    cylinders = dict()
+    cylinders = {}
     exceptions = tuple()
 
     @classmethod

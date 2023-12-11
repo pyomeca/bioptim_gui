@@ -48,8 +48,8 @@ async def handle_pkl(file: UploadFile) -> (bool, float):
     try:
         integrated_state = loaded_data["integrated_states"][-1]["q"][:, -1]
         sol_states = loaded_data["solution"].states[-1]["q"][:, -1]
-    except KeyError:
-        raise HTTPException(400, f"Pickle doesn't contain the right data")
+    except KeyError as e:
+        raise HTTPException(400, f"Pickle doesn't contain the right data from {e}") from e
 
     to_discard = False
     cost = loaded_data["solution"].cost
@@ -61,7 +61,7 @@ async def handle_pkl(file: UploadFile) -> (bool, float):
 
 
 @router.post("/load", response_model=LoadExistingResponse)
-async def load_pickle(files: List[UploadFile] = []):
+async def load_pickle(files: List[UploadFile] = None):
     """
     Load a pickles file and return the best one to use and the one to discard
     The pickles are received as a list of UploadFile, instead of a list of filepath, to allow the api to be hosted on a

@@ -2,7 +2,7 @@ import json
 
 from fastapi import APIRouter
 
-import bioptim_gui_api.generic_ocp.misc.generic_ocp_config as config
+from bioptim_gui_api.generic_ocp.misc.generic_ocp_config import DefaultGenericOCPConfig
 
 router = APIRouter(
     responses={404: {"description": "Not found"}},
@@ -10,17 +10,16 @@ router = APIRouter(
 
 
 def read_generic_ocp_data(key: str = None) -> dict:
-    with open(config.DefaultGenericOCPConfig.datafile, "r") as f:
+    with open(DefaultGenericOCPConfig.datafile, "r") as f:
         data = json.load(f)
     return data if key is None else data[key]
 
 
 def arg_to_string(argument: dict) -> str:
-    name, type, value = argument["name"], argument["type"], argument["value"]
-    if type == "int" or type == "float":
+    name, arg_type, value = argument["name"], argument["type"], argument["value"]
+    if arg_type in ["int", "float"]:
         return f"{name}={value}"
-    else:
-        return f'{name}="{value}"'
+    return f'{name}="{value}"'
 
 
 @router.get("/generate_code", response_model=str)
@@ -82,20 +81,20 @@ def prepare_ocp():
     n_shooting = [{", ".join([str(p["nb_shooting_points"]) for p in phases])}]
     phase_time = [{", ".join([str(p["duration"]) for p in phases])}]
 """
-    generated += f"""
+    generated += """
     # Declaration of the dynamics function used during integration
     dynamics = DynamicsList()
     """
 
     if nb_phases == 1:
-        generated += f"""
+        generated += """
     dynamics.add(
         DynamicsFcn.TORQUE_DRIVEN,
         expand=True,
     )
     """
     else:
-        generated += f"""
+        generated += """
     for i in range(nb_phases):
         dynamics.add(
             DynamicsFcn.TORQUE_DRIVEN,
@@ -104,7 +103,7 @@ def prepare_ocp():
         )
 """
 
-    generated += f"""
+    generated += """
     # Declaration of the constraints and objectives of the ocp
     constraints = ConstraintList()
     objective_functions = ObjectiveList()
@@ -168,7 +167,7 @@ def prepare_ocp():
             generated += """    )
 """
 
-    generated += f"""
+    generated += """
     # Declaration of optimization variables bounds and initial guesses
     x_bounds = BoundsList()
     x_initial_guesses = InitialGuessList()
@@ -225,7 +224,7 @@ def prepare_ocp():
             generated += """    )
 """
 
-        generated += f"""
+            generated += f"""
     u_initial_guesses.add(
         "{control_variable["name"]}",
         initial_guess={control_variable["initial_guess"]},

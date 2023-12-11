@@ -2,7 +2,7 @@ from bioptim_gui_api.penalty.misc.penalty_config import DefaultPenaltyConfig
 from bioptim_gui_api.penalty.misc.penalty_utils import create_objective
 
 
-def spotting_objectives(phase_name: str, model):
+def spotting_objectives():
     # Spotting
     """
     MINIMIZE_SEGMENT_VELOCITY lagrange: Head, default, weight=10.0
@@ -142,8 +142,8 @@ def with_visual_criteria_objectives(phase_names, phase_index, model):
     """
     objectives = []
     # FIRST AND LAST
-    if phase_index == 0 or phase_index == len(phase_names) - 1:
-        objectives += spotting_objectives(phase_names[phase_index], model)
+    if phase_index in [0, len(phase_names) - 1]:
+        objectives += spotting_objectives()
 
     # ALL
     objectives += with_visual_criteria_common_objectives(phase_names[phase_index], model)

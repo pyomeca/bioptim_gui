@@ -9,7 +9,13 @@ from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_code_generation import (
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases import (
     router as phases_router,
 )
-from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_responses import *
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
+    ModelPathRequest,
+    NbPhasesRequest,
+)
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_responses import (
+    ModelPathResponse,
+)
 from bioptim_gui_api.generic_ocp.misc.generic_ocp_utils import (
     read_generic_ocp_data,
     update_generic_ocp_data,
@@ -37,7 +43,7 @@ def add_phase_info(n: int = 1) -> None:
     phases_info = data["phases_info"]
     before = len(phases_info)
 
-    for i in range(before, before + n):
+    for _ in range(before, before + n):
         phases_info.append(config.DefaultGenericOCPConfig.default_phases_info)
 
     data["phases_info"] = phases_info
@@ -50,8 +56,6 @@ def remove_phase_info(n: int = 0) -> None:
         raise ValueError("n must be positive")
     data = read_generic_ocp_data()
     phases_info = data["phases_info"]
-    before = len(phases_info)
-    n_phases = before - n
 
     for _ in range(n):
         phases_info.pop()

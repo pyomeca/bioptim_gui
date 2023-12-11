@@ -106,7 +106,7 @@ class PenaltyPrinter:
         """
         ret = ""
         if not self.expand:
-            ret += f"expand=False,\n"
+            ret += "expand=False,\n"
         return ret
 
     def _target_str(self) -> str:
@@ -124,7 +124,7 @@ class PenaltyPrinter:
         """
         ret = ""
         if self.derivative:
-            ret += f"derivative=True,\n"
+            ret += "derivative=True,\n"
         return ret
 
     def _integration_rule_str(self) -> str:
@@ -142,7 +142,7 @@ class PenaltyPrinter:
         """
         ret = ""
         if self.multi_thread:
-            ret += f"multi_thread=True,\n"
+            ret += "multi_thread=True,\n"
         return ret
 
     def _phase_str(self) -> str:
@@ -154,7 +154,7 @@ class PenaltyPrinter:
             ret += f"phase={self.phase},\n"
         return ret
 
-    def __common__args__(self, nb_phase: int = 1) -> str:
+    def __common__args__(self) -> str:
         """
         This function is used to get the common arguments of a penalty.
         """
@@ -170,7 +170,10 @@ class PenaltyPrinter:
 
         return ret
 
-    def __str__(self, indent: int = 8, nb_phase: int = 1) -> str:
+    def _regular_str(self) -> str:
+        return ""
+
+    def stringify(self, indent: int = 8) -> str:
         """
         This function is used to get the string of a penalty.
         """
@@ -180,7 +183,7 @@ class PenaltyPrinter:
         else:
             ret = self._regular_str()
 
-        ret += self.__common__args__(nb_phase)
+        ret += self.__common__args__()
 
         # indent the whole string
         # strip to remove excess spaces at the end of the string

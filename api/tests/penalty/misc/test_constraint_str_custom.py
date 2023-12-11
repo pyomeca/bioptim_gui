@@ -17,7 +17,7 @@ def test_custom_str_simple():
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        str(constraint)
+        constraint.stringify()
         == """my_func,
         node=Node.ALL,
         quadratic=False,
@@ -39,7 +39,7 @@ def test_custom_str_simple_phase():
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        constraint.__str__(nb_phase=36)
+        constraint.stringify()
         == """my_func,
         node=Node.ALL,
         quadratic=False,
@@ -62,7 +62,7 @@ def test_custom_str_indent_8():
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        constraint.__str__(indent=12, nb_phase=1)
+        constraint.stringify(indent=12)
         == """my_func,
             node=Node.ALL,
             quadratic=False,
@@ -84,7 +84,7 @@ def test_custom_str_indent_8_with_phase():
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        constraint.__str__(indent=12, nb_phase=36)
+        constraint.stringify(indent=12)
         == """my_func,
             node=Node.ALL,
             quadratic=False,
@@ -107,7 +107,7 @@ def test_custom_str_indent_8_with_phase_all():
         arguments=[{"name": "function", "value": "my_func", "type": "function"}],
     )
     assert (
-        constraint.__str__(indent=12, nb_phase=36)
+        constraint.stringify(indent=12)
         == """my_func,
             node=Node.ALL,
             quadratic=False,
@@ -170,7 +170,7 @@ def test_custom_multiple_arguments():
         ],
     )
     assert (
-        objective.__str__(indent=12, nb_phase=36)
+        objective.stringify(indent=12)
         == """my_func,
             function2="haha",
             additional=1,

@@ -77,14 +77,15 @@ def obj_arguments(objective_type: str, penalty_type: str) -> list:
     if penalty_type == "CUSTOM":
         return [{"name": "function", "value": None, "type": "function"}]
 
-    if objective_type == "mayer":
-        penalty_fcn = getattr(ObjectiveFcn.Mayer, penalty_type)
-    elif objective_type == "lagrange":
-        penalty_fcn = getattr(ObjectiveFcn.Lagrange, penalty_type)
-    else:
-        raise HTTPException(404, f"{objective_type} not found")
+    try:
+        if objective_type == "mayer":
+            penalty_fcn = getattr(ObjectiveFcn.Mayer, penalty_type)
+        elif objective_type == "lagrange":
+            penalty_fcn = getattr(ObjectiveFcn.Lagrange, penalty_type)
+        arguments = get_args(penalty_fcn)
+    except Exception as e:
+        raise HTTPException(500, f"{objective_type} not found from {e}") from e
 
-    arguments = get_args(penalty_fcn)
     return arguments
 
 
@@ -104,8 +105,8 @@ def constraint_arguments(penalty_type: str) -> list:
     penalty_type = penalty_type.upper().replace(" ", "_")
     try:
         penalty_fcn = getattr(bioptim.ConstraintFcn, penalty_type)
-    except AttributeError:
-        raise HTTPException(404, f"{penalty_type} not found")
+    except AttributeError as e:
+        raise HTTPException(404, f"{penalty_type} not found from {e}") from e
 
     arguments = get_args(penalty_fcn)
     return arguments
