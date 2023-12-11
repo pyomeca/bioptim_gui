@@ -1,7 +1,9 @@
+from abc import ABC, abstractmethod
+
 from bioptim_gui_api.utils.format_utils import arg_to_string
 
 
-class PenaltyPrinter:
+class PenaltyPrinter(ABC):
     """
     This class is used to generate the penalty inside prepare_ocp of the acrobatics OCP. (generated code)
     SHOULD NOT BE USED DIRECTLY.
@@ -170,8 +172,9 @@ class PenaltyPrinter:
 
         return ret
 
+    @abstractmethod
     def _regular_str(self) -> str:
-        return ""
+        ...
 
     def stringify(self, indent: int = 8) -> str:
         """
