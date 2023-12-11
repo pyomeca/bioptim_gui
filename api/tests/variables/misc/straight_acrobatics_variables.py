@@ -1,7 +1,7 @@
 import numpy as np
 
 from bioptim_gui_api.utils.format_utils import invert_min_max
-from bioptim_gui_api.variables.misc.variables_utils import maximum_fig_arms_angle
+from bioptim_gui_api.variables.misc.variables_utils import maximum_fig_arms_angle, define_loose_bounds, LooseValue
 
 
 class StraightAcrobaticsVariables:
@@ -98,69 +98,57 @@ class StraightAcrobaticsVariables:
         # somersaulting
         x_bounds[phase]["min"][cls.Xrot, 1] = 2 * np.pi * phase - 0.1
         x_bounds[phase]["max"][cls.Xrot, 1] = 2 * np.pi * (phase + 1) + 0.1
-        x_bounds[phase]["min"][cls.Xrot, 2] = 2 * np.pi * (phase + 1) - 0.1
-        x_bounds[phase]["max"][cls.Xrot, 2] = 2 * np.pi * (phase + 1) + 0.1
+        define_loose_bounds(x_bounds[phase], cls.Xrot, 2, LooseValue(2 * np.pi * (phase + 1), 0.1))
 
         # twisting
         x_bounds[phase]["min"][cls.Zrot, 1] = np.pi * sum(half_twists[:phase]) - np.pi / 4 - 0.2
         x_bounds[phase]["max"][cls.Zrot, 1] = np.pi * sum(half_twists[: phase + 1]) + np.pi / 4 + 0.2
-        x_bounds[phase]["min"][cls.Zrot, 2] = np.pi * sum(half_twists[: phase + 1]) - np.pi / 4 - 0.2
-        x_bounds[phase]["max"][cls.Zrot, 2] = np.pi * sum(half_twists[: phase + 1]) + np.pi / 4 + 0.2
+        define_loose_bounds(
+            x_bounds[phase], cls.Zrot, 2, LooseValue(np.pi * sum(half_twists[: phase + 1]), np.pi / 4 + 0.2)
+        )
 
         if phase == nb_somersaults - 1:
             # bounds for last_somersault
             # keep 1/2 somersault before landing phase
             x_bounds[nb_somersaults - 1]["min"][cls.Xrot, 1] = 2 * np.pi * (nb_somersaults - 1) - 0.1
             x_bounds[nb_somersaults - 1]["max"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults - np.pi / 2 + 0.1
-            x_bounds[nb_somersaults - 1]["min"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - np.pi / 2 - 0.1
-            x_bounds[nb_somersaults - 1]["max"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - np.pi / 2 + 0.1
+            define_loose_bounds(
+                x_bounds[nb_somersaults - 1], cls.Xrot, 2, LooseValue(2 * np.pi * nb_somersaults - np.pi / 2, 0.1)
+            )
 
             # twists must be done before landing
-            x_bounds[nb_somersaults - 1]["min"][cls.Zrot, 2] = np.pi * sum(half_twists) - 0.1
-            x_bounds[nb_somersaults - 1]["max"][cls.Zrot, 2] = np.pi * sum(half_twists) + 0.1
+            define_loose_bounds(x_bounds[nb_somersaults - 1], cls.Zrot, 2, LooseValue(np.pi * sum(half_twists), 0.1))
 
     @classmethod
-    def _fill_landing_phase(cls, x_bounds, nb_somersaults: int, half_twists: list) -> dict:
-        # landing
-        x_bounds[-1]["min"][:, 0] = x_bounds[-2]["min"][:, 2]
-        x_bounds[-1]["max"][:, 0] = x_bounds[-2]["max"][:, 2]
+    def _fill_landing_phase(cls, x_bounds, half_twists: list) -> dict:
+        nb_somersaults = len(half_twists)
 
-        x_bounds[-1]["min"][:, 2] = np.zeros(cls.nb_q) - 0.1
-        x_bounds[-1]["max"][:, 2] = np.zeros(cls.nb_q) + 0.1
-
+        # Pelvis translations
         x_bounds[-1]["min"][[cls.X, cls.Y, cls.Z], 2] = [-0.01, -0.01, 0]
         x_bounds[-1]["max"][[cls.X, cls.Y, cls.Z], 2] = [0.01, 0.01, 0.01]
 
-        # finish last half-somersault
+        # Somersault
         x_bounds[-1]["min"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults - np.pi / 2 - 0.1
         x_bounds[-1]["max"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults + 0.1
-        x_bounds[-1]["min"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults - 0.1
-        x_bounds[-1]["max"][cls.Xrot, 2] = 2 * np.pi * nb_somersaults + 0.1
+        define_loose_bounds(x_bounds[-1], cls.Xrot, 2, LooseValue(2 * np.pi * nb_somersaults, 0.1))
 
-        # keep twists finished
-        x_bounds[-1]["min"][cls.Zrot, :] = np.pi * sum(half_twists) - 0.1
-        x_bounds[-1]["max"][cls.Zrot, :] = np.pi * sum(half_twists) + 0.1
-
-        # tilt pi / 16
-        x_bounds[-1]["min"][cls.Yrot, :] = -np.pi / 16
-        x_bounds[-1]["max"][cls.Yrot, :] = np.pi / 16
+        # Tilt
+        define_loose_bounds(x_bounds[-1], cls.Yrot, None, LooseValue(0.0, np.pi / 16))
+        # Twist
+        define_loose_bounds(x_bounds[-1], cls.Zrot, None, LooseValue(np.pi * sum(half_twists), 0.1))
 
         # FIG Code of Points 14.5, arms to stop twisting rotation
         max_angle = maximum_fig_arms_angle(half_twists)
         # Right arm
         x_bounds[-1]["min"][cls.YrotRightUpperArm, 0] = 0
         x_bounds[-1]["max"][cls.YrotRightUpperArm, 0] = max_angle
-        x_bounds[-1]["min"][cls.YrotRightUpperArm, 2] = 2.9 - 0.1
-        x_bounds[-1]["max"][cls.YrotRightUpperArm, 2] = 2.9 + 0.1
-        x_bounds[-1]["min"][cls.ZrotRightUpperArm, 2] = -0.1
-        x_bounds[-1]["max"][cls.ZrotRightUpperArm, 2] = 0.1
+        define_loose_bounds(x_bounds[-1], cls.YrotRightUpperArm, 2, LooseValue(2.9, 0.1))
+        define_loose_bounds(x_bounds[-1], cls.ZrotRightUpperArm, 2, LooseValue(0.0, 0.1))
         # Left arm
         x_bounds[-1]["min"][cls.YrotLeftUpperArm, 0] = -max_angle
         x_bounds[-1]["max"][cls.YrotLeftUpperArm, 0] = 0
-        x_bounds[-1]["min"][cls.YrotLeftUpperArm, 2] = -2.9 - 0.1
-        x_bounds[-1]["max"][cls.YrotLeftUpperArm, 2] = -2.9 + 0.1
-        x_bounds[-1]["min"][cls.ZrotLeftUpperArm, 2] = -0.1
-        x_bounds[-1]["max"][cls.ZrotLeftUpperArm, 2] = 0.1
+        define_loose_bounds(x_bounds[-1], cls.YrotLeftUpperArm, 2, LooseValue(-2.9, 0.1))
+        define_loose_bounds(x_bounds[-1], cls.ZrotLeftUpperArm, 2, LooseValue(0.0, 0.1))
 
     @classmethod
     def get_q_bounds(cls, half_twists: list, prefer_left: bool) -> dict:
@@ -179,18 +167,12 @@ class StraightAcrobaticsVariables:
         for phase in range(nb_somersaults):
             cls._fill_somersault_phase(x_bounds, phase, half_twists)
 
-        cls._fill_landing_phase(x_bounds, nb_somersaults, half_twists)
+        cls._fill_landing_phase(x_bounds, half_twists)
 
-        if (not is_forward) or (not prefer_left):
-            for i in range(len(x_bounds)):
-                if not is_forward:
-                    tmp = x_bounds[i]["min"][cls.Xrot].copy()
-                    x_bounds[i]["min"][cls.Xrot] = -x_bounds[i]["max"][cls.Xrot]
-                    x_bounds[i]["max"][cls.Xrot] = -tmp
-                if not prefer_left:
-                    tmp = x_bounds[i]["min"][cls.Zrot].copy()
-                    x_bounds[i]["min"][cls.Zrot] = -x_bounds[i]["max"][cls.Zrot]
-                    x_bounds[i]["max"][cls.Zrot] = -tmp
+        if not is_forward:
+            invert_min_max(x_bounds, cls.Xrot)
+        if not prefer_left:
+            invert_min_max(x_bounds, cls.Zrot)
 
         return x_bounds
 

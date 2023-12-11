@@ -122,26 +122,20 @@ class StraightAcrobaticsVariables:
     @classmethod
     def _fill_landing_phase(cls, x_bounds, half_twists: list) -> dict:
         nb_somersaults = len(half_twists)
-        # landing
-        x_bounds[-1]["min"][:, 0] = x_bounds[-2]["min"][:, 2]
-        x_bounds[-1]["max"][:, 0] = x_bounds[-2]["max"][:, 2]
 
-        x_bounds[-1]["min"][:, 2] = np.zeros(cls.nb_q) - 0.1
-        x_bounds[-1]["max"][:, 2] = np.zeros(cls.nb_q) + 0.1
-
+        # Pelvis translations
         x_bounds[-1]["min"][[cls.X, cls.Y, cls.Z], 2] = [-0.01, -0.01, 0]
         x_bounds[-1]["max"][[cls.X, cls.Y, cls.Z], 2] = [0.01, 0.01, 0.01]
 
-        # finish last half-somersault
+        # Somersault
         x_bounds[-1]["min"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults - np.pi / 2 - 0.1
         x_bounds[-1]["max"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults + 0.1
         define_loose_bounds(x_bounds[-1], cls.Xrot, 2, LooseValue(2 * np.pi * nb_somersaults, 0.1))
 
-        # keep twists finished
-        define_loose_bounds(x_bounds[-1], cls.Zrot, None, LooseValue(np.pi * sum(half_twists), 0.1))
-
-        # tilt pi / 16
+        # Tilt
         define_loose_bounds(x_bounds[-1], cls.Yrot, None, LooseValue(0.0, np.pi / 16))
+        # Twist
+        define_loose_bounds(x_bounds[-1], cls.Zrot, None, LooseValue(np.pi * sum(half_twists), 0.1))
 
         # FIG Code of Points 14.5, arms to stop twisting rotation
         max_angle = maximum_fig_arms_angle(half_twists)
@@ -150,7 +144,6 @@ class StraightAcrobaticsVariables:
         x_bounds[-1]["max"][cls.YrotRightUpperArm, 0] = max_angle
         define_loose_bounds(x_bounds[-1], cls.YrotRightUpperArm, 2, LooseValue(2.9, 0.1))
         define_loose_bounds(x_bounds[-1], cls.ZrotRightUpperArm, 2, LooseValue(0.0, 0.1))
-
         # Left arm
         x_bounds[-1]["min"][cls.YrotLeftUpperArm, 0] = -max_angle
         x_bounds[-1]["max"][cls.YrotLeftUpperArm, 0] = 0
