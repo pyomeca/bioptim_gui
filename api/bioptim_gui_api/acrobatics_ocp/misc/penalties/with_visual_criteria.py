@@ -9,9 +9,7 @@ def spotting_objectives():
     """
     return [
         create_objective(
-            objective_type="lagrange",
             penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_SEGMENT_VELOCITY"],
-            nodes="default",
             weight=10.0,
             arguments=[
                 {"name": "segment", "value": "Head", "type": "string"},
@@ -92,7 +90,6 @@ def with_visual_criteria_common_objectives(phase_name, model):
     ]:
         objectives.append(
             create_objective(
-                objective_type="lagrange",
                 penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
                 nodes="default",
                 weight=weight,
@@ -108,7 +105,6 @@ def with_visual_criteria_common_objectives(phase_name, model):
         # Keeping the trampoline bed in the peripheral vision
         objectives.append(
             create_objective(
-                objective_type="lagrange",
                 penalty_type=DefaultPenaltyConfig.original_to_min_dict["CUSTOM"],
                 nodes="all_shooting",
                 weight=100.0,
