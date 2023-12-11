@@ -58,23 +58,28 @@ class AcrobaticsGenerationCustomPenalties:
 
     @staticmethod
     def closest_distance_between_lines() -> str:
-        return """def closestDistanceBetweenLines(a0, a1, b0, b1):
-    # addapté de https://stackoverflow.com/questions/2824478/shortest-distance-between-two-line-segments
+        return """def closest_distance_between_lines():
+    # adapté de https://stackoverflow.com/questions/2824478/shortest-distance-between-two-line-segments
+
+    a0 = cas.SX.sym("a0", 3, 1)
+    b0 = cas.SX.sym("b0", 3, 1)
+    a1 = cas.SX.sym("a1", 3, 1)
+    b1 = cas.SX.sym("b1", 3, 1)
 
     # Calculate denomitator
     VectA = a1 - a0
     VectB = b1 - b0
-    norm_A = cas.norm_2(VectA)
-    norm_B = cas.norm_2(VectB)
+    norm_A = cas.norm_fro(VectA)
+    norm_B = cas.norm_fro(VectB)
 
     Unit_A = VectA / norm_A
     Unit_B = VectB / norm_B
 
     cross = cas.cross(Unit_A, Unit_B)
-    norm_cross = cas.norm_2(cross)**2
+    norm_cross = cas.norm_fro(cross) ** 2
 
     # Lines criss-cross: Calculate the projected closest points
-    t = (b0 - a0)
+    t = b0 - a0
     A_mat = cas.horzcat(t, cas.horzcat(Unit_B, cross))
     B_mat = cas.horzcat(t, cas.horzcat(Unit_A, cross))
     A_Q, A_R = cas.qr(A_mat)
@@ -92,7 +97,7 @@ class AcrobaticsGenerationCustomPenalties:
 
     Distance2 = cas.norm_2(pA - pB)
 
-    Func = cas.Function('Distance', [a0, a1, b0, b1], [Distance2])
+    Func = cas.Function("Distance", [a0, a1, b0, b1], [Distance2])
 
     return Func
 """
@@ -100,39 +105,56 @@ class AcrobaticsGenerationCustomPenalties:
     @staticmethod
     def custom_noncrossing_const() -> str:
         return """def custom_noncrossing_const(
-    controller: PenaltyController, marker_idx1, marker_idx2, marker_idx3, marker_idx4, rayon1, rayon2
+    controller: PenaltyController,
+    marker_1: str,
+    marker_2: str,
+    marker_3: str,
+    marker_4: str,
+    radius_1: float,
+    radius_2: float,
 ):
-    nq = int(nlp.nx / 2)
-    Markers_func = biorbd.to_casadi_func("markers", nlp.model.markers, nlp.q)
-    val_contrainte = []
-    for v in x:
-        q = v[:nq]
-        Markers = Markers_func(q)
-        Distance = closestDistanceBetweenLines_func(
-            Markers[:, marker_idx1], Markers[:, marker_idx2], Markers[:, marker_idx3], Markers[:, marker_idx4]
-        )
-        val_contrainte = cas.vertcat(val_contrainte, Distance - (rayon1 + rayon2))
-    return val_contrainte
+    markers_idx = [controller.model.marker_index(marker) for marker in [marker_1, marker_2, marker_3, marker_4]]
+
+    markers = controller.model.markers(controller.states["q"].cx_start)
+
+    constraint_value = []
+    distance = closest_distance_between_lines()(
+        markers[markers_idx[0]],
+        markers[markers_idx[1]],
+        markers[markers_idx[2]],
+        markers[markers_idx[3]],
+    )
+    constraint_value = cas.vertcat(constraint_value, distance - (radius_1 + radius_2))
+    return constraint_value
 """
 
     @staticmethod
     def custom_noncrossing_obj() -> str:
         return """def custom_noncrossing_obj(
-    controller: PenaltyController, marker_idx1, marker_idx2, marker_idx3, marker_idx4, rayon1, rayon2
+    controller: PenaltyController,
+    marker_1: str,
+    marker_2: str,
+    marker_3: str,
+    marker_4: str,
+    radius_1: float,
+    radius_2: float,
 ):
-    nq = int(nlp.nx / 2)
-    Markers_func = biorbd.to_casadi_func("markers", nlp.model.markers, nlp.q)
-    val_objectif = []
-    for v in x:
-        q = v[:nq]
-        Markers = Markers_func(q)
-        Distance = closestDistanceBetweenLines_func(
-            Markers[:, marker_idx1], Markers[:, marker_idx2], Markers[:, marker_idx3], Markers[:, marker_idx4]
-        )
-        val_tempo = 4 * 0.5 ** ((Distance - (rayon1 + rayon2)) - 1)
-        obj = cas.if_else(Distance > 4 * (rayon1 + rayon2), 0, val_tempo)
-        val_objectif = cas.vertcat(val_objectif, obj)
-    return val_objectif
+    markers_idx = [controller.model.marker_index(marker) for marker in [marker_1, marker_2, marker_3, marker_4]]
+
+    markers = controller.model.markers(controller.states["q"].cx_start)
+
+    objective_value = []
+    distance = closest_distance_between_lines(
+        markers[:, markers_idx[0]],
+        markers[:, markers_idx[1]],
+        markers[:, markers_idx[2]],
+        markers[:, markers_idx[3]],
+    )
+    tmp = 4 * 0.5 ** ((distance - (radius_1 + radius_2)) - 1)
+    obj = cas.if_else(distance > 4 * (radius_1 + radius_2), 0, tmp)
+
+    objective_value = cas.vertcat(objective_value, obj)
+    return objective_value
 """
 
     @staticmethod
