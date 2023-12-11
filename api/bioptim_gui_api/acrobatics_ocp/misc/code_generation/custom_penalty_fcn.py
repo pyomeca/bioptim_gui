@@ -1,4 +1,8 @@
 class AcrobaticsGenerationCustomPenalties:
+    """
+    This class contains the custom penalty functions used in the acrobatics ocp.
+    """
+
     @staticmethod
     def custom_trampoline_bed_in_peripheral_vision():
         return f"""def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) -> cas.MX:

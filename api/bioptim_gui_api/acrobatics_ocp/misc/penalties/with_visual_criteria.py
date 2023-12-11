@@ -4,6 +4,9 @@ from bioptim_gui_api.penalty.misc.penalty_utils import create_objective
 
 def spotting_objectives(phase_name: str, model):
     # Spotting
+    """
+    MINIMIZE_SEGMENT_VELOCITY lagrange: Head, default, weight=10.0
+    """
     return [
         create_objective(
             objective_type="lagrange",
@@ -18,6 +21,9 @@ def spotting_objectives(phase_name: str, model):
 
 
 def quiet_eye_objective():
+    """
+    TRACK_VECTOR_ORIENTATIONS_FROM_MARKERS lagrange: eyes_vect_start, eyes_vect_end, default, weight=1.0
+    """
     # quiet eye
     return [
         create_objective(
@@ -119,6 +125,21 @@ def with_visual_criteria_common_objectives(phase_name, model):
 
 
 def with_visual_criteria_objectives(phase_names, phase_index, model):
+    """
+    FIRST_AND_LAST:
+    MINIMIZE_SEGMENT_VELOCITY lagrange: Head, default, weight=10.0
+
+    ALL:
+    MINIMIZE_STATE lagrange: qdot, [ZrotEyes, XrotEyes], default, weight=1.0
+    MINIMIZE_STATE lagrange: q, [ZrotEyes, XrotEyes], default, weight=10.0
+    MINIMIZE_STATE lagrange: q, [ZrotHead, XrotHead], default, weight=100.0
+
+    ALL_BUT_SOMERSAULT:
+    CUSTOM lagrange: custom_trampoline_bed_in_peripheral_vision, all_shooting, weight=100.0
+
+    LAST:
+    TRACK_VECTOR_ORIENTATIONS_FROM_MARKERS lagrange: eyes_vect_start, eyes_vect_end, default, weight=1.0
+    """
     objectives = []
     # FIRST AND LAST
     if phase_index == 0 or phase_index == len(phase_names) - 1:

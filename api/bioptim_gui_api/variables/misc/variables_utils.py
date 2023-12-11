@@ -46,11 +46,33 @@ def maximum_fig_arms_angle(half_twists: list) -> float:
 
 
 class LooseValue(NamedTuple):
+    """
+    A value with a looseness
+    """
+
     value: float
     looseness: float = 0.0
 
 
 def define_loose_bounds(bound: np.ndarray, dof: int, node: int, loose_value: LooseValue) -> None:
+    """
+    Define the bounds with a looseness around a value, the min and max are modified so the values are value +- looseness
+
+    Parameters
+    ----------
+    bound: np.ndarray
+        The bound to modify
+    dof: int
+        The degree of freedom to modify
+    node: int
+        The node to modify (0,1,2 : START, MIDDLE, END)
+    loose_value: LooseValue
+        The value and looseness to set
+
+    Returns
+    -------
+    None
+    """
     value, looseness = loose_value.value, loose_value.looseness
     if node is None:
         bound["min"][dof, :] = value - looseness

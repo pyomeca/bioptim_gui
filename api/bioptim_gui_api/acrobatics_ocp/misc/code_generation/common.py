@@ -1,4 +1,8 @@
 class AcrobaticsGenerationCommon:
+    """
+    This class contains the common code for the generation of the acrobatics, including multistart, save, main, ...
+    """
+
     @staticmethod
     def construct_path(half_twists: list[int], side: str, position: str):
         return f"""

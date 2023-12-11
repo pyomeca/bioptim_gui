@@ -17,6 +17,9 @@ def default_bounds_initial_guess(
     bounds_interpolation_type: str = "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
     initial_guess_interpolation_type: str = "CONSTANT",
 ):
+    """
+    Return the default information for a variable
+    """
     bounds = variables_zeros(dimension, bounds_interpolation_type)
     initial_guess = variables_zeros(dimension, initial_guess_interpolation_type)
 
@@ -31,6 +34,19 @@ def default_bounds_initial_guess(
 
 
 class DefaultVariablesConfig:
+    """
+    Default variables config depending on choosen dynamics
+
+    Attributes
+    ----------
+    default_dummy_variables: dict
+        The default dummy variables
+
+    default_torque_driven_variables: dict
+        The default torque driven variables
+
+    """
+
     default_dummy_variables = {
         "state_variables": [
             default_bounds_initial_guess("coucou"),
@@ -52,6 +68,21 @@ class DefaultVariablesConfig:
 
 
 def get_variable_computer(position: str = "straight", with_visual_criteria: bool = False):
+    """
+    Return the variable computer (to compute bounds and initial_guess for q, qdot, tau) depending on the position and
+    the visual criteria.
+
+    Parameters
+    ----------
+    position: str
+        The position ("straight", "tuck", "pike")
+    with_visual_criteria: bool
+        If the visual criteria is used or not
+
+    Returns
+    -------
+    The variable computer
+    """
     with_visual = {
         "straight": StraightAcrobaticsWithVisualVariables,
         "tuck": TuckAcrobaticsWithVisualVariables,

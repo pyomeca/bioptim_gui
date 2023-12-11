@@ -2,6 +2,10 @@ from bioptim_gui_api.utils.format_utils import format_2d_array
 
 
 class AcrobaticsGenerationBounds:
+    """
+    This class is used to generate the bounds inside prepare_ocp of the acrobatics OCP.
+    """
+
     @staticmethod
     def declare_bounds() -> str:
         return """

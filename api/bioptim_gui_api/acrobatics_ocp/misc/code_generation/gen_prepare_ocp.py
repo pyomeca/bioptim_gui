@@ -7,6 +7,10 @@ from bioptim_gui_api.variables.misc.variables_config import get_variable_compute
 
 
 class AcrobaticsGenerationPrepareOCP:
+    """
+    This class is used to generate the prepare_ocp function
+    """
+
     @staticmethod
     def prepare_ocp_header() -> str:
         return """

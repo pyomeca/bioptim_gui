@@ -3,7 +3,7 @@ from bioptim_gui_api.model_converter.converter_str_utils import BioModConverterU
 
 class BioModConverter:
     """
-    Base class for bioMod model converters
+    Base class for bioMod model converters, SHOULD NOT be used directly
 
     Attributes
     ----------
@@ -23,6 +23,11 @@ class BioModConverter:
 
     @classmethod
     def _add_dofs(cls, segment_name: str, updated_lines: list[str], stripped: str):
+        """
+        This function is used to add them to the updated_lines list if needed.
+
+        rotations and translations line in a bioMod are usually written after the rt line.
+        """
         if stripped.startswith("rt"):
             if segment_name in cls.segment_translation:
                 updated_lines.append(f"\ttranslations {cls.segment_translation[segment_name]}\n")
@@ -31,7 +36,9 @@ class BioModConverter:
 
     @classmethod
     def _ignore_unused_markers(cls, lines: list[str], current_index: int) -> int:
-        """ """
+        """
+        This function is used to ignore the markers that are not used in the model.
+        """
         stripped = lines[current_index].strip()
 
         if not stripped.startswith("marker"):
@@ -39,15 +46,20 @@ class BioModConverter:
 
         marker_name = stripped.split()[1]
         if marker_name in cls.markers:
+            # don't ignore the marker, it is used
             return current_index
 
         while not lines[current_index].strip().startswith("endmarker"):
             current_index += 1
 
+        # recursive call to handle the case where there are multiple markers in a row without a new line
         return cls._ignore_unused_markers(lines, current_index + 1)
 
     @classmethod
     def _check_missing_segments(cls, lines: list[str]) -> None:
+        """
+        This function is used to check that the model contains all the required segments according to the converter.
+        """
         utils = BioModConverterUtils(lines)
         existing_segments = set()
         segment_name = ""
@@ -63,6 +75,9 @@ class BioModConverter:
 
     @classmethod
     def _check_missing_markers(cls, lines: list[str]) -> None:
+        """
+        This function is used to check that the model contains all the required markers according to the converter.
+        """
         utils = BioModConverterUtils(lines)
         existing_markers = set()
         for i, line in enumerate(lines):

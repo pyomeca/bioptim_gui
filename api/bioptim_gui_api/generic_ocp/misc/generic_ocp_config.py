@@ -2,6 +2,18 @@ from bioptim_gui_api.variables.misc.variables_config import DefaultVariablesConf
 
 
 class DefaultGenericOCPConfig:
+    """
+    Default config for generic ocp
+
+    Attributes
+    ----------
+    datafile: str
+        The file name that will be used to store the data and in the endpoints(e.g. "generic_ocp_data.json")
+
+    base_data: dict
+        The base data at startup (e.g. {nb_phases, model_path, final_time, ...})
+    """
+
     datafile = "generic_ocp_data.json"
 
     default_phases_info = {

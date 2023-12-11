@@ -111,7 +111,20 @@ def constraint_arguments(penalty_type: str) -> list:
     return arguments
 
 
-def create_objective(**kwargs):
+def create_objective(**kwargs) -> dict:
+    """
+    Create an objective without having to specify all the arguments if they are the default ones.
+
+    Parameters
+    ----------
+    kwargs: dict
+        The information on the objective (e.g. {"objective_type": "lagrange", "penalty_type": "MINIMIZE_STATE", ...})
+
+    Returns
+    -------
+    dict
+        The objective
+    """
     return {
         "objective_type": kwargs.get("objective_type", "lagrange"),
         "penalty_type": kwargs.get("penalty_type", "MINIMIZE_STATE"),
@@ -127,7 +140,20 @@ def create_objective(**kwargs):
     }
 
 
-def create_constraint(**kwargs):
+def create_constraint(**kwargs) -> dict:
+    """
+    Create a constraint without having to specify all the arguments if they are the default ones.
+
+    Parameters
+    ----------
+    kwargs: dict
+        The information on the constraint (e.g. {"penalty_type": "SUPERIMPOSE_MARKERS", ...})
+
+    Returns
+    -------
+    dict
+        The constraint
+    """
     return {
         "penalty_type": kwargs.get("penalty_type", "TIME_CONSTRAINT"),
         "nodes": kwargs.get("nodes", "end"),

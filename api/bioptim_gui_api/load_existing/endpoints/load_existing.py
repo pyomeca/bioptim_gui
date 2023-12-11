@@ -14,6 +14,31 @@ router = APIRouter(
 
 
 async def handle_pkl(file: UploadFile) -> (bool, float):
+    """
+    Handle a pickle file to check if it has to be discarded by user and return discard choice and the cost of the
+    solution
+
+    A pickle file has to be discarded if the integrated states and the solution states diverge by more than 1 degree.
+
+    Parameters
+    ----------
+    file: UploadFile
+        The pickle file to handle
+
+    Returns
+    -------
+    bool
+        True if the pickle file has to be discarded, False otherwise
+    float
+        The cost of the solution
+
+    Raises
+    ------
+    HTTPException
+        If the file is not a pickle file
+    HTTPException
+        If the pickle file doesn't contain the right data (integrated_states and solution)
+    """
     if file.content_type != "application/octet-stream":
         raise HTTPException(400, "File must be a pickle file")
 
@@ -37,6 +62,21 @@ async def handle_pkl(file: UploadFile) -> (bool, float):
 
 @router.post("/load", response_model=LoadExistingResponse)
 async def load_pickle(files: List[UploadFile] = []):
+    """
+    Load a pickles file and return the best one to use and the one to discard
+    The pickles are received as a list of UploadFile, instead of a list of filepath, to allow the api to be hosted on a
+    remote server.
+
+    Parameters
+    ----------
+    files: List[UploadFile]
+        The pickle files to load
+
+    Returns
+    -------
+    LoadExistingResponse
+        The best (lowest) cost pickle file to use and the one to discard
+    """
     min_cost = float("inf")
     to_discard = []
     best = None

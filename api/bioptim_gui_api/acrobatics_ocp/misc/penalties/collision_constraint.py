@@ -3,6 +3,9 @@ from bioptim_gui_api.penalty.misc.penalty_utils import create_constraint
 
 
 def collision_constraint_constraints(phase_name, position):
+    """
+    CUSTOM custom_noncrossing_const all_shooting, weight=1.0
+    """
     constraints = []
 
     if phase_name == "Somersault":
