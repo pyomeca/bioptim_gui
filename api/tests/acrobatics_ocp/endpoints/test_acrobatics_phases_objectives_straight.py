@@ -508,4 +508,8 @@ def test_changing_penalty_not_exist():
         "/acrobatics/phases_info/0/objectives/0/penalty_type",
         json={"penalty_type": "MINIMIZE_CONTROL"},
     )
-    assert response.status_code != 200, response
+    assert response.status_code == 200, response
+
+    data = response.json()
+    assert data["penalty_type"] == "MINIMIZE_CONTROL"
+    assert data["objective_type"] == "lagrange"

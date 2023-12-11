@@ -83,6 +83,8 @@ def obj_arguments(objective_type: str, penalty_type: str) -> list:
         elif objective_type == "lagrange":
             penalty_fcn = getattr(ObjectiveFcn.Lagrange, penalty_type)
         arguments = get_args(penalty_fcn)
+    except AttributeError as e:
+        raise AttributeError(f"{penalty_type} not found from {e}") from e
     except Exception as e:
         raise HTTPException(500, f"{objective_type} not found from {e}") from e
 
