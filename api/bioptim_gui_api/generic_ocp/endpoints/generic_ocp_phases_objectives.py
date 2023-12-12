@@ -69,7 +69,6 @@ def get_objective_dropdown_list():
         "MINIMIZE_QDDOT",
         "MINIMIZE_SEGMENT_ROTATION",
         "MINIMIZE_SEGMENT_VELOCITY",
-        "MINIMIZE_STATE",
         "MINIMIZE_TIME",
         "PROPORTIONAL_CONTROL",
         "PROPORTIONAL_STATE",
