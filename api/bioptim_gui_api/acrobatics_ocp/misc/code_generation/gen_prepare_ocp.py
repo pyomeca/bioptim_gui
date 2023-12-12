@@ -146,9 +146,9 @@ def prepare_ocp(
 """
 
     @staticmethod
-    def return_ocp() -> str:
+    def return_ocp(torque_driven: bool) -> str:
         n_threads = cpu_count() - 2
-        return f"""
+        ret = f"""
     # Construct and return the optimal control program (OCP)
     return OptimalControlProgram(
         bio_model=bio_model,
@@ -160,18 +160,23 @@ def prepare_ocp(
         x_init=x_initial_guesses,
         u_init=u_initial_guesses,
         objective_functions=objective_functions,
-        variable_mappings=mapping,
-        use_sx=False,
+"""
+        if torque_driven:
+            ret += "        variable_mappings=mapping,\n"
+
+        ret += f"""        use_sx=False,
         constraints=constraints,
         multinode_constraints=multinode_constraints,
         n_threads=({int(n_threads / 2)} if is_multistart else {n_threads}),
     )
 """
+        return ret
 
     @staticmethod
     def prepare_ocp(data: dict, new_model_path: str) -> str:
         position = data["position"]
         with_visual_criteria = data["with_visual_criteria"]
+        torque_driven = data["dynamics"] == "torque_driven"
         model = get_variable_computer(position, with_visual_criteria)
 
         ret = AcrobaticsGenerationPrepareOCP.prepare_ocp_header()
@@ -181,6 +186,7 @@ def prepare_ocp(
         ret += AcrobaticsGenerationPrepareOCP.multinode_constraints(data)
         ret += AcrobaticsGenerationBounds.bounds(data, model)
         ret += AcrobaticsGenerationPrepareOCP.multistart_noise(data)
-        ret += AcrobaticsGenerationPrepareOCP.bimapping(model)
-        ret += AcrobaticsGenerationPrepareOCP.return_ocp()
+        if torque_driven:
+            ret += AcrobaticsGenerationPrepareOCP.bimapping(model)
+        ret += AcrobaticsGenerationPrepareOCP.return_ocp(torque_driven)
         return ret

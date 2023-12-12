@@ -158,9 +158,18 @@ class AcrobaticsGenerationCustomPenalties:
 """
 
     @staticmethod
-    def all_customs_function() -> str:
-        ret = AcrobaticsGenerationCustomPenalties.custom_trampoline_bed_in_peripheral_vision()
-        ret += AcrobaticsGenerationCustomPenalties.closest_distance_between_lines()
-        ret += AcrobaticsGenerationCustomPenalties.custom_noncrossing_const()
-        ret += AcrobaticsGenerationCustomPenalties.custom_noncrossing_obj()
+    def all_customs_function(data: dict) -> str:
+        with_visual_criteria = data["with_visual_criteria"]
+        collision_constraint = data["collision_constraint"]
+
+        ret = ""
+
+        if with_visual_criteria:
+            ret += AcrobaticsGenerationCustomPenalties.custom_trampoline_bed_in_peripheral_vision()
+            ret += AcrobaticsGenerationCustomPenalties.custom_trampoline_bed_in_peripheral_vision()
+
+        if collision_constraint:
+            ret += AcrobaticsGenerationCustomPenalties.closest_distance_between_lines()
+            ret += AcrobaticsGenerationCustomPenalties.custom_noncrossing_const()
+            ret += AcrobaticsGenerationCustomPenalties.custom_noncrossing_obj()
         return ret

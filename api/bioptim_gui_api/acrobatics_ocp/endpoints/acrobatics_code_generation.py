@@ -18,7 +18,7 @@ router = APIRouter()
 def generated_code(data: dict, new_model_path: str) -> str:
     ret = AcrobaticsGenerationImport.generate_imports()
     ret += f'BIOMODEL_PATH = "{new_model_path}"\n'
-    ret += AcrobaticsGenerationCustomPenalties.all_customs_function()
+    ret += AcrobaticsGenerationCustomPenalties.all_customs_function(data)
     ret += AcrobaticsGenerationPrepareOCP.prepare_ocp(data, new_model_path)
     ret += AcrobaticsGenerationCommon.generate_common(data)
     return ret
