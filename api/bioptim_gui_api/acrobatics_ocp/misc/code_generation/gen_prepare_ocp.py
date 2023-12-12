@@ -72,14 +72,15 @@ def prepare_ocp(
         return ret
 
     @staticmethod
-    def dynamics() -> str:
-        return """
+    def dynamics_str(data) -> str:
+        dynamics = data["dynamics"].upper()
+        return f"""
     # Declaration of the dynamics function used during integration
     dynamics = DynamicsList()
 
     for i in range(nb_phases):
         dynamics.add(
-            DynamicsFcn.TORQUE_DRIVEN,
+            DynamicsFcn.{dynamics},
             phase=i,
         )
 """
@@ -182,7 +183,7 @@ def prepare_ocp(
         ret = AcrobaticsGenerationPrepareOCP.prepare_ocp_header()
         ret += AcrobaticsGenerationPrepareOCP.generic_elements(data, new_model_path)
         ret += AcrobaticsGenerationPrepareOCP.penalties(data)
-        ret += AcrobaticsGenerationPrepareOCP.dynamics()
+        ret += AcrobaticsGenerationPrepareOCP.dynamics_str(data)
         ret += AcrobaticsGenerationPrepareOCP.multinode_constraints(data)
         ret += AcrobaticsGenerationBounds.bounds(data, model)
         ret += AcrobaticsGenerationPrepareOCP.multistart_noise(data)
