@@ -170,7 +170,7 @@ def add_non_crossing_penalty(objectives, constraints, warm_start=True, **kwargs)
         objectives.add(
             custom_noncrossing_obj,
             **kwargs,
-            custom_type=ObjectiveFcn.Lagrange,
+            custom_type=ObjectiveFcn.Mayer,
         )
     else:
         constraints.add(
