@@ -1,6 +1,7 @@
 import copy
 from typing import NamedTuple
 
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import read_acrobatics_data
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.collision_constraint import (
     collision_constraint_constraints,
 )
@@ -234,9 +235,12 @@ def phase_name_to_info(position, phase_names: str, phase_index: int, additional_
     res["objectives"] = get_phase_objectives(phase_names, phase_index, position, additional_criteria)
     res["constraints"] = get_phase_constraints(phase_name, position, additional_criteria)
 
+    dynamics = read_acrobatics_data("dynamics")
+    control = "tau" if dynamics == "torque_driven" else "qddot_joints"
+
     for objective in res["objectives"]:
         for arguments in objective["arguments"]:
             if arguments["name"] == "key" and arguments["value"] == "tau":
-                arguments["value"] = "qddot_joints"
+                arguments["value"] = control
 
     return res
