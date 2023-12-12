@@ -2,6 +2,8 @@ import pytest
 from bioptim import ObjectiveFcn, ConstraintFcn
 from fastapi.exceptions import HTTPException
 
+from bioptim_gui_api.penalty.misc.constraint_printer import ConstraintPrinter
+from bioptim_gui_api.penalty.misc.objective_printer import ObjectivePrinter
 from bioptim_gui_api.penalty.misc.penalty_utils import (
     get_args,
     format_arg_type,
@@ -9,6 +11,7 @@ from bioptim_gui_api.penalty.misc.penalty_utils import (
     constraint_arguments,
     create_objective,
     create_constraint,
+    penalty_str_to_non_collision_penalty,
 )
 
 
@@ -165,3 +168,85 @@ def test_create_constraint():
         "multi_thread": False,
         "arguments": [],
     }
+
+
+def test_stringify_for_non_collision_constraint():
+    constraint = ConstraintPrinter(
+        phase=0,
+        penalty_type="CUSTOM",
+        nodes="all_shooting",
+        quadratic=True,
+        expand=True,
+        target=None,
+        derivative=False,
+        integration_rule="rectangle_left",
+        multi_thread=False,
+        arguments=[
+            {"name": "function", "value": "custom_noncrossing_const", "type": "function"},
+            {"name": "marker_1", "value": "RightShoulder", "type": "str"},
+            {"name": "marker_2", "value": "RightKnuckle", "type": "str"},
+            {"name": "radius_1", "value": 0.05, "type": "float"},
+            {"name": "marker_3", "value": "LeftShoulder", "type": "str"},
+            {"name": "marker_4", "value": "LeftKnuckle", "type": "str"},
+            {"name": "radius_2", "value": 0.05, "type": "float"},
+        ],
+    )
+    assert (
+        penalty_str_to_non_collision_penalty(constraint.stringify())
+        == """add_non_crossing_penalty(
+        objective_functions,
+        constraints,
+        warming_up,
+        marker_1="RightShoulder",
+        marker_2="RightKnuckle",
+        radius_1=0.05,
+        marker_3="LeftShoulder",
+        marker_4="LeftKnuckle",
+        radius_2=0.05,
+        node=Node.ALL_SHOOTING,
+        quadratic=True,
+    )"""
+    )
+
+
+def test_stringify_for_non_collision_obj():
+    objective = ObjectivePrinter(
+        phase=0,
+        penalty_type="CUSTOM",
+        objective_type="lagrange",
+        weight=1.0,
+        nodes="all_shooting",
+        quadratic=True,
+        expand=True,
+        target=None,
+        derivative=False,
+        integration_rule="rectangle_left",
+        multi_thread=False,
+        arguments=[
+            {"name": "function", "value": "custom_noncrossing_const", "type": "function"},
+            {"name": "marker_1", "value": "RightShoulder", "type": "str"},
+            {"name": "marker_2", "value": "RightKnuckle", "type": "str"},
+            {"name": "radius_1", "value": 0.05, "type": "float"},
+            {"name": "marker_3", "value": "LeftShoulder", "type": "str"},
+            {"name": "marker_4", "value": "LeftKnuckle", "type": "str"},
+            {"name": "radius_2", "value": 0.05, "type": "float"},
+        ],
+    )
+    assert (
+        penalty_str_to_non_collision_penalty(objective.stringify())
+        == """add_non_crossing_penalty(
+        objective_functions,
+        constraints,
+        warming_up,
+        custom_type=ObjectiveFcn.Lagrange,
+        weight=1.0,
+        marker_1="RightShoulder",
+        marker_2="RightKnuckle",
+        radius_1=0.05,
+        marker_3="LeftShoulder",
+        marker_4="LeftKnuckle",
+        radius_2=0.05,
+        node=Node.ALL_SHOOTING,
+        quadratic=True,
+    )"""
+    )

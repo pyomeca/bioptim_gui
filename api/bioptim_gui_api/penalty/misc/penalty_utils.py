@@ -168,3 +168,30 @@ def create_constraint(**kwargs) -> dict:
         "multi_thread": kwargs.get("multi_thread", False),
         "arguments": kwargs.get("arguments", []),
     }
+
+
+def penalty_str_to_non_collision_penalty(stringified: str) -> str:
+    """
+    Convert a stringified penalty to a non-collision penalty
+
+    Parameters
+    ----------
+    stringified: str
+        The stringified penalty
+
+    Returns
+    -------
+    str
+        The non-collision penalty
+    """
+    ret = """add_non_crossing_penalty(
+        objective_functions,
+        constraints,
+        warming_up,
+"""
+    lines = stringified.split("\n")
+    # remove lines that starts wtih custom_noncrossing_const
+    updated_lines = [line for line in lines if not line.startswith("custom_noncrossing_")]
+
+    ret += "\n".join(updated_lines) + "    )"
+    return ret

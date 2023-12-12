@@ -5,7 +5,8 @@ class AcrobaticsGenerationCustomPenalties:
 
     @staticmethod
     def custom_trampoline_bed_in_peripheral_vision():
-        return """def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) -> cas.MX:
+        return """
+def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) -> cas.MX:
     \"""
     This function aims to encourage the avatar to keep the trampoline bed in his peripheral vision.
     It is done by discretizing the vision cone into vectors and determining if the vector projection of the gaze are
@@ -29,7 +30,7 @@ class AcrobaticsGenerationCustomPenalties:
     obj = 0
     for i_r in range(11):
         for i_th in range(10):
-            marker_idx = controller.model.marker_index(f"cone_approx_{{i_r}}_{{i_th}}")
+            marker_idx = controller.model.marker_index(f"cone_approx_{i_r}_{i_th}")
             vector_origin = controller.model.markers(controller.states["q"].mx)[eyes_vect_start_marker_idx]
             vector_end = controller.model.markers(controller.states["q"].mx)[marker_idx]
             vector = vector_end - vector_origin
@@ -58,7 +59,8 @@ class AcrobaticsGenerationCustomPenalties:
 
     @staticmethod
     def closest_distance_between_lines() -> str:
-        return """def closest_distance_between_lines():
+        return """
+def closest_distance_between_lines():
     # adapté de https://stackoverflow.com/questions/2824478/shortest-distance-between-two-line-segments
 
     a0 = cas.SX.sym("a0", 3, 1)
@@ -104,7 +106,8 @@ class AcrobaticsGenerationCustomPenalties:
 
     @staticmethod
     def custom_noncrossing_const() -> str:
-        return """def custom_noncrossing_const(
+        return """
+def custom_noncrossing_const(
     controller: PenaltyController,
     marker_1: str,
     marker_2: str,
@@ -130,7 +133,8 @@ class AcrobaticsGenerationCustomPenalties:
 
     @staticmethod
     def custom_noncrossing_obj() -> str:
-        return """def custom_noncrossing_obj(
+        return """
+def custom_noncrossing_obj(
     controller: PenaltyController,
     marker_1: str,
     marker_2: str,
@@ -144,17 +148,35 @@ class AcrobaticsGenerationCustomPenalties:
     markers = controller.model.markers(controller.states["q"].cx_start)
 
     objective_value = []
-    distance = closest_distance_between_lines(
-        markers[:, markers_idx[0]],
-        markers[:, markers_idx[1]],
-        markers[:, markers_idx[2]],
-        markers[:, markers_idx[3]],
+    distance = closest_distance_between_lines()(
+        markers[markers_idx[0]],
+        markers[markers_idx[1]],
+        markers[markers_idx[2]],
+        markers[markers_idx[3]],
     )
     tmp = 4 * 0.5 ** ((distance - (radius_1 + radius_2)) - 1)
     obj = cas.if_else(distance > 4 * (radius_1 + radius_2), 0, tmp)
 
     objective_value = cas.vertcat(objective_value, obj)
     return objective_value
+"""
+
+    @staticmethod
+    def add_noncrossing_penalty() -> str:
+        return """
+def add_non_crossing_penalty(objectives, constraints, warm_start=True, **kwargs):
+    kwargs["quadratic"] = not warm_start
+    if warm_start:
+        objectives.add(
+            custom_noncrossing_obj,
+            **kwargs,
+            custom_type=ObjectiveFcn.Lagrange,
+        )
+    else:
+        constraints.add(
+            custom_noncrossing_const,
+            **kwargs,
+        )
 """
 
     @staticmethod
@@ -166,10 +188,10 @@ class AcrobaticsGenerationCustomPenalties:
 
         if with_visual_criteria:
             ret += AcrobaticsGenerationCustomPenalties.custom_trampoline_bed_in_peripheral_vision()
-            ret += AcrobaticsGenerationCustomPenalties.custom_trampoline_bed_in_peripheral_vision()
 
         if collision_constraint:
             ret += AcrobaticsGenerationCustomPenalties.closest_distance_between_lines()
             ret += AcrobaticsGenerationCustomPenalties.custom_noncrossing_const()
             ret += AcrobaticsGenerationCustomPenalties.custom_noncrossing_obj()
+            ret += AcrobaticsGenerationCustomPenalties.add_noncrossing_penalty()
         return ret
