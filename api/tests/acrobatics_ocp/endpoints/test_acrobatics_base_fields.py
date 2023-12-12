@@ -227,3 +227,50 @@ def test_put_collision_constraint():
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     assert response.json()["collision_constraint"]
+
+
+def test_put_dynamics():
+    response = client.put("/acrobatics/dynamics/", json={"dynamics": "torque_driven"})
+    assert response.status_code == 304, response
+
+    response = client.put("/acrobatics/dynamics/", json={"dynamics": "joints_acceleration_driven"})
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["dynamics"] == "joints_acceleration_driven"
+    assert data["phases_info"][0]["objectives"][0]["arguments"][0]["value"] == "qddot_joints"
+
+
+def test_put_dynamics_then_add_phase():
+    response = client.put("/acrobatics/dynamics/", json={"dynamics": "joints_acceleration_driven"})
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["dynamics"] == "joints_acceleration_driven"
+    for phase in data["phases_info"]:
+        assert phase["objectives"][0]["arguments"][0]["value"] == "qddot_joints"
+
+    response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
+    assert response.status_code == 200, response
+
+    data = response.json()
+    assert data["dynamics"] == "joints_acceleration_driven"
+    for phase in data["phases_info"]:
+        for i in 0, 1:
+            assert (
+                phase["objectives"][i]["arguments"][0]["value"] == "qddot_joints"
+            ), "MINIMIZE_CONTROL key should now be qddot_joints after changing dynamics to joints_acceleration_driven"
+
+    response = client.put("/acrobatics/dynamics/", json={"dynamics": "torque_driven"})
+    assert response.status_code == 200, response
+
+    data = response.json()
+    for phase in data:
+        for i in 0, 1:
+            assert (
+                phase["objectives"][i]["arguments"][0]["value"] == "tau"
+            ), "MINIMIZE_CONTROL key should now be qddot_joints after changing dynamics to joints_acceleration_driven"

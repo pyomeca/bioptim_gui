@@ -100,13 +100,14 @@ class AcrobaticsGenerationBounds:
 """
 
     @staticmethod
-    def add_tau_bounds(model) -> str:
+    def add_tau_bounds(data: dict, model) -> str:
         tau_bounds = model.get_tau_bounds()
+        control = "tau" if data["dynamics"] == "TORQUE_DRIVEN" else "qddot_joints"
 
         return f"""
     for phase in range(nb_phases):
         u_bounds.add(
-            "tau",
+            "{control}",
             min_bound={tau_bounds["min"]},
             max_bound={tau_bounds["max"]},
             interpolation=InterpolationType.CONSTANT,
@@ -115,12 +116,13 @@ class AcrobaticsGenerationBounds:
 """
 
     @staticmethod
-    def add_tau_init(model) -> str:
+    def add_tau_init(data: dict, model) -> str:
         tau_init = model.get_tau_init()
+        control = "tau" if data["dynamics"] == "TORQUE_DRIVEN" else "qddot_joints"
 
         return f"""
     u_initial_guesses.add(
-        "tau",
+        "{control}",
         initial_guess={tau_init},
         interpolation=InterpolationType.CONSTANT,
         phase=0,
@@ -134,6 +136,6 @@ class AcrobaticsGenerationBounds:
         ret += AcrobaticsGenerationBounds.add_qdot_bounds(data, model)
         ret += AcrobaticsGenerationBounds.add_q_init(data, model)
         ret += AcrobaticsGenerationBounds.add_qdot_init(data, model)
-        ret += AcrobaticsGenerationBounds.add_tau_bounds(model)
-        ret += AcrobaticsGenerationBounds.add_tau_init(model)
+        ret += AcrobaticsGenerationBounds.add_tau_bounds(data, model)
+        ret += AcrobaticsGenerationBounds.add_tau_init(data, model)
         return ret

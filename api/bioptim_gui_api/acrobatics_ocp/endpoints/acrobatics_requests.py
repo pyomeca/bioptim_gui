@@ -7,6 +7,7 @@ from bioptim_gui_api.acrobatics_ocp.misc.enums import (
     Position,
     SportType,
     PreferredTwistSide,
+    Dynamics,
 )
 from bioptim_gui_api.penalty.misc.enums import ObjectiveType
 
@@ -115,3 +116,7 @@ class ArgumentRequest(BaseModel):
 class CodeGenerationRequest(BaseModel):
     model_path: str
     save_path: str
+
+
+class DynamicsRequest(BaseModel):
+    dynamics: Dynamics

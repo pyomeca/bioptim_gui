@@ -56,6 +56,7 @@ class DefaultAcrobaticsConfig:
         "preferred_twist_side": "left",
         "with_visual_criteria": False,
         "collision_constraint": False,
+        "dynamics": "torque_driven",
         "phases_info": [
             copy.deepcopy(default_phases_info),
             copy.deepcopy(default_phases_info),
@@ -232,5 +233,10 @@ def phase_name_to_info(position, phase_names: str, phase_index: int, additional_
 
     res["objectives"] = get_phase_objectives(phase_names, phase_index, position, additional_criteria)
     res["constraints"] = get_phase_constraints(phase_name, position, additional_criteria)
+
+    for objective in res["objectives"]:
+        for arguments in objective["arguments"]:
+            if arguments["name"] == "key" and arguments["value"] == "tau":
+                arguments["value"] = "qddot_joints"
 
     return res

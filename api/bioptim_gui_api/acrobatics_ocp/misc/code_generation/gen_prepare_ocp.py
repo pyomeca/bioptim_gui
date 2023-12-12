@@ -102,8 +102,10 @@ def prepare_ocp(
 """
 
     @staticmethod
-    def multistart_noise() -> str:
-        return """
+    def multistart_noise(data: dict) -> str:
+        dynamics = data["dynamics"]
+        control = "tau" if dynamics == "TORQUE_DRIVEN" else "qddot_joints"
+        return f"""
     if is_multistart:
         for i in range(nb_phases):
             x_initial_guesses[i]["q"].add_noise(
@@ -121,8 +123,8 @@ def prepare_ocp(
             seed=seed,
         )
 
-        u_initial_guesses[0]["tau"].add_noise(
-            bounds=u_bounds[0]["tau"],
+        u_initial_guesses[0]["{control}"].add_noise(
+            bounds=u_bounds[0]["{control}"],
             magnitude=0.2,
             magnitude_type=MagnitudeType.RELATIVE,
             n_shooting=n_shooting[0],
@@ -178,7 +180,7 @@ def prepare_ocp(
         ret += AcrobaticsGenerationPrepareOCP.dynamics()
         ret += AcrobaticsGenerationPrepareOCP.multinode_constraints(data)
         ret += AcrobaticsGenerationBounds.bounds(data, model)
-        ret += AcrobaticsGenerationPrepareOCP.multistart_noise()
+        ret += AcrobaticsGenerationPrepareOCP.multistart_noise(data)
         ret += AcrobaticsGenerationPrepareOCP.bimapping(model)
         ret += AcrobaticsGenerationPrepareOCP.return_ocp()
         return ret

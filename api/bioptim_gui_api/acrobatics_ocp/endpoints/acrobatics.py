@@ -6,6 +6,7 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_code_generation import 
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_phases import router as acrobatics_somersaults_router
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import (
     CollisionConstraintRequest,
+    DynamicsRequest,
     FinalTimeMarginRequest,
     FinalTimeRequest,
     ModelPathRequest,
@@ -266,6 +267,35 @@ def put_collision_constraint(collision_constraint: CollisionConstraintRequest):
 
     new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
     update_phase_info(new_phase_names)
+
+    phases_info = read_acrobatics_data("phases_info")
+    return phases_info
+
+
+@router.put("/dynamics", response_model=list)
+def put_dynamics(dynamics: DynamicsRequest):
+    new_value = dynamics.dynamics
+    old_value = read_acrobatics_data("dynamics")
+    if old_value == new_value:
+        raise HTTPException(
+            status_code=304,
+            detail=f"dynamics is already {old_value}",
+        )
+
+    update_acrobatics_data("dynamics", new_value)
+
+    phases_info = read_acrobatics_data("phases_info")
+
+    new_control = "tau" if new_value == "torque_driven" else "qddot_joints"
+    old_control = "tau" if new_value != "torque_driven" else "qddot_joints"
+
+    for phase in phases_info:
+        for objective in phase["objectives"]:
+            for arguments in objective["arguments"]:
+                if arguments["name"] == "key" and arguments["value"] == old_control:
+                    arguments["value"] = new_control
+
+    update_acrobatics_data("phases_info", phases_info)
 
     phases_info = read_acrobatics_data("phases_info")
     return phases_info
