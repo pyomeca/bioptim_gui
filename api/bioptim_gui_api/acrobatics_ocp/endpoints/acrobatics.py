@@ -272,6 +272,11 @@ def put_collision_constraint(collision_constraint: CollisionConstraintRequest):
     return phases_info
 
 
+@router.get("/dynamics", response_model=list)
+def get_dynamics():
+    return ["torque_driven", "joints_acceleration_driven"]
+
+
 @router.put("/dynamics", response_model=list)
 def put_dynamics(dynamics: DynamicsRequest):
     new_value = dynamics.dynamics

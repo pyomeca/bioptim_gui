@@ -7,6 +7,7 @@ import 'package:bioptim_gui/widgets/acrobatics/acrobatic_information.dart';
 import 'package:bioptim_gui/widgets/acrobatics/acrobatic_position_chooser.dart';
 import 'package:bioptim_gui/widgets/acrobatics/acrobatic_sport_type_chooser.dart';
 import 'package:bioptim_gui/widgets/acrobatics/acrobatic_twist_side_chooser.dart';
+import 'package:bioptim_gui/widgets/acrobatics/acrobatics_dynamics_chooser.dart';
 import 'package:bioptim_gui/widgets/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -89,9 +90,13 @@ class _HeaderBuilder extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AcrobaticSportTypeChooser(
-                      width: width,
-                      defaultValue: acrobaticsData.sportType.capitalize()),
+                  Row(children: [
+                    AcrobaticSportTypeChooser(
+                        width: width * 0.35 - 6,
+                        defaultValue: acrobaticsData.sportType.capitalize()),
+                    const SizedBox(width: 12),
+                    AcrobaticsDynamicChooser(width: width * 0.65 - 6),
+                  ]),
                   const SizedBox(height: 12),
                   AcrobaticBioModelChooser(
                     width: width,
