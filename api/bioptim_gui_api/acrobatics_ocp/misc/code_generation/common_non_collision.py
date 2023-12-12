@@ -97,7 +97,7 @@ def get_solver(warming_up: bool = False):
     solver.set_maximum_iterations(max_iter)
     solver.set_convergence_tolerance(1e-6)
 
-    if warming_up:
+    if not warming_up:
         solver.set_bound_frac(1e-8)
         solver.set_bound_push(1e-8)
 

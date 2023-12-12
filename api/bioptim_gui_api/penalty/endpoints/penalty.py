@@ -1,5 +1,7 @@
-from bioptim import Node, QuadratureRule
+from bioptim import QuadratureRule
 from fastapi import APIRouter
+
+from bioptim_gui_api.acrobatics_ocp.misc.enums import Node
 
 router = APIRouter(
     prefix="/penalties",

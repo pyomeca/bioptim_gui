@@ -156,12 +156,20 @@ class PenaltyPrinter(ABC):
             ret += f"phase={self.phase},\n"
         return ret
 
+    def _node_str(self) -> str:
+        if self.nodes == "all[3:]":
+            return f"node=[i for i in range(3,n_shooting[{self.phase}] + 1)],\n"
+        elif self.nodes == "all[:-3]":
+            return f"node=[i for i in range(n_shooting[{self.phase}] - 2)],\n"
+        else:
+            return f"node=Node.{self.nodes.upper()},\n"
+
     def __common__args__(self) -> str:
         """
         This function is used to get the common arguments of a penalty.
         """
         ret = ""
-        ret += f"node=Node.{self.nodes.upper()},\n"
+        ret += self._node_str()
         ret += f"quadratic={self.quadratic},\n"
         ret += self._expand_str()
         ret += self._target_str()

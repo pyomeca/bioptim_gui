@@ -14,11 +14,17 @@ def collision_constraint_constraints(phase_name, position):
     collision_computer = get_collision_computer(position)
     non_collisions_markers = collision_computer.non_collision_markers_combinations()
 
+    position_node = {
+        "Pike": "all[3:]",
+        "Tuck": "all[3:]",
+        "Kick out": "all[:-3]",
+    }
+
     for m1_1, m1_2, m2_1, m2_2 in non_collisions_markers:
         constraints.append(
             create_constraint(
                 penalty_type="CUSTOM",
-                nodes="all_shooting",
+                nodes=position_node.get(phase_name, "all_shooting"),
                 weight=1.0,
                 arguments=[
                     {"name": "function", "value": "custom_noncrossing_const", "type": "function"},

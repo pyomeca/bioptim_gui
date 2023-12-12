@@ -1,6 +1,6 @@
 from typing import Optional
 
-from bioptim import QuadratureRule, Node
+from bioptim import QuadratureRule
 from pydantic import BaseModel
 
 from bioptim_gui_api.acrobatics_ocp.misc.enums import (
@@ -8,6 +8,7 @@ from bioptim_gui_api.acrobatics_ocp.misc.enums import (
     SportType,
     PreferredTwistSide,
     Dynamics,
+    Node,
 )
 from bioptim_gui_api.penalty.misc.enums import ObjectiveType
 
