@@ -24,10 +24,7 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import (
     TargetResponse,
     WeightResponse,
 )
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import (
-    read_acrobatics_data,
-    update_acrobatics_data,
-)
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import update_acrobatics_data, read_acrobatics_data
 from bioptim_gui_api.penalty.misc.penalty_config import DefaultPenaltyConfig
 from bioptim_gui_api.penalty.misc.penalty_utils import obj_arguments
 

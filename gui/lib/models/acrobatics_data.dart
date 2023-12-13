@@ -17,6 +17,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   String preferredTwistSide;
   bool withVisualCriteria;
   bool collisionConstraint;
+  bool withSpine;
   String dynamics;
   List<SomersaultPhase> _phasesInfo = [];
 
@@ -31,6 +32,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
         preferredTwistSide = data["preferred_twist_side"],
         withVisualCriteria = data["with_visual_criteria"],
         collisionConstraint = data["collision_constraint"],
+        withSpine = data["with_spine"],
         dynamics = data["dynamics"],
         _phasesInfo = (data["phases_info"] as List<dynamic>).map((somersault) {
           return SomersaultPhase.fromJson(somersault);
@@ -132,6 +134,9 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
       case "collision_constraint":
         collisionConstraint = value == "true";
         break;
+      case "with_spine":
+        withSpine = value == "true";
+        break;
       case "dynamics":
         dynamics = value;
         break;
@@ -169,6 +174,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
     preferredTwistSide = newData.preferredTwistSide;
     withVisualCriteria = newData.withVisualCriteria;
     collisionConstraint = newData.collisionConstraint;
+    withSpine = newData.withSpine;
     dynamics = newData.dynamics;
     _phasesInfo = List.from(newData._phasesInfo);
 

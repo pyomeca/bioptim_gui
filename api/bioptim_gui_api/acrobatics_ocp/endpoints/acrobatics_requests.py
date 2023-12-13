@@ -121,3 +121,7 @@ class CodeGenerationRequest(BaseModel):
 
 class DynamicsRequest(BaseModel):
     dynamics: Dynamics
+
+
+class WithSpineRequest(BaseModel):
+    with_spine: bool

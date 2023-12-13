@@ -16,6 +16,7 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import (
     PreferredTwistSideRequest,
     SportTypeRequest,
     VisualCriteriaRequest,
+    WithSpineRequest,
 )
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import (
     FinalTimeMarginResponse,
@@ -24,21 +25,18 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import (
     PreferredTwistSideResponse,
     SportTypeResponse,
 )
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import (
-    AdditionalCriteria,
-    phase_name_to_info,
-)
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import update_acrobatics_data, read_acrobatics_data
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import (
     acrobatics_phase_names,
-    read_acrobatics_data,
-    update_acrobatics_data,
     update_phase_info,
+    phase_name_to_info,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.enums import (
     Position,
     PreferredTwistSide,
     SportType,
 )
+from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 
 router = APIRouter(
     prefix="/acrobatics",
@@ -107,6 +105,7 @@ def put_nb_half_twist(somersault_index: int, half_twists_request: NbHalfTwistsRe
     additional_criteria = AdditionalCriteria(
         with_visual_criteria=data["with_visual_criteria"],
         collision_constraint=data["collision_constraint"],
+        with_spine=data["with_spine"],
     )
 
     new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
@@ -301,6 +300,34 @@ def put_dynamics(dynamics: DynamicsRequest):
                     arguments["value"] = new_control
 
     update_acrobatics_data("phases_info", phases_info)
+
+    phases_info = read_acrobatics_data("phases_info")
+    return phases_info
+
+
+@router.put("/with_spine", response_model=list)
+def put_with_spine(with_spine: WithSpineRequest):
+    new_value = with_spine.with_spine
+    old_value = read_acrobatics_data("with_spine")
+    if old_value == new_value:
+        raise HTTPException(
+            status_code=304,
+            detail=f"with_spine is already {old_value}",
+        )
+
+    update_acrobatics_data("with_spine", new_value)
+    if new_value:
+        update_acrobatics_data("dynamics", "joints_acceleration_driven")
+    else:
+        update_acrobatics_data("dynamics", "torque_driven")
+
+    data = read_acrobatics_data()
+    nb_somersaults = data["nb_somersaults"]
+    position = data["position"]
+    half_twists = data["nb_half_twists"]
+
+    new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
+    update_phase_info(new_phase_names)
 
     phases_info = read_acrobatics_data("phases_info")
     return phases_info

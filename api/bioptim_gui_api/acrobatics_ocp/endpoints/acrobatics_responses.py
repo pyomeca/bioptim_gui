@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, NamedTuple
 
 from bioptim import Axis
 from pydantic import BaseModel
@@ -93,7 +93,11 @@ class ArgumentResponse(BaseModel):
     value: Union[int, float, str, list, None, Axis]
 
 
-class CodeGenerationResponse(BaseModel):
-    generated_code: str
+class NewGeneratedBioMod(NamedTuple):
     new_model: str
     new_model_path: str
+
+
+class CodeGenerationResponse(BaseModel):
+    generated_code: str
+    new_models: list[NewGeneratedBioMod]

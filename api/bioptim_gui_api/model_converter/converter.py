@@ -176,13 +176,13 @@ class PikeConverter(StraightConverter):
 
     markers = [
         "MiddleRightHand",
-        "TargetRightHand",
+        "PikeTargetRightHand",
         "MiddleLeftHand",
-        "TargetLeftHand",
+        "PikeTargetLeftHand",
     ]
 
 
-class TuckConverter(PikeConverter):
+class TuckConverter(StraightConverter):
     segment_rotation = {
         "Pelvis": "xyz",
         "RightUpperArm": "zy",
@@ -192,3 +192,10 @@ class TuckConverter(PikeConverter):
         "UpperLegs": "xy",
         "LowerLegs": "x",
     }
+
+    markers = [
+        "MiddleRightHand",
+        "TuckTargetRightHand",
+        "MiddleLeftHand",
+        "TuckTargetLeftHand",
+    ]

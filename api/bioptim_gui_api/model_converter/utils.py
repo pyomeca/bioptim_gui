@@ -1,10 +1,35 @@
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import AdditionalCriteria
+from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 from bioptim_gui_api.model_converter.converter import (
     BioModConverter,
     PikeConverter,
     StraightConverter,
     TuckConverter,
 )
+
+
+with_visual_segment_rotations = {"Head": "zx", "Eyes": "zx"}
+with_visual_markers = ["eyes_vect_start", "eyes_vect_end", "fixation_front", "fixation_center"] + [
+    f"Trampo_corner_{n}" for n in range(1, 5)
+]
+cones = [f"cone_approx_{i}_{j}" for i in range(11) for j in range(10)]
+
+
+straight_collision_markers = ["HeadTop", "Ankle", "RightShoulder", "RightKnuckle", "LeftShoulder", "LeftKnuckle"]
+pike_collision_markers = straight_collision_markers + ["RightElbow", "LeftElbow", "PelvisBase"]
+tuck_collision_markers = pike_collision_markers + ["Knee"]
+
+collision_markers = {
+    "straight": straight_collision_markers,
+    "pike": pike_collision_markers,
+    "tuck": tuck_collision_markers,
+}
+
+spine_segment_rotations = {
+    "Stomach": "xyz",
+    "Rib": "xyz",
+    "Nipple": "xyz",
+    "Shoulder": "xyz",
+}
 
 
 def get_converter(position: str = "straight", additional_criteria: AdditionalCriteria = None) -> BioModConverter:
@@ -39,22 +64,6 @@ def get_converter(position: str = "straight", additional_criteria: AdditionalCri
         "pike": PikeConverter,
     }
 
-    with_visual_segment_rotations = {"Head": "zx", "Eyes": "zx"}
-    with_visual_markers = ["eyes_vect_start", "eyes_vect_end", "fixation_front", "fixation_center"] + [
-        f"Trampo_corner_{n}" for n in range(1, 5)
-    ]
-    cones = [f"cone_approx_{i}_{j}" for i in range(11) for j in range(10)]
-
-    straight_collision_markers = ["HeadTop", "Ankle", "RightShoulder", "RightKnuckle", "LeftShoulder", "LeftKnuckle"]
-    pike_collision_markers = straight_collision_markers + ["RightElbow", "LeftElbow", "PelvisBase"]
-    tuck_collision_markers = pike_collision_markers + ["Knee"]
-
-    collision_markers = {
-        "straight": straight_collision_markers,
-        "pike": pike_collision_markers,
-        "tuck": tuck_collision_markers,
-    }
-
     base = base_converters[position]
 
     # copy necessary, or else it modifies the base class
@@ -71,6 +80,9 @@ def get_converter(position: str = "straight", additional_criteria: AdditionalCri
 
     if additional_criteria.collision_constraint:
         new_markers += collision_markers[position]
+
+    if additional_criteria.with_spine:
+        new_segment_rotation.update(spine_segment_rotations)
 
     class SubConverter(BioModConverter):
         segment_rotation = new_segment_rotation

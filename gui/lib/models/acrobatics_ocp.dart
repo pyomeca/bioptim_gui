@@ -34,13 +34,15 @@ class AcrobaticsOCPProgram {
 
     final responseData = json.decode(await getGeneratedContent());
     final generatedContent = responseData['generated_code'];
-    final generatedModel = responseData['new_model'];
-    final newModelPath = responseData['new_model_path'];
 
     final codeFile = File(path);
     codeFile.writeAsStringSync(generatedContent);
 
-    final modelFile = File(newModelPath);
-    modelFile.writeAsStringSync(generatedModel);
+    for (final modelModelPath in responseData['new_models']) {
+      final newModel = modelModelPath[0];
+      final newModelPath = modelModelPath[1];
+      final modelFile = File(newModelPath);
+      modelFile.writeAsStringSync(newModel);
+    }
   }
 }

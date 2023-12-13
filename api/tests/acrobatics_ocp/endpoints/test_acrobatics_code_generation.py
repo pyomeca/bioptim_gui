@@ -39,15 +39,16 @@ def test_generate_code_no_model():
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
 @pytest.mark.parametrize(
-    ("with_visual_criteria", "non_collision", "folder"),
+    ("with_visual_criteria", "non_collision", "with_spine", "folder"),
     [
-        (True, True, "with_collision_and_visual"),
-        (True, False, "with_visual"),
-        (False, True, "with_collision"),
-        (False, False, "vanilla"),
+        (True, True, False, "with_collision_and_visual"),
+        (True, False, False, "with_visual"),
+        (False, True, False, "with_collision"),
+        (False, False, False, "vanilla"),
+        (True, True, True, "everything"),
     ],
 )
-def test_generate_code_simple_position(position, with_visual_criteria, non_collision, folder):
+def test_generate_code_simple_position(position, with_visual_criteria, non_collision, with_spine, folder):
     # using base data and a position model (16 degrees of freedom)
     model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
     response = client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
@@ -61,6 +62,10 @@ def test_generate_code_simple_position(position, with_visual_criteria, non_colli
         response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
         assert response.status_code == 200, response
 
+    if with_spine:
+        response = client.put("/acrobatics/with_spine", json={"with_spine": True})
+        assert response.status_code == 200, response
+
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
     assert response.status_code != 400, response
 
@@ -70,8 +75,8 @@ def test_generate_code_simple_position(position, with_visual_criteria, non_colli
     response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
     assert response.status_code == 200, response
     data = response.json()
-    assert data["new_model_path"] == f"saver/{position}-{position}.bioMod"
-    assert data["new_model_path"] in data["generated_code"]
+    assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
+    assert data["new_models"][0][1] in data["generated_code"]
 
     # data = response.json()
     #
@@ -86,15 +91,18 @@ def test_generate_code_simple_position(position, with_visual_criteria, non_colli
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
 @pytest.mark.parametrize(
-    ("with_visual_criteria", "non_collision", "folder"),
+    ("with_visual_criteria", "non_collision", "with_spine", "folder"),
     [
-        (True, True, "with_collision_and_visual"),
-        (True, False, "with_visual"),
-        (False, True, "with_collision"),
-        (False, False, "vanilla"),
+        (True, True, False, "with_collision_and_visual"),
+        (True, False, False, "with_visual"),
+        (False, True, False, "with_collision"),
+        (False, False, False, "vanilla"),
+        (True, True, True, "everything"),
     ],
 )
-def test_generate_code_position_no_objective_no_constraint(position, with_visual_criteria, non_collision, folder):
+def test_generate_code_position_no_objective_no_constraint(
+    position, with_visual_criteria, non_collision, with_spine, folder
+):
     # using base data and a position model (16 degrees of freedom)
     model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
     response = client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
@@ -106,6 +114,10 @@ def test_generate_code_position_no_objective_no_constraint(position, with_visual
 
     if non_collision:
         response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
+        assert response.status_code == 200, response
+
+    if with_spine:
+        response = client.put("/acrobatics/with_spine", json={"with_spine": True})
         assert response.status_code == 200, response
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
@@ -123,8 +135,8 @@ def test_generate_code_position_no_objective_no_constraint(position, with_visual
     response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
     assert response.status_code == 200, response
     data = response.json()
-    assert data["new_model_path"] == f"saver/{position}-{position}.bioMod"
-    assert data["new_model_path"] in data["generated_code"]
+    assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
+    assert data["new_models"][0][1] in data["generated_code"]
 
     # data = response.json()
     #
@@ -139,15 +151,18 @@ def test_generate_code_position_no_objective_no_constraint(position, with_visual
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
 @pytest.mark.parametrize(
-    ("with_visual_criteria", "non_collision", "folder"),
+    ("with_visual_criteria", "non_collision", "with_spine", "folder"),
     [
-        (True, True, "with_collision_and_visual"),
-        (True, False, "with_visual"),
-        (False, True, "with_collision"),
-        (False, False, "vanilla"),
+        (True, True, False, "with_collision_and_visual"),
+        (True, False, False, "with_visual"),
+        (False, True, False, "with_collision"),
+        (False, False, False, "vanilla"),
+        (True, True, True, "everything"),
     ],
 )
-def test_generate_code_position_objective_and_constraint(position, with_visual_criteria, non_collision, folder):
+def test_generate_code_position_objective_and_constraint(
+    position, with_visual_criteria, non_collision, with_spine, folder
+):
     # using base data and a position model (16 degrees of freedom)
     model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
@@ -163,6 +178,10 @@ def test_generate_code_position_objective_and_constraint(position, with_visual_c
         response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
         assert response.status_code == 200, response
 
+    if with_spine:
+        response = client.put("/acrobatics/with_spine", json={"with_spine": True})
+        assert response.status_code == 200, response
+
     client.post("/acrobatics/phases_info/0/constraints")
     client.post("/acrobatics/phases_info/0/constraints")
 
@@ -175,8 +194,8 @@ def test_generate_code_position_objective_and_constraint(position, with_visual_c
     response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
     assert response.status_code == 200, response
     data = response.json()
-    assert data["new_model_path"] == f"saver/{position}-{position}.bioMod"
-    assert data["new_model_path"] in data["generated_code"]
+    assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
+    assert data["new_models"][0][1] in data["generated_code"]
 
     # data = response.json()
     #
@@ -191,15 +210,18 @@ def test_generate_code_position_objective_and_constraint(position, with_visual_c
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
 @pytest.mark.parametrize(
-    ("with_visual_criteria", "non_collision", "folder"),
+    ("with_visual_criteria", "non_collision", "with_spine", "folder"),
     [
-        (True, True, "with_collision_and_visual"),
-        (True, False, "with_visual"),
-        (False, True, "with_collision"),
-        (False, False, "vanilla"),
+        (True, True, False, "with_collision_and_visual"),
+        (True, False, False, "with_visual"),
+        (False, True, False, "with_collision"),
+        (False, False, False, "vanilla"),
+        (True, True, True, "everything"),
     ],
 )
-def test_generate_code_2_phase_position_objective_and_constraint(position, with_visual_criteria, non_collision, folder):
+def test_generate_code_2_phase_position_objective_and_constraint(
+    position, with_visual_criteria, non_collision, with_spine, folder
+):
     # using base data and a position model (16 degrees of freedom)
     model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
@@ -210,6 +232,10 @@ def test_generate_code_2_phase_position_objective_and_constraint(position, with_
 
     if non_collision:
         response = client.put("/acrobatics/collision_constraint", json={"collision_constraint": True})
+        assert response.status_code == 200, response
+
+    if with_spine:
+        response = client.put("/acrobatics/with_spine", json={"with_spine": True})
         assert response.status_code == 200, response
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
@@ -231,8 +257,8 @@ def test_generate_code_2_phase_position_objective_and_constraint(position, with_
     response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
     assert response.status_code == 200, response
     data = response.json()
-    assert data["new_model_path"] == f"saver/{position}-{position}.bioMod"
-    assert data["new_model_path"] in data["generated_code"]
+    assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
+    assert data["new_models"][0][1] in data["generated_code"]
 
     # data = response.json()
     #
@@ -247,15 +273,18 @@ def test_generate_code_2_phase_position_objective_and_constraint(position, with_
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
 @pytest.mark.parametrize(
-    ("with_visual_criteria", "non_collision", "folder"),
+    ("with_visual_criteria", "non_collision", "with_spine", "folder"),
     [
-        (True, True, "with_collision_and_visual"),
-        (True, False, "with_visual"),
-        (False, True, "with_collision"),
-        (False, False, "vanilla"),
+        (True, True, False, "with_collision_and_visual"),
+        (True, False, False, "with_visual"),
+        (False, True, False, "with_collision"),
+        (False, False, False, "vanilla"),
+        (True, True, True, "everything"),
     ],
 )
-def test_generate_code_modified_objective_and_constraint(position, with_visual_criteria, non_collision, folder):
+def test_generate_code_modified_objective_and_constraint(
+    position, with_visual_criteria, non_collision, with_spine, folder
+):
     # using base data and a position model (16 degrees of freedom)
     model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
     client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
@@ -335,8 +364,8 @@ def test_generate_code_modified_objective_and_constraint(position, with_visual_c
     response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
     assert response.status_code == 200, response
     data = response.json()
-    assert data["new_model_path"] == f"saver/{position}-{position}.bioMod"
-    assert data["new_model_path"] in data["generated_code"]
+    assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
+    assert data["new_models"][0][1] in data["generated_code"]
 
     # data = response.json()
     #

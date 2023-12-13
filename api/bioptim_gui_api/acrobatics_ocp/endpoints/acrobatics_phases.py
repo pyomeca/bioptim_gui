@@ -14,10 +14,7 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import (
     NbShootingPointsResponse,
     SomersaultDurationResponse,
 )
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import (
-    read_acrobatics_data,
-    update_acrobatics_data,
-)
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import update_acrobatics_data, read_acrobatics_data
 
 router = APIRouter()
 router.include_router(objectives_router)

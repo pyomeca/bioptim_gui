@@ -703,15 +703,17 @@ segment LowerLegs
 endsegment
 
 
-	marker TargetRightHand
+	marker PikeTargetRightHand
 		parent LowerLegs
 		position -0.1 0 -0.22
 	endmarker
 
-	marker TargetLeftHand
+	marker PikeTargetLeftHand
 		parent LowerLegs
 		position 0.1 0 -0.22
 	endmarker
+
+
 
 segment Feet
 	parent LowerLegs

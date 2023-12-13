@@ -112,7 +112,6 @@ def test_put_final_time_margin():
     assert response.json()["final_time_margin"] == 0.2
 
 
-# TODO implement when front is ready
 # def test_get_position_single_somersault():
 #     response = client.get("/acrobatics/position/")
 #     assert response.status_code == 200, response
@@ -227,6 +226,25 @@ def test_put_collision_constraint():
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     assert response.json()["collision_constraint"]
+
+
+def test_put_with_spine():
+    response = client.put("/acrobatics/with_spine/", json={"with_spine": False})
+    assert response.status_code == 304, response
+
+    response = client.put("/acrobatics/with_spine/", json={"with_spine": True})
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["with_spine"]
+    assert data["dynamics"] == "joints_acceleration_driven"
+    for phase in data["phases_info"]:
+        for i in 0, 1:
+            assert (
+                phase["objectives"][i]["arguments"][0]["value"] == "qddot_joints"
+            ), "MINIMIZE_CONTROL key should now be qddot_joints after changing to 'with_spine'"
 
 
 def test_put_dynamics():

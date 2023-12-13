@@ -708,12 +708,14 @@ endsegment
 		position 0.0 0.0 0.0
 	endmarker
 
-	marker TargetRightHand
+
+
+	marker TuckTargetRightHand
 		parent LowerLegs
 		position -0.1 0 -0.22
 	endmarker
 
-	marker TargetLeftHand
+	marker TuckTargetLeftHand
 		parent LowerLegs
 		position 0.1 0 -0.22
 	endmarker

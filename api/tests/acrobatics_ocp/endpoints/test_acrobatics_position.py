@@ -33,7 +33,6 @@ def run_for_all():
     os.remove(datafile)
 
 
-# TODO implement when front is ready
 # def test_get_position_single_somersault():
 #     response = client.get("/acrobatics/position/")
 #     assert response.status_code == 200, response

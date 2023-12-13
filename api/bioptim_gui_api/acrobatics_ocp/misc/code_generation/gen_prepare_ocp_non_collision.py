@@ -4,6 +4,7 @@ from bioptim_gui_api.acrobatics_ocp.misc.code_generation.bounds_non_collision im
     AcrobaticsGenerationBoundsNonCollision,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.code_generation.gen_prepare_ocp import AcrobaticsGenerationPrepareOCP
+from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 from bioptim_gui_api.penalty.misc.constraint_printer import ConstraintPrinter
 from bioptim_gui_api.penalty.misc.objective_printer import ObjectivePrinter
 from bioptim_gui_api.penalty.misc.penalty_utils import penalty_str_to_non_collision_penalty
@@ -154,9 +155,14 @@ def prepare_ocp(
     @staticmethod
     def prepare_ocp(data: dict, new_model_path: str) -> str:
         position = data["position"]
-        with_visual_criteria = data["with_visual_criteria"]
         torque_driven = data["dynamics"] == "torque_driven"
-        model = get_variable_computer(position, with_visual_criteria)
+        additional_criteria = AdditionalCriteria(
+            with_visual_criteria=data["with_visual_criteria"],
+            collision_constraint=data["collision_constraint"],
+            with_spine=data["with_spine"],
+        )
+
+        model = get_variable_computer(position, additional_criteria)
 
         ret = AcrobaticsGenerationPrepareOCPNonCollision.prepare_ocp_header()
         ret += AcrobaticsGenerationPrepareOCPNonCollision.generic_elements(data, new_model_path)

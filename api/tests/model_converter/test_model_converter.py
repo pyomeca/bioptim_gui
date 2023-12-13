@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import AdditionalCriteria
+from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 from bioptim_gui_api.model_converter.utils import get_converter
 
 BIOMODS_PATH = "test_biomods"  # to change depending on from where you run the test
@@ -17,18 +17,21 @@ BIOMODS_PATH = "test_biomods"  # to change depending on from where you run the t
     ],
 )
 @pytest.mark.parametrize(
-    ("with_visual_criteria", "non_collision", "without_cone", "folder"),
+    ("with_visual_criteria", "non_collision", "without_cone", "with_spine", "folder"),
     [
-        (True, True, False, "with_collision_and_visual"),
-        (True, True, True, "with_collision_and_visual_coneless"),
-        (True, False, False, "with_visual"),
-        (True, False, True, "with_visual_coneless"),
-        (False, True, False, "with_collision"),
-        (False, False, False, "vanilla"),
+        (True, True, False, False, "with_collision_and_visual"),
+        (True, True, True, False, "with_collision_and_visual_coneless"),
+        (True, False, False, False, "with_visual"),
+        (True, False, True, False, "with_visual_coneless"),
+        (False, True, False, False, "with_collision"),
+        (False, False, False, False, "vanilla"),
+        (True, True, False, True, "everything"),
     ],
 )
-def test_good(position, with_visual_criteria, non_collision, without_cone, folder):
-    converter = get_converter(position, AdditionalCriteria(with_visual_criteria, non_collision, without_cone))
+def test_good(position, with_visual_criteria, non_collision, without_cone, with_spine, folder):
+    converter = get_converter(
+        position, AdditionalCriteria(with_visual_criteria, non_collision, without_cone, with_spine)
+    )
     actual = converter.convert(f"{BIOMODS_PATH}/{folder}/{folder}_base.bioMod")
     with open(f"{BIOMODS_PATH}/{folder}/good/{position}.bioMod", "r") as f:
         expected = f.read()

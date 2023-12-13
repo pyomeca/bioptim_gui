@@ -159,7 +159,7 @@ segment LowerLegs
 	meshrt pi 0 0 xyz 0 0 0
 endsegment
 
-	marker TargetRightHand
+	marker PikeTargetRightHand
 		parent LowerLegs
 		position -0.1 0 -0.22
 	endmarker
