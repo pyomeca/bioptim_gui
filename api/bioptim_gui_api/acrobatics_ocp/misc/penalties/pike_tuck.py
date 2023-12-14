@@ -2,7 +2,7 @@ from bioptim_gui_api.penalty.misc.penalty_config import DefaultPenaltyConfig
 from bioptim_gui_api.penalty.misc.penalty_utils import create_objective
 
 
-def pike_tuck_objectives(phase_name: str, model) -> list:
+def pike_tuck_objectives(phase_name: str, model, position: str) -> list:
     """
     SUPERIMPOSE_MARKERS mayer: MiddleRightHand, TargetRightHand, end, weight=1.0
     SUPERIMPOSE_MARKERS mayer: MiddleLeftHand, TargetLeftHand, end, weight=1.0
@@ -28,7 +28,7 @@ def pike_tuck_objectives(phase_name: str, model) -> list:
                     },
                     {
                         "name": "second_marker",
-                        "value": f"Target{side}Hand",
+                        "value": f"{position.capitalize()}Target{side}Hand",
                         "type": "string",
                     },
                 ],

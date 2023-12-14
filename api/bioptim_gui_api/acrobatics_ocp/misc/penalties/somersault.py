@@ -67,7 +67,7 @@ def somersault_constraints(phase_name: str, position: str) -> list:
                         },
                         {
                             "name": "second_marker",
-                            "value": f"Target{side}Hand",
+                            "value": f"{position.capitalize()}Target{side}Hand",
                             "type": "str",
                         },
                     ],

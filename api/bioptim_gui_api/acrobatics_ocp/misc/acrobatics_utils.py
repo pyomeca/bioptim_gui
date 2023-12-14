@@ -168,7 +168,7 @@ def get_phase_objectives(
         phase_name=phase_names[phase_index], position=position, phase_index=phase_index, model=model
     )
 
-    objectives += pike_tuck_objectives(phase_name, model)
+    objectives += pike_tuck_objectives(phase_name, model, position)
     objectives += kickout_objectives(phase_name, model)
     objectives += twist_objectives(phase_name, model)
     objectives += waiting_objectives(phase_name, model)
@@ -245,13 +245,14 @@ def phase_name_to_info(position, phase_names: str, phase_index: int, additional_
     res["constraints"] = get_phase_constraints(phase_name, position, additional_criteria)
 
     dynamics = read_acrobatics_data("dynamics")
-    control = "tau" if dynamics == "torque_driven" else "qddot_joints"
+    old_control = "tau" if dynamics != "torque_driven" else "qddot_joints"
+    new_control = "tau" if dynamics == "torque_driven" else "qddot_joints"
 
     # TODO test this further
 
     for objective in res["objectives"]:
         for arguments in objective["arguments"]:
-            if arguments["name"] == "key" and arguments["value"] == "tau":
-                arguments["value"] = control
+            if arguments["name"] == "key" and arguments["value"] == old_control:
+                arguments["value"] = new_control
 
     return res
