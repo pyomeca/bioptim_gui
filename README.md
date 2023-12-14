@@ -31,12 +31,6 @@ Allow Docker to access your X Server by executing the following command in your 
 	 cd bioptim-gui
 ```
     
--   Modify permissions (optional - only needed if necessary):
-    
-```bash
-    chmod +x entrypoint.sh
-```
-    
 -   Run the application using Docker Compose:
     
 ```bash
