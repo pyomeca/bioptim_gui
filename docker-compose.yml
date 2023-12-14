@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  bioptim_gui:
+    build:
+      context: gui
+    image: bioptim_gui:1.0
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    network_mode: "host"
+    depends_on:
+      - bioptim_gui_api
+
+  bioptim_gui_api:
+    build:
+      context: api
+    image: bioptim_gui_api:1.0
+    networks:
+      - internal
+    ports:
+      - "127.0.0.1:8000:8000"
+
+networks:
+  internal:
