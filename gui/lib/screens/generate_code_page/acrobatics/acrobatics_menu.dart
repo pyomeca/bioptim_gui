@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AcrobaticsMenu extends StatefulWidget {
-  const AcrobaticsMenu({super.key, this.columnWidth = 400.0});
+  const AcrobaticsMenu({super.key, this.columnWidth = 500.0});
 
   final double columnWidth;
 
