@@ -9,6 +9,7 @@ abstract class Penalty {
   bool derivative;
   dynamic target;
   String integrationRule;
+  bool expanded = false;
   List<Argument> arguments;
 
   Penalty.fromJson(Map<String, dynamic> penaltyData)

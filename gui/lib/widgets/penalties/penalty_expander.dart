@@ -243,7 +243,12 @@ class _PathTile extends StatelessWidget {
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
-        initialExpandedState: false,
+        initialExpandedState:
+            data.phaseInfo[phaseIndex].objectives[penaltyIndex].expanded,
+        onTapHeader: (isExpanded) {
+          data.phaseInfo[phaseIndex].objectives[penaltyIndex].expanded =
+              isExpanded;
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

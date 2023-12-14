@@ -54,8 +54,8 @@ class RemoteBooleanSwitchState extends State<RemoteBooleanSwitch> {
     });
 
     // Alexandre: TODO find a prettier way to reset the export button
-    AcrobaticsControllers.instance.notifyListeners();
-    OptimalControlProgramControllers.instance.notifyListeners();
+    // AcrobaticsControllers.instance.notifyListeners();
+    // OptimalControlProgramControllers.instance.notifyListeners();
   }
 
   @override
