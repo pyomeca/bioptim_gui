@@ -79,6 +79,9 @@ def put_objective_type(phase_index: int, objective_index: int, objective_type: O
     objective_type_value = objective_type.objective_type.value
     penalty_type = phases_info[phase_index]["objectives"][objective_index]["penalty_type"]
 
+    if objective_type_value == "lagrange":
+        phases_info[phase_index]["objectives"][objective_index]["nodes"] = "all_shooting"
+
     weight = phases_info[phase_index]["objectives"][objective_index]["weight"]
 
     if weight > 0:

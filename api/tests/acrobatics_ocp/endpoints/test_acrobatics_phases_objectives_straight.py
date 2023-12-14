@@ -387,7 +387,7 @@ def test_add_objective_check_arguments_changing_objective_type():
     data = response.json()
     assert data[2]["objective_type"] == "lagrange"
     assert data[2]["penalty_type"] == "MINIMIZE_TIME"
-    assert data[2]["nodes"] == "end"
+    assert data[2]["nodes"] == "all_shooting"
     assert len(data[2]["arguments"]) == 0
 
 
@@ -513,3 +513,16 @@ def test_changing_penalty_not_exist():
     data = response.json()
     assert data["penalty_type"] == "MINIMIZE_CONTROL"
     assert data["objective_type"] == "lagrange"
+
+
+def test_switch_to_lagrange_all_shooting():
+    # swiching to lagrange objective should switch the node to all_shooting
+    response = client.put(
+        "/acrobatics/phases_info/0/objectives/2/objective_type",
+        json={"objective_type": "lagrange"},
+    )
+
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["objective_type"] == "lagrange"
+    assert data["nodes"] == "all_shooting"
