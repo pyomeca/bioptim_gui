@@ -243,11 +243,17 @@ class _PathTile extends StatelessWidget {
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
-        initialExpandedState:
-            data.phaseInfo[phaseIndex].objectives[penaltyIndex].expanded,
+        initialExpandedState: penaltyType == Objective
+            ? data.phaseInfo[phaseIndex].objectives[penaltyIndex].expanded
+            : data.phaseInfo[phaseIndex].constraints[penaltyIndex].expanded,
         onTapHeader: (isExpanded) {
-          data.phaseInfo[phaseIndex].objectives[penaltyIndex].expanded =
-              isExpanded;
+          if (penaltyType == Constraint) {
+            data.phaseInfo[phaseIndex].constraints[penaltyIndex].expanded =
+                isExpanded;
+          } else {
+            data.phaseInfo[phaseIndex].objectives[penaltyIndex].expanded =
+                isExpanded;
+          }
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

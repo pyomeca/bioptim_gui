@@ -214,8 +214,9 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
         : false;
 
     // keep expanded value
-    penalty.expanded =
-        _phasesInfo[somersaultIndex].objectives[penaltyIndex].expanded;
+    penalty.expanded = penaltyType == "objective"
+        ? _phasesInfo[somersaultIndex].objectives[penaltyIndex].expanded
+        : _phasesInfo[somersaultIndex].constraints[penaltyIndex].expanded;
 
     if (penaltyType == "objective") {
       _phasesInfo[somersaultIndex].objectives[penaltyIndex] =
@@ -226,7 +227,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
     }
 
     // force redraw only if the penalty type or objective type if it's an objective
-    // changes (to update arguments)
+    // changes (to update arguments and other fields)
     if (penaltyTypeChanged || objectiveTypeChanged || minMaxChanged) {
       notifyListeners();
     }
@@ -323,9 +324,10 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
           : Constraint.fromJson(
               json.decode(response.body) as Map<String, dynamic>);
 
-      newPenalties.expand = _phasesInfo[phaseIndex]
-          .objectives[penaltyIndex]
-          .expanded; // keep expanded value
+// keep expanded value
+      newPenalties.expand = penaltyType == "objectives"
+          ? _phasesInfo[phaseIndex].objectives[penaltyIndex].expanded
+          : _phasesInfo[phaseIndex].constraints[penaltyIndex].expanded;
 
       if (isObjective) {
         updatePenalty(phaseIndex, "objective", penaltyIndex, newPenalties);
