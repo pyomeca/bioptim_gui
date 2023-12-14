@@ -14,7 +14,7 @@ RUN git clone https://github.com/pyomeca/bioptim.git /app
 WORKDIR /app
 
 # Install necessary packages directly using Conda
-RUN conda install biorbd bioviz python-graphviz -c conda-forge
+RUN conda install biorbd bioviz python-graphviz -c conda-forge -y
 
 # Activate Conda environment
 SHELL ["conda", "run", "-n", "base", "/bin/bash", "-c"]

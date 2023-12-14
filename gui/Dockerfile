@@ -1,16 +1,18 @@
-# Use Ubuntu as the base image
+# Dockerfile for Flutter
+ 
+# Specify a base image
 FROM ubuntu:22.04
-
-# Set non-interactive mode during installation
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Update package lists and install necessary tools
-RUN apt-get update && \
-    apt-get install -y \
-    sudo \
-    curl \
+ 
+# Set environment variables
+ENV FLUTTER_VERSION=3.13.5
+ENV FLUTTER_HOME=/opt/flutter
+ 
+# Install dependencies
+RUN apt-get update && apt-get install -y \
     git \
+    curl \
     unzip \
+    curl \
     xz-utils \
     clang \
     cmake \
@@ -20,42 +22,27 @@ RUN apt-get update && \
     liblzma-dev \
     libstdc++-12-dev \
     && rm -rf /var/lib/apt/lists/*
-
-# Download and extract Flutter SDK
-RUN curl -O https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.16.3-stable.tar.xz && \
-    tar xf flutter_linux_3.16.3-stable.tar.xz -C /usr/local && \
-    rm flutter_linux_3.16.3-stable.tar.xz
-
-# Create a non-root user and set permissions for /app directory
-RUN useradd -ms /bin/bash flutteruser && \
-    mkdir /app && chown -R flutteruser:flutteruser /app
-
-# Give sudo privileges to the non-root user (optional)
-RUN echo 'flutteruser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/flutteruser
-
-# Switch to the non-root user, we can't flutter pub get as root
-
-# Add Flutter to the PATH environment variable
-ENV PATH="${PATH}:/usr/local/flutter/bin"
-
-# Run 'flutter doctor' to verify installation and accept licenses
+ 
+# Install Flutter
+RUN git clone -b ${FLUTTER_VERSION} https://github.com/flutter/flutter.git ${FLUTTER_HOME}
+ 
+# Add flutter to PATH
+ENV PATH="${FLUTTER_HOME}/bin:${PATH}"
+ 
+# Verify flutter installation
 RUN flutter doctor
-
-# Set the working directory inside the container
+ 
+# Set the working directory
 WORKDIR /app
-
+ 
 # Copy specific directories and files into the container
 COPY lib /app/lib
 COPY linux /app/linux
 COPY pubspec.yaml /app/pubspec.yaml
 COPY assets /app/assets
-
-# Run 'flutter pub get' # true to prevent the command to make the docker fail
-RUN flutter pub get || true
-
-RUN chown -R flutteruser /app/linux/flutter/generated_plugin_registrant.h
-
-USER flutteruser
-
-# Set the command to run the app in release mode when the container starts
+ 
+# Expose port
+EXPOSE 8080
+ 
+# Run the command when the container launches
 CMD ["flutter", "run"]
