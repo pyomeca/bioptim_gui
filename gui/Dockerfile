@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y \
     libgtk-3-dev \
     liblzma-dev \
     libstdc++-12-dev \
+    zenity \
     && rm -rf /var/lib/apt/lists/*
  
 # Install Flutter
