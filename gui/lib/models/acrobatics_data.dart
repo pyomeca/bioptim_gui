@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:bioptim_gui/models/acrobatics_controllers.dart';
 import 'package:bioptim_gui/models/acrobatics_request_maker.dart';
@@ -195,6 +196,28 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   @override
   void updatePenalty(int somersaultIndex, String penaltyType, int penaltyIndex,
       Penalty penalty) {
+    final oldPenalty = penaltyType == "objective"
+        ? _phasesInfo[somersaultIndex].objectives[penaltyIndex]
+        : _phasesInfo[somersaultIndex].constraints[penaltyIndex];
+
+    final newPenaltyType = penalty.penaltyType;
+    final oldPenaltyType = oldPenalty.penaltyType;
+    final penaltyTypeChanged = newPenaltyType != oldPenaltyType;
+
+    final objectiveTypeChanged = penaltyType == "objective"
+        ? (penalty as Objective).objectiveType !=
+            (oldPenalty as Objective).objectiveType
+        : false;
+
+    final minMaxChanged = penaltyType == "objective"
+        ? (penalty as Objective).weight * (oldPenalty as Objective).weight > 0
+        : false;
+
+    // keep expanded value
+    penalty.expanded = penaltyType == "objective"
+        ? _phasesInfo[somersaultIndex].objectives[penaltyIndex].expanded
+        : _phasesInfo[somersaultIndex].constraints[penaltyIndex].expanded;
+
     if (penaltyType == "objective") {
       _phasesInfo[somersaultIndex].objectives[penaltyIndex] =
           penalty as Objective;
@@ -203,13 +226,18 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
           penalty as Constraint;
     }
 
-    notifyListeners();
+    // force redraw only if the penalty type or objective type if it's an objective
+    // changes (to update arguments and other fields)
+    if (penaltyTypeChanged || objectiveTypeChanged || minMaxChanged) {
+      notifyListeners();
+    }
   }
 
   @override
   void updatePhaseInfo(List newData) {
     final newPhases =
         (newData).map((p) => SomersaultPhase.fromJson(p)).toList();
+
     _phasesInfo = newPhases;
 
     notifyListeners();
@@ -295,6 +323,11 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
               json.decode(response.body) as Map<String, dynamic>)
           : Constraint.fromJson(
               json.decode(response.body) as Map<String, dynamic>);
+
+// keep expanded value
+      newPenalties.expand = penaltyType == "objectives"
+          ? _phasesInfo[phaseIndex].objectives[penaltyIndex].expanded
+          : _phasesInfo[phaseIndex].constraints[penaltyIndex].expanded;
 
       if (isObjective) {
         updatePenalty(phaseIndex, "objective", penaltyIndex, newPenalties);

@@ -51,9 +51,28 @@ def add_constraint(phase_index: int):
 def get_constraints_dropdown_list():
     # we don't use all the available constraints for now
     return [
-        "TIME_CONSTRAINT",
-        "SUPERIMPOSE_MARKERS",
         "CUSTOM",
+        "PROPORTIONAL_CONTROL",
+        "PROPORTIONAL_STATE",
+        "SUPERIMPOSE_MARKERS",
+        "SUPERIMPOSE_MARKERS_VELOCITY",
+        "TIME_CONSTRAINT",
+        "TRACK_ANGULAR_MOMENTUM",
+        "TRACK_COM_POSITION",
+        "TRACK_COM_VELOCITY",
+        "TRACK_CONTROL",
+        "TRACK_LINEAR_MOMENTUM",
+        "TRACK_MARKER_WITH_SEGMENT_AXIS",
+        "TRACK_MARKERS",
+        "TRACK_MARKERS_ACCELERATION",
+        "TRACK_MARKERS_VELOCITY",
+        "TRACK_POWER",
+        "TRACK_QDDOT",
+        "TRACK_SEGMENT_ROTATION",
+        "TRACK_SEGMENT_VELOCITY",
+        "TRACK_SEGMENT_WITH_CUSTOM_RT",
+        "TRACK_STATE",
+        "TRACK_VECTOR_ORIENTATIONS_FROM_MARKERS",
     ]
     # if all constraints have to be implemented
     # return [e.name for e in ConstraintFcn]
