@@ -57,8 +57,8 @@ def get_objective_dropdown_list(phase_index: int, objective_index: int):
     weight = objective["weight"]
 
     if weight > 0:
-        return DefaultPenaltyConfig.min_to_original_dict.keys()
-    return DefaultPenaltyConfig.max_to_original_dict.keys()
+        return list(DefaultPenaltyConfig.min_to_original_dict.keys())
+    return list(DefaultPenaltyConfig.max_to_original_dict.keys())
 
 
 @router.delete("/{phase_index}/objectives/{objective_index}", response_model=list)

@@ -90,7 +90,7 @@ class WeightResponse(WeightRequest):
 class ArgumentResponse(BaseModel):
     key: str
     type: str
-    value: Union[int, float, str, list, None, Axis]
+    value: Union[float, int, str, list, None, Axis]
 
 
 class NewGeneratedBioMod(NamedTuple):
