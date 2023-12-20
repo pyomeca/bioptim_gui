@@ -1,13 +1,6 @@
 import copy
 
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.common import common_objectives
-from bioptim_gui_api.penalty.misc.penalty_config import DefaultPenaltyConfig
-from bioptim_gui_api.penalty.misc.penalty_utils import (
-    create_objective,
-)
-from bioptim_gui_api.variables.misc.straight_acrobatics_variables import (
-    StraightAcrobaticsVariables,
-)
 
 
 class DefaultAcrobaticsConfig:
@@ -51,56 +44,3 @@ class DefaultAcrobaticsConfig:
             copy.deepcopy(default_phases_info),
         ],
     }
-    base_data["phases_info"][0]["phase_name"] = "Somersault 1"
-    base_data["phases_info"][1]["phase_name"] = "Landing"
-
-    base_data["phases_info"][0]["objectives"].append(
-        create_objective(
-            objective_type="lagrange",
-            penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
-            nodes="all_shooting",
-            weight=50000.0,
-            arguments=[
-                {"name": "key", "value": "q", "type": "str"},
-                {
-                    "name": "index",
-                    "value": StraightAcrobaticsVariables.shoulder_dofs,
-                    "type": "list",
-                },
-            ],
-        )
-    )
-    base_data["phases_info"][0]["objectives"].append(
-        create_objective(
-            objective_type="mayer",
-            penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
-            nodes="all",
-            weight=100.0,
-            arguments=[
-                {"name": "key", "value": "q", "type": "str"},
-                {
-                    "name": "index",
-                    "value": [StraightAcrobaticsVariables.Yrot],
-                    "type": "list",
-                },
-            ],
-        )
-    )
-
-    # land safely
-    base_data["phases_info"][1]["objectives"].append(
-        create_objective(
-            objective_type="mayer",
-            penalty_type=DefaultPenaltyConfig.original_to_min_dict["MINIMIZE_STATE"],
-            nodes="end",
-            weight=1000.0,
-            arguments=[
-                {"name": "key", "value": "q", "type": "str"},
-                {
-                    "name": "index",
-                    "value": [StraightAcrobaticsVariables.Yrot],
-                    "type": "list",
-                },
-            ],
-        )
-    )

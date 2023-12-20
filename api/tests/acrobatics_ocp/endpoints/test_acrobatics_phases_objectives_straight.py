@@ -8,6 +8,8 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics import router
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import (
     DefaultAcrobaticsConfig,
 )
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import phase_name_to_info
+from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 
 test_app = FastAPI()
 test_app.include_router(router)
@@ -21,7 +23,20 @@ def run_for_all():
     datafile = DefaultAcrobaticsConfig.datafile
 
     with open(datafile, "w") as f:
-        json.dump(DefaultAcrobaticsConfig.base_data, f)
+        base_data = DefaultAcrobaticsConfig.base_data
+        json.dump(base_data, f)
+
+    phase_names = ["Somersault 1", "Landing"]
+    base_phases = [
+        phase_name_to_info("straight", phase_names, i, AdditionalCriteria()) for i, _ in enumerate(phase_names)
+    ]
+    base_phases[0]["phase_name"] = "Somersault 1"
+    base_phases[1]["phase_name"] = "Landing"
+
+    base_data["phases_info"] = base_phases
+
+    with open(datafile, "w") as f:
+        json.dump(base_data, f)
 
     yield
 
