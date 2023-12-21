@@ -7,9 +7,7 @@ from fastapi.testclient import TestClient
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics import (
     router,
 )
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import (
-    DefaultAcrobaticsConfig,
-)
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import phase_name_to_info
 from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 
@@ -22,10 +20,10 @@ client = TestClient(test_app)
 def run_for_all():
     # before test: create file
 
-    datafile = DefaultAcrobaticsConfig.datafile
+    datafile = AcrobaticsOCPData.datafile
 
     with open(datafile, "w") as f:
-        base_data = DefaultAcrobaticsConfig.base_data
+        base_data = AcrobaticsOCPData.base_data
         json.dump(base_data, f)
 
     phase_names = ["Somersault 1", "Landing"]

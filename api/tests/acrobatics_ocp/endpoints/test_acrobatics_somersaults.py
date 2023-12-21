@@ -8,9 +8,7 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics import (
     router,
     update_phase_info,
 )
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import (
-    DefaultAcrobaticsConfig,
-)
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
 
 test_app = FastAPI()
 test_app.include_router(router)
@@ -21,10 +19,10 @@ client = TestClient(test_app)
 def run_for_all():
     # before test: create file
 
-    datafile = DefaultAcrobaticsConfig.datafile
+    datafile = AcrobaticsOCPData.datafile
 
     with open(datafile, "w") as f:
-        json.dump(DefaultAcrobaticsConfig.base_data, f)
+        json.dump(AcrobaticsOCPData.base_data, f)
 
     yield
 

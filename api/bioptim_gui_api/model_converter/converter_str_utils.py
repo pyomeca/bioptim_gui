@@ -60,7 +60,8 @@ class BioModConverterUtils:
         segment_name = stripped.split()[1]
         return segment_name
 
-    def get_marker_name(self, line: str) -> str:
+    @staticmethod
+    def get_marker_name(line: str) -> str:
         """
         This function is used to get the name of the marker in the current line.
 

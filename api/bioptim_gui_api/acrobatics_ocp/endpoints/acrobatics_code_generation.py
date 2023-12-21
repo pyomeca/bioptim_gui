@@ -2,9 +2,8 @@ from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 
-from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import CodeGenerationRequest
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import CodeGenerationResponse, NewGeneratedBioMod
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import read_acrobatics_data
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
 from bioptim_gui_api.acrobatics_ocp.misc.code_generation.common import AcrobaticsGenerationCommon
 from bioptim_gui_api.acrobatics_ocp.misc.code_generation.common_non_collision import (
     AcrobaticsGenerationCommonNonCollision,
@@ -16,6 +15,7 @@ from bioptim_gui_api.acrobatics_ocp.misc.code_generation.gen_prepare_ocp_non_col
 )
 from bioptim_gui_api.acrobatics_ocp.misc.code_generation.imports import AcrobaticsGenerationImport
 from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import CodeGenerationRequest
 from bioptim_gui_api.model_converter.utils import get_converter
 
 router = APIRouter()
@@ -74,7 +74,8 @@ def converted_model(save_path: str, data: dict) -> list[NewGeneratedBioMod]:
 
 @router.post("/generate_code", response_model=CodeGenerationResponse)
 def get_acrobatics_generated_code(req: CodeGenerationRequest):
-    data = read_acrobatics_data()
+    data = AcrobaticsOCPData.read_data()
+
     model_path = data["model_path"]
 
     if not model_path:

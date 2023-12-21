@@ -68,7 +68,7 @@ def test_variables_zeros_error():
     ],
 )
 def test_fig_max_arms_angle_45(half_twists):
-    maximum_fig_arms_angle(half_twists) == np.deg2rad(45)
+    assert maximum_fig_arms_angle(half_twists) == np.deg2rad(45)
 
 
 @pytest.mark.parametrize(
@@ -89,7 +89,7 @@ def test_fig_max_arms_angle_45(half_twists):
     ],
 )
 def test_fig_max_arms_angle_90(half_twists):
-    maximum_fig_arms_angle(half_twists) == np.deg2rad(90)
+    assert maximum_fig_arms_angle(half_twists) == np.deg2rad(90)
 
 
 def test_define_loose():

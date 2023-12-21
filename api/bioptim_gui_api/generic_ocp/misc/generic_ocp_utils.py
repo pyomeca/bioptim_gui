@@ -1,43 +1,32 @@
 import json
 
-import bioptim_gui_api.generic_ocp.misc.generic_ocp_config as config
+from bioptim_gui_api.generic_ocp.misc.generic_ocp_data import GenericOCPData
 
 
-def update_generic_ocp_data(key: str, value) -> None:
-    """
-    Update the data of the generic ocp
+def add_phase_info(n: int = 1) -> None:
+    if n < 1:
+        raise ValueError("n must be positive")
 
-    Parameters
-    ----------
-    key: str
-        The key to update
-    value: Any
-        The value to put in the key
+    data = GenericOCPData.read_data()
+    phases_info = data["phases_info"]
+    before = len(phases_info)
 
-    Returns
-    -------
-    None
-    """
-    with open(config.DefaultGenericOCPConfig.datafile, "r") as f:
-        data = json.load(f)
-    data[key] = value
-    with open(config.DefaultGenericOCPConfig.datafile, "w") as f:
+    for _ in range(before, before + n):
+        phases_info.append(GenericOCPData.default_phase_info)
+
+    data["phases_info"] = phases_info
+    with open(GenericOCPData.datafile, "w") as f:
         json.dump(data, f)
 
 
-def read_generic_ocp_data(key: str = None):
-    """
-    Read the data of the generic ocp
+def remove_phase_info(n: int = 0) -> None:
+    if n < 0:
+        raise ValueError("n must be positive")
+    data = GenericOCPData.read_data()
+    phases_info = data["phases_info"]
 
-    Parameters
-    ----------
-    key: str
-        The key to read
-
-    Returns
-    -------
-    The data or the value of the key, the whole data if key is None
-    """
-    with open(config.DefaultGenericOCPConfig.datafile, "r") as f:
-        data = json.load(f)
-    return data if key is None else data[key]
+    for _ in range(n):
+        phases_info.pop()
+    data["phases_info"] = phases_info
+    with open(GenericOCPData.datafile, "w") as f:
+        json.dump(data, f)

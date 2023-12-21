@@ -1,43 +1,36 @@
-import json
+import copy
 
-from bioptim_gui_api.acrobatics_ocp.misc import acrobatics_config as config
-
-
-def update_acrobatics_data(key: str, value) -> None:
-    """
-    Update the data of the acrobatics ocp
-
-    Parameters
-    ----------
-    key: str
-        The key to update
-    value: Any
-        The value to put in the key
-
-    Returns
-    -------
-    None
-    """
-    with open(config.DefaultAcrobaticsConfig.datafile, "r") as f:
-        data = json.load(f)
-    data[key] = value
-    with open(config.DefaultAcrobaticsConfig.datafile, "w") as f:
-        json.dump(data, f)
+from bioptim_gui_api.acrobatics_ocp.misc.penalties.common import common_objectives
+from bioptim_gui_api.generic_ocp.misc.generic_ocp_data import GenericOCPData
 
 
-def read_acrobatics_data(key: str = None):
-    """
-    Read the data of the acrobatics ocp
+class AcrobaticsOCPData(GenericOCPData):
+    datafile = "acrobatics_data.json"
 
-    Parameters
-    ----------
-    key: str
-        The key to read
+    default_phases_info = {
+        "phase_name": None,
+        "nb_shooting_points": 40,
+        "duration": 1.0,
+        "objectives": common_objectives(),
+        "constraints": [],
+    }
 
-    Returns
-    -------
-    The data or the value of the key, the whole data if key is None
-    """
-    with open(config.DefaultAcrobaticsConfig.datafile, "r") as f:
-        data = json.load(f)
-    return data if key is None else data[key]
+    base_data = {
+        "nb_phases": 2,
+        "nb_somersaults": 1,
+        "nb_half_twists": [0],
+        "model_path": "",
+        "final_time": 1.0,
+        "final_time_margin": 0.1,
+        "position": "straight",
+        "sport_type": "trampoline",
+        "preferred_twist_side": "left",
+        "with_visual_criteria": False,
+        "collision_constraint": False,
+        "dynamics": "torque_driven",
+        "with_spine": False,
+        "phases_info": [
+            copy.deepcopy(default_phases_info),
+            copy.deepcopy(default_phases_info),
+        ],
+    }

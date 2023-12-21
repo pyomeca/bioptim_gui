@@ -1,18 +1,10 @@
-import json
-
 from fastapi import APIRouter
 
-from bioptim_gui_api.generic_ocp.misc.generic_ocp_config import DefaultGenericOCPConfig
+from bioptim_gui_api.generic_ocp.misc.generic_ocp_data import GenericOCPData
 
 router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
-
-
-def read_generic_ocp_data(key: str = None) -> dict:
-    with open(DefaultGenericOCPConfig.datafile, "r") as f:
-        data = json.load(f)
-    return data if key is None else data[key]
 
 
 def arg_to_string(argument: dict) -> str:
@@ -24,7 +16,7 @@ def arg_to_string(argument: dict) -> str:
 
 @router.get("/generate_code", response_model=str)
 def get_generic_ocp_generated_code():
-    data = read_generic_ocp_data()
+    data = GenericOCPData.read_data()
 
     nb_phases = data["nb_phases"]
     model_path = data["model_path"]

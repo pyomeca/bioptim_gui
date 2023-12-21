@@ -1,13 +1,16 @@
-import json
-
 from fastapi import APIRouter, HTTPException
 
-import bioptim_gui_api.generic_ocp.misc.generic_ocp_config as config
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_code_generation import (
     router as code_generation_router,
 )
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases import (
-    router as phases_router,
+    GenericPhaseRouter,
+)
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases_constraints import GenericOCPConstraintRouter
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases_objectives import GenericOCPObjectiveRouter
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases_variables import (
+    GenericControlVariableRouter,
+    GenericStateVariableRouter,
 )
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
     ModelPathRequest,
@@ -16,79 +19,72 @@ from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_responses import (
     ModelPathResponse,
 )
-from bioptim_gui_api.generic_ocp.misc.generic_ocp_utils import (
-    read_generic_ocp_data,
-    update_generic_ocp_data,
-)
+from bioptim_gui_api.generic_ocp.misc.generic_ocp_data import GenericOCPData
+from bioptim_gui_api.generic_ocp.misc.generic_ocp_utils import add_phase_info, remove_phase_info
+
+
+class GenericOCPBaseFieldRegistrar:
+    def __init__(self, data):
+        self.data = data
+        self.router = None
+
+    def register(self, route: APIRouter) -> None:
+        self.router = route
+
+        # register all endpoints
+        self.register_get_ocp_data()
+        self.register_update_nb_phases()
+        self.register_put_model_path()
+
+    def register_get_ocp_data(self) -> None:
+        @self.router.get("/", response_model=dict)
+        def get_ocp_data():
+            data = self.data.read_data()
+            return data
+
+    def register_update_nb_phases(self) -> None:
+        @self.router.put("/nb_phases", response_model=dict)
+        def put_nb_phases(nb_phases: NbPhasesRequest):
+            old_value = self.data.read_data("nb_phases")
+            new_value = nb_phases.nb_phases
+            if new_value < 0:
+                raise HTTPException(status_code=400, detail="nb_phases must be positive")
+
+            if new_value > old_value:
+                add_phase_info(new_value - old_value)
+            elif new_value < old_value:
+                remove_phase_info(old_value - new_value)
+
+            self.data.update_data("nb_phases", new_value)
+
+            data = self.data.read_data()
+            return data
+
+    def register_put_model_path(self) -> None:
+        @self.router.put("/model_path", response_model=ModelPathResponse)
+        def put_model_path(model_path: ModelPathRequest):
+            self.data.update_data("model_path", model_path.model_path)
+            return ModelPathResponse(model_path=model_path.model_path)
+
 
 router = APIRouter(
     prefix="/generic_ocp",
     tags=["generic_ocp"],
     responses={404: {"description": "Not found"}},
 )
-router.include_router(
-    phases_router,
+GenericOCPBaseFieldRegistrar(GenericOCPData).register(router)
+
+phase_router = APIRouter(
     prefix="/phases_info",
     tags=["phases"],
     responses={404: {"description": "Not found"}},
 )
+GenericPhaseRouter(GenericOCPData).register(phase_router)
+GenericOCPObjectiveRouter(GenericOCPData).register(phase_router)
+GenericOCPConstraintRouter(GenericOCPData).register(phase_router)
+GenericControlVariableRouter(GenericOCPData).register(phase_router)
+GenericStateVariableRouter(GenericOCPData).register(phase_router)
+
+router.include_router(phase_router)
+
 router.include_router(code_generation_router)
-
-
-def add_phase_info(n: int = 1) -> None:
-    if n < 1:
-        raise ValueError("n must be positive")
-
-    data = read_generic_ocp_data()
-    phases_info = data["phases_info"]
-    before = len(phases_info)
-
-    for _ in range(before, before + n):
-        phases_info.append(config.DefaultGenericOCPConfig.default_phases_info)
-
-    data["phases_info"] = phases_info
-    with open(config.DefaultGenericOCPConfig.datafile, "w") as f:
-        json.dump(data, f)
-
-
-def remove_phase_info(n: int = 0) -> None:
-    if n < 0:
-        raise ValueError("n must be positive")
-    data = read_generic_ocp_data()
-    phases_info = data["phases_info"]
-
-    for _ in range(n):
-        phases_info.pop()
-    data["phases_info"] = phases_info
-    with open(config.DefaultGenericOCPConfig.datafile, "w") as f:
-        json.dump(data, f)
-
-
-@router.get("/", response_model=dict)
-def get_generic_ocp_data():
-    data = read_generic_ocp_data()
-    return data
-
-
-@router.put("/nb_phases", response_model=dict)
-def update_nb_phases(nb_phases: NbPhasesRequest):
-    old_value = read_generic_ocp_data("nb_phases")
-    new_value = nb_phases.nb_phases
-    if new_value < 0:
-        raise HTTPException(status_code=400, detail="nb_phases must be positive")
-
-    if new_value > old_value:
-        add_phase_info(new_value - old_value)
-    elif new_value < old_value:
-        remove_phase_info(old_value - new_value)
-
-    update_generic_ocp_data("nb_phases", new_value)
-
-    data = read_generic_ocp_data()
-    return data
-
-
-@router.put("/model_path", response_model=ModelPathResponse)
-def put_model_path(model_path: ModelPathRequest):
-    update_generic_ocp_data("model_path", model_path.model_path)
-    return ModelPathResponse(model_path=model_path.model_path)

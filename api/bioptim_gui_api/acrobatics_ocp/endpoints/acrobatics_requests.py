@@ -1,24 +1,18 @@
-from typing import Optional
-
-from bioptim import QuadratureRule
 from pydantic import BaseModel
 
 from bioptim_gui_api.acrobatics_ocp.misc.enums import (
     Position,
     SportType,
     PreferredTwistSide,
-    Dynamics,
-    Node,
 )
-from bioptim_gui_api.penalty.misc.enums import ObjectiveType
 
 
 class NbSomersaultsRequest(BaseModel):
     nb_somersaults: int
 
 
-class ModelPathRequest(BaseModel):
-    model_path: str
+class NbHalfTwistsRequest(BaseModel):
+    nb_half_twists: int
 
 
 class FinalTimeRequest(BaseModel):
@@ -47,80 +41,6 @@ class VisualCriteriaRequest(BaseModel):
 
 class CollisionConstraintRequest(BaseModel):
     collision_constraint: bool
-
-
-class NbShootingPointsRequest(BaseModel):
-    nb_shooting_points: int
-
-
-class SomersaultDurationRequest(BaseModel):
-    duration: float
-
-
-class NbHalfTwistsRequest(BaseModel):
-    nb_half_twists: int
-
-
-class NodesRequest(BaseModel):
-    nodes: Node
-
-
-class QuadraticRequest(BaseModel):
-    quadratic: bool
-
-
-class ExpandRequest(BaseModel):
-    expand: bool
-
-
-class TargetRequest(BaseModel):
-    target: Optional[list] = None
-
-
-class DerivativeRequest(BaseModel):
-    derivative: bool
-
-
-class IntegrationRuleRequest(BaseModel):
-    integration_rule: QuadratureRule
-
-
-class MultiThreadRequest(BaseModel):
-    multi_thread: bool
-
-
-class WeightRequest(BaseModel):
-    weight: float
-
-
-class ObjectiveTypeRequest(BaseModel):
-    objective_type: ObjectiveType
-
-
-class PenaltyTypeRequest(BaseModel):
-    penalty_type: str
-
-
-class ConstraintFcnRequest(PenaltyTypeRequest):
-    pass
-
-
-class ObjectiveFcnRequest(PenaltyTypeRequest):
-    pass
-
-
-class ArgumentRequest(BaseModel):
-    type: str
-    value: int | float | str | list | None
-
-
-class CodeGenerationRequest(BaseModel):
-    model_path: str
-    save_path: str
-
-
-class DynamicsRequest(BaseModel):
-    dynamics: Dynamics
 
 
 class WithSpineRequest(BaseModel):

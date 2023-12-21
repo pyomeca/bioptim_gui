@@ -1,30 +1,13 @@
-from typing import Union, NamedTuple
+from typing import NamedTuple
 
-from bioptim import Axis
 from pydantic import BaseModel
 
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import (
-    ExpandRequest,
-    DerivativeRequest,
     FinalTimeMarginRequest,
     FinalTimeRequest,
-    IntegrationRuleRequest,
-    ModelPathRequest,
-    MultiThreadRequest,
-    NbShootingPointsRequest,
-    NodesRequest,
     PreferredTwistSideRequest,
-    QuadraticRequest,
-    SomersaultDurationRequest,
     SportTypeRequest,
-    TargetRequest,
-    VisualCriteriaRequest,
-    WeightRequest,
 )
-
-
-class ModelPathResponse(ModelPathRequest):
-    pass
 
 
 class FinalTimeResponse(FinalTimeRequest):
@@ -41,56 +24,6 @@ class SportTypeResponse(SportTypeRequest):
 
 class PreferredTwistSideResponse(PreferredTwistSideRequest):
     pass
-
-
-class VisualCriteriaResponse(VisualCriteriaRequest):
-    pass
-
-
-class NbShootingPointsResponse(NbShootingPointsRequest):
-    pass
-
-
-class SomersaultDurationResponse(SomersaultDurationRequest):
-    pass
-
-
-class NodesResponse(NodesRequest):
-    pass
-
-
-class QuadraticResponse(QuadraticRequest):
-    pass
-
-
-class ExpandResponse(ExpandRequest):
-    pass
-
-
-class TargetResponse(TargetRequest):
-    pass
-
-
-class DerivativeResponse(DerivativeRequest):
-    pass
-
-
-class IntegrationRuleResponse(IntegrationRuleRequest):
-    pass
-
-
-class MultiThreadResponse(MultiThreadRequest):
-    pass
-
-
-class WeightResponse(WeightRequest):
-    pass
-
-
-class ArgumentResponse(BaseModel):
-    key: str
-    type: str
-    value: Union[float, int, str, list, None, Axis]
 
 
 class NewGeneratedBioMod(NamedTuple):

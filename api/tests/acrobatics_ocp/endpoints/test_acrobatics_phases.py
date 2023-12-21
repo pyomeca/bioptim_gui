@@ -5,9 +5,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics import router
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import (
-    DefaultAcrobaticsConfig,
-)
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import phase_name_to_info
 from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 
@@ -20,10 +18,10 @@ client = TestClient(test_app)
 def run_for_all():
     # before test: create file
 
-    datafile = DefaultAcrobaticsConfig.datafile
+    datafile = AcrobaticsOCPData.datafile
 
-    with open(DefaultAcrobaticsConfig.datafile, "w") as f:
-        base_data = DefaultAcrobaticsConfig.base_data
+    with open(datafile, "w") as f:
+        base_data = AcrobaticsOCPData.base_data
         json.dump(base_data, f)
 
     phase_names = ["Somersault 1", "Landing"]
@@ -35,7 +33,7 @@ def run_for_all():
 
     base_data["phases_info"] = base_phases
 
-    with open(DefaultAcrobaticsConfig.datafile, "w") as f:
+    with open(AcrobaticsOCPData.datafile, "w") as f:
         json.dump(base_data, f)
 
     yield
@@ -81,7 +79,7 @@ def test_get_somersault_with_index():
 
 
 def test_get_somersault_with_index_wrong():
-    response = client.get("/acrobatics/phases_info/1")
+    response = client.get("/acrobatics/phases_info/2")
     assert response.status_code == 404, response
 
 

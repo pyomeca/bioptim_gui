@@ -3,10 +3,8 @@ import json
 
 import numpy as np
 
-import bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config as config
 import bioptim_gui_api.acrobatics_ocp.misc.models
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_config import DefaultAcrobaticsConfig
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import read_acrobatics_data
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
 from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.collision_constraint import collision_constraint_constraints
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.common import common_objectives
@@ -45,9 +43,11 @@ def update_phase_info(phase_names: list[str]) -> None:
     if len(phase_names) == 0:
         raise ValueError("n must be positive")
 
-    data = read_acrobatics_data()
+    with open(AcrobaticsOCPData.datafile, "r") as f:
+        data = json.load(f)
 
     n_phases = len(phase_names)
+
     final_time = data["final_time"]
     position = data["position"]
     additional_criteria = bioptim_gui_api.acrobatics_ocp.misc.models.AdditionalCriteria(
@@ -72,8 +72,10 @@ def update_phase_info(phase_names: list[str]) -> None:
                 if arguments["name"] == "key" and arguments["value"] in ["tau", "qddot_joints"]:
                     arguments["value"] = control
 
+    AcrobaticsOCPData.update_data("nb_phases", n_phases)
+
     data["phases_info"] = new_phases
-    with open(config.DefaultAcrobaticsConfig.datafile, "w") as f:
+    with open(AcrobaticsOCPData.datafile, "w") as f:
         json.dump(data, f)
 
 
@@ -213,7 +215,9 @@ def get_phase_constraints(phase_name: str, position: str, additional_criteria: A
     return constraints
 
 
-def phase_name_to_info(position, phase_names: str, phase_index: int, additional_criteria: AdditionalCriteria) -> dict:
+def phase_name_to_info(
+    position, phase_names: list[str], phase_index: int, additional_criteria: AdditionalCriteria
+) -> dict:
     """
     Returns the phase info for the given phase name, position and additional criteria
 
@@ -238,13 +242,15 @@ def phase_name_to_info(position, phase_names: str, phase_index: int, additional_
     phase_name = phase_names[phase_index]
 
     # need to deepcopy or else there will be unwanted modification due to addresses
-    res = copy.deepcopy(DefaultAcrobaticsConfig.default_phases_info)
+    res = copy.deepcopy(AcrobaticsOCPData.default_phases_info)
     res["phase_name"] = phase_name
 
     res["objectives"] = get_phase_objectives(phase_names, phase_index, position, additional_criteria)
     res["constraints"] = get_phase_constraints(phase_name, position, additional_criteria)
 
-    dynamics = read_acrobatics_data("dynamics")
+    with open(AcrobaticsOCPData.datafile, "r") as f:
+        dynamics = json.load(f)["dynamics"]
+
     old_control = "tau" if dynamics != "torque_driven" else "qddot_joints"
     new_control = "tau" if dynamics == "torque_driven" else "qddot_joints"
 
