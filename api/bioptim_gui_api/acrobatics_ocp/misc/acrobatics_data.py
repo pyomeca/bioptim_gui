@@ -2,6 +2,7 @@ import copy
 
 from bioptim_gui_api.acrobatics_ocp.misc.penalties.common import common_objectives
 from bioptim_gui_api.generic_ocp.misc.generic_ocp_data import GenericOCPData
+from bioptim_gui_api.variables.misc.variables_config import DefaultVariablesConfig
 
 
 class AcrobaticsOCPData(GenericOCPData):
@@ -13,6 +14,8 @@ class AcrobaticsOCPData(GenericOCPData):
         "duration": 1.0,
         "objectives": common_objectives(),
         "constraints": [],
+        "state_variables": DefaultVariablesConfig.default_torque_driven_variables["state_variables"].copy(),
+        "control_variables": DefaultVariablesConfig.default_torque_driven_variables["control_variables"].copy(),
     }
 
     base_data = {

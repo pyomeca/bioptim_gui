@@ -28,17 +28,20 @@ from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPDat
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import (
     acrobatics_phase_names,
     update_phase_info,
-    phase_name_to_info,
+    adapt_dynamics,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.enums import (
     Position,
     PreferredTwistSide,
     SportType,
 )
-from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp import GenericOCPBaseFieldRegistrar
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases_constraints import GenericOCPConstraintRouter
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases_objectives import GenericOCPObjectiveRouter
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases_variables import (
+    GenericControlVariableRouter,
+    GenericStateVariableRouter,
+)
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import DynamicsRequest
 
 
@@ -50,7 +53,7 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
         super().register(route)
 
         # register additional endpoints
-        self.reggister_put_nb_somersaults()
+        self.register_put_nb_somersaults()
         self.register_put_nb_half_twists()
         self.register_put_final_time()
         self.register_put_final_time_margin()
@@ -70,7 +73,7 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
         # disable the endpoint
         pass
 
-    def reggister_put_nb_somersaults(self):
+    def register_put_nb_somersaults(self):
         @self.router.put("/nb_somersaults", response_model=dict)
         def update_nb_somersaults(nb_somersaults: NbSomersaultsRequest):
             """
@@ -116,21 +119,8 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
             position = data["position"]
             half_twists = data["nb_half_twists"]
 
-            additional_criteria = AdditionalCriteria(
-                with_visual_criteria=data["with_visual_criteria"],
-                collision_constraint=data["collision_constraint"],
-                with_spine=data["with_spine"],
-            )
-
             new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
-
-            new_phases = [
-                phase_name_to_info(position, new_phase_names, i, additional_criteria)
-                for i, _ in enumerate(new_phase_names)
-            ]
-
-            data["phases_info"] = new_phases
-            self.data.update_data("phases_info", new_phases)
+            update_phase_info(new_phase_names)
 
             phases_info = self.data.read_data("phases_info")
             return phases_info
@@ -178,17 +168,13 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
 
             # 1 somersault tuck/pike are not allowed, set the nb_somersault to 2
             if old_value == "straight" and nb_somersaults == 1:
-                self.data.update_data("position", new_value)
                 self.data.update_data("nb_somersaults", 2)
 
                 half_twists = data["nb_half_twists"] + [0]
                 self.data.update_data("nb_half_twists", half_twists)
 
-                new_phase_names = acrobatics_phase_names(2, new_value, half_twists)
-                update_phase_info(new_phase_names)
-            else:
-                new_phase_names = acrobatics_phase_names(nb_somersaults, new_value, half_twists)
-                update_phase_info(new_phase_names)
+            new_phase_names = acrobatics_phase_names(nb_somersaults, new_value, half_twists)
+            update_phase_info(new_phase_names)
 
             return self.data.read_data()
 
@@ -299,14 +285,8 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
 
             phases_info = self.data.read_data("phases_info")
 
-            new_control = "tau" if new_value == "torque_driven" else "qddot_joints"
-            old_control = "tau" if new_value != "torque_driven" else "qddot_joints"
-
             for phase in phases_info:
-                for objective in phase["objectives"]:
-                    for arguments in objective["arguments"]:
-                        if arguments["name"] == "key" and arguments["value"] == old_control:
-                            arguments["value"] = new_control
+                adapt_dynamics(phase, new_value)
 
             self.data.update_data("phases_info", phases_info)
 
@@ -356,6 +336,8 @@ phase_router = APIRouter(
 AcrobaticsPhaseRouter().register(phase_router)
 GenericOCPObjectiveRouter(AcrobaticsOCPData).register(phase_router)
 GenericOCPConstraintRouter(AcrobaticsOCPData).register(phase_router)
+GenericControlVariableRouter(AcrobaticsOCPData).register(phase_router)
+GenericStateVariableRouter(AcrobaticsOCPData).register(phase_router)
 
 router.include_router(phase_router)
 

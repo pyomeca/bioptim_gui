@@ -215,6 +215,16 @@ def get_phase_constraints(phase_name: str, position: str, additional_criteria: A
     return constraints
 
 
+def adapt_dynamics(phases: dict, dynamics: str) -> None:
+    old_control = "tau" if dynamics != "torque_driven" else "qddot_joints"
+    new_control = "tau" if dynamics == "torque_driven" else "qddot_joints"
+
+    for objective in phases["objectives"]:
+        for arguments in objective["arguments"]:
+            if arguments["name"] == "key" and arguments["value"] == old_control:
+                arguments["value"] = new_control
+
+
 def phase_name_to_info(
     position, phase_names: list[str], phase_index: int, additional_criteria: AdditionalCriteria
 ) -> dict:
@@ -251,14 +261,6 @@ def phase_name_to_info(
     with open(AcrobaticsOCPData.datafile, "r") as f:
         dynamics = json.load(f)["dynamics"]
 
-    old_control = "tau" if dynamics != "torque_driven" else "qddot_joints"
-    new_control = "tau" if dynamics == "torque_driven" else "qddot_joints"
-
-    # TODO test this further
-
-    for objective in res["objectives"]:
-        for arguments in objective["arguments"]:
-            if arguments["name"] == "key" and arguments["value"] == old_control:
-                arguments["value"] = new_control
+    adapt_dynamics(res, dynamics)
 
     return res
