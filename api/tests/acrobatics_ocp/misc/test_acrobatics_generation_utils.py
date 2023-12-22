@@ -10,7 +10,7 @@ import pytest
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_generation_utils import generated_code
 from tests.acrobatics_ocp.misc.acrobatics_generation_utils import generated_code as baseline_generated_code
 
-config_examples_path = "../config_examples"
+config_examples_path = "acrobatics_ocp/config_examples"
 
 
 @pytest.mark.parametrize("position", ["straight", "pike", "tuck"])
