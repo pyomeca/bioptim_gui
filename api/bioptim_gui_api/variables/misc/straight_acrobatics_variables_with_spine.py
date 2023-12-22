@@ -31,12 +31,12 @@ class StraightAcrobaticsVariablesWithSpine(StraightAcrobaticsVariables):
 
     q_min_bounds = np.array(
         [
-            [-1, -1, -1],
-            [-1, -1, -1],
-            [-0.1, -0.1, -0.1],
-            [0, 0, 0],
-            [-np.pi / 4, -np.pi / 4, -np.pi / 4],
-            [0, 0, 0],
+            [-1] * 3,
+            [-1] * 3,
+            [-0.1] * 3,
+            [0] * 3,
+            [-np.pi / 4] * 3,
+            [0] * 3,
             [-np.pi / 12] * 3,
             [-np.pi / 12] * 3,
             [-np.pi / 12] * 3,
@@ -49,21 +49,21 @@ class StraightAcrobaticsVariablesWithSpine(StraightAcrobaticsVariables):
             [-np.pi / 12] * 3,
             [-np.pi / 12] * 3,
             [-np.pi / 12] * 3,
-            [-0.65, -0.65, -0.65],
-            [-0.05, -0.05, -0.05],
-            [-2.0, -2.0, -2.0],
-            [-3.0, -3.0, -3.0],
+            [-0.65] * 3,
+            [-0.05] * 3,
+            [-2.0] * 3,
+            [-3.0] * 3,
         ]
     )
 
     q_max_bounds = np.array(
         [
-            [1, 1, 1],
-            [1, 1, 1],
-            [15, 15, 15],
-            [0, 0, 0],
-            [np.pi / 4, np.pi / 4, np.pi / 4],
-            [0, 0, 0],
+            [1] * 3,
+            [1] * 3,
+            [15] * 3,
+            [0] * 3,
+            [np.pi / 4] * 3,
+            [0] * 3,
             [np.pi / 12] * 3,
             [np.pi / 12] * 3,
             [np.pi / 12] * 3,
@@ -76,9 +76,9 @@ class StraightAcrobaticsVariablesWithSpine(StraightAcrobaticsVariables):
             [np.pi / 12] * 3,
             [np.pi / 12] * 3,
             [np.pi / 12] * 3,
-            [2.0, 2.0, 2.0],
-            [3.0, 3.0, 3.0],
-            [0.65, 0.65, 0.65],
-            [0.05, 0.05, 0.05],
+            [2.0] * 3,
+            [3.0] * 3,
+            [0.65] * 3,
+            [0.05] * 3,
         ]
     )
