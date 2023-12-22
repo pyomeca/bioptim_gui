@@ -3,7 +3,7 @@ import os
 import pytest
 
 from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
-from bioptim_gui_api.model_converter.utils import get_converter
+from bioptim_gui_api.model_converter.converter_utils import get_converter
 
 BIOMODS_PATH = "test_biomods"  # to change depending on from where you run the test
 

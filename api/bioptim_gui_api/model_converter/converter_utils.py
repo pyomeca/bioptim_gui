@@ -1,3 +1,5 @@
+from typing import Type
+
 from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 from bioptim_gui_api.model_converter.converter import (
     BioModConverter,
@@ -5,7 +7,6 @@ from bioptim_gui_api.model_converter.converter import (
     StraightConverter,
     TuckConverter,
 )
-
 
 with_visual_segment_rotations = {"Head": "zx", "Eyes": "zx"}
 with_visual_markers = ["eyes_vect_start", "eyes_vect_end", "fixation_front", "fixation_center"] + [
@@ -32,7 +33,7 @@ spine_segment_rotations = {
 }
 
 
-def get_converter(position: str = "straight", additional_criteria: AdditionalCriteria = None) -> BioModConverter:
+def get_converter(position: str = "straight", additional_criteria: AdditionalCriteria = None) -> Type[BioModConverter]:
     """
     Get the converter class for the given position and additional criteria
 
