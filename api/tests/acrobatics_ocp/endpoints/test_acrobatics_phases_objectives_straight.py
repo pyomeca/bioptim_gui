@@ -179,6 +179,8 @@ def test_put_objective_common_argument(key, default_value, new_value):
         json={key: new_value},
     )
     assert response.status_code == 200, response
+    data = response.json()
+    assert data[key] == new_value
 
     response = client.get("/acrobatics/phases_info/0/objectives")
     assert response.status_code == 200, response

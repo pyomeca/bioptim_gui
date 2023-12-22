@@ -116,6 +116,8 @@ def test_put_constraints_common_argument(key, default_value, new_value):
         json={key: new_value},
     )
     assert response.status_code == 200, response
+    data = response.json()
+    assert data[key] == new_value
 
     response = client.get("/generic_ocp/phases_info/0/constraints")
     assert response.status_code == 200, response
