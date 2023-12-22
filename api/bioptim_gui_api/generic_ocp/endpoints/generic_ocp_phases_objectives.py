@@ -1,3 +1,4 @@
+from bioptim import ObjectiveFcn
 from fastapi import APIRouter
 
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_penalties import GenericOCPPenaltyRouter
@@ -29,6 +30,15 @@ class GenericOCPObjectiveRouter(GenericOCPPenaltyRouter):
     def register_put_penalty_type(self):
         @self.router.put("/{phase_index}/objectives/{objective_index}/penalty_type", response_model=dict)
         def put_objective_penalty_type(phase_index: int, objective_index: int, penalty_type: ObjectiveFcnRequest):
+            objective_fcn = {
+                "mayer": ObjectiveFcn.Mayer,
+                "lagrange": ObjectiveFcn.Lagrange,
+            }
+            complementary = {
+                "mayer": "lagrange",
+                "lagrange": "mayer",
+            }
+
             penalty_type_value = penalty_type.penalty_type
             phases_info = self.data.read_data("phases_info")
             objective = phases_info[phase_index]["objectives"][objective_index]
@@ -43,11 +53,12 @@ class GenericOCPObjectiveRouter(GenericOCPPenaltyRouter):
                 penalty_type_value = DefaultPenaltyConfig.max_to_original_dict[penalty_type_value]
 
             try:
-                arguments = obj_arguments(objective_type=objective_type, penalty_type=penalty_type_value)
+                getattr(objective_fcn[objective_type], penalty_type_value)
             except AttributeError:
-                other_objective_type = "lagrange" if objective_type == "mayer" else "mayer"
-                objective["objective_type"] = other_objective_type
-                arguments = obj_arguments(objective_type=other_objective_type, penalty_type=penalty_type_value)
+                objective["objective_type"] = complementary[objective["objective_type"]]
+                objective_type = objective["objective_type"]
+
+            arguments = obj_arguments(objective_type=objective_type, penalty_type=penalty_type_value)
 
             objective["arguments"] = arguments
 

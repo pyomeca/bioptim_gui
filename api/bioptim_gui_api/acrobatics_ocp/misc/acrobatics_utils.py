@@ -206,13 +206,17 @@ def get_phase_constraints(phase_name: str, position: str, additional_criteria: A
 
 
 def adapt_dynamics(phases: dict, dynamics: str) -> None:
-    old_control = "tau" if dynamics != "torque_driven" else "qddot_joints"
-    new_control = "tau" if dynamics == "torque_driven" else "qddot_joints"
+    dynamics_control = {
+        "torque_driven": "tau",
+        "joints_acceleration_driven": "qddot_joints",
+    }
+    control_names = dynamics_control.values()
+    control = dynamics_control[dynamics]
 
     for objective in phases["objectives"]:
         for arguments in objective["arguments"]:
-            if arguments["name"] == "key" and arguments["value"] == old_control:
-                arguments["value"] = new_control
+            if arguments["name"] == "key" and arguments["value"] in control_names:
+                arguments["value"] = control
 
 
 def phase_name_to_info(

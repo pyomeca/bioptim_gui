@@ -49,7 +49,8 @@ class AcrobaticsPhaseModifiers:
             # updating data
             data = self.data.read_data()
             position = data["position"]
-            updated_half_twists = data["nb_half_twists"][:new_nb_somersaults] + [0] * (new_nb_somersaults - old_value)
+            additional_twists = [0] * (new_nb_somersaults - old_value)
+            updated_half_twists = data["nb_half_twists"][:new_nb_somersaults] + additional_twists
 
             self.data.update_data("nb_somersaults", new_nb_somersaults)
             self.data.update_data("nb_half_twists", updated_half_twists)
