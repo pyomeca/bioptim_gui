@@ -19,64 +19,54 @@ from bioptim_gui_api.acrobatics_ocp.misc.penalties.with_visual_criteria import w
 from bioptim_gui_api.variables.misc.variables_config import get_variable_computer
 
 
-def update_phase_info(phase_names: list[str]) -> None:
+def update_phase_info() -> list[dict]:
     """
-    Update the phases_info of the acrobatics, given a list of phase names
+    Update the phases_info of the acrobatics
     It will update the phase_name, duration and objectives and constraints according to the new phase names, the
     existing position, with_visual_criteria and collision_constraint.
 
+    - Compute the phase names
     - The phase names are updated in the order they are given.
     - The new durations for each phase is calculated by dividing the final_time by the number of phases.
     - The phase's objectives and constraints are updated according to the new phase name, existing position, and
     additional criteria (with_visual_criteria and collision_constraint)
 
 
-    Parameters
-    ----------
-    phase_names: list[str]
-        The new phase names
-
     Returns
     -------
-    None
+    list[dict]
+        The updated phases_info
     """
-    if len(phase_names) == 0:
-        raise ValueError("n must be positive")
-
     with open(AcrobaticsOCPData.datafile, "r") as f:
         data = json.load(f)
 
-    n_phases = len(phase_names)
-
-    final_time = data["final_time"]
+    nb_somersaults = data["nb_somersaults"]
     position = data["position"]
+    half_twists = data["nb_half_twists"]
+    final_time = data["final_time"]
     additional_criteria = bioptim_gui_api.acrobatics_ocp.misc.models.AdditionalCriteria(
         with_visual_criteria=data["with_visual_criteria"],
         collision_constraint=data["collision_constraint"],
         with_spine=data["with_spine"],
     )
 
+    phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
+    n_phases = len(phase_names)
+
     new_phases = [phase_name_to_info(position, phase_names, i, additional_criteria) for i, _ in enumerate(phase_names)]
 
     for i in range(n_phases):
         new_phases[i]["phase_name"] = phase_names[i]
-
-    for i in range(0, n_phases):
         # rounding is necessary to avoid buffer overflow in the frontend
         new_phases[i]["duration"] = round(final_time / n_phases, 2)
 
-    control = "tau" if data["dynamics"] == "torque_driven" else "qddot_joints"
     for phase in new_phases:
-        for objective in phase["objectives"]:
-            for arguments in objective["arguments"]:
-                if arguments["name"] == "key" and arguments["value"] in ["tau", "qddot_joints"]:
-                    arguments["value"] = control
+        adapt_dynamics(phase, data["dynamics"])
 
     AcrobaticsOCPData.update_data("nb_phases", n_phases)
+    AcrobaticsOCPData.update_data("phases_info", new_phases)
 
-    data["phases_info"] = new_phases
-    with open(AcrobaticsOCPData.datafile, "w") as f:
-        json.dump(data, f)
+    return new_phases
 
 
 def calculate_n_tuck(half_twists: list[int]) -> int:

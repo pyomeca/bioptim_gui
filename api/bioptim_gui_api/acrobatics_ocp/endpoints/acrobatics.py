@@ -6,17 +6,12 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_code_generation import 
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_phases import (
     AcrobaticsPhaseRouter,
 )
+from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_phases_modifiers import AcrobaticsPhaseModifiers
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import (
-    CollisionConstraintRequest,
     FinalTimeMarginRequest,
     FinalTimeRequest,
-    NbHalfTwistsRequest,
-    NbSomersaultsRequest,
-    PositionRequest,
     PreferredTwistSideRequest,
     SportTypeRequest,
-    VisualCriteriaRequest,
-    WithSpineRequest,
 )
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import (
     FinalTimeMarginResponse,
@@ -26,8 +21,6 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import (
 )
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import (
-    acrobatics_phase_names,
-    update_phase_info,
     adapt_dynamics,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.enums import (
@@ -53,77 +46,19 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
         super().register(route)
 
         # register additional endpoints
-        self.register_put_nb_somersaults()
-        self.register_put_nb_half_twists()
         self.register_put_final_time()
         self.register_put_final_time_margin()
         self.register_get_positions()
-        self.register_put_position()
         self.register_get_sport_types()
         self.register_put_sport_type()
         self.register_get_preferred_twist_side()
         self.register_put_preferred_twist_side()
-        self.register_put_with_visual_criteria()
-        self.register_put_collision_constraint()
         self.register_get_dynamics()
         self.register_put_dynamics()
-        self.register_put_with_spine()
 
     def register_update_nb_phases(self) -> None:
         # disable the endpoint
         pass
-
-    def register_put_nb_somersaults(self):
-        @self.router.put("/nb_somersaults", response_model=dict)
-        def update_nb_somersaults(nb_somersaults: NbSomersaultsRequest):
-            """
-            Append or pop the half_twists list
-            Update the number of somersaults of the acrobatics ocp
-            Update the phase info of the acrobatics ocp accordingly
-            """
-            nb_max_somersaults = 5
-            old_value = self.data.read_data("nb_somersaults")
-            new_nb_somersaults = nb_somersaults.nb_somersaults
-
-            if new_nb_somersaults <= 0 or new_nb_somersaults > nb_max_somersaults:
-                raise HTTPException(status_code=400, detail="nb_somersaults must be positive")
-
-            data = self.data.read_data()
-            position = data["position"]
-            updated_half_twists = data["nb_half_twists"][:new_nb_somersaults] + [0] * (new_nb_somersaults - old_value)
-
-            # 1 somersault tuck/pike are not allowed, set the position to straight
-            if new_nb_somersaults == 1 and position != "straight":
-                self.data.update_data("position", "straight")
-                new_phase_names = acrobatics_phase_names(new_nb_somersaults, "straight", updated_half_twists)
-            else:
-                new_phase_names = acrobatics_phase_names(new_nb_somersaults, position, updated_half_twists)
-
-            self.data.update_data("nb_somersaults", new_nb_somersaults)
-            self.data.update_data("nb_half_twists", updated_half_twists)
-            update_phase_info(new_phase_names)
-
-            return self.data.read_data()
-
-    def register_put_nb_half_twists(self):
-        @self.router.put("/nb_half_twists/{somersault_index}", response_model=list)
-        def put_nb_half_twist(somersault_index: int, half_twists_request: NbHalfTwistsRequest):
-            if half_twists_request.nb_half_twists < 0:
-                raise HTTPException(status_code=400, detail="nb_half_twists must be positive or zero")
-            half_twists = self.data.read_data("nb_half_twists")
-            half_twists[somersault_index] = half_twists_request.nb_half_twists
-            self.data.update_data("nb_half_twists", half_twists)
-
-            data = self.data.read_data()
-            nb_somersaults = data["nb_somersaults"]
-            position = data["position"]
-            half_twists = data["nb_half_twists"]
-
-            new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
-            update_phase_info(new_phase_names)
-
-            phases_info = self.data.read_data("phases_info")
-            return phases_info
 
     def register_put_final_time(self):
         @self.router.put("/final_time", response_model=FinalTimeResponse)
@@ -147,36 +82,6 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
         @self.router.get("/position", response_model=list)
         def get_position():
             return [side.capitalize() for side in Position]
-
-    def register_put_position(self):
-        @self.router.put("/position", response_model=dict)
-        def put_position(position: PositionRequest):
-            new_value = position.position.value
-            old_value = self.data.read_data("position")
-
-            if old_value == new_value:
-                raise HTTPException(
-                    status_code=304,
-                    detail=f"position is already {position}",
-                )
-
-            self.data.update_data("position", new_value)
-
-            data = self.data.read_data()
-            nb_somersaults = data["nb_somersaults"]
-            half_twists = data["nb_half_twists"]
-
-            # 1 somersault tuck/pike are not allowed, set the nb_somersault to 2
-            if old_value == "straight" and nb_somersaults == 1:
-                self.data.update_data("nb_somersaults", 2)
-
-                half_twists = data["nb_half_twists"] + [0]
-                self.data.update_data("nb_half_twists", half_twists)
-
-            new_phase_names = acrobatics_phase_names(nb_somersaults, new_value, half_twists)
-            update_phase_info(new_phase_names)
-
-            return self.data.read_data()
 
     def register_get_sport_types(self):
         @self.router.get("/sport_type", response_model=list)
@@ -217,54 +122,6 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
             self.data.update_data("preferred_twist_side", new_value)
             return PreferredTwistSideResponse(preferred_twist_side=new_value)
 
-    def register_put_with_visual_criteria(self):
-        @self.router.put("/with_visual_criteria", response_model=list)
-        def put_with_visual_criteria(visual_criteria: VisualCriteriaRequest):
-            new_value = visual_criteria.with_visual_criteria
-            old_value = self.data.read_data("with_visual_criteria")
-            if old_value == new_value:
-                raise HTTPException(
-                    status_code=304,
-                    detail=f"with_visual_criteria is already {old_value}",
-                )
-
-            self.data.update_data("with_visual_criteria", new_value)
-
-            data = self.data.read_data()
-            nb_somersaults = data["nb_somersaults"]
-            position = data["position"]
-            half_twists = data["nb_half_twists"]
-
-            new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
-            update_phase_info(new_phase_names)
-
-            phases_info = self.data.read_data("phases_info")
-            return phases_info
-
-    def register_put_collision_constraint(self):
-        @self.router.put("/collision_constraint", response_model=list)
-        def put_collision_constraint(collision_constraint: CollisionConstraintRequest):
-            new_value = collision_constraint.collision_constraint
-            old_value = self.data.read_data("collision_constraint")
-            if old_value == new_value:
-                raise HTTPException(
-                    status_code=304,
-                    detail=f"collision_constraint is already {old_value}",
-                )
-
-            self.data.update_data("collision_constraint", new_value)
-
-            data = self.data.read_data()
-            nb_somersaults = data["nb_somersaults"]
-            position = data["position"]
-            half_twists = data["nb_half_twists"]
-
-            new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
-            update_phase_info(new_phase_names)
-
-            phases_info = self.data.read_data("phases_info")
-            return phases_info
-
     def register_get_dynamics(self):
         @self.router.get("/dynamics", response_model=list)
         def get_dynamics():
@@ -289,36 +146,6 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
                 adapt_dynamics(phase, new_value)
 
             self.data.update_data("phases_info", phases_info)
-
-            phases_info = self.data.read_data("phases_info")
-            return phases_info
-
-    def register_put_with_spine(self):
-        @self.router.put("/with_spine", response_model=list)
-        def put_with_spine(with_spine: WithSpineRequest):
-            new_value = with_spine.with_spine
-            old_value = self.data.read_data("with_spine")
-            if old_value == new_value:
-                raise HTTPException(
-                    status_code=304,
-                    detail=f"with_spine is already {old_value}",
-                )
-
-            self.data.update_data("with_spine", new_value)
-            if new_value:
-                self.data.update_data("dynamics", "joints_acceleration_driven")
-            else:
-                self.data.update_data("dynamics", "torque_driven")
-
-            data = self.data.read_data()
-            nb_somersaults = data["nb_somersaults"]
-            position = data["position"]
-            half_twists = data["nb_half_twists"]
-
-            new_phase_names = acrobatics_phase_names(nb_somersaults, position, half_twists)
-            update_phase_info(new_phase_names)
-
-            phases_info = self.data.read_data("phases_info")
             return phases_info
 
 
@@ -328,6 +155,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 AcrobaticsOCPBaseFieldRegistrar(AcrobaticsOCPData).register(router)
+AcrobaticsPhaseModifiers(AcrobaticsOCPData).register(router)
 
 phase_router = APIRouter(
     prefix="/phases_info",

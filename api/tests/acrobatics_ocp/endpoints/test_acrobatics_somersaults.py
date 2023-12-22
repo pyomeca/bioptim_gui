@@ -6,7 +6,6 @@ from fastapi.testclient import TestClient
 
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics import (
     router,
-    update_phase_info,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
 
@@ -30,11 +29,6 @@ def run_for_all():
     import os
 
     os.remove(datafile)
-
-
-def test_add_somersault_info_wrong():
-    with pytest.raises(ValueError):
-        update_phase_info([])
 
 
 @pytest.mark.parametrize("nb_somersaults", [-1e9, -1000, -1, 0, 6, 7, 8, 9, 100, 1e9])

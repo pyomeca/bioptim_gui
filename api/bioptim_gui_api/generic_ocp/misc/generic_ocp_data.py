@@ -42,7 +42,7 @@ class GenericOCPData:
         return data if key is None else data[key]
 
     @classmethod
-    def update_data(cls, key: str, value) -> None:
+    def update_data(cls, key: str | None, value) -> None:
         """
         Update the data of the ocp store in a json file
 
@@ -57,8 +57,12 @@ class GenericOCPData:
         -------
         None
         """
-        with open(cls.datafile, "r") as f:
-            data = json.load(f)
-        data[key] = value
+        if key is not None:
+            with open(cls.datafile, "r") as f:
+                data = json.load(f)
+            data[key] = value
+        else:
+            data = value
+
         with open(cls.datafile, "w") as f:
             json.dump(data, f)
