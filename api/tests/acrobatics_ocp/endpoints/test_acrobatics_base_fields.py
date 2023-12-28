@@ -248,6 +248,19 @@ def test_put_with_spine():
                 phase["objectives"][i]["arguments"][0]["value"] == "qddot_joints"
             ), "MINIMIZE_CONTROL key should now be qddot_joints after changing to 'with_spine'"
 
+    response = client.put("/acrobatics/with_spine/", json={"with_spine": False})
+    assert response.status_code == 200, response
+
+    response = client.get("/acrobatics/")
+    data = response.json()
+    assert not data["with_spine"]
+    assert data["dynamics"] == "torque_driven"
+    for phase in data["phases_info"]:
+        for i in 0, 1:
+            assert (
+                phase["objectives"][i]["arguments"][0]["value"] == "tau"
+            ), "MINIMIZE_CONTROL key should now be tau after changing to 'with_spine' to False"
+
 
 def test_put_dynamics():
     response = client.put("/acrobatics/dynamics/", json={"dynamics": "torque_driven"})
@@ -307,3 +320,9 @@ def test_put_dynamics_then_add_phase():
             assert (
                 phase["objectives"][i]["arguments"][0]["value"] == "tau"
             ), "MINIMIZE_CONTROL key should stay tau, when modifying the nb_half_twists"
+
+
+def test_get_dynamcis():
+    response = client.get("/acrobatics/dynamics/")
+    assert response.status_code == 200, response
+    assert set(response.json()) == {"torque_driven", "joints_acceleration_driven"}
