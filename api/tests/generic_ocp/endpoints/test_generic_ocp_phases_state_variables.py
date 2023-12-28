@@ -47,8 +47,8 @@ def test_put_state_variable_dimension():
         [0.0, 0.0, 0.0],
     ]
     assert phase_info["state_variables"][0]["initial_guess"] == [
-        [0.0],
-        [0.0],
+        [0.0, 0.0],
+        [0.0, 0.0],
     ]
 
 
@@ -99,7 +99,7 @@ def test_put_state_variable_initial_guess():
 
     response = client.get("/generic_ocp/phases_info/")
     phase_info = response.json()[0]
-    assert phase_info["state_variables"][0]["initial_guess"] == [[69.0]]
+    assert phase_info["state_variables"][0]["initial_guess"] == [[69.0, 0.0]]
 
 
 def test_put_state_variable_initial_guess_interpolation_type():

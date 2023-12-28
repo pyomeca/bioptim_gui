@@ -8,8 +8,7 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics import (
     router,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import phase_name_to_info
-from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import update_phase_info
 
 test_app = FastAPI()
 test_app.include_router(router)
@@ -26,17 +25,7 @@ def run_for_all():
         base_data = AcrobaticsOCPData.base_data
         json.dump(base_data, f)
 
-    phase_names = ["Somersault 1", "Landing"]
-    base_phases = [
-        phase_name_to_info("straight", phase_names, i, AdditionalCriteria()) for i, _ in enumerate(phase_names)
-    ]
-    base_phases[0]["phase_name"] = "Somersault 1"
-    base_phases[1]["phase_name"] = "Landing"
-
-    base_data["phases_info"] = base_phases
-
-    with open(datafile, "w") as f:
-        json.dump(base_data, f)
+    update_phase_info()
 
     yield
 
@@ -58,7 +47,7 @@ def test_base_info():
     assert data["sport_type"] == "trampoline"
     assert data["preferred_twist_side"] == "left"
     assert len(data["phases_info"]) == 2
-    assert data["phases_info"][0]["duration"] == 1.0
+    assert data["phases_info"][0]["duration"] == 0.5
 
     assert data["phases_info"][0]["phase_name"] == "Somersault 1"
     assert len(data["phases_info"][0]["objectives"]) == 5

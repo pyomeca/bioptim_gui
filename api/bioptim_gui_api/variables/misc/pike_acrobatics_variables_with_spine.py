@@ -55,6 +55,7 @@ class PikeAcrobaticsVariablesWithSpine(PikeAcrobaticsVariables):
             [-np.pi / 12] * 3,
             [-np.pi / 12] * 3,
             [-np.pi / 12] * 3,
+            [-0.65] * 3,
             [-0.05] * 3,
             [-1.8] * 3,
             [-2.65] * 3,

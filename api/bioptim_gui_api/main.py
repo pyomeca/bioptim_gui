@@ -5,8 +5,7 @@ from fastapi import FastAPI
 
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics import router as acrobatics_router
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import phase_name_to_info
-from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import update_phase_info
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp import router as generic_ocp_router
 from bioptim_gui_api.generic_ocp.misc.generic_ocp_data import GenericOCPData
 from bioptim_gui_api.load_existing.endpoints.load_existing import router as load_existing_router
@@ -30,17 +29,7 @@ def startup_event():
         base_data = AcrobaticsOCPData.base_data
         json.dump(base_data, f)
 
-    phase_names = ["Somersault 1", "Landing"]
-    base_phases = [
-        phase_name_to_info("straight", phase_names, i, AdditionalCriteria()) for i, _ in enumerate(phase_names)
-    ]
-    base_phases[0]["phase_name"] = "Somersault 1"
-    base_phases[1]["phase_name"] = "Landing"
-
-    base_data["phases_info"] = base_phases
-
-    with open(AcrobaticsOCPData.datafile, "w") as f:
-        json.dump(base_data, f)
+    update_phase_info()
 
     with open(GenericOCPData.datafile, "w") as f:
         json.dump(GenericOCPData.base_data, f)

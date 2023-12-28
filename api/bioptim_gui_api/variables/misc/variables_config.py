@@ -1,4 +1,5 @@
 import copy
+from typing import Type
 
 from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 from bioptim_gui_api.variables.misc.pike_acrobatics_variables import PikeAcrobaticsVariables
@@ -38,7 +39,7 @@ def default_bounds_initial_guess(
 
     return {
         "name": f"{name}",
-        "dimension": 1,
+        "dimension": dimension,
         "bounds_interpolation_type": f"{bounds_interpolation_type}",
         "bounds": {"min_bounds": copy.deepcopy(bounds), "max_bounds": copy.deepcopy(bounds)},
         "initial_guess_interpolation_type": f"{initial_guess_interpolation_type}",
@@ -71,16 +72,28 @@ class DefaultVariablesConfig:
 
     default_torque_driven_variables = {
         "state_variables": [
-            default_bounds_initial_guess("q"),
-            default_bounds_initial_guess("qdot"),
+            default_bounds_initial_guess(
+                "q",
+                bounds_interpolation_type="CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                initial_guess_interpolation_type="LINEAR",
+            ),
+            default_bounds_initial_guess(
+                "qdot",
+                bounds_interpolation_type="CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                initial_guess_interpolation_type="CONSTANT",
+            ),
         ],
         "control_variables": [
-            default_bounds_initial_guess("tau"),
+            default_bounds_initial_guess(
+                "tau", bounds_interpolation_type="CONSTANT", initial_guess_interpolation_type="CONSTANT"
+            ),
         ],
     }
 
 
-def get_variable_computer(position: str = "straight", additional_criteria: AdditionalCriteria = None):
+def get_variable_computer(
+    position: str = "straight", additional_criteria: AdditionalCriteria = None
+) -> Type[StraightAcrobaticsVariables]:
     """
     Return the variable computer (to compute bounds and initial_guess for q, qdot, tau) depending on the position and
     the visual criteria and spine criteria.

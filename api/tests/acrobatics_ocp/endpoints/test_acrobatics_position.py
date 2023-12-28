@@ -8,6 +8,7 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics import (
     router,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import update_phase_info
 
 test_app = FastAPI()
 test_app.include_router(router)
@@ -22,6 +23,8 @@ def run_for_all():
 
     with open(datafile, "w") as f:
         json.dump(AcrobaticsOCPData.base_data, f)
+
+    update_phase_info()
 
     yield
 
@@ -121,3 +124,37 @@ def test_pike_to_straight():
     assert data["nb_somersaults"] == 2
     assert len(data["phases_info"]) == 3  # somersault 1, somersault 2, landing
     assert data["nb_half_twists"] == [0, 0]
+
+
+@pytest.mark.parametrize("position", ["tuck", "pike", "straight"])
+@pytest.mark.parametrize("with_visual_criteria", [4, 0])
+@pytest.mark.parametrize("collision_constraint", [True, False])
+@pytest.mark.parametrize("with_spine", [12, 0])
+def test_state_variables_dimensions(position, with_visual_criteria, collision_constraint, with_spine):
+    position_dim = {
+        "tuck": 17,
+        "pike": 16,
+        "straight": 10,
+    }
+    expected_dim = position_dim[position] + with_visual_criteria + with_spine
+
+    response = client.put("/acrobatics/position/", json={"position": position})
+    assert response.status_code in [200, 304]
+    response = client.put("/acrobatics/with_visual_criteria/", json={"with_visual_criteria": with_visual_criteria != 0})
+    assert response.status_code in [200, 304]
+    response = client.put("/acrobatics/collision_constraint/", json={"collision_constraint": collision_constraint})
+    assert response.status_code in [200, 304]
+    response = client.put("/acrobatics/with_spine/", json={"with_spine": with_spine != 0})
+    assert response.status_code in [200, 304]
+
+    response = client.get("/acrobatics/phases_info")
+    assert response.status_code == 200, response
+    phases = response.json()
+    for phase in phases:
+        for state in phase["state_variables"]:
+            assert (
+                state["dimension"] == expected_dim
+            ), "dimension on state variable should be modified alongside position, with_visual_criteria, collision_constraint and with_spine"
+            assert len(state["bounds"]["min_bounds"]) == expected_dim
+            assert len(state["bounds"]["max_bounds"]) == expected_dim
+            assert len(state["initial_guess"]) == expected_dim

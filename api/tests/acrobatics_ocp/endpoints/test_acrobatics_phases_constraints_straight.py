@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics import router
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import update_phase_info
 
 test_app = FastAPI()
 test_app.include_router(router)
@@ -20,6 +21,8 @@ def run_for_all():
 
     with open(datafile, "w") as f:
         json.dump(AcrobaticsOCPData.base_data, f)
+
+    update_phase_info()
 
     yield
 

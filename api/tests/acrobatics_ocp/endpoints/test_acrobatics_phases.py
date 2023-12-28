@@ -6,8 +6,7 @@ from fastapi.testclient import TestClient
 
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics import router
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import phase_name_to_info
-from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
+from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import update_phase_info
 
 test_app = FastAPI()
 test_app.include_router(router)
@@ -24,17 +23,7 @@ def run_for_all():
         base_data = AcrobaticsOCPData.base_data
         json.dump(base_data, f)
 
-    phase_names = ["Somersault 1", "Landing"]
-    base_phases = [
-        phase_name_to_info("straight", phase_names, i, AdditionalCriteria()) for i, _ in enumerate(phase_names)
-    ]
-    base_phases[0]["phase_name"] = "Somersault 1"
-    base_phases[1]["phase_name"] = "Landing"
-
-    base_data["phases_info"] = base_phases
-
-    with open(AcrobaticsOCPData.datafile, "w") as f:
-        json.dump(base_data, f)
+    update_phase_info()
 
     yield
 
@@ -49,7 +38,7 @@ def test_get_phases_info():
     assert response.status_code == 200, response
     data = response.json()
     assert len(data) == 2
-    assert data[0]["duration"] == 1
+    assert data[0]["duration"] == 0.5
     assert len(data[0]["objectives"]) == 5
     assert len(data[0]["constraints"]) == 0
     assert len(data[1]["objectives"]) == 4
@@ -73,7 +62,7 @@ def test_get_somersault_with_index():
     response = client.get("/acrobatics/phases_info/0")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["duration"] == 1
+    assert data["duration"] == 0.5
     assert len(data["objectives"]) == 5
     assert len(data["constraints"]) == 0
 
@@ -147,18 +136,18 @@ def test_put_somersault_duration():
     response = client.get("/acrobatics/phases_info/0")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["duration"] == 1
+    assert data["duration"] == 0.5
 
     response = client.put(
         "/acrobatics/phases_info/0/duration",
-        json={"duration": 0.5},
+        json={"duration": 0.6},
     )
     assert response.status_code == 200, response
 
     response = client.get("/acrobatics/phases_info/0")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["duration"] == 0.5
+    assert data["duration"] == 0.6
 
 
 def test_put_somersault_duration_wrong():
@@ -213,7 +202,7 @@ def test_put_somersault_duration_changes_final_time_simple_more():
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["final_time"] == 2.2
+    assert data["final_time"] == 1.7
 
 
 def test_put_somersault_duration_changes_final_time_simple_less():
@@ -226,7 +215,7 @@ def test_put_somersault_duration_changes_final_time_simple_less():
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
     data = response.json()
-    assert data["final_time"] == 1.2
+    assert data["final_time"] == 0.7
 
 
 def test_put_somersault_duration_changes_final_time_simple_more_multiple():

@@ -38,12 +38,14 @@ class GenericVariableRouter(ABC):
             variable["dimension"] = new_dimension
 
             for bound in variable["bounds"].keys():
-                shape = np.array(variable["bounds"][bound]).shape
-                new_value = np.zeros((new_dimension, shape[1])).tolist()
+                bound_shape = np.array(variable["bounds"][bound]).shape
+                new_bound_shape = (new_dimension, bound_shape[1]) if len(bound_shape) == 2 else (new_dimension,)
+                new_value = np.zeros(new_bound_shape).tolist()
                 variable["bounds"][bound] = new_value
 
-            shape = np.array(variable["initial_guess"]).shape
-            new_value = np.zeros((new_dimension, shape[1])).tolist()
+            init_shape = np.array(variable["initial_guess"]).shape
+            new_init_shape = (new_dimension, init_shape[1]) if len(init_shape) == 2 else (new_dimension,)
+            new_value = np.zeros(new_init_shape).tolist()
             variable["initial_guess"] = new_value
 
             self.data.update_data("phases_info", phases_info)
@@ -100,7 +102,10 @@ class GenericVariableRouter(ABC):
 
             variable = phases_info[phase_index][self.variable_type][variable_index]
 
-            variable["bounds"]["max_bounds"][x][y] = new_value
+            if variable["bounds_interpolation_type"] == "CONSTANT":
+                variable["bounds"]["max_bounds"][x] = new_value
+            else:
+                variable["bounds"]["max_bounds"][x][y] = new_value
 
             phases_info[phase_index][self.variable_type][variable_index] = variable
 
@@ -115,7 +120,11 @@ class GenericVariableRouter(ABC):
 
             variable = phases_info[phase_index][self.variable_type][variable_index]
 
-            variable["bounds"]["min_bounds"][x][y] = new_value
+            if variable["bounds_interpolation_type"] == "CONSTANT":
+                variable["bounds"]["min_bounds"][x] = new_value
+            else:
+                variable["bounds"]["min_bounds"][x][y] = new_value
+
             phases_info[phase_index][self.variable_type][variable_index] = variable
 
             self.data.update_data("phases_info", phases_info)
@@ -129,7 +138,11 @@ class GenericVariableRouter(ABC):
 
             variable = phases_info[phase_index][self.variable_type][variable_index]
 
-            variable["initial_guess"][x][y] = new_value
+            if variable["initial_guess_interpolation_type"] == "CONSTANT":
+                variable["initial_guess"][x] = new_value
+            else:
+                variable["initial_guess"][x][y] = new_value
+
             phases_info[phase_index][self.variable_type][variable_index] = variable
 
             self.data.update_data("phases_info", phases_info)
