@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
 
+from bioptim_gui_api.acrobatics_ocp.code_generation.acrobatics_generation_utils import generated_code, converted_model
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import CodeGenerationResponse
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_generation_utils import generated_code, converted_model
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import CodeGenerationRequest
 
 router = APIRouter()

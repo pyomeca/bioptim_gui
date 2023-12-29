@@ -5,17 +5,17 @@ import numpy as np
 
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
 from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
-from bioptim_gui_api.acrobatics_ocp.misc.penalties.collision_constraint import collision_constraint_constraints
-from bioptim_gui_api.acrobatics_ocp.misc.penalties.common import common_objectives
-from bioptim_gui_api.acrobatics_ocp.misc.penalties.kickout import kickout_objectives
-from bioptim_gui_api.acrobatics_ocp.misc.penalties.landing import landing_objectives
-from bioptim_gui_api.acrobatics_ocp.misc.penalties.pike_tuck import pike_tuck_objectives
-from bioptim_gui_api.acrobatics_ocp.misc.penalties.somersault import somersault_objectives, somersault_constraints
-from bioptim_gui_api.acrobatics_ocp.misc.penalties.twist import twist_objectives
-from bioptim_gui_api.acrobatics_ocp.misc.penalties.waiting import waiting_objectives
-from bioptim_gui_api.acrobatics_ocp.misc.penalties.with_spine import with_spine_objectives
-from bioptim_gui_api.acrobatics_ocp.misc.penalties.with_visual_criteria import with_visual_criteria_objectives
-from bioptim_gui_api.variables.misc.variables_config import get_variable_computer
+from bioptim_gui_api.acrobatics_ocp.penalties.collision_constraint import collision_constraint_constraints
+from bioptim_gui_api.acrobatics_ocp.penalties.common import common_objectives
+from bioptim_gui_api.acrobatics_ocp.penalties.kickout import kickout_objectives
+from bioptim_gui_api.acrobatics_ocp.penalties.landing import landing_objectives
+from bioptim_gui_api.acrobatics_ocp.penalties.pike_tuck import pike_tuck_objectives
+from bioptim_gui_api.acrobatics_ocp.penalties.somersault import somersault_objectives, somersault_constraints
+from bioptim_gui_api.acrobatics_ocp.penalties.twist import twist_objectives
+from bioptim_gui_api.acrobatics_ocp.penalties.waiting import waiting_objectives
+from bioptim_gui_api.acrobatics_ocp.penalties.with_spine import with_spine_objectives
+from bioptim_gui_api.acrobatics_ocp.penalties.with_visual_criteria import with_visual_criteria_objectives
+from bioptim_gui_api.acrobatics_ocp.variables.variable_compute import get_variable_computer
 
 
 def update_state_control_variables(phases: list[dict], data: dict) -> None:

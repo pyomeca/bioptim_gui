@@ -7,7 +7,7 @@ import json
 
 import pytest
 
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_generation_utils import generated_code
+from bioptim_gui_api.acrobatics_ocp.code_generation.acrobatics_generation_utils import generated_code
 from tests.acrobatics_ocp.misc.acrobatics_generation_utils import generated_code as baseline_generated_code
 
 config_examples_path = "acrobatics_ocp/config_examples"

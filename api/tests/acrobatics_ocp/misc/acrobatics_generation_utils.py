@@ -1,13 +1,13 @@
-from tests.acrobatics_ocp.misc.code_generation.common import AcrobaticsGenerationCommon
-from tests.acrobatics_ocp.misc.code_generation.common_non_collision import (
+from tests.acrobatics_ocp.code_generation.common import AcrobaticsGenerationCommon
+from tests.acrobatics_ocp.code_generation.common_non_collision import (
     AcrobaticsGenerationCommonNonCollision,
 )
-from tests.acrobatics_ocp.misc.code_generation.custom_penalty_fcn import AcrobaticsGenerationCustomPenalties
-from tests.acrobatics_ocp.misc.code_generation.gen_prepare_ocp import AcrobaticsGenerationPrepareOCP
-from tests.acrobatics_ocp.misc.code_generation.gen_prepare_ocp_non_collision import (
+from tests.acrobatics_ocp.code_generation.custom_penalty_fcn import AcrobaticsGenerationCustomPenalties
+from tests.acrobatics_ocp.code_generation.gen_prepare_ocp import AcrobaticsGenerationPrepareOCP
+from tests.acrobatics_ocp.code_generation.gen_prepare_ocp_non_collision import (
     AcrobaticsGenerationPrepareOCPNonCollision,
 )
-from tests.acrobatics_ocp.misc.code_generation.imports import AcrobaticsGenerationImport
+from tests.acrobatics_ocp.code_generation.imports import AcrobaticsGenerationImport
 
 
 def generated_code(data: dict, new_model_path: str) -> str:
