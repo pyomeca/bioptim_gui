@@ -20,9 +20,7 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import (
     SportTypeResponse,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import (
-    adapt_dynamics,
-)
+from bioptim_gui_api.acrobatics_ocp.misc.dynamics_updating import adapt_dynamics
 from bioptim_gui_api.acrobatics_ocp.misc.enums import (
     Position,
     PreferredTwistSide,

@@ -8,9 +8,7 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import (
     VisualCriteriaRequest,
     WithSpineRequest,
 )
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import (
-    update_phase_info,
-)
+from bioptim_gui_api.acrobatics_ocp.misc.phase_updating import update_phase_info
 
 
 class AcrobaticsPhaseModifiers:
@@ -48,15 +46,16 @@ class AcrobaticsPhaseModifiers:
 
             # updating data
             data = self.data.read_data()
-            position = data["position"]
+
             additional_twists = [0] * (new_nb_somersaults - old_value)
-            updated_half_twists = data["nb_half_twists"][:new_nb_somersaults] + additional_twists
+            filtered_twists = data["nb_half_twists"][:new_nb_somersaults]
+            updated_half_twists = filtered_twists + additional_twists
 
             self.data.update_data("nb_somersaults", new_nb_somersaults)
             self.data.update_data("nb_half_twists", updated_half_twists)
 
             # 1 somersault tuck/pike are not allowed, set the position to straight
-            if new_nb_somersaults == 1 and position != "straight":
+            if new_nb_somersaults == 1 and data["position"] != "straight":
                 self.data.update_data("position", "straight")
 
             update_phase_info()

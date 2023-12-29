@@ -8,7 +8,7 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics import (
     router,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
-from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import update_phase_info
+from bioptim_gui_api.acrobatics_ocp.misc.phase_updating import update_phase_info
 
 test_app = FastAPI()
 test_app.include_router(router)

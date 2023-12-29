@@ -11,6 +11,14 @@ from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
 from bioptim_gui_api.variables.misc.variables_utils import variables_zeros
 
 
+def new_shape(array: list, new_dimension: int) -> tuple:
+    shape = np.array(array).shape
+    if len(shape) == 1:
+        return (new_dimension,)
+    else:
+        return new_dimension, shape[1]
+
+
 class GenericVariableRouter(ABC):
     def __init__(self, data, variable_type: str):
         self.data = data
@@ -32,21 +40,15 @@ class GenericVariableRouter(ABC):
             phases_info = self.data.read_data("phases_info")
 
             new_dimension = dimension.dimension
-
             variable = phases_info[phase_index][self.variable_type][variable_index]
-
             variable["dimension"] = new_dimension
 
             for bound in variable["bounds"].keys():
-                bound_shape = np.array(variable["bounds"][bound]).shape
-                new_bound_shape = (new_dimension, bound_shape[1]) if len(bound_shape) == 2 else (new_dimension,)
-                new_value = np.zeros(new_bound_shape).tolist()
-                variable["bounds"][bound] = new_value
+                new_bound_shape = new_shape(variable["bounds"][bound], new_dimension)
+                variable["bounds"][bound] = np.zeros(new_bound_shape).tolist()
 
-            init_shape = np.array(variable["initial_guess"]).shape
-            new_init_shape = (new_dimension, init_shape[1]) if len(init_shape) == 2 else (new_dimension,)
-            new_value = np.zeros(new_init_shape).tolist()
-            variable["initial_guess"] = new_value
+            new_init_shape = new_shape(variable["initial_guess"], new_dimension)
+            variable["initial_guess"] = np.zeros(new_init_shape).tolist()
 
             self.data.update_data("phases_info", phases_info)
             return phases_info

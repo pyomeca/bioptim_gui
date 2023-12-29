@@ -1,6 +1,6 @@
 import copy
 
-from bioptim_gui_api.acrobatics_ocp.penalties.common import common_objectives
+from bioptim_gui_api.acrobatics_ocp.penalties.phases.common import common_objectives
 from bioptim_gui_api.generic_ocp.misc.generic_ocp_data import GenericOCPData
 from bioptim_gui_api.variables.misc.variables_config import DefaultVariablesConfig
 
