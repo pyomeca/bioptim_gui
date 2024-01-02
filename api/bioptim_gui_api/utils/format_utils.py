@@ -66,3 +66,33 @@ def invert_min_max(bounds: list, index: int) -> None:
         tmp = bounds[i]["min"][index].copy()
         bounds[i]["min"][index] = -bounds[i]["max"][index]
         bounds[i]["max"][index] = -tmp
+
+
+def indent_lines(text: str, indent: int = 4) -> str:
+    """
+    Indent each line of the given text by the given number of spaces. Ignore beginning and trailing new lines.
+
+    Parameters
+    ----------
+    text: str
+        The text to indent.
+    indent: int
+        The number of spaces to indent the text.
+
+    Returns
+    -------
+    str
+        The indented text.
+    """
+    lines = text.split("\n")
+    res = ""
+    for line in lines:
+        if line:
+            res += f"{' ' * indent}{line}\n"
+        else:
+            res += "\n"
+
+    # remove trailing new line
+    res = res[:-1]
+
+    return res

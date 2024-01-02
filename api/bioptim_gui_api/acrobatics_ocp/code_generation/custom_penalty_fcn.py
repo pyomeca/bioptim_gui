@@ -3,8 +3,8 @@ class AcrobaticsGenerationCustomPenalties:
     This class contains the custom penalty functions used in the acrobatics ocp.
     """
 
-    @staticmethod
-    def custom_trampoline_bed_in_peripheral_vision():
+    @classmethod
+    def custom_trampoline_bed_in_peripheral_vision(cls):
         return """
 def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) -> cas.MX:
     \"""
@@ -57,8 +57,8 @@ def custom_trampoline_bed_in_peripheral_vision(controller: PenaltyController) ->
     return out
 """
 
-    @staticmethod
-    def closest_distance_between_lines() -> str:
+    @classmethod
+    def closest_distance_between_lines(cls) -> str:
         return """
 def closest_distance_between_lines():
     # adapté de https://stackoverflow.com/questions/2824478/shortest-distance-between-two-line-segments
@@ -104,8 +104,8 @@ def closest_distance_between_lines():
     return Func
 """
 
-    @staticmethod
-    def custom_noncrossing_const() -> str:
+    @classmethod
+    def custom_noncrossing_const(cls) -> str:
         return """
 def custom_noncrossing_const(
     controller: PenaltyController,
@@ -131,8 +131,8 @@ def custom_noncrossing_const(
     return constraint_value
 """
 
-    @staticmethod
-    def custom_noncrossing_obj() -> str:
+    @classmethod
+    def custom_noncrossing_obj(cls) -> str:
         return """
 def custom_noncrossing_obj(
     controller: PenaltyController,
@@ -161,8 +161,8 @@ def custom_noncrossing_obj(
     return objective_value
 """
 
-    @staticmethod
-    def add_noncrossing_penalty() -> str:
+    @classmethod
+    def add_noncrossing_penalty(cls) -> str:
         return """
 def add_non_crossing_penalty(objectives, constraints, warm_start=True, **kwargs):
     kwargs["quadratic"] = not warm_start
@@ -179,19 +179,19 @@ def add_non_crossing_penalty(objectives, constraints, warm_start=True, **kwargs)
         )
 """
 
-    @staticmethod
-    def all_customs_function(data: dict) -> str:
+    @classmethod
+    def all_customs_function(cls, data: dict) -> str:
         with_visual_criteria = data["with_visual_criteria"]
         collision_constraint = data["collision_constraint"]
 
         ret = ""
 
         if with_visual_criteria:
-            ret += AcrobaticsGenerationCustomPenalties.custom_trampoline_bed_in_peripheral_vision()
+            ret += cls.custom_trampoline_bed_in_peripheral_vision()
 
         if collision_constraint:
-            ret += AcrobaticsGenerationCustomPenalties.closest_distance_between_lines()
-            ret += AcrobaticsGenerationCustomPenalties.custom_noncrossing_const()
-            ret += AcrobaticsGenerationCustomPenalties.custom_noncrossing_obj()
-            ret += AcrobaticsGenerationCustomPenalties.add_noncrossing_penalty()
+            ret += cls.closest_distance_between_lines()
+            ret += cls.custom_noncrossing_const()
+            ret += cls.custom_noncrossing_obj()
+            ret += cls.add_noncrossing_penalty()
         return ret

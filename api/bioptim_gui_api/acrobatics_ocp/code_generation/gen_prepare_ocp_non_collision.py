@@ -4,8 +4,6 @@ from bioptim_gui_api.acrobatics_ocp.code_generation.bounds_non_collision import 
     AcrobaticsGenerationBoundsNonCollision,
 )
 from bioptim_gui_api.acrobatics_ocp.code_generation.gen_prepare_ocp import AcrobaticsGenerationPrepareOCP
-from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
-from bioptim_gui_api.acrobatics_ocp.variables.variable_compute import get_variable_computer
 from bioptim_gui_api.penalty.misc.constraint_printer import ConstraintPrinter
 from bioptim_gui_api.penalty.misc.objective_printer import ObjectivePrinter
 from bioptim_gui_api.penalty.misc.penalty_utils import penalty_str_to_non_collision_penalty
@@ -16,8 +14,10 @@ class AcrobaticsGenerationPrepareOCPNonCollision(AcrobaticsGenerationPrepareOCP)
     This class is used to generate the prepare_ocp function for non-collision acrobatics
     """
 
-    @staticmethod
-    def prepare_ocp_header() -> str:
+    bounds_generation = AcrobaticsGenerationBoundsNonCollision
+
+    @classmethod
+    def prepare_ocp_header(cls) -> str:
         return """
 def prepare_ocp(
     seed: int = 0,
@@ -38,8 +38,8 @@ def prepare_ocp(
     \"""
 """
 
-    @staticmethod
-    def penalties(data: dict) -> str:
+    @classmethod
+    def penalties(cls, data: dict) -> str:
         phases = data["phases_info"]
         nb_phases = len(phases)
         ret = """
@@ -81,8 +81,8 @@ def prepare_ocp(
 """
         return ret
 
-    @staticmethod
-    def multistart_noise(data: dict) -> str:
+    @classmethod
+    def multistart_noise(cls, data: dict) -> str:
         dynamics = data["dynamics"]
         control = "tau" if dynamics == "torque_driven" else "qddot_joints"
         return f"""
@@ -112,21 +112,8 @@ def prepare_ocp(
         )
 """
 
-    @staticmethod
-    def bimapping(model) -> str:
-        nb_q = model.nb_q
-        nb_tau = model.nb_tau
-        return f"""
-    mapping = BiMappingList()
-    mapping.add(
-        "tau",
-        to_second=[None, None, None, None, None, None, {", ".join([str(i) for i in range(nb_tau)])}],
-        to_first=[{", ".join([str(i + (nb_q - nb_tau)) for i in range(nb_tau)])}],
-    )
-"""
-
-    @staticmethod
-    def return_ocp(torque_driven: bool) -> str:
+    @classmethod
+    def return_ocp(cls, torque_driven: bool) -> str:
         n_threads = cpu_count() - 2
         ret = f"""
     # Construct and return the optimal control program (OCP)
@@ -150,28 +137,4 @@ def prepare_ocp(
         n_threads={int(n_threads / 2)},
     )
 """
-        return ret
-
-    @staticmethod
-    def prepare_ocp(data: dict, new_model_path: str) -> str:
-        position = data["position"]
-        torque_driven = data["dynamics"] == "torque_driven"
-        additional_criteria = AdditionalCriteria(
-            with_visual_criteria=data["with_visual_criteria"],
-            collision_constraint=data["collision_constraint"],
-            with_spine=data["with_spine"],
-        )
-
-        model = get_variable_computer(position, additional_criteria)
-
-        ret = AcrobaticsGenerationPrepareOCPNonCollision.prepare_ocp_header()
-        ret += AcrobaticsGenerationPrepareOCPNonCollision.generic_elements(data, new_model_path)
-        ret += AcrobaticsGenerationPrepareOCPNonCollision.penalties(data)
-        ret += AcrobaticsGenerationPrepareOCPNonCollision.dynamics_str(data)
-        ret += AcrobaticsGenerationPrepareOCPNonCollision.multinode_constraints(data)
-        ret += AcrobaticsGenerationBoundsNonCollision.bounds(data, model)
-        ret += AcrobaticsGenerationPrepareOCPNonCollision.multistart_noise(data)
-        if torque_driven:
-            ret += AcrobaticsGenerationPrepareOCPNonCollision.bimapping(model)
-        ret += AcrobaticsGenerationPrepareOCPNonCollision.return_ocp(torque_driven)
         return ret

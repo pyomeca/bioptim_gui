@@ -1,3 +1,5 @@
+import numpy as np
+
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import (
     acrobatics_phase_names,
@@ -36,7 +38,7 @@ def update_state_control_variables(phases: list[dict], data: dict) -> None:
         collision_constraint=data["collision_constraint"],
         with_spine=data["with_spine"],
     )
-    final_time = data["final_time"]
+    final_time = sum(s["duration"] for s in phases)
     is_forward = sum(half_twists) % 2 != 0
 
     model = get_variable_computer(position, additional_criteria)
@@ -61,19 +63,19 @@ def update_state_control_variables(phases: list[dict], data: dict) -> None:
                 "dimension": nb_q,
                 "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
                 "bounds": {
-                    "min_bounds": q_bounds[i]["min"].tolist(),
-                    "max_bounds": q_bounds[i]["max"].tolist(),
+                    "min_bounds": np.round(q_bounds[i]["min"], 2).tolist(),
+                    "max_bounds": np.round(q_bounds[i]["max"], 2).tolist(),
                 },
                 "initial_guess_interpolation_type": "LINEAR",
-                "initial_guess": q_init[i].T.tolist(),
+                "initial_guess": np.round(q_init[i].T, 2).tolist(),
             },
             {
                 "name": "qdot",
                 "dimension": nb_qdot,
                 "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
                 "bounds": {
-                    "min_bounds": qdot_bounds[i]["min"].tolist(),
-                    "max_bounds": qdot_bounds[i]["max"].tolist(),
+                    "min_bounds": np.round(qdot_bounds[i]["min"], 2).tolist(),
+                    "max_bounds": np.round(qdot_bounds[i]["max"], 2).tolist(),
                 },
                 "initial_guess_interpolation_type": "CONSTANT",
                 "initial_guess": qdot_init,

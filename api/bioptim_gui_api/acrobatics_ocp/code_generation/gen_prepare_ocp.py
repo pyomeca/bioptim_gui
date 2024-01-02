@@ -1,8 +1,6 @@
 from multiprocessing import cpu_count
 
 from bioptim_gui_api.acrobatics_ocp.code_generation.bounds import AcrobaticsGenerationBounds
-from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
-from bioptim_gui_api.acrobatics_ocp.variables.variable_compute import get_variable_computer
 from bioptim_gui_api.penalty.misc.constraint_printer import ConstraintPrinter
 from bioptim_gui_api.penalty.misc.objective_printer import ObjectivePrinter
 
@@ -12,8 +10,10 @@ class AcrobaticsGenerationPrepareOCP:
     This class is used to generate the prepare_ocp function
     """
 
-    @staticmethod
-    def prepare_ocp_header() -> str:
+    bounds_generation = AcrobaticsGenerationBounds
+
+    @classmethod
+    def prepare_ocp_header(cls) -> str:
         return """
 def prepare_ocp(
     seed: int = 0,
@@ -33,8 +33,8 @@ def prepare_ocp(
     \"""
 """
 
-    @staticmethod
-    def generic_elements(data: dict, new_model_path: str) -> str:
+    @classmethod
+    def generic_elements(cls, data: dict, new_model_path: str) -> str:
         phases = data["phases_info"]
         nb_phases = len(phases)
 
@@ -49,8 +49,8 @@ def prepare_ocp(
 
 """
 
-    @staticmethod
-    def penalties(data: dict) -> str:
+    @classmethod
+    def penalties(cls, data: dict) -> str:
         phases = data["phases_info"]
         nb_phases = len(phases)
         ret = """
@@ -72,8 +72,8 @@ def prepare_ocp(
 """
         return ret
 
-    @staticmethod
-    def dynamics_str(data) -> str:
+    @classmethod
+    def dynamics_str(cls, data) -> str:
         dynamics = data["dynamics"].upper()
         return f"""
     # Declaration of the dynamics function used during integration
@@ -86,8 +86,8 @@ def prepare_ocp(
         )
 """
 
-    @staticmethod
-    def multinode_constraints(data) -> str:
+    @classmethod
+    def multinode_constraints(cls, data) -> str:
         phases = data["phases_info"]
         nb_phases = len(phases)
         total_time = sum(s["duration"] for s in phases)
@@ -103,10 +103,10 @@ def prepare_ocp(
     )
 """
 
-    @staticmethod
-    def multistart_noise(data: dict) -> str:
+    @classmethod
+    def multistart_noise(cls, data: dict) -> str:
         dynamics = data["dynamics"]
-        control = "tau" if dynamics == "TORQUE_DRIVEN" else "qddot_joints"
+        control = "tau" if dynamics == "torque_driven" else "qddot_joints"
         return f"""
     if is_multistart:
         for i in range(nb_phases):
@@ -134,10 +134,11 @@ def prepare_ocp(
         )
 """
 
-    @staticmethod
-    def bimapping(model) -> str:
-        nb_q = model.nb_q
-        nb_tau = model.nb_tau
+    @classmethod
+    def bimapping(cls, data: dict) -> str:
+        nb_q = data["phases_info"][0]["state_variables"][0]["dimension"]
+        nb_tau = data["phases_info"][0]["control_variables"][0]["dimension"]
+
         return f"""
     mapping = BiMappingList()
     mapping.add(
@@ -147,8 +148,8 @@ def prepare_ocp(
     )
 """
 
-    @staticmethod
-    def return_ocp(torque_driven: bool) -> str:
+    @classmethod
+    def return_ocp(cls, torque_driven: bool) -> str:
         n_threads = cpu_count() - 2
         ret = f"""
     # Construct and return the optimal control program (OCP)
@@ -174,25 +175,18 @@ def prepare_ocp(
 """
         return ret
 
-    @staticmethod
-    def prepare_ocp(data: dict, new_model_path: str) -> str:
-        position = data["position"]
+    @classmethod
+    def prepare_ocp(cls, data: dict, new_model_path: str) -> str:
         torque_driven = data["dynamics"] == "torque_driven"
-        additional_criteria = AdditionalCriteria(
-            with_visual_criteria=data["with_visual_criteria"],
-            collision_constraint=data["collision_constraint"],
-            with_spine=data["with_spine"],
-        )
-        model = get_variable_computer(position, additional_criteria)
 
-        ret = AcrobaticsGenerationPrepareOCP.prepare_ocp_header()
-        ret += AcrobaticsGenerationPrepareOCP.generic_elements(data, new_model_path)
-        ret += AcrobaticsGenerationPrepareOCP.penalties(data)
-        ret += AcrobaticsGenerationPrepareOCP.dynamics_str(data)
-        ret += AcrobaticsGenerationPrepareOCP.multinode_constraints(data)
-        ret += AcrobaticsGenerationBounds.bounds(data, model)
-        ret += AcrobaticsGenerationPrepareOCP.multistart_noise(data)
+        ret = cls.prepare_ocp_header()
+        ret += cls.generic_elements(data, new_model_path)
+        ret += cls.penalties(data)
+        ret += cls.dynamics_str(data)
+        ret += cls.multinode_constraints(data)
+        ret += cls.bounds_generation.bounds(data)
+        ret += cls.multistart_noise(data)
         if torque_driven:
-            ret += AcrobaticsGenerationPrepareOCP.bimapping(model)
-        ret += AcrobaticsGenerationPrepareOCP.return_ocp(torque_driven)
+            ret += cls.bimapping(data)
+        ret += cls.return_ocp(torque_driven)
         return ret

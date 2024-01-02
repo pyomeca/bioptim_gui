@@ -1,5 +1,6 @@
-from bioptim_gui_api.utils.format_utils import format_2d_array, arg_to_string
 import pytest
+
+from bioptim_gui_api.utils.format_utils import format_2d_array, arg_to_string, indent_lines
 
 
 def test_format_2d_array():
@@ -21,3 +22,61 @@ def test_format_2d_array():
 )
 def test_arg_to_string(argument, expected):
     assert arg_to_string(argument) == expected
+
+
+def test_indent_simple():
+    text = """
+    haha
+        hope it works
+"""
+
+    expected = """
+        haha
+            hope it works
+"""
+
+    assert indent_lines(text, 4) == expected
+
+
+def test_indent_no_beginning_new_line():
+    text = """    haha
+        hope it works
+"""
+
+    expected = """        haha
+            hope it works
+"""
+
+    assert indent_lines(text, 4) == expected
+
+
+def test_indent_no_trailing_new_line():
+    text = """
+    haha
+        hope it works"""
+
+    expected = """
+        haha
+            hope it works"""
+
+    assert indent_lines(text, 4) == expected
+
+
+def test_multiple_newline_in_middle():
+    text = """
+    haha
+
+
+        hope it works
+        
+"""
+
+    expected = """
+        haha
+
+
+            hope it works
+            
+"""
+
+    assert indent_lines(text, 4) == expected

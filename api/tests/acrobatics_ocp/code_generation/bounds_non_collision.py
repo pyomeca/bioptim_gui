@@ -44,7 +44,7 @@ class AcrobaticsGenerationBoundsNonCollision(AcrobaticsGenerationBounds):
     @staticmethod
     def add_qdot_bounds(data: dict, model) -> str:
         phases = data["phases_info"]
-        is_forward = data["position"] == "straight"
+        is_forward = sum(data["nb_half_twists"]) % 2 != 0
 
         nb_phases = len(phases)
         total_time = sum(s["duration"] for s in phases)
@@ -95,7 +95,7 @@ class AcrobaticsGenerationBoundsNonCollision(AcrobaticsGenerationBounds):
             ret += f"""
         x_initial_guesses.add(
             "q",
-            initial_guess={format_2d_array(q_init[i].T)},
+            initial_guess={format_2d_array(q_init[i].T, 12)},
             interpolation=InterpolationType.LINEAR,
             phase={i},
         )

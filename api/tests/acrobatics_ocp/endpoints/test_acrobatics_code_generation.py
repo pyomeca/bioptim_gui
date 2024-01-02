@@ -14,6 +14,12 @@ test_app.include_router(router)
 client = TestClient(test_app)
 
 
+def save_config(top_folder, folder, position):
+    data = AcrobaticsOCPData.read_data()
+    with open(f"acrobatics_ocp/config_examples/{top_folder}/{folder}/{position}.json", "w") as f:
+        json.dump(data, f, indent=4)
+
+
 @pytest.fixture(autouse=True)
 def run_for_all():
     # before test: create file
@@ -80,6 +86,8 @@ def test_generate_code_simple_position(position, with_visual_criteria, non_colli
     assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
     assert data["new_models"][0][1] in data["generated_code"]
 
+    save_config("simple", folder, position)
+
     # data = response.json()
     #
     # # filter out the bio_model line, because of absolute path that may vary between devs
@@ -140,6 +148,8 @@ def test_generate_code_position_no_objective_no_constraint(
     assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
     assert data["new_models"][0][1] in data["generated_code"]
 
+    save_config("no_penalties", folder, position)
+
     # data = response.json()
     #
     # # filter out the bio_model line, because of absolute path that may vary between devs
@@ -198,6 +208,8 @@ def test_generate_code_position_objective_and_constraint(
     data = response.json()
     assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
     assert data["new_models"][0][1] in data["generated_code"]
+
+    save_config("penalties", folder, position)
 
     # data = response.json()
     #
@@ -261,6 +273,8 @@ def test_generate_code_2_phase_position_objective_and_constraint(
     data = response.json()
     assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
     assert data["new_models"][0][1] in data["generated_code"]
+
+    save_config("more_phases", folder, position)
 
     # data = response.json()
     #
@@ -368,6 +382,8 @@ def test_generate_code_modified_objective_and_constraint(
     data = response.json()
     assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
     assert data["new_models"][0][1] in data["generated_code"]
+
+    save_config("modified_penalties", folder, position)
 
     # data = response.json()
     #

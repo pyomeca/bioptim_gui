@@ -6,16 +6,19 @@ class AcrobaticsGenerationCommonNonCollision(AcrobaticsGenerationCommon):
     This class contains the common code for the generation of the acrobatics, including multistart, save, main, ...
     """
 
-    @staticmethod
-    def construct_path(half_twists: list[int], side: str, position: str):
+    @classmethod
+    def construct_path(cls, data: dict) -> str:
+        half_twists = data["nb_half_twists"]
+        side = data["preferred_twist_side"]
+        position = data["position"]
         return f"""
 def construct_filepath(warming_up, save_path, seed = 0):
     is_warm = "warming" if warming_up else "warm"
     return f"{{save_path}}/{{is_warm}}_acrobatics_{'_'.join(str(i) for i in half_twists)}_{side}_{position}_{{seed}}.pkl"
 """
 
-    @staticmethod
-    def save_result():
+    @classmethod
+    def save_result(cls) -> str:
         return """
 def save_results(sol: Solution, *combinatorial_parameters, **extra_parameters) -> None:
     \"""
@@ -69,8 +72,8 @@ def save_results(sol: Solution, *combinatorial_parameters, **extra_parameters) -
         pkl.dump(to_save, file)
 """
 
-    @staticmethod
-    def should_solve():
+    @classmethod
+    def should_solve(cls) -> str:
         return """
 def should_solve(*combinatorial_parameters, **extra_parameters):
     save_folder = extra_parameters["save_folder"]
@@ -86,8 +89,8 @@ def should_solve(*combinatorial_parameters, **extra_parameters):
     return not os.path.exists(file_path)
 """
 
-    @staticmethod
-    def get_solver():
+    @classmethod
+    def get_solver(cls) -> str:
         return """
 def get_solver(warming_up: bool = False):
     solver = Solver.IPOPT(show_online_optim=False, show_options=dict(show_bounds=True))
@@ -104,8 +107,8 @@ def get_solver(warming_up: bool = False):
     return solver
 """
 
-    @staticmethod
-    def prepare_multi_start():
+    @classmethod
+    def prepare_multi_start(cls) -> str:
         return """
 def prepare_multi_start(
     combinatorial_parameters: dict,
@@ -127,8 +130,11 @@ def prepare_multi_start(
     )
 """
 
-    @staticmethod
-    def main_function(half_twists: list[int], side: str, position: str) -> str:
+    @classmethod
+    def main_function(cls, data: dict) -> str:
+        half_twists = data["nb_half_twists"]
+        side = data["preferred_twist_side"]
+        position = data["position"]
         file_addon = f"{'_'.join(str(i) for i in half_twists)}_{side}_{position}"
         return f"""
 def main(nb_seeds: int = 1, save_folder: str = "save"):
@@ -186,8 +192,8 @@ def main(nb_seeds: int = 1, save_folder: str = "save"):
         f.write(f"warm_{{nb_seeds}}_acrobatics_{file_addon}: {{time.time() - start_time}}\\n")
 """
 
-    @staticmethod
-    def name_eq_main():
+    @classmethod
+    def name_eq_main(cls) -> str:
         return """
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -204,18 +210,3 @@ if __name__ == "__main__":
 
     main(nb_seeds, save_folder_path)
 """
-
-    @staticmethod
-    def generate_common(data: dict) -> str:
-        half_twists = data["nb_half_twists"]
-        side = data["preferred_twist_side"]
-        position = data["position"]
-
-        ret = AcrobaticsGenerationCommonNonCollision.construct_path(half_twists, side, position)
-        ret += AcrobaticsGenerationCommonNonCollision.save_result()
-        ret += AcrobaticsGenerationCommonNonCollision.should_solve()
-        ret += AcrobaticsGenerationCommonNonCollision.get_solver()
-        ret += AcrobaticsGenerationCommonNonCollision.prepare_multi_start()
-        ret += AcrobaticsGenerationCommonNonCollision.main_function(half_twists, side, position)
-        ret += AcrobaticsGenerationCommonNonCollision.name_eq_main()
-        return ret

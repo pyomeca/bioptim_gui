@@ -1,1 +1,1458 @@
-{"nb_phases": 2, "nb_somersaults": 1, "nb_half_twists": [0], "model_path": "/Users/aweng/afs/bioptim_gui/api/tests/test_biomods/with_collision_and_visual/good/straight.bioMod", "final_time": 1.0, "final_time_margin": 0.1, "position": "straight", "sport_type": "trampoline", "preferred_twist_side": "left", "with_visual_criteria": true, "collision_constraint": true, "dynamics": "torque_driven", "with_spine": false, "phases_info": [{"phase_name": "Somersault 1", "nb_shooting_points": 40, "duration": 0.5, "objectives": [{"objective_type": "lagrange", "penalty_type": "MINIMIZE_CONTROL", "nodes": "all_shooting", "quadratic": false, "expand": false, "target": [1.0, 0.0], "derivative": true, "integration_rule": "midpoint", "multi_thread": true, "weight": 1.0, "arguments": [{"name": "key", "value": "tau", "type": "string"}]}, {"objective_type": "lagrange", "penalty_type": "MINIMIZE_CONTROL", "nodes": "all_shooting", "quadratic": true, "expand": true, "target": null, "derivative": true, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 1.0, "arguments": [{"name": "key", "value": "tau", "type": "string"}]}, {"objective_type": "mayer", "penalty_type": "MINIMIZE_TIME", "nodes": "end", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 1.0, "arguments": [{"name": "min_bound", "value": 0.1, "type": "float"}, {"name": "max_bound", "value": 2.0, "type": "float"}]}, {"objective_type": "lagrange", "penalty_type": "MINIMIZE_STATE", "nodes": "all_shooting", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 50000.0, "arguments": [{"name": "key", "value": "q", "type": "str"}, {"name": "index", "value": [6, 7, 8, 9], "type": "list"}]}, {"objective_type": "mayer", "penalty_type": "MINIMIZE_STATE", "nodes": "all", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 100.0, "arguments": [{"name": "key", "value": "q", "type": "str"}, {"name": "index", "value": [4], "type": "list"}]}, {"objective_type": "lagrange", "penalty_type": "MINIMIZE_SEGMENT_VELOCITY", "nodes": "all_shooting", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 10.0, "arguments": [{"name": "segment", "value": "Head", "type": "string"}]}, {"objective_type": "lagrange", "penalty_type": "MINIMIZE_STATE", "nodes": "default", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 1.0, "arguments": [{"name": "key", "value": "qdot", "type": "string"}, {"name": "index", "value": [8, 9], "type": "list"}]}, {"objective_type": "lagrange", "penalty_type": "MINIMIZE_STATE", "nodes": "default", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 10.0, "arguments": [{"name": "key", "value": "q", "type": "string"}, {"name": "index", "value": [8, 9], "type": "list"}]}, {"objective_type": "lagrange", "penalty_type": "MINIMIZE_STATE", "nodes": "default", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 100.0, "arguments": [{"name": "key", "value": "q", "type": "string"}, {"name": "index", "value": [6, 7], "type": "list"}]}], "constraints": [{"penalty_type": "CUSTOM", "nodes": "all_shooting", "quadratic": false, "expand": false, "target": [5.5, 3.14], "derivative": true, "integration_rule": "approximate_trapezoidal", "multi_thread": true, "arguments": [{"name": "function", "value": "custom_noncrossing_const", "type": "function"}, {"name": "marker_1", "value": "RightShoulder", "type": "str"}, {"name": "marker_2", "value": "RightKnuckle", "type": "str"}, {"name": "radius_1", "value": 0.05, "type": "float"}, {"name": "marker_3", "value": "LeftShoulder", "type": "str"}, {"name": "marker_4", "value": "LeftKnuckle", "type": "str"}, {"name": "radius_2", "value": 0.05, "type": "float"}]}, {"penalty_type": "TIME_CONSTRAINT", "nodes": "end", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "arguments": []}], "state_variables": [{"name": "q", "dimension": 1, "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT", "bounds": {"min_bounds": [[0.0, 0.0, 0.0]], "max_bounds": [[0.0, 0.0, 0.0]]}, "initial_guess_interpolation_type": "CONSTANT", "initial_guess": [[0.0]]}, {"name": "qdot", "dimension": 1, "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT", "bounds": {"min_bounds": [[0.0, 0.0, 0.0]], "max_bounds": [[0.0, 0.0, 0.0]]}, "initial_guess_interpolation_type": "CONSTANT", "initial_guess": [[0.0]]}], "control_variables": [{"name": "tau", "dimension": 1, "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT", "bounds": {"min_bounds": [[0.0, 0.0, 0.0]], "max_bounds": [[0.0, 0.0, 0.0]]}, "initial_guess_interpolation_type": "CONSTANT", "initial_guess": [[0.0]]}]}, {"phase_name": "Landing", "nb_shooting_points": 40, "duration": 0.5, "objectives": [{"objective_type": "lagrange", "penalty_type": "MINIMIZE_CONTROL", "nodes": "all_shooting", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 1.0, "arguments": [{"name": "key", "value": "tau", "type": "string"}]}, {"objective_type": "lagrange", "penalty_type": "MINIMIZE_CONTROL", "nodes": "all_shooting", "quadratic": true, "expand": true, "target": null, "derivative": true, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 1.0, "arguments": [{"name": "key", "value": "tau", "type": "string"}]}, {"objective_type": "mayer", "penalty_type": "MINIMIZE_TIME", "nodes": "end", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 1.0, "arguments": [{"name": "min_bound", "value": 0.1, "type": "float"}, {"name": "max_bound", "value": 2.0, "type": "float"}]}, {"objective_type": "mayer", "penalty_type": "MINIMIZE_STATE", "nodes": "end", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 1000.0, "arguments": [{"name": "key", "value": "q", "type": "str"}, {"name": "index", "value": [4], "type": "list"}]}, {"objective_type": "lagrange", "penalty_type": "MINIMIZE_SEGMENT_VELOCITY", "nodes": "all_shooting", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 10.0, "arguments": [{"name": "segment", "value": "Head", "type": "string"}]}, {"objective_type": "lagrange", "penalty_type": "MINIMIZE_STATE", "nodes": "default", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 1.0, "arguments": [{"name": "key", "value": "qdot", "type": "string"}, {"name": "index", "value": [8, 9], "type": "list"}]}, {"objective_type": "lagrange", "penalty_type": "MINIMIZE_STATE", "nodes": "default", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 10.0, "arguments": [{"name": "key", "value": "q", "type": "string"}, {"name": "index", "value": [8, 9], "type": "list"}]}, {"objective_type": "lagrange", "penalty_type": "MINIMIZE_STATE", "nodes": "default", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 100.0, "arguments": [{"name": "key", "value": "q", "type": "string"}, {"name": "index", "value": [6, 7], "type": "list"}]}, {"objective_type": "lagrange", "penalty_type": "CUSTOM", "nodes": "all_shooting", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 100.0, "arguments": [{"name": "function", "value": "custom_trampoline_bed_in_peripheral_vision", "type": "function"}]}, {"objective_type": "lagrange", "penalty_type": "ALIGN_MARKERS_WITH_VECTOR", "nodes": "default", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "weight": 1.0, "arguments": [{"name": "vector_0_marker_0", "value": "eyes_vect_start", "type": "string"}, {"name": "vector_0_marker_1", "value": "eyes_vect_end", "type": "string"}, {"name": "vector_1_marker_0", "value": "eyes_vect_start", "type": "string"}, {"name": "vector_1_marker_1", "value": "fixation_front", "type": "string"}]}], "constraints": [{"penalty_type": "CUSTOM", "nodes": "all_shooting", "quadratic": true, "expand": true, "target": null, "derivative": false, "integration_rule": "rectangle_left", "multi_thread": false, "arguments": [{"name": "function", "value": "custom_noncrossing_const", "type": "function"}, {"name": "marker_1", "value": "RightShoulder", "type": "str"}, {"name": "marker_2", "value": "RightKnuckle", "type": "str"}, {"name": "radius_1", "value": 0.05, "type": "float"}, {"name": "marker_3", "value": "LeftShoulder", "type": "str"}, {"name": "marker_4", "value": "LeftKnuckle", "type": "str"}, {"name": "radius_2", "value": 0.05, "type": "float"}]}], "state_variables": [{"name": "q", "dimension": 1, "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT", "bounds": {"min_bounds": [[0.0, 0.0, 0.0]], "max_bounds": [[0.0, 0.0, 0.0]]}, "initial_guess_interpolation_type": "CONSTANT", "initial_guess": [[0.0]]}, {"name": "qdot", "dimension": 1, "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT", "bounds": {"min_bounds": [[0.0, 0.0, 0.0]], "max_bounds": [[0.0, 0.0, 0.0]]}, "initial_guess_interpolation_type": "CONSTANT", "initial_guess": [[0.0]]}], "control_variables": [{"name": "tau", "dimension": 1, "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT", "bounds": {"min_bounds": [[0.0, 0.0, 0.0]], "max_bounds": [[0.0, 0.0, 0.0]]}, "initial_guess_interpolation_type": "CONSTANT", "initial_guess": [[0.0]]}]}]}
+{
+    "nb_phases": 2,
+    "nb_somersaults": 1,
+    "nb_half_twists": [
+        0
+    ],
+    "model_path": "/home/aweng/afs/bioptim_gui/api/tests/test_biomods/with_collision_and_visual/good/straight.bioMod",
+    "final_time": 1.0,
+    "final_time_margin": 0.1,
+    "position": "straight",
+    "sport_type": "trampoline",
+    "preferred_twist_side": "left",
+    "with_visual_criteria": true,
+    "collision_constraint": true,
+    "dynamics": "torque_driven",
+    "with_spine": false,
+    "phases_info": [
+        {
+            "phase_name": "Somersault 1",
+            "nb_shooting_points": 40,
+            "duration": 0.5,
+            "objectives": [
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": false,
+                    "expand": false,
+                    "target": [
+                        1.0,
+                        0.0
+                    ],
+                    "derivative": true,
+                    "integration_rule": "midpoint",
+                    "multi_thread": true,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": true,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MINIMIZE_TIME",
+                    "nodes": "end",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "min_bound",
+                            "value": 0.1,
+                            "type": "float"
+                        },
+                        {
+                            "name": "max_bound",
+                            "value": 2.0,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 50000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                6,
+                                7,
+                                8,
+                                9
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 100.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                4
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_SEGMENT_VELOCITY",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 10.0,
+                    "arguments": [
+                        {
+                            "name": "segment",
+                            "value": "Head",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "default",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "qdot",
+                            "type": "string"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                8,
+                                9
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "default",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 10.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "string"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                8,
+                                9
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "default",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 100.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "string"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                6,
+                                7
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                }
+            ],
+            "constraints": [
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all_shooting",
+                    "quadratic": false,
+                    "expand": false,
+                    "target": [
+                        5.5,
+                        3.14
+                    ],
+                    "derivative": true,
+                    "integration_rule": "approximate_trapezoidal",
+                    "multi_thread": true,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "RightShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "RightKnuckle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "LeftShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "LeftKnuckle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "TIME_CONSTRAINT",
+                    "nodes": "end",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": []
+                }
+            ],
+            "state_variables": [
+                {
+                    "name": "q",
+                    "dimension": 14,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -0.0,
+                                -1.0,
+                                -1.0
+                            ],
+                            [
+                                -0.0,
+                                -1.0,
+                                -1.0
+                            ],
+                            [
+                                -0.0,
+                                -0.1,
+                                -0.1
+                            ],
+                            [
+                                -0.0,
+                                -4.81,
+                                -4.81
+                            ],
+                            [
+                                0.0,
+                                -0.79,
+                                -0.79
+                            ],
+                            [
+                                0.0,
+                                -0.99,
+                                -0.1
+                            ],
+                            [
+                                -0.1,
+                                -1.05,
+                                -1.05
+                            ],
+                            [
+                                -0.1,
+                                -1.22,
+                                -1.22
+                            ],
+                            [
+                                -0.1,
+                                -0.39,
+                                -0.39
+                            ],
+                            [
+                                0.29,
+                                -0.52,
+                                -0.52
+                            ],
+                            [
+                                0.0,
+                                -0.65,
+                                -0.65
+                            ],
+                            [
+                                2.9,
+                                -0.05,
+                                -0.05
+                            ],
+                            [
+                                0.0,
+                                -2.0,
+                                -2.0
+                            ],
+                            [
+                                -2.9,
+                                -3.0,
+                                -3.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                0.0,
+                                1.0,
+                                1.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                1.0
+                            ],
+                            [
+                                0.0,
+                                15.0,
+                                15.0
+                            ],
+                            [
+                                -0.0,
+                                0.1,
+                                -4.61
+                            ],
+                            [
+                                0.0,
+                                0.79,
+                                0.79
+                            ],
+                            [
+                                0.0,
+                                0.99,
+                                0.1
+                            ],
+                            [
+                                0.1,
+                                1.05,
+                                1.05
+                            ],
+                            [
+                                0.1,
+                                0.39,
+                                0.39
+                            ],
+                            [
+                                0.1,
+                                0.39,
+                                0.39
+                            ],
+                            [
+                                0.49,
+                                0.52,
+                                0.52
+                            ],
+                            [
+                                0.0,
+                                2.0,
+                                2.0
+                            ],
+                            [
+                                2.9,
+                                3.0,
+                                3.0
+                            ],
+                            [
+                                0.0,
+                                0.65,
+                                0.65
+                            ],
+                            [
+                                -2.9,
+                                0.05,
+                                0.05
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "LINEAR",
+                    "initial_guess": [
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            7.45
+                        ],
+                        [
+                            -0.0,
+                            -4.71
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            -0.41
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.39,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.68
+                        ],
+                        [
+                            2.9,
+                            1.48
+                        ],
+                        [
+                            0.0,
+                            -0.68
+                        ],
+                        [
+                            -2.9,
+                            -1.48
+                        ]
+                    ]
+                },
+                {
+                    "name": "qdot",
+                    "dimension": 14,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -0.5,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -0.5,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                2.9,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -200.0,
+                                -200.0,
+                                -200.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                0.5,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                0.5,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                6.9,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                -0.5,
+                                -0.5,
+                                -0.5
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        0.0,
+                        0.0,
+                        4.905,
+                        6.283185307179586,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "control_variables": [
+                {
+                    "name": "tau",
+                    "dimension": 10,
+                    "bounds_interpolation_type": "CONSTANT",
+                    "bounds": {
+                        "min_bounds": [
+                            -500,
+                            -500,
+                            -500,
+                            -500,
+                            -500,
+                            -500,
+                            -500,
+                            -500,
+                            -500,
+                            -500
+                        ],
+                        "max_bounds": [
+                            500,
+                            500,
+                            500,
+                            500,
+                            500,
+                            500,
+                            500,
+                            500,
+                            500,
+                            500
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            ]
+        },
+        {
+            "phase_name": "Landing",
+            "nb_shooting_points": 40,
+            "duration": 0.5,
+            "objectives": [
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": true,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MINIMIZE_TIME",
+                    "nodes": "end",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "min_bound",
+                            "value": 0.1,
+                            "type": "float"
+                        },
+                        {
+                            "name": "max_bound",
+                            "value": 2.0,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "end",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                4
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_SEGMENT_VELOCITY",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 10.0,
+                    "arguments": [
+                        {
+                            "name": "segment",
+                            "value": "Head",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "default",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "qdot",
+                            "type": "string"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                8,
+                                9
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "default",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 10.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "string"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                8,
+                                9
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "default",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 100.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "string"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                6,
+                                7
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 100.0,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_trampoline_bed_in_peripheral_vision",
+                            "type": "function"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "ALIGN_MARKERS_WITH_VECTOR",
+                    "nodes": "default",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "vector_0_marker_0",
+                            "value": "eyes_vect_start",
+                            "type": "string"
+                        },
+                        {
+                            "name": "vector_0_marker_1",
+                            "value": "eyes_vect_end",
+                            "type": "string"
+                        },
+                        {
+                            "name": "vector_1_marker_0",
+                            "value": "eyes_vect_start",
+                            "type": "string"
+                        },
+                        {
+                            "name": "vector_1_marker_1",
+                            "value": "fixation_front",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "constraints": [
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "RightShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "RightKnuckle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "LeftShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "LeftKnuckle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                }
+            ],
+            "state_variables": [
+                {
+                    "name": "q",
+                    "dimension": 14,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -1.0,
+                                -1.0,
+                                -0.01
+                            ],
+                            [
+                                -1.0,
+                                -1.0,
+                                -0.01
+                            ],
+                            [
+                                -0.1,
+                                -0.1,
+                                0.0
+                            ],
+                            [
+                                -0.0,
+                                -6.38,
+                                -6.38
+                            ],
+                            [
+                                -0.2,
+                                -0.2,
+                                -0.2
+                            ],
+                            [
+                                -0.1,
+                                -0.1,
+                                -0.1
+                            ],
+                            [
+                                -1.05,
+                                -1.05,
+                                -1.05
+                            ],
+                            [
+                                -1.22,
+                                -1.22,
+                                -1.22
+                            ],
+                            [
+                                -0.39,
+                                -0.39,
+                                -0.39
+                            ],
+                            [
+                                -0.52,
+                                -0.52,
+                                -0.52
+                            ],
+                            [
+                                -0.65,
+                                -0.65,
+                                -0.1
+                            ],
+                            [
+                                0.0,
+                                -0.05,
+                                2.8
+                            ],
+                            [
+                                -2.0,
+                                -2.0,
+                                -0.1
+                            ],
+                            [
+                                -0.79,
+                                -3.0,
+                                -3.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                1.0,
+                                1.0,
+                                0.01
+                            ],
+                            [
+                                1.0,
+                                1.0,
+                                0.01
+                            ],
+                            [
+                                15.0,
+                                15.0,
+                                0.01
+                            ],
+                            [
+                                -0.0,
+                                -4.61,
+                                -6.18
+                            ],
+                            [
+                                0.2,
+                                0.2,
+                                0.2
+                            ],
+                            [
+                                0.1,
+                                0.1,
+                                0.1
+                            ],
+                            [
+                                1.05,
+                                1.05,
+                                1.05
+                            ],
+                            [
+                                0.39,
+                                0.39,
+                                0.39
+                            ],
+                            [
+                                0.39,
+                                0.39,
+                                0.39
+                            ],
+                            [
+                                0.52,
+                                0.52,
+                                0.52
+                            ],
+                            [
+                                2.0,
+                                2.0,
+                                0.1
+                            ],
+                            [
+                                0.79,
+                                3.0,
+                                3.0
+                            ],
+                            [
+                                0.65,
+                                0.65,
+                                0.1
+                            ],
+                            [
+                                0.0,
+                                0.05,
+                                -2.8
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "LINEAR",
+                    "initial_guess": [
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            7.45,
+                            0.0
+                        ],
+                        [
+                            -0.0,
+                            -6.28
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            -0.41,
+                            -0.41
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.68,
+                            0.0
+                        ],
+                        [
+                            0.39,
+                            2.9
+                        ],
+                        [
+                            -0.68,
+                            0.0
+                        ],
+                        [
+                            -0.39,
+                            -2.9
+                        ]
+                    ]
+                },
+                {
+                    "name": "qdot",
+                    "dimension": 14,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -10.0,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -10.0,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -200.0,
+                                -200.0,
+                                -200.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                -0.5,
+                                -0.5,
+                                -0.5
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        0.0,
+                        0.0,
+                        4.905,
+                        6.283185307179586,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0,
+                        0.0
+                    ]
+                }
+            ],
+            "control_variables": [
+                {
+                    "name": "tau",
+                    "dimension": 10,
+                    "bounds_interpolation_type": "CONSTANT",
+                    "bounds": {
+                        "min_bounds": [
+                            -500,
+                            -500,
+                            -500,
+                            -500,
+                            -500,
+                            -500,
+                            -500,
+                            -500,
+                            -500,
+                            -500
+                        ],
+                        "max_bounds": [
+                            500,
+                            500,
+                            500,
+                            500,
+                            500,
+                            500,
+                            500,
+                            500,
+                            500,
+                            500
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            ]
+        }
+    ]
+}

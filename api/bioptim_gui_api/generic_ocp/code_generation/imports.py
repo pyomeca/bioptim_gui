@@ -1,10 +1,10 @@
-class AcrobaticsGenerationImport:
+class ImportGeneration:
     """
     This class contains the imports for the acrobatics generation
     """
 
-    @staticmethod
-    def generate_imports() -> str:
+    @classmethod
+    def generate_imports(cls) -> str:
         return """\"""This file was automatically generated using BioptimGUI version 0.0.1\"""
 
 import argparse

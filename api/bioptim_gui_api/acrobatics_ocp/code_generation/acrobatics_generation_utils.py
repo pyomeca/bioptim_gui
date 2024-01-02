@@ -9,9 +9,9 @@ from bioptim_gui_api.acrobatics_ocp.code_generation.gen_prepare_ocp import Acrob
 from bioptim_gui_api.acrobatics_ocp.code_generation.gen_prepare_ocp_non_collision import (
     AcrobaticsGenerationPrepareOCPNonCollision,
 )
-from bioptim_gui_api.acrobatics_ocp.code_generation.imports import AcrobaticsGenerationImport
 from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import NewGeneratedBioMod
 from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
+from bioptim_gui_api.generic_ocp.code_generation.imports import ImportGeneration
 from bioptim_gui_api.model_converter.converter_utils import get_converter
 
 
@@ -24,7 +24,7 @@ def generated_code(data: dict, new_model_path: str) -> str:
         prepare_ocp_printer = AcrobaticsGenerationPrepareOCPNonCollision
         common_printer = AcrobaticsGenerationCommonNonCollision
 
-    ret = AcrobaticsGenerationImport.generate_imports()
+    ret = ImportGeneration.generate_imports()
     ret += f'BIOMODEL_PATH = "{new_model_path}"\n'
     ret += AcrobaticsGenerationCustomPenalties.all_customs_function(data)
     ret += prepare_ocp_printer.prepare_ocp(data, new_model_path)

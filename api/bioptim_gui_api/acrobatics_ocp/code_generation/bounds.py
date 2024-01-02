@@ -1,31 +1,20 @@
+from bioptim_gui_api.acrobatics_ocp.variables.utils import BioptimVariable, var_bounds_list, var_initial_guess_list
+from bioptim_gui_api.generic_ocp.code_generation.bounds import BoundsGeneration
 from bioptim_gui_api.utils.format_utils import format_2d_array
 
 
-class AcrobaticsGenerationBounds:
+class AcrobaticsGenerationBounds(BoundsGeneration):
     """
     This class is used to generate the bounds inside prepare_ocp of the acrobatics OCP.
     """
 
-    @staticmethod
-    def declare_bounds() -> str:
-        return """
-    # Declaration of optimization variables bounds and initial guesses
-    # Path constraint
-    x_bounds = BoundsList()
-    x_initial_guesses = InitialGuessList()
-
-    u_bounds = BoundsList()
-    u_initial_guesses = InitialGuessList()
-"""
-
-    @staticmethod
-    def add_q_bounds(data: dict, model) -> str:
+    @classmethod
+    def add_q_bounds(cls, data: dict) -> str:
         phases = data["phases_info"]
-        half_twists = data["nb_half_twists"]
-        prefer_left = data["preferred_twist_side"] == "left"
+
+        q_bounds = var_bounds_list(data, "q", BioptimVariable.STATE_VARIABLE)
 
         nb_phases = len(phases)
-        q_bounds = model.get_q_bounds(half_twists, prefer_left)
 
         ret = ""
         for i in range(nb_phases):
@@ -34,20 +23,19 @@ class AcrobaticsGenerationBounds:
         "q",
         min_bound={format_2d_array(q_bounds[i]["min"])},
         max_bound={format_2d_array(q_bounds[i]["max"])},
-        interpolation=InterpolationType.CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT,
+        interpolation=InterpolationType.{q_bounds[i]["interpolation_type"]},
         phase={i},
     )
 """
         return ret
 
-    @staticmethod
-    def add_qdot_bounds(data: dict, model) -> str:
+    @classmethod
+    def add_qdot_bounds(cls, data: dict) -> str:
         phases = data["phases_info"]
-        is_forward = data["position"] == "straight"
+
+        qdot_bounds = var_bounds_list(data, "qdot", BioptimVariable.STATE_VARIABLE)
 
         nb_phases = len(phases)
-        total_time = sum(s["duration"] for s in phases)
-        qdot_bounds = model.get_qdot_bounds(nb_phases, total_time, is_forward)
 
         ret = ""
         for i in range(nb_phases):
@@ -56,86 +44,88 @@ class AcrobaticsGenerationBounds:
         "qdot",
         min_bound={format_2d_array(qdot_bounds[i]["min"])},
         max_bound={format_2d_array(qdot_bounds[i]["max"])},
-        interpolation=InterpolationType.CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT,
+        interpolation=InterpolationType.{qdot_bounds[i]["interpolation_type"]},
         phase={i},
     )
 """
         return ret
 
-    @staticmethod
-    def add_q_init(data: dict, model) -> str:
+    @classmethod
+    def add_q_init(cls, data: dict) -> str:
         phases = data["phases_info"]
-        half_twists = data["nb_half_twists"]
-        prefer_left = data["preferred_twist_side"] == "left"
+
+        q_init = var_initial_guess_list(data, "q", BioptimVariable.STATE_VARIABLE)
 
         nb_phases = len(phases)
-        q_init = model.get_q_init(half_twists, prefer_left)
 
         ret = ""
         for i in range(nb_phases):
             ret += f"""
     x_initial_guesses.add(
         "q",
-        initial_guess={format_2d_array(q_init[i].T)},
-        interpolation=InterpolationType.LINEAR,
+        initial_guess={format_2d_array(q_init[i]["initial_guess"])},
+        interpolation=InterpolationType.{q_init[i]["interpolation_type"]},
         phase={i},
     )
 """
         return ret
 
-    @staticmethod
-    def add_qdot_init(data: dict, model) -> str:
-        phases = data["phases_info"]
-        final_time = sum(s["duration"] for s in phases)
-        nb_somersaults = data["nb_somersaults"]
-        qdot_init = model.get_qdot_init(nb_somersaults, final_time)
+    @classmethod
+    def add_qdot_init(cls, data: dict) -> str:
+        qdot = data["phases_info"][0]["state_variables"][1]
+        qdot_init = qdot["initial_guess"]
+        interpolation_type = qdot["initial_guess_interpolation_type"]
 
         return f"""
     x_initial_guesses.add(
         "qdot",
         initial_guess={qdot_init},
-        interpolation=InterpolationType.CONSTANT,
+        interpolation=InterpolationType.{interpolation_type},
         phase=0,
     )
 """
 
-    @staticmethod
-    def add_tau_bounds(data: dict, model) -> str:
-        tau_bounds = model.get_tau_bounds()
-        control = "tau" if data["dynamics"] == "TORQUE_DRIVEN" else "qddot_joints"
+    @classmethod
+    def add_tau_bounds(cls, data: dict) -> str:
+        control_var = data["phases_info"][0]["control_variables"][0]
+        control_bounds = control_var["bounds"]
+        control_name = control_var["name"]
+        interpolation_type = control_var["bounds_interpolation_type"]
 
         return f"""
     for phase in range(nb_phases):
         u_bounds.add(
-            "{control}",
-            min_bound={tau_bounds["min"]},
-            max_bound={tau_bounds["max"]},
-            interpolation=InterpolationType.CONSTANT,
+            "{control_name}",
+            min_bound={control_bounds["min_bounds"]},
+            max_bound={control_bounds["max_bounds"]},
+            interpolation=InterpolationType.{interpolation_type},
             phase=phase,
         )
 """
 
-    @staticmethod
-    def add_tau_init(data: dict, model) -> str:
-        tau_init = model.get_tau_init()
-        control = "tau" if data["dynamics"] == "TORQUE_DRIVEN" else "qddot_joints"
+    @classmethod
+    def add_tau_init(cls, data: dict) -> str:
+        control = data["phases_info"][0]["control_variables"][0]
+        control_init = control["initial_guess"]
+        interpolation_type = control["initial_guess_interpolation_type"]
+        control_name = control["name"]
 
         return f"""
     u_initial_guesses.add(
-        "{control}",
-        initial_guess={tau_init},
-        interpolation=InterpolationType.CONSTANT,
+        "{control_name}",
+        initial_guess={control_init},
+        interpolation=InterpolationType.{interpolation_type},
         phase=0,
     )
 """
 
-    @staticmethod
-    def bounds(data: dict, model) -> str:
-        ret = AcrobaticsGenerationBounds.declare_bounds()
-        ret += AcrobaticsGenerationBounds.add_q_bounds(data, model)
-        ret += AcrobaticsGenerationBounds.add_qdot_bounds(data, model)
-        ret += AcrobaticsGenerationBounds.add_q_init(data, model)
-        ret += AcrobaticsGenerationBounds.add_qdot_init(data, model)
-        ret += AcrobaticsGenerationBounds.add_tau_bounds(data, model)
-        ret += AcrobaticsGenerationBounds.add_tau_init(data, model)
+    @classmethod
+    def bounds(cls, data: dict) -> str:
+        ret = cls.declare_bounds()
+        ret += cls.add_q_bounds(data)
+        ret += cls.add_qdot_bounds(data)
+        ret += cls.add_tau_bounds(data)
+        ret += cls.add_q_init(data)
+        ret += cls.add_qdot_init(data)
+        ret += cls.add_tau_init(data)
         return ret

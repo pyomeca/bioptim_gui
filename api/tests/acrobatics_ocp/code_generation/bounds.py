@@ -43,7 +43,7 @@ class AcrobaticsGenerationBounds:
     @staticmethod
     def add_qdot_bounds(data: dict, model) -> str:
         phases = data["phases_info"]
-        is_forward = data["position"] == "straight"
+        is_forward = sum(data["nb_half_twists"]) % 2 != 0
 
         nb_phases = len(phases)
         total_time = sum(s["duration"] for s in phases)
@@ -102,7 +102,7 @@ class AcrobaticsGenerationBounds:
     @staticmethod
     def add_tau_bounds(data: dict, model) -> str:
         tau_bounds = model.get_tau_bounds()
-        control = "tau" if data["dynamics"] == "TORQUE_DRIVEN" else "qddot_joints"
+        control = "tau" if data["dynamics"] == "torque_driven" else "qddot_joints"
 
         return f"""
     for phase in range(nb_phases):
@@ -118,7 +118,7 @@ class AcrobaticsGenerationBounds:
     @staticmethod
     def add_tau_init(data: dict, model) -> str:
         tau_init = model.get_tau_init()
-        control = "tau" if data["dynamics"] == "TORQUE_DRIVEN" else "qddot_joints"
+        control = "tau" if data["dynamics"] == "torque_driven" else "qddot_joints"
 
         return f"""
     u_initial_guesses.add(
@@ -134,8 +134,8 @@ class AcrobaticsGenerationBounds:
         ret = AcrobaticsGenerationBounds.declare_bounds()
         ret += AcrobaticsGenerationBounds.add_q_bounds(data, model)
         ret += AcrobaticsGenerationBounds.add_qdot_bounds(data, model)
+        ret += AcrobaticsGenerationBounds.add_tau_bounds(data, model)
         ret += AcrobaticsGenerationBounds.add_q_init(data, model)
         ret += AcrobaticsGenerationBounds.add_qdot_init(data, model)
-        ret += AcrobaticsGenerationBounds.add_tau_bounds(data, model)
         ret += AcrobaticsGenerationBounds.add_tau_init(data, model)
         return ret

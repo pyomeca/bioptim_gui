@@ -1,6 +1,6 @@
 # tests used for refactor purposes (no logic changes) only
 # to assure that the result if not modified by the refactor
-# by testing it with the a baseline, being the duplicate files in tests/acrobatics_ocp/misc/code_generation
+# by testing it with the baseline, being the duplicate files in tests/acrobatics_ocp/misc/code_generation
 # and tests/acrobatics_ocp/misc/acrobatics_generation_utils.py
 
 import json
@@ -8,7 +8,7 @@ import json
 import pytest
 
 from bioptim_gui_api.acrobatics_ocp.code_generation.acrobatics_generation_utils import generated_code
-from tests.acrobatics_ocp.misc.acrobatics_generation_utils import generated_code as baseline_generated_code
+from tests.acrobatics_ocp.code_generation.acrobatics_generation_utils import generated_code as baseline_generated_code
 
 config_examples_path = "acrobatics_ocp/config_examples"
 

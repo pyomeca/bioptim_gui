@@ -106,7 +106,7 @@ def prepare_ocp(
     @staticmethod
     def multistart_noise(data: dict) -> str:
         dynamics = data["dynamics"]
-        control = "tau" if dynamics == "TORQUE_DRIVEN" else "qddot_joints"
+        control = "tau" if dynamics == "torque_driven" else "qddot_joints"
         return f"""
     if is_multistart:
         for i in range(nb_phases):
