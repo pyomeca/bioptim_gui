@@ -19,6 +19,21 @@ class OCPRequestMaker<T extends OCPData> {
   final String prefix;
   final String phaseInfoString;
 
+  Future<OCPAvailableValues> getAvailableValues() async {
+    final nodeUrl = Uri.parse('${APIConfig.url}/penalties/nodes');
+    final nodeResponse = await http.get(nodeUrl);
+    final nodeJson = json.decode(nodeResponse.body);
+    final nodeValues = List<String>.from(nodeJson);
+
+    final integrationRuleUrl =
+        Uri.parse('${APIConfig.url}/penalties/integration_rules');
+    final integrationRuleResponse = await http.get(integrationRuleUrl);
+    final integrationRuleJson = json.decode(integrationRuleResponse.body);
+    final integrationRuleValues = List<String>.from(integrationRuleJson);
+
+    return OCPAvailableValues(nodeValues, integrationRuleValues);
+  }
+
   Future<http.Response> updateField(String fieldName, String newValue) async {
     final url = Uri.parse('${APIConfig.url}/$prefix/$fieldName');
     final body = json.encode({fieldName: newValue});

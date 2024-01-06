@@ -16,6 +16,7 @@ abstract class OCPData<T extends Phase> with ChangeNotifier {
   List<T> phasesInfo = [];
   T Function(Map<String, dynamic>) phaseFromJsonFunction;
   final OCPRequestMaker _requestMaker;
+  OCPAvailableValues? availablesValue;
 
   OCPData.fromJson(
     Map<String, dynamic> data,
@@ -218,4 +219,17 @@ abstract class Phase {
             (phaseData["control_variables"] as List<dynamic>).map((variable) {
           return Variable.fromJson(variable);
         }).toList();
+}
+
+///
+/// [OCPAvailableValues] represents the available values for the dropdowns,
+/// they can be used for performance reasons
+class OCPAvailableValues {
+  List<String> nodes = [];
+  List<String> integrationRules = [];
+
+  OCPAvailableValues(
+    this.nodes,
+    this.integrationRules,
+  );
 }

@@ -14,23 +14,25 @@ class CustomHttpDropdown extends StatefulWidget {
     required this.title,
     required this.width,
     required this.defaultValue,
-    required this.getEndpoint,
+    this.getEndpoint,
     this.putEndpoint,
     required this.requestKey,
     this.color = Colors.black,
     this.customStringFormatting = _defaultToString,
     this.customCallBack,
     this.customOnSelected,
+    this.items,
   });
 
   final String title;
   final double width;
   final String defaultValue;
-  final String getEndpoint;
+  final String? getEndpoint;
   final String? putEndpoint;
   // the key used in the request of the put method
   final String requestKey;
   final Color color;
+  final List<String>? items;
 
   final Function(String) customStringFormatting;
   static String _defaultToString(String s) => s.toString().toLowerCase();
@@ -50,7 +52,12 @@ class CustomHttpDropdownState extends State<CustomHttpDropdown> {
   void initState() {
     super.initState();
     _selectedValue = widget.defaultValue;
-    _fetchAvailableValues();
+
+    if (widget.items != null) {
+      _availableValues = widget.items!;
+    } else {
+      _fetchAvailableValues();
+    }
   }
 
   Future<void> _fetchAvailableValues() async {
