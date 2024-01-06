@@ -227,9 +227,15 @@ abstract class Phase {
 class OCPAvailableValues {
   List<String> nodes = [];
   List<String> integrationRules = [];
+  List<String> objectivesMinimize = [];
+  List<String> objectivesMaximize = [];
+  List<String> constraints = [];
 
   OCPAvailableValues(
     this.nodes,
     this.integrationRules,
+    this.objectivesMinimize,
+    this.objectivesMaximize,
+    this.constraints,
   );
 }

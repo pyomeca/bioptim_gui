@@ -20,18 +20,26 @@ class OCPRequestMaker<T extends OCPData> {
   final String phaseInfoString;
 
   Future<OCPAvailableValues> getAvailableValues() async {
-    final nodeUrl = Uri.parse('${APIConfig.url}/penalties/nodes');
-    final nodeResponse = await http.get(nodeUrl);
-    final nodeJson = json.decode(nodeResponse.body);
-    final nodeValues = List<String>.from(nodeJson);
+    final url = Uri.parse('${APIConfig.url}/penalties/available_values');
+    final response = await http.get(url);
+    final jsonResponse = json.decode(response.body);
 
-    final integrationRuleUrl =
-        Uri.parse('${APIConfig.url}/penalties/integration_rules');
-    final integrationRuleResponse = await http.get(integrationRuleUrl);
-    final integrationRuleJson = json.decode(integrationRuleResponse.body);
-    final integrationRuleValues = List<String>.from(integrationRuleJson);
+    List<String> nodeValues = List<String>.from(jsonResponse["nodes"]);
+    List<String> integrationRules =
+        List<String>.from(jsonResponse["integration_rules"]);
+    List<String> objectiveMin =
+        List<String>.from(jsonResponse["objectives"]["minimize"]);
+    List<String> objectiveMax =
+        List<String>.from(jsonResponse["objectives"]["maximize"]);
+    List<String> constraints = List<String>.from(jsonResponse["constraints"]);
 
-    return OCPAvailableValues(nodeValues, integrationRuleValues);
+    return OCPAvailableValues(
+      nodeValues,
+      integrationRules,
+      objectiveMin,
+      objectiveMax,
+      constraints,
+    );
   }
 
   Future<http.Response> updateField(String fieldName, String newValue) async {

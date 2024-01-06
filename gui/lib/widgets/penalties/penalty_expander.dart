@@ -338,6 +338,7 @@ class _PathTile extends StatelessWidget {
                     width: (penaltyType == Objective) ? width / 2 - 3 : width,
                     child: NodesChooser(
                       width: width,
+                      items: data.availablesValue!.nodes,
                       putEndpoint:
                           '$endpointPrefix/$phaseIndex/${_penaltyTypeToEndpoint(plural: true)}/$penaltyIndex/nodes',
                       defaultValue: penalty.nodes,
@@ -413,6 +414,7 @@ class _PathTile extends StatelessWidget {
                     width: width,
                     child: IntegrationRuleChooser(
                       width: width,
+                      items: data.availablesValue!.integrationRules,
                       putEndpoint:
                           '$endpointPrefix/$phaseIndex/${_penaltyTypeToEndpoint(plural: true)}/$penaltyIndex/integration_rule',
                       defaultValue: penalty.integrationRule,
