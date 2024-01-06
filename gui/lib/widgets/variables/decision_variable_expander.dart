@@ -20,12 +20,14 @@ class DecisionVariableExpander extends StatelessWidget {
     required this.phaseIndex,
     required this.width,
     required this.endpointPrefix,
+    this.enableDimension = true,
   });
 
   final DecisionVariableType from;
   final int phaseIndex;
   final double width;
   final String endpointPrefix;
+  final bool enableDimension;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +57,7 @@ class DecisionVariableExpander extends StatelessWidget {
               from: from,
               width: width,
               endpointPrefix: endpointPrefix,
+              enableDimension: enableDimension,
             ),
         ]),
       );
@@ -70,6 +73,7 @@ class _DecisionVariableChooser extends StatelessWidget {
     required this.variableIndex,
     required this.width,
     required this.endpointPrefix,
+    required this.enableDimension,
   });
 
   final String name;
@@ -78,6 +82,7 @@ class _DecisionVariableChooser extends StatelessWidget {
   final DecisionVariableType from;
   final double width;
   final String endpointPrefix;
+  final bool enableDimension;
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +113,7 @@ class _DecisionVariableChooser extends StatelessWidget {
               SizedBox(
                 width: width / 3 - 8,
                 child: PositiveIntegerTextField(
+                  enabled: enableDimension,
                   label: 'Dimension',
                   value: variable.dimension.toString(),
                   onSubmitted: (value) async {
