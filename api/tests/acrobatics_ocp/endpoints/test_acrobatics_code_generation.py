@@ -15,9 +15,11 @@ client = TestClient(test_app)
 
 
 def save_config(top_folder, folder, position):
-    data = AcrobaticsOCPData.read_data()
-    with open(f"acrobatics_ocp/config_examples/{top_folder}/{folder}/{position}.json", "w") as f:
-        json.dump(data, f, indent=4)
+    # data = AcrobaticsOCPData.read_data()
+    # with open(f"acrobatics_ocp/config_examples/{top_folder}/{folder}/{position}.json", "w") as f:
+    #     json.dump(data, f, indent=4)
+
+    return
 
 
 @pytest.fixture(autouse=True)
