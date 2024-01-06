@@ -30,8 +30,8 @@ class DecisionVariableExpander extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<OCPData>(builder: (context, data, child) {
       List<Variable> variables = from == DecisionVariableType.control
-          ? (data.phaseInfo[phaseIndex] as GenericPhase).controlVariables
-          : (data.phaseInfo[phaseIndex] as GenericPhase).stateVariables;
+          ? (data.phasesInfo[phaseIndex] as GenericPhase).controlVariables
+          : (data.phasesInfo[phaseIndex] as GenericPhase).stateVariables;
 
       return AnimatedExpandingWidget(
         header: SizedBox(
@@ -101,9 +101,9 @@ class _DecisionVariableChooser extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<OCPData>(builder: (context, data, child) {
       final variable = from == DecisionVariableType.control
-          ? (data.phaseInfo[phaseIndex] as GenericPhase)
+          ? (data.phasesInfo[phaseIndex] as GenericPhase)
               .controlVariables[variableIndex]
-          : (data.phaseInfo[phaseIndex] as GenericPhase)
+          : (data.phasesInfo[phaseIndex] as GenericPhase)
               .stateVariables[variableIndex];
 
       return Column(
@@ -271,9 +271,9 @@ class _DataFiller extends StatelessWidget {
 
     return Consumer<OCPData>(builder: (context, data, child) {
       final variable = from == DecisionVariableType.control
-          ? (data.phaseInfo[phaseIndex] as GenericPhase)
+          ? (data.phasesInfo[phaseIndex] as GenericPhase)
               .controlVariables[variableIndex]
-          : (data.phaseInfo[phaseIndex] as GenericPhase)
+          : (data.phasesInfo[phaseIndex] as GenericPhase)
               .stateVariables[variableIndex];
 
       final interpolationType = title == 'Initial guess'

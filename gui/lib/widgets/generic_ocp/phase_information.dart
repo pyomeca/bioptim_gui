@@ -23,7 +23,7 @@ class PhaseInformation extends StatelessWidget {
             width: width / 2 - 6,
             child: PositiveIntegerTextField(
               label: 'Number of shooting points',
-              value: data.phaseInfo[phaseIndex].nbShootingPoints.toString(),
+              value: data.phasesInfo[phaseIndex].nbShootingPoints.toString(),
               onSubmitted: (newValue) {
                 if (newValue.isNotEmpty) {
                   data.updatePhaseField(
@@ -35,7 +35,7 @@ class PhaseInformation extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: PositiveFloatTextField(
-              value: data.phaseInfo[phaseIndex].duration.toString(),
+              value: data.phasesInfo[phaseIndex].duration.toString(),
               label: 'Phase time (s)',
               onSubmitted: (newValue) {
                 if (newValue.isNotEmpty) {

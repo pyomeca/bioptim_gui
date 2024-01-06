@@ -1,16 +1,12 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:bioptim_gui/models/acrobatics_controllers.dart';
 import 'package:bioptim_gui/models/acrobatics_request_maker.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
-import 'package:bioptim_gui/models/penalty.dart';
-import 'package:flutter/foundation.dart';
 
-class AcrobaticsData extends ChangeNotifier implements OCPData {
+class AcrobaticsData extends OCPData<SomersaultPhase> {
   int _nbSomersaults;
   List<int> halfTwists = [];
-  String _modelPath;
   double finalTime;
   double finalTimeMargin;
   String position;
@@ -20,12 +16,10 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   bool collisionConstraint;
   bool withSpine;
   String dynamics;
-  List<SomersaultPhase> _phasesInfo = [];
 
   AcrobaticsData.fromJson(Map<String, dynamic> data)
       : _nbSomersaults = data["nb_somersaults"],
         halfTwists = List.from(data["nb_half_twists"]),
-        _modelPath = data["model_path"],
         finalTime = data["final_time"],
         finalTimeMargin = data["final_time_margin"],
         position = data["position"],
@@ -35,26 +29,11 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
         collisionConstraint = data["collision_constraint"],
         withSpine = data["with_spine"],
         dynamics = data["dynamics"],
-        _phasesInfo = (data["phases_info"] as List<dynamic>).map((somersault) {
-          return SomersaultPhase.fromJson(somersault);
-        }).toList();
+        super.fromJson(data, (json) => SomersaultPhase.fromJson(json),
+            AcrobaticsRequestMaker());
 
   ///
   /// Getters Setters
-
-  @override
-  AcrobaticsRequestMaker get requestMaker {
-    return AcrobaticsRequestMaker();
-  }
-
-  @override
-  List<Phase> get phaseInfo => _phasesInfo;
-
-  @override
-  String get modelPath => _modelPath;
-
-  @override
-  int get nbPhases => phaseInfo.length;
 
   int get nbSomersaults => _nbSomersaults;
   set nbSomersaults(int value) {
@@ -72,7 +51,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
         .map((p) => SomersaultPhase.fromJson(p))
         .toList();
 
-    _phasesInfo = newPhases;
+    phasesInfo = newPhases;
 
     halfTwists[index] = value;
     notifyListeners();
@@ -85,7 +64,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
         .map((p) => SomersaultPhase.fromJson(p))
         .toList();
 
-    _phasesInfo = newPhases;
+    phasesInfo = newPhases;
     dynamics = value;
     notifyListeners();
   }
@@ -110,9 +89,6 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
     switch (name) {
       case "nb_somersaults":
         nbSomersaults = int.parse(value);
-        break;
-      case "model_path":
-        _modelPath = value;
         break;
       case "final_time":
         finalTime = double.parse(value);
@@ -153,10 +129,10 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
 
     switch (fieldName) {
       case "duration":
-        _phasesInfo[phaseIndex].duration = double.parse(newValue);
+        phasesInfo[phaseIndex].duration = double.parse(newValue);
         break;
       case "nb_shooting_points":
-        _phasesInfo[phaseIndex].nbShootingPoints = int.parse(newValue);
+        phasesInfo[phaseIndex].nbShootingPoints = int.parse(newValue);
         break;
       default:
         break;
@@ -167,7 +143,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
   void updateData(AcrobaticsData newData) {
     nbSomersaults = newData.nbSomersaults;
     halfTwists = List.from(newData.halfTwists);
-    _modelPath = newData._modelPath;
+    modelPath = newData.modelPath;
     finalTime = newData.finalTime;
     finalTimeMargin = newData.finalTimeMargin;
     position = newData.position;
@@ -177,68 +153,7 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
     collisionConstraint = newData.collisionConstraint;
     withSpine = newData.withSpine;
     dynamics = newData.dynamics;
-    _phasesInfo = List.from(newData._phasesInfo);
-
-    notifyListeners();
-  }
-
-  @override
-  void updatePenalties(
-      int somersaultIndex, String penaltyType, List<Penalty> penalties) {
-    if (penaltyType == "objective") {
-      _phasesInfo[somersaultIndex].objectives = penalties as List<Objective>;
-    } else {
-      _phasesInfo[somersaultIndex].constraints = penalties as List<Constraint>;
-    }
-    notifyListeners();
-  }
-
-  @override
-  void updatePenalty(int somersaultIndex, String penaltyType, int penaltyIndex,
-      Penalty penalty) {
-    final oldPenalty = penaltyType == "objective"
-        ? _phasesInfo[somersaultIndex].objectives[penaltyIndex]
-        : _phasesInfo[somersaultIndex].constraints[penaltyIndex];
-
-    final newPenaltyType = penalty.penaltyType;
-    final oldPenaltyType = oldPenalty.penaltyType;
-    final penaltyTypeChanged = newPenaltyType != oldPenaltyType;
-
-    final objectiveTypeChanged = penaltyType == "objective"
-        ? (penalty as Objective).objectiveType !=
-            (oldPenalty as Objective).objectiveType
-        : false;
-
-    final minMaxChanged = penaltyType == "objective"
-        ? (penalty as Objective).weight * (oldPenalty as Objective).weight > 0
-        : false;
-
-    // keep expanded value
-    penalty.expanded = penaltyType == "objective"
-        ? _phasesInfo[somersaultIndex].objectives[penaltyIndex].expanded
-        : _phasesInfo[somersaultIndex].constraints[penaltyIndex].expanded;
-
-    if (penaltyType == "objective") {
-      _phasesInfo[somersaultIndex].objectives[penaltyIndex] =
-          penalty as Objective;
-    } else {
-      _phasesInfo[somersaultIndex].constraints[penaltyIndex] =
-          penalty as Constraint;
-    }
-
-    // force redraw only if the penalty type or objective type if it's an objective
-    // changes (to update arguments and other fields)
-    if (penaltyTypeChanged || objectiveTypeChanged || minMaxChanged) {
-      notifyListeners();
-    }
-  }
-
-  @override
-  void updatePhaseInfo(List newData) {
-    final newPhases =
-        (newData).map((p) => SomersaultPhase.fromJson(p)).toList();
-
-    _phasesInfo = newPhases;
+    phasesInfo = List.from(newData.phasesInfo);
 
     notifyListeners();
   }
@@ -248,101 +163,8 @@ class AcrobaticsData extends ChangeNotifier implements OCPData {
     AcrobaticsControllers.instance.notifyListeners();
     super.notifyListeners();
   }
-
-  @override
-  void updatePenaltyArgument(
-      int phaseIndex,
-      int objectiveIndex,
-      String argumentName,
-      String? newValue,
-      String argumentType,
-      int argumentIndex,
-      String penaltyType) {
-    requestMaker.updatePenaltyArgument(phaseIndex, objectiveIndex, argumentName,
-        newValue, argumentType, penaltyType);
-
-    _phasesInfo[phaseIndex]
-        .objectives[objectiveIndex]
-        .arguments[argumentIndex]
-        .value = newValue;
-
-    notifyListeners();
-  }
-
-  @override
-  Future<bool> updatePenaltyField(int phaseIndex, int penaltyIndex,
-      String penaltyType, String fieldName, dynamic newValue,
-      {bool? doUpdate}) async {
-    final response = await requestMaker.updatePenaltyField(
-        phaseIndex, penaltyType, penaltyIndex, fieldName, newValue);
-
-    if (response.statusCode != 200) {
-      return Future(() => false);
-    }
-
-    final isObjective = penaltyType == "objectives";
-
-    switch (fieldName) {
-      case "target":
-        _phasesInfo[phaseIndex].objectives[penaltyIndex].target = newValue;
-        break;
-      case "integration_rule":
-        _phasesInfo[phaseIndex].objectives[penaltyIndex].integrationRule =
-            newValue!;
-        break;
-      case "weight":
-        _phasesInfo[phaseIndex].objectives[penaltyIndex].weight =
-            double.tryParse(newValue!) ?? 0.0;
-        break;
-      case "nodes":
-        _phasesInfo[phaseIndex].constraints[penaltyIndex].nodes = newValue!;
-        break;
-      case "quadratic":
-        _phasesInfo[phaseIndex].constraints[penaltyIndex].quadratic =
-            newValue == "true";
-        break;
-      case "expand":
-        _phasesInfo[phaseIndex].constraints[penaltyIndex].expand =
-            newValue == "true";
-        break;
-      case "multi_thread":
-        _phasesInfo[phaseIndex].constraints[penaltyIndex].multiThread =
-            newValue == "true";
-        break;
-      case "derivative":
-        _phasesInfo[phaseIndex].constraints[penaltyIndex].derivative =
-            newValue == "true";
-        break;
-      default:
-        break;
-    }
-
-    if (doUpdate != null && doUpdate) {
-      final Penalty newPenalties = isObjective
-          ? Objective.fromJson(
-              json.decode(response.body) as Map<String, dynamic>)
-          : Constraint.fromJson(
-              json.decode(response.body) as Map<String, dynamic>);
-
-// keep expanded value
-      newPenalties.expand = penaltyType == "objectives"
-          ? _phasesInfo[phaseIndex].objectives[penaltyIndex].expanded
-          : _phasesInfo[phaseIndex].constraints[penaltyIndex].expanded;
-
-      if (isObjective) {
-        updatePenalty(phaseIndex, "objective", penaltyIndex, newPenalties);
-      } else {
-        updatePenalty(phaseIndex, "constraint", penaltyIndex, newPenalties);
-      }
-    } else {
-      notifyListeners();
-    }
-
-    return Future(() => true);
-  }
 }
 
 class SomersaultPhase extends Phase {
-  SomersaultPhase.fromJson(Map<String, dynamic> somersaultData)
-      : super.fromJson(somersaultData);
+  SomersaultPhase.fromJson(super.somersaultData) : super.fromJson();
 }

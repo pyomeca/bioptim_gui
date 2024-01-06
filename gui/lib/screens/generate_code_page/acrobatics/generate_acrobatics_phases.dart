@@ -21,7 +21,7 @@ class SomersaultGenerationMenu extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          for (int i = 0; i < acrobaticsData.phaseInfo.length; i++)
+          for (int i = 0; i < acrobaticsData.phasesInfo.length; i++)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 36),
               child: SizedBox(
@@ -45,7 +45,7 @@ class SomersaultGenerationMenu extends StatelessWidget {
       return AnimatedExpandingWidget(
         header: Center(
           child: Text(
-            'Information on ${acrobaticsData.phaseInfo[somersaultIndex].phaseName}',
+            'Information on ${acrobaticsData.phasesInfo[somersaultIndex].phaseName}',
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),

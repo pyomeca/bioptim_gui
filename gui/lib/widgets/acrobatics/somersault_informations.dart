@@ -19,7 +19,7 @@ class SomersaultInformation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<OCPData>(builder: (context, data, child) {
       final somersaultPhase =
-          (data.phaseInfo[somersaultIndex] as SomersaultPhase);
+          (data.phasesInfo[somersaultIndex] as SomersaultPhase);
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

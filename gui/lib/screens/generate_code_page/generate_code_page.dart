@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 
 class GenerateCode extends StatefulWidget {
-  const GenerateCode({super.key, this.columnWidth = 400.0});
+  const GenerateCode({super.key, this.columnWidth = 450.0});
 
   final double columnWidth;
 

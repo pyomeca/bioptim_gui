@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'package:bioptim_gui/models/acrobatics_controllers.dart';
-import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:bioptim_gui/models/api_config.dart';

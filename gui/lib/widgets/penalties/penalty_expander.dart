@@ -83,8 +83,8 @@ class PenaltyExpanderState extends State<PenaltyExpander> {
   Widget build(BuildContext context) {
     return Consumer<OCPData>(builder: (context, data, child) {
       final penalties = (widget.penaltyType == Constraint)
-          ? data.phaseInfo[widget.phaseIndex].constraints
-          : data.phaseInfo[widget.phaseIndex].objectives;
+          ? data.phasesInfo[widget.phaseIndex].constraints
+          : data.phasesInfo[widget.phaseIndex].objectives;
 
       return AnimatedExpandingWidget(
         header: SizedBox(
@@ -233,25 +233,25 @@ class _PathTile extends StatelessWidget {
           child: Text(
             penaltyType == Objective
                 ? data
-                    .phaseInfo[phaseIndex].objectives[penaltyIndex].penaltyType
+                    .phasesInfo[phaseIndex].objectives[penaltyIndex].penaltyType
                     .replaceAll("_", " ")
                     .capitalize()
-                : data
-                    .phaseInfo[phaseIndex].constraints[penaltyIndex].penaltyType
+                : data.phasesInfo[phaseIndex].constraints[penaltyIndex]
+                    .penaltyType
                     .replaceAll("_", " ")
                     .capitalize(),
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
         initialExpandedState: penaltyType == Objective
-            ? data.phaseInfo[phaseIndex].objectives[penaltyIndex].expanded
-            : data.phaseInfo[phaseIndex].constraints[penaltyIndex].expanded,
+            ? data.phasesInfo[phaseIndex].objectives[penaltyIndex].expanded
+            : data.phasesInfo[phaseIndex].constraints[penaltyIndex].expanded,
         onTapHeader: (isExpanded) {
           if (penaltyType == Constraint) {
-            data.phaseInfo[phaseIndex].constraints[penaltyIndex].expanded =
+            data.phasesInfo[phaseIndex].constraints[penaltyIndex].expanded =
                 isExpanded;
           } else {
-            data.phaseInfo[phaseIndex].objectives[penaltyIndex].expanded =
+            data.phasesInfo[phaseIndex].objectives[penaltyIndex].expanded =
                 isExpanded;
           }
         },
