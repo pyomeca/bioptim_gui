@@ -69,7 +69,7 @@ def test_correct_state_variable_dimension():
                 "q": (10, 3),
                 "qdot": (10, 3),
                 "q_init": (10, 2),
-                "qdot_init": (10,),
+                "qdot_init": (10, 1),
             }
 
             bounds = state_variable["bounds"]

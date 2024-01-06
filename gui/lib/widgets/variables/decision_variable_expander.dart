@@ -311,10 +311,7 @@ class _DataFiller extends StatelessWidget {
                             border: OutlineInputBorder(),
                           ),
                           controller: TextEditingController(
-                            text: (nbCols != 1)
-                                ? bounds[i][j].toString()
-                                : bounds[i].toString(),
-                          ),
+                              text: bounds[i][j].toString()),
                           onSubmitted: (value) async {
                             if (value.isNotEmpty) {
                               final response =

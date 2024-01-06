@@ -79,7 +79,7 @@ class AcrobaticsGenerationBounds(BoundsGeneration):
         return f"""
     x_initial_guesses.add(
         "qdot",
-        initial_guess={qdot_init},
+        initial_guess={format_2d_array(qdot_init)},
         interpolation=InterpolationType.{interpolation_type},
         phase=0,
     )
@@ -96,8 +96,8 @@ class AcrobaticsGenerationBounds(BoundsGeneration):
     for phase in range(nb_phases):
         u_bounds.add(
             "{control_name}",
-            min_bound={control_bounds["min_bounds"]},
-            max_bound={control_bounds["max_bounds"]},
+            min_bound={format_2d_array(control_bounds["min_bounds"], 12)},
+            max_bound={format_2d_array(control_bounds["max_bounds"], 12)},
             interpolation=InterpolationType.{interpolation_type},
             phase=phase,
         )
@@ -113,7 +113,7 @@ class AcrobaticsGenerationBounds(BoundsGeneration):
         return f"""
     u_initial_guesses.add(
         "{control_name}",
-        initial_guess={control_init},
+        initial_guess={format_2d_array(control_init)},
         interpolation=InterpolationType.{interpolation_type},
         phase=0,
     )

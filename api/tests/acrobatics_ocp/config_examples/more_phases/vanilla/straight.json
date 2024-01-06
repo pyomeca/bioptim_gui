@@ -5,7 +5,7 @@
         0,
         0
     ],
-    "model_path": "/home/aweng/afs/bioptim_gui/api/tests/test_biomods/vanilla/good/straight.bioMod",
+    "model_path": "/Users/aweng/afs/bioptim_gui/api/tests/test_biomods/vanilla/good/straight.bioMod",
     "final_time": 1.0,
     "final_time_margin": 0.1,
     "position": "straight",
@@ -430,16 +430,36 @@
                     },
                     "initial_guess_interpolation_type": "CONSTANT",
                     "initial_guess": [
-                        0.0,
-                        0.0,
-                        4.85595,
-                        12.566370614359172,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            4.86
+                        ],
+                        [
+                            12.57
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
                     ]
                 }
             ],
@@ -450,24 +470,48 @@
                     "bounds_interpolation_type": "CONSTANT",
                     "bounds": {
                         "min_bounds": [
-                            -500,
-                            -500,
-                            -500,
-                            -500
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ]
                         ],
                         "max_bounds": [
-                            500,
-                            500,
-                            500,
-                            500
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ]
                         ]
                     },
                     "initial_guess_interpolation_type": "CONSTANT",
                     "initial_guess": [
-                        0,
-                        0,
-                        0,
-                        0
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
                     ]
                 }
             ]
@@ -886,16 +930,36 @@
                     },
                     "initial_guess_interpolation_type": "CONSTANT",
                     "initial_guess": [
-                        0.0,
-                        0.0,
-                        4.85595,
-                        12.566370614359172,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            4.86
+                        ],
+                        [
+                            12.57
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
                     ]
                 }
             ],
@@ -906,24 +970,48 @@
                     "bounds_interpolation_type": "CONSTANT",
                     "bounds": {
                         "min_bounds": [
-                            -500,
-                            -500,
-                            -500,
-                            -500
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ]
                         ],
                         "max_bounds": [
-                            500,
-                            500,
-                            500,
-                            500
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ]
                         ]
                     },
                     "initial_guess_interpolation_type": "CONSTANT",
                     "initial_guess": [
-                        0,
-                        0,
-                        0,
-                        0
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
                     ]
                 }
             ]
@@ -1290,16 +1378,36 @@
                     },
                     "initial_guess_interpolation_type": "CONSTANT",
                     "initial_guess": [
-                        0.0,
-                        0.0,
-                        4.85595,
-                        12.566370614359172,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            4.86
+                        ],
+                        [
+                            12.57
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
                     ]
                 }
             ],
@@ -1310,24 +1418,48 @@
                     "bounds_interpolation_type": "CONSTANT",
                     "bounds": {
                         "min_bounds": [
-                            -500,
-                            -500,
-                            -500,
-                            -500
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ]
                         ],
                         "max_bounds": [
-                            500,
-                            500,
-                            500,
-                            500
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ]
                         ]
                     },
                     "initial_guess_interpolation_type": "CONSTANT",
                     "initial_guess": [
-                        0,
-                        0,
-                        0,
-                        0
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
                     ]
                 }
             ]

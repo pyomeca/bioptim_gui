@@ -1,3 +1,5 @@
+import numpy as np
+
 from bioptim_gui_api.utils.format_utils import format_2d_array
 from tests.acrobatics_ocp.code_generation.bounds import AcrobaticsGenerationBounds
 
@@ -55,8 +57,8 @@ class AcrobaticsGenerationBoundsNonCollision(AcrobaticsGenerationBounds):
             ret += f"""
     x_bounds.add(
         "qdot",
-        min_bound={format_2d_array(qdot_bounds[i]["min"])},
-        max_bound={format_2d_array(qdot_bounds[i]["max"])},
+        min_bound={format_2d_array(qdot_bounds[i]["min"],)},
+        max_bound={format_2d_array(qdot_bounds[i]["max"] )},
         interpolation=InterpolationType.CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT,
         phase={i},
     )
@@ -72,8 +74,8 @@ class AcrobaticsGenerationBoundsNonCollision(AcrobaticsGenerationBounds):
     for phase in range(nb_phases):
         u_bounds.add(
             "{control}",
-            min_bound={tau_bounds["min"]},
-            max_bound={tau_bounds["max"]},
+            min_bound={format_2d_array(np.array([tau_bounds["min"]]).T.tolist(), 12)},
+            max_bound={format_2d_array(np.array([tau_bounds["max"]]).T.tolist(), 12)},
             interpolation=InterpolationType.CONSTANT,
             phase=phase,
         )
@@ -107,12 +109,12 @@ class AcrobaticsGenerationBoundsNonCollision(AcrobaticsGenerationBounds):
         phases = data["phases_info"]
         final_time = sum(s["duration"] for s in phases)
         nb_somersaults = data["nb_somersaults"]
-        qdot_init = model.get_qdot_init(nb_somersaults, final_time)
+        qdot_init = np.round(model.get_qdot_init(nb_somersaults, final_time), 2)
 
         return f"""
         x_initial_guesses.add(
             "qdot",
-            initial_guess={qdot_init},
+            initial_guess={format_2d_array(np.array([qdot_init]).T, 12)},
             interpolation=InterpolationType.CONSTANT,
             phase=0,
         )
@@ -126,7 +128,7 @@ class AcrobaticsGenerationBoundsNonCollision(AcrobaticsGenerationBounds):
         return f"""
         u_initial_guesses.add(
             "{control}",
-            initial_guess={tau_init},
+            initial_guess={format_2d_array(np.array([tau_init]).T.tolist(), 12)},
             interpolation=InterpolationType.CONSTANT,
             phase=0,
         )

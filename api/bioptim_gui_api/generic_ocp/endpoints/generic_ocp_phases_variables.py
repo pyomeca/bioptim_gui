@@ -104,10 +104,7 @@ class GenericVariableRouter(ABC):
 
             variable = phases_info[phase_index][self.variable_type][variable_index]
 
-            if variable["bounds_interpolation_type"] == "CONSTANT":
-                variable["bounds"]["max_bounds"][x] = new_value
-            else:
-                variable["bounds"]["max_bounds"][x][y] = new_value
+            variable["bounds"]["max_bounds"][x][y] = new_value
 
             phases_info[phase_index][self.variable_type][variable_index] = variable
 
@@ -122,10 +119,7 @@ class GenericVariableRouter(ABC):
 
             variable = phases_info[phase_index][self.variable_type][variable_index]
 
-            if variable["bounds_interpolation_type"] == "CONSTANT":
-                variable["bounds"]["min_bounds"][x] = new_value
-            else:
-                variable["bounds"]["min_bounds"][x][y] = new_value
+            variable["bounds"]["min_bounds"][x][y] = new_value
 
             phases_info[phase_index][self.variable_type][variable_index] = variable
 
@@ -140,10 +134,7 @@ class GenericVariableRouter(ABC):
 
             variable = phases_info[phase_index][self.variable_type][variable_index]
 
-            if variable["initial_guess_interpolation_type"] == "CONSTANT":
-                variable["initial_guess"][x] = new_value
-            else:
-                variable["initial_guess"][x][y] = new_value
+            variable["initial_guess"][x][y] = new_value
 
             phases_info[phase_index][self.variable_type][variable_index] = variable
 

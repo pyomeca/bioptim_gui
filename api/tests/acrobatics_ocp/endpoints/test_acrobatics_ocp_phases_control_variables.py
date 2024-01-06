@@ -1,5 +1,6 @@
 import json
 
+import numpy as np
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -89,9 +90,9 @@ def test_put_control_variable_dimension():
     response = client.get("/acrobatics/phases_info/")
     phase_info = response.json()[0]
     assert phase_info["control_variables"][0]["dimension"] == 2
-    assert phase_info["control_variables"][0]["bounds"]["min_bounds"] == [0.0, 0.0]
-    assert phase_info["control_variables"][0]["bounds"]["max_bounds"] == [0.0, 0.0]
-    assert phase_info["control_variables"][0]["initial_guess"] == [0.0, 0.0]
+    assert phase_info["control_variables"][0]["bounds"]["min_bounds"] == np.zeros((2, 1)).tolist()
+    assert phase_info["control_variables"][0]["bounds"]["max_bounds"] == np.zeros((2, 1)).tolist()
+    assert phase_info["control_variables"][0]["initial_guess"] == np.zeros((2, 1)).tolist()
 
 
 def test_put_control_variable_bounds_interpolation_type():
@@ -121,7 +122,7 @@ def test_put_control_variable_bounds(bounds):
 
     response = client.get("/acrobatics/phases_info/")
     phase_info = response.json()[0]
-    assert phase_info["control_variables"][0]["bounds"][f"{bounds}"][0] == 42.0
+    assert phase_info["control_variables"][0]["bounds"][f"{bounds}"][0][0] == 42.0
 
 
 def test_put_control_variable_initial_guess():
@@ -137,7 +138,7 @@ def test_put_control_variable_initial_guess():
 
     response = client.get("/acrobatics/phases_info/")
     phase_info = response.json()[0]
-    assert phase_info["control_variables"][0]["initial_guess"] == [69.0, 0, 0, 0]
+    assert phase_info["control_variables"][0]["initial_guess"] == [[69.0], [0], [0], [0]]
 
 
 def test_put_control_variable_initial_guess_interpolation_type():

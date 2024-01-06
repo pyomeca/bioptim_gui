@@ -18,7 +18,7 @@ class StraightAcrobaticsVariables:
     YrotLeftUpperArm = 9
 
     nb_q, nb_qdot, nb_tau = 10, 10, 4
-    tau_min, tau_max, tau_init = -500, 500, 0
+    tau_min, tau_max, tau_init = -500.0, 500.0, 0.0
     qdot_min, qdot_max = -10 * np.pi, 10 * np.pi
 
     arm_dofs = [

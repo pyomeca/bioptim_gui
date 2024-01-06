@@ -83,7 +83,7 @@ def test_put_control_variable_bounds(bounds):
 
     response = client.get("/generic_ocp/phases_info/")
     phase_info = response.json()[0]
-    assert phase_info["control_variables"][0]["bounds"][f"{bounds}"][0] == 42.0
+    assert phase_info["control_variables"][0]["bounds"][f"{bounds}"][0] == [42.0]
 
 
 def test_put_control_variable_initial_guess():
@@ -99,7 +99,7 @@ def test_put_control_variable_initial_guess():
 
     response = client.get("/generic_ocp/phases_info/")
     phase_info = response.json()[0]
-    assert phase_info["control_variables"][0]["initial_guess"] == [69.0]
+    assert phase_info["control_variables"][0]["initial_guess"] == [[69.0]]
 
 
 def test_put_control_variable_initial_guess_interpolation_type():

@@ -78,7 +78,7 @@ def update_state_control_variables(phases: list[dict], data: dict) -> None:
                     "max_bounds": np.round(qdot_bounds[i]["max"], 2).tolist(),
                 },
                 "initial_guess_interpolation_type": "CONSTANT",
-                "initial_guess": qdot_init,
+                "initial_guess": np.round(np.array([qdot_init]).T, 2).tolist(),
             },
         ]
         phases[i]["control_variables"] = [
@@ -87,11 +87,11 @@ def update_state_control_variables(phases: list[dict], data: dict) -> None:
                 "dimension": nb_tau,
                 "bounds_interpolation_type": "CONSTANT",
                 "bounds": {
-                    "min_bounds": tau_bounds["min"],
-                    "max_bounds": tau_bounds["max"],
+                    "min_bounds": np.array([tau_bounds["min"]]).T.tolist(),
+                    "max_bounds": np.array([tau_bounds["max"]]).T.tolist(),
                 },
                 "initial_guess_interpolation_type": "CONSTANT",
-                "initial_guess": tau_init,
+                "initial_guess": np.array([tau_init]).T.tolist(),
             },
         ]
 
