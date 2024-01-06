@@ -10,8 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class SpineCriteriaCheckbox extends StatefulWidget {
-  const SpineCriteriaCheckbox({Key? key, this.defaultValue = false})
-      : super(key: key);
+  const SpineCriteriaCheckbox({super.key, this.defaultValue = false});
 
   final bool defaultValue;
 

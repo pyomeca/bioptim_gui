@@ -7,12 +7,12 @@ class BooleanSwitch extends StatefulWidget {
   final double width;
 
   const BooleanSwitch({
-    Key? key,
+    super.key,
     required this.customOnChanged,
     required this.initialValue,
     required this.leftText,
     required this.width, // Add width as a parameter
-  }) : super(key: key);
+  });
 
   @override
   BooleanSwitchState createState() => BooleanSwitchState();

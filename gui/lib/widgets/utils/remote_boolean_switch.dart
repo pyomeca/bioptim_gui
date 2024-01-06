@@ -13,13 +13,13 @@ class RemoteBooleanSwitch extends StatefulWidget {
   final String requestKey;
 
   const RemoteBooleanSwitch({
-    Key? key,
+    super.key,
     required this.endpoint,
     required this.defaultValue,
     required this.leftText,
     required this.width,
     required this.requestKey,
-  }) : super(key: key);
+  });
 
   @override
   RemoteBooleanSwitchState createState() => RemoteBooleanSwitchState();

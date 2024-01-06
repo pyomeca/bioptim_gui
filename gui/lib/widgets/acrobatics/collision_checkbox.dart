@@ -10,8 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class CollisionCheckbox extends StatefulWidget {
-  const CollisionCheckbox({Key? key, this.defaultValue = false})
-      : super(key: key);
+  const CollisionCheckbox({super.key, this.defaultValue = false});
 
   final bool defaultValue;
 

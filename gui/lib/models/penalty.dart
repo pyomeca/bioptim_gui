@@ -50,10 +50,10 @@ class Objective extends Penalty {
   String objectiveType;
   double weight;
 
-  Objective.fromJson(Map<String, dynamic> objectiveData)
+  Objective.fromJson(super.objectiveData)
       : objectiveType = objectiveData["objective_type"],
         weight = objectiveData["weight"],
-        super.fromJson(objectiveData);
+        super.fromJson();
 
   @override
   String penaltyTypeToString() {
@@ -67,8 +67,7 @@ class Objective extends Penalty {
 }
 
 class Constraint extends Penalty {
-  Constraint.fromJson(Map<String, dynamic> constraintData)
-      : super.fromJson(constraintData);
+  Constraint.fromJson(super.constraintData) : super.fromJson();
 
   @override
   String penaltyTypeToString() {
