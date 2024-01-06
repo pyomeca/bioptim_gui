@@ -64,13 +64,15 @@ class PhaseGenerationMenu extends StatelessWidget {
             DecisionVariableExpander(
                 from: DecisionVariableType.state,
                 phaseIndex: phaseIndex,
-                width: width),
+                width: width,
+                endpointPrefix: '/generic_ocp/phases_info'),
             const SizedBox(height: 12),
             const Divider(),
             DecisionVariableExpander(
               from: DecisionVariableType.control,
               phaseIndex: phaseIndex,
               width: width,
+              endpointPrefix: '/generic_ocp/phases_info',
             ),
             const SizedBox(height: 12),
             const Divider(),

@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:bioptim_gui/models/api_config.dart';
 import 'package:bioptim_gui/models/decision_variables_type.dart';
-import 'package:bioptim_gui/models/generic_ocp_data.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
 import 'package:bioptim_gui/models/variables.dart';
 import 'package:bioptim_gui/widgets/utils/animated_expanding_widget.dart';
@@ -20,18 +19,20 @@ class DecisionVariableExpander extends StatelessWidget {
     required this.from,
     required this.phaseIndex,
     required this.width,
+    required this.endpointPrefix,
   });
 
   final DecisionVariableType from;
   final int phaseIndex;
   final double width;
+  final String endpointPrefix;
 
   @override
   Widget build(BuildContext context) {
     return Consumer<OCPData>(builder: (context, data, child) {
       List<Variable> variables = from == DecisionVariableType.control
-          ? (data.phasesInfo[phaseIndex] as GenericPhase).controlVariables
-          : (data.phasesInfo[phaseIndex] as GenericPhase).stateVariables;
+          ? data.phasesInfo[phaseIndex].controlVariables
+          : data.phasesInfo[phaseIndex].stateVariables;
 
       return AnimatedExpandingWidget(
         header: SizedBox(
@@ -53,6 +54,7 @@ class DecisionVariableExpander extends StatelessWidget {
               variableIndex: i,
               from: from,
               width: width,
+              endpointPrefix: endpointPrefix,
             ),
         ]),
       );
@@ -67,6 +69,7 @@ class _DecisionVariableChooser extends StatelessWidget {
     required this.phaseIndex,
     required this.variableIndex,
     required this.width,
+    required this.endpointPrefix,
   });
 
   final String name;
@@ -74,37 +77,14 @@ class _DecisionVariableChooser extends StatelessWidget {
   final int variableIndex;
   final DecisionVariableType from;
   final double width;
-
-  Future<dynamic> updateField(String fieldName, String newValue) async {
-    final url = from == DecisionVariableType.control
-        ? '${APIConfig.url}/generic_ocp/phases_info/$phaseIndex/control_variables/'
-            '$variableIndex/$fieldName'
-        : '${APIConfig.url}/generic_ocp/phases_info/$phaseIndex/state_variables/'
-            '$variableIndex/$fieldName';
-
-    final headers = {'Content-Type': 'application/json'};
-    final body = json.encode({fieldName: newValue});
-    final response =
-        await http.put(Uri.parse(url), body: body, headers: headers);
-
-    if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('$fieldName updated with value: $newValue');
-      }
-      return response;
-    } else {
-      throw Exception('Failed to update $fieldName');
-    }
-  }
+  final String endpointPrefix;
 
   @override
   Widget build(BuildContext context) {
     return Consumer<OCPData>(builder: (context, data, child) {
       final variable = from == DecisionVariableType.control
-          ? (data.phasesInfo[phaseIndex] as GenericPhase)
-              .controlVariables[variableIndex]
-          : (data.phasesInfo[phaseIndex] as GenericPhase)
-              .stateVariables[variableIndex];
+          ? data.phasesInfo[phaseIndex].controlVariables[variableIndex]
+          : data.phasesInfo[phaseIndex].stateVariables[variableIndex];
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -132,7 +112,9 @@ class _DecisionVariableChooser extends StatelessWidget {
                   value: variable.dimension.toString(),
                   onSubmitted: (value) async {
                     if (value.isNotEmpty) {
-                      final response = await updateField("dimension", value);
+                      final response = await data.requestMaker
+                          .updateDecisionVariableField("dimension", phaseIndex,
+                              from, variableIndex, value);
 
                       final newPhases =
                           (json.decode(response.body) as List<dynamic>);
@@ -148,9 +130,9 @@ class _DecisionVariableChooser extends StatelessWidget {
           InterpolationChooser(
             width: width,
             putEndpoint: from == DecisionVariableType.control
-                ? '/generic_ocp/phases_info/$phaseIndex/control_variables/'
+                ? '$endpointPrefix/$phaseIndex/control_variables/'
                     '$variableIndex/bounds_interpolation_type'
-                : '/generic_ocp/phases_info/$phaseIndex/state_variables/'
+                : '$endpointPrefix/$phaseIndex/state_variables/'
                     '$variableIndex/bounds_interpolation_type',
             requestKey: 'interpolation_type',
             titlePrefix: 'Bounds',
@@ -165,9 +147,9 @@ class _DecisionVariableChooser extends StatelessWidget {
           InterpolationChooser(
             width: width,
             putEndpoint: from == DecisionVariableType.control
-                ? '/generic_ocp/phases_info/$phaseIndex/control_variables/'
+                ? '/$endpointPrefix/$phaseIndex/control_variables/'
                     '$variableIndex/initial_guess_interpolation_type'
-                : '/generic_ocp/phases_info/$phaseIndex/state_variables/'
+                : '/$endpointPrefix/$phaseIndex/state_variables/'
                     '$variableIndex/initial_guess_interpolation_type',
             requestKey: 'interpolation_type',
             titlePrefix: 'Initial guess',
@@ -185,6 +167,7 @@ class _DecisionVariableChooser extends StatelessWidget {
             from: from,
             phaseIndex: phaseIndex,
             variableIndex: variableIndex,
+            endpointPrefix: endpointPrefix,
           ),
           const SizedBox(height: 12),
           _DataFiller(
@@ -193,6 +176,7 @@ class _DecisionVariableChooser extends StatelessWidget {
             from: from,
             phaseIndex: phaseIndex,
             variableIndex: variableIndex,
+            endpointPrefix: endpointPrefix,
           ),
           const SizedBox(height: 12),
           _DataFiller(
@@ -201,6 +185,7 @@ class _DecisionVariableChooser extends StatelessWidget {
             from: from,
             phaseIndex: phaseIndex,
             variableIndex: variableIndex,
+            endpointPrefix: endpointPrefix,
           ),
           const SizedBox(height: 16),
         ],
@@ -216,6 +201,7 @@ class _DataFiller extends StatelessWidget {
     required this.from,
     required this.phaseIndex,
     required this.variableIndex,
+    required this.endpointPrefix,
   });
 
   final String title;
@@ -223,6 +209,7 @@ class _DataFiller extends StatelessWidget {
   final DecisionVariableType from;
   final int phaseIndex;
   final int variableIndex;
+  final String endpointPrefix;
 
   Future<http.Response> updateVariableValue(
       int i, int j, String newValue) async {
@@ -233,9 +220,9 @@ class _DataFiller extends StatelessWidget {
             : 'initial_guess';
 
     final url = from == DecisionVariableType.control
-        ? '${APIConfig.url}/generic_ocp/phases_info/$phaseIndex/control_variables/'
+        ? '${APIConfig.url}/$endpointPrefix/$phaseIndex/control_variables/'
             '$variableIndex/$fieldName'
-        : '${APIConfig.url}/generic_ocp/phases_info/$phaseIndex/state_variables/'
+        : '${APIConfig.url}/$endpointPrefix/$phaseIndex/state_variables/'
             '$variableIndex/$fieldName';
 
     final headers = {'Content-Type': 'application/json'};
@@ -271,10 +258,8 @@ class _DataFiller extends StatelessWidget {
 
     return Consumer<OCPData>(builder: (context, data, child) {
       final variable = from == DecisionVariableType.control
-          ? (data.phasesInfo[phaseIndex] as GenericPhase)
-              .controlVariables[variableIndex]
-          : (data.phasesInfo[phaseIndex] as GenericPhase)
-              .stateVariables[variableIndex];
+          ? data.phasesInfo[phaseIndex].controlVariables[variableIndex]
+          : data.phasesInfo[phaseIndex].stateVariables[variableIndex];
 
       final interpolationType = title == 'Initial guess'
           ? variable.initialGuessInterpolationType
@@ -326,7 +311,10 @@ class _DataFiller extends StatelessWidget {
                             border: OutlineInputBorder(),
                           ),
                           controller: TextEditingController(
-                              text: bounds[i][j].toString()),
+                            text: (nbCols != 1)
+                                ? bounds[i][j].toString()
+                                : bounds[i].toString(),
+                          ),
                           onSubmitted: (value) async {
                             if (value.isNotEmpty) {
                               final response =

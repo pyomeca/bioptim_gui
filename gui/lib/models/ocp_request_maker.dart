@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bioptim_gui/models/api_config.dart';
+import 'package:bioptim_gui/models/decision_variables_type.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -159,6 +160,31 @@ class OCPRequestMaker<T extends OCPData> {
       print(
           '$phaseInfoString $phaseIndex\'s $penaltyType $penaltyIndex $argumentName changed to value $newValue');
     }
+    return response;
+  }
+
+  Future<http.Response> updateDecisionVariableField(
+      String fieldName,
+      int phaseIndex,
+      DecisionVariableType from,
+      int variableIndex,
+      String newValue) async {
+    final url = from == DecisionVariableType.control
+        ? '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/control_variables/'
+            '$variableIndex/$fieldName'
+        : '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/state_variables/'
+            '$variableIndex/$fieldName';
+
+    final headers = {'Content-Type': 'application/json'};
+    final body = json.encode({fieldName: newValue});
+    final response =
+        await http.put(Uri.parse(url), body: body, headers: headers);
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update $fieldName');
+    }
+    if (kDebugMode) print('$fieldName updated with value: $newValue');
+
     return response;
   }
 }

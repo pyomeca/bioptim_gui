@@ -1,8 +1,10 @@
+import 'package:bioptim_gui/models/decision_variables_type.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/widgets/acrobatics/somersault_informations.dart';
 import 'package:bioptim_gui/widgets/penalties/penalty_expander.dart';
 import 'package:bioptim_gui/widgets/utils/animated_expanding_widget.dart';
+import 'package:bioptim_gui/widgets/variables/decision_variable_expander.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -60,6 +62,23 @@ class SomersaultGenerationMenu extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             const Divider(),
+            // begin remove, decision variables are not necessary for somersault for now
+            DecisionVariableExpander(
+                from: DecisionVariableType.state,
+                phaseIndex: somersaultIndex,
+                width: width,
+                endpointPrefix: 'acrobatics/phases_info'),
+            const SizedBox(height: 12),
+            const Divider(),
+            DecisionVariableExpander(
+              from: DecisionVariableType.control,
+              phaseIndex: somersaultIndex,
+              width: width,
+              endpointPrefix: 'acrobatics/phases_info',
+            ),
+            const SizedBox(height: 12),
+            const Divider(),
+            // end remove
             PenaltyExpander(
               penaltyType: Objective,
               phaseIndex: somersaultIndex,
