@@ -338,7 +338,10 @@ class _PathTile extends StatelessWidget {
                     width: (penaltyType == Objective) ? width / 2 - 3 : width,
                     child: NodesChooser(
                       width: width,
-                      items: data.availablesValue!.nodes,
+                      items: penaltyType == Objective &&
+                              (penalty as Objective).objectiveType == "lagrange"
+                          ? ["All shooting"]
+                          : data.availablesValue!.nodes,
                       putEndpoint:
                           '$endpointPrefix/$phaseIndex/${_penaltyTypeToEndpoint(plural: true)}/$penaltyIndex/nodes',
                       defaultValue: penalty.nodes,
