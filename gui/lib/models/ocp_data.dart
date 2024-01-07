@@ -107,35 +107,18 @@ abstract class OCPData<T extends Phase> with ChangeNotifier {
     final isObjective = penaltyType == "objectives";
 
     switch (fieldName) {
+      // All fields aren't necessarily updated because they are handled by the state of their parent widget
+      // (for dropdown menu(node, integration rule), boolean switches (derivative, multi_thread, expand, quadratic))
       case "target":
-        phasesInfo[phaseIndex].objectives[penaltyIndex].target = newValue;
-        break;
-      case "integration_rule":
-        phasesInfo[phaseIndex].objectives[penaltyIndex].integrationRule =
-            newValue!;
+        if (isObjective) {
+          phasesInfo[phaseIndex].objectives[penaltyIndex].target = newValue;
+        } else {
+          phasesInfo[phaseIndex].constraints[penaltyIndex].target = newValue;
+        }
         break;
       case "weight":
         phasesInfo[phaseIndex].objectives[penaltyIndex].weight =
             double.tryParse(newValue!) ?? 0.0;
-        break;
-      case "nodes":
-        phasesInfo[phaseIndex].constraints[penaltyIndex].nodes = newValue!;
-        break;
-      case "quadratic":
-        phasesInfo[phaseIndex].constraints[penaltyIndex].quadratic =
-            newValue == "true";
-        break;
-      case "expand":
-        phasesInfo[phaseIndex].constraints[penaltyIndex].expand =
-            newValue == "true";
-        break;
-      case "multi_thread":
-        phasesInfo[phaseIndex].constraints[penaltyIndex].multiThread =
-            newValue == "true";
-        break;
-      case "derivative":
-        phasesInfo[phaseIndex].constraints[penaltyIndex].derivative =
-            newValue == "true";
         break;
       default:
         break;
