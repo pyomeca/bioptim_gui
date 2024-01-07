@@ -17,6 +17,19 @@ class StraightAcrobaticsVariables:
     ZrotLeftUpperArm = 8
     YrotLeftUpperArm = 9
 
+    dofs = [
+        "X",
+        "Y",
+        "Z",
+        "Xrot",
+        "Yrot",
+        "Zrot",
+        "ZrotRightUpperArm",
+        "YrotRightUpperArm",
+        "ZrotLeftUpperArm",
+        "YrotLeftUpperArm",
+    ]
+
     nb_q, nb_qdot, nb_tau = 10, 10, 4
     tau_min, tau_max, tau_init = -500.0, 500.0, 0.0
     qdot_min, qdot_max = -10 * np.pi, 10 * np.pi

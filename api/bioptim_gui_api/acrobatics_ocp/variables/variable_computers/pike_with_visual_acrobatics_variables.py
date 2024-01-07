@@ -27,6 +27,29 @@ class PikeAcrobaticsWithVisualVariables(PikeAcrobaticsVariables):
     XrotUpperLegs = 18
     YrotUpperLegs = 19
 
+    dofs = [
+        "X",
+        "Y",
+        "Z",
+        "Xrot",
+        "Yrot",
+        "Zrot",
+        "ZrotHead",
+        "XrotHead",
+        "ZrotEyes",
+        "XrotEyes",
+        "ZrotRightUpperArm",
+        "YrotRightUpperArm",
+        "ZrotRightLowerArm",
+        "XrotRightLowerArm",
+        "ZrotLeftUpperArm",
+        "YrotLeftUpperArm",
+        "ZrotLeftLowerArm",
+        "XrotLeftLowerArm",
+        "XrotUpperLegs",
+        "YrotUpperLegs",
+    ]
+
     nb_q, nb_qdot, nb_tau = 20, 20, 14
 
     q_min_bounds = np.array(

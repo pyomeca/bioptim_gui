@@ -21,6 +21,23 @@ class StraightAcrobaticsWithVisualVariables(StraightAcrobaticsVariables):
     ZrotLeftUpperArm = 12
     YrotLeftUpperArm = 13
 
+    dofs = [
+        "X",
+        "Y",
+        "Z",
+        "Xrot",
+        "Yrot",
+        "Zrot",
+        "ZrotHead",
+        "XrotHead",
+        "ZrotEyes",
+        "XrotEyes",
+        "ZrotRightUpperArm",
+        "YrotRightUpperArm",
+        "ZrotLeftUpperArm",
+        "YrotLeftUpperArm",
+    ]
+
     nb_q, nb_qdot, nb_tau = 14, 14, 10
 
     q_min_bounds = np.array(

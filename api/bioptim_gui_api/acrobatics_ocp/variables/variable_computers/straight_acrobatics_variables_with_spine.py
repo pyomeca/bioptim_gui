@@ -29,6 +29,31 @@ class StraightAcrobaticsVariablesWithSpine(StraightAcrobaticsVariables):
     ZrotLeftUpperArm = 20
     YrotLeftUpperArm = 21
 
+    dofs = [
+        "X",
+        "Y",
+        "Z",
+        "Xrot",
+        "Yrot",
+        "Zrot",
+        "XrotStomach",
+        "YrotStomach",
+        "ZrotStomach",
+        "XrotRib",
+        "YrotRib",
+        "ZrotRib",
+        "XrotNipple",
+        "YrotNipple",
+        "ZrotNipple",
+        "XrotShoulder",
+        "YrotShoulder",
+        "ZrotShoulder",
+        "ZrotRightUpperArm",
+        "YrotRightUpperArm",
+        "ZrotLeftUpperArm",
+        "YrotLeftUpperArm",
+    ]
+
     nb_q, nb_qdot, nb_tau = 22, 22, 16
 
     q_min_bounds = np.array(

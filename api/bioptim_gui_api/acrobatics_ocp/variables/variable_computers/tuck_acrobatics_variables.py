@@ -24,6 +24,26 @@ class TuckAcrobaticsVariables(PikeAcrobaticsVariables):
     YrotUpperLegs = 15
     XrotLowerLegs = 16
 
+    dofs = [
+        "X",
+        "Y",
+        "Z",
+        "Xrot",
+        "Yrot",
+        "Zrot",
+        "ZrotRightUpperArm",
+        "YrotRightUpperArm",
+        "ZrotRightLowerArm",
+        "XrotRightLowerArm",
+        "ZrotLeftUpperArm",
+        "YrotLeftUpperArm",
+        "ZrotLeftLowerArm",
+        "XrotLeftLowerArm",
+        "XrotUpperLegs",
+        "YrotUpperLegs",
+        "XrotLowerLegs",
+    ]
+
     nb_q, nb_qdot, nb_tau = 17, 17, 11
 
     arm_dofs = [

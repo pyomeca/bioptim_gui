@@ -35,6 +35,37 @@ class PikeAcrobaticsVariablesWithSpine(PikeAcrobaticsVariables):
     XrotUpperLegs = 26
     YrotUpperLegs = 27
 
+    dofs = [
+        "X",
+        "Y",
+        "Z",
+        "Xrot",
+        "Yrot",
+        "Zrot",
+        "XrotStomach",
+        "YrotStomach",
+        "ZrotStomach",
+        "XrotRib",
+        "YrotRib",
+        "ZrotRib",
+        "XrotNipple",
+        "YrotNipple",
+        "ZrotNipple",
+        "XrotShoulder",
+        "YrotShoulder",
+        "ZrotShoulder",
+        "ZrotRightUpperArm",
+        "YrotRightUpperArm",
+        "ZrotRightLowerArm",
+        "XrotRightLowerArm",
+        "ZrotLeftUpperArm",
+        "YrotLeftUpperArm",
+        "ZrotLeftLowerArm",
+        "XrotLeftLowerArm",
+        "XrotUpperLegs",
+        "YrotUpperLegs",
+    ]
+
     nb_q, nb_qdot, nb_tau = 28, 28, 22
 
     q_min_bounds = np.array(

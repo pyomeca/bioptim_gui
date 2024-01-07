@@ -25,6 +25,25 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
     XrotUpperLegs = 14
     YrotUpperLegs = 15
 
+    dofs = [
+        "X",
+        "Y",
+        "Z",
+        "Xrot",
+        "Yrot",
+        "Zrot",
+        "ZrotRightUpperArm",
+        "YrotRightUpperArm",
+        "ZrotRightLowerArm",
+        "XrotRightLowerArm",
+        "ZrotLeftUpperArm",
+        "YrotLeftUpperArm",
+        "ZrotLeftLowerArm",
+        "XrotLeftLowerArm",
+        "XrotUpperLegs",
+        "YrotUpperLegs",
+    ]
+
     nb_q, nb_qdot, nb_tau = 16, 16, 10
 
     arm_dofs = [

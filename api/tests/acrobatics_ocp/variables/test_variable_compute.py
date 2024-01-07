@@ -15,7 +15,9 @@ def test_get_variable_computer(position, with_visual_criteria, collision_constra
     additional_criteria = AdditionalCriteria(
         with_visual_criteria=with_visual_criteria, collision_constraint=collision_constraint, with_spine=with_spine
     )
-    assert get_variable_computer(position, additional_criteria)
+    v_compute = get_variable_computer(position, additional_criteria)
+    assert v_compute is not None
+    assert v_compute.nb_q == len(v_compute.dofs)
 
 
 def test_get_variable_computer_simple():
