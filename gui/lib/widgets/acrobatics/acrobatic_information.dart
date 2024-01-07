@@ -1,5 +1,4 @@
 import 'package:bioptim_gui/models/acrobatics_data.dart';
-import 'package:bioptim_gui/models/acrobatics_request_maker.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
 import 'package:bioptim_gui/widgets/acrobatics/collision_checkbox.dart';
 import 'package:bioptim_gui/widgets/acrobatics/visual_criteria_checkbox.dart';
@@ -7,7 +6,6 @@ import 'package:bioptim_gui/widgets/acrobatics/with_spine_checkbox.dart';
 import 'package:bioptim_gui/widgets/utils/positive_float_text_field.dart';
 import 'package:bioptim_gui/widgets/utils/positive_integer_text_field.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:provider/provider.dart';
 
 class AcrobaticInformation extends StatelessWidget {
@@ -32,13 +30,7 @@ class AcrobaticInformation extends StatelessWidget {
                 value: acrobaticsData.nbSomersaults.toString(),
                 onSubmitted: (newValue) async {
                   if (newValue.isNotEmpty) {
-                    final response = await AcrobaticsRequestMaker()
-                        .updateField("nb_somersaults", newValue);
-
-                    final updatedData =
-                        AcrobaticsData.fromJson(json.decode(response.body));
-
-                    acrobaticsData.updateData(updatedData);
+                    await data.updateFieldAndData("nb_somersaults", newValue);
                   }
                 },
               ),

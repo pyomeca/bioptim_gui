@@ -27,7 +27,7 @@ class AcrobaticPositionChooser extends StatelessWidget {
         color: Colors.red,
         customOnSelected: (value) async {
           final success = await (data as AcrobaticsData)
-              .updatePosition(value.toLowerCase());
+              .updateFieldAndData("position", value.toLowerCase());
           return success;
         },
       );

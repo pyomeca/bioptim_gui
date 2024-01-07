@@ -8,6 +8,7 @@ import 'package:bioptim_gui/widgets/acrobatics/acrobatic_position_chooser.dart';
 import 'package:bioptim_gui/widgets/acrobatics/acrobatic_sport_type_chooser.dart';
 import 'package:bioptim_gui/widgets/acrobatics/acrobatic_twist_side_chooser.dart';
 import 'package:bioptim_gui/widgets/acrobatics/acrobatics_dynamics_chooser.dart';
+import 'package:bioptim_gui/widgets/utils/animated_expanding_widget.dart';
 import 'package:bioptim_gui/widgets/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -122,6 +123,39 @@ class _HeaderBuilder extends StatelessWidget {
                             defaultValue: acrobaticsData.position.capitalize(),
                           )),
                     ],
+                  ),
+                  const SizedBox(height: 12),
+                  // list acrobaticsData.dofNames
+                  AnimatedExpandingWidget(
+                    header: SizedBox(
+                      width: width,
+                      child: const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Degrees of freedom",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    child: SizedBox(
+                      width: width,
+                      height: 25.0 * acrobaticsData.dofNames.length.toDouble(),
+                      child: ListView.builder(
+                        controller: ScrollController(),
+                        scrollDirection: Axis.vertical,
+                        itemCount: acrobaticsData.dofNames.length,
+                        itemBuilder: (context, index) {
+                          return SizedBox(
+                            width: 100,
+                            child: Text(
+                              '$index ${acrobaticsData.dofNames[index]}',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ],
               );

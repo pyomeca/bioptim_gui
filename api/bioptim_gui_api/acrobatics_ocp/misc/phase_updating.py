@@ -43,6 +43,8 @@ def update_state_control_variables(phases: list[dict], data: dict) -> None:
 
     model = get_variable_computer(position, additional_criteria)
 
+    AcrobaticsOCPData.update_data("dof_names", model.dofs)
+
     nb_q = model.nb_q
     nb_qdot = model.nb_qdot
     nb_tau = model.nb_tau

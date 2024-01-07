@@ -73,8 +73,8 @@ class AcrobaticsPhaseModifiers:
             half_twists[somersault_index] = half_twists_request.nb_half_twists
             self.data.update_data("nb_half_twists", half_twists)
 
-            phases_info = update_phase_info()
-            return phases_info
+            phases = update_phase_info()
+            return phases
 
     def register_put_position(self):
         @self.router.put("/position", response_model=dict)
@@ -100,11 +100,10 @@ class AcrobaticsPhaseModifiers:
                 self.data.update_data("nb_half_twists", half_twists)
 
             update_phase_info()
-
             return self.data.read_data()
 
     def register_put_with_visual_criteria(self):
-        @self.router.put("/with_visual_criteria", response_model=list)
+        @self.router.put("/with_visual_criteria", response_model=dict)
         def put_with_visual_criteria(visual_criteria: VisualCriteriaRequest):
             new_value = visual_criteria.with_visual_criteria
 
@@ -119,11 +118,11 @@ class AcrobaticsPhaseModifiers:
             # updating data
             self.data.update_data("with_visual_criteria", new_value)
 
-            phases_info = update_phase_info()
-            return phases_info
+            update_phase_info()
+            return self.data.read_data()
 
     def register_put_collision_constraint(self):
-        @self.router.put("/collision_constraint", response_model=list)
+        @self.router.put("/collision_constraint", response_model=dict)
         def put_collision_constraint(collision_constraint: CollisionConstraintRequest):
             new_value = collision_constraint.collision_constraint
 
@@ -138,11 +137,11 @@ class AcrobaticsPhaseModifiers:
             # updating data
             self.data.update_data("collision_constraint", new_value)
 
-            phases_info = update_phase_info()
-            return phases_info
+            update_phase_info()
+            return self.data.read_data()
 
     def register_put_with_spine(self):
-        @self.router.put("/with_spine", response_model=list)
+        @self.router.put("/with_spine", response_model=dict)
         def put_with_spine(with_spine: WithSpineRequest):
             new_value = with_spine.with_spine
 
@@ -161,5 +160,5 @@ class AcrobaticsPhaseModifiers:
             else:
                 self.data.update_data("dynamics", "torque_driven")
 
-            phases_info = update_phase_info()
-            return phases_info
+            update_phase_info()
+            return self.data.read_data()

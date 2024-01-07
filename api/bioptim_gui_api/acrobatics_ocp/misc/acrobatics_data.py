@@ -32,6 +32,7 @@ class AcrobaticsOCPData(GenericOCPData):
         "collision_constraint": False,
         "dynamics": "torque_driven",
         "with_spine": False,
+        "dof_names": [],
         "phases_info": [
             copy.deepcopy(default_phases_info),
             copy.deepcopy(default_phases_info),

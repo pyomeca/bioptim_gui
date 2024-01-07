@@ -16,6 +16,7 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
   bool collisionConstraint;
   bool withSpine;
   String dynamics;
+  List<String> dofNames = [];
 
   AcrobaticsData.fromJson(Map<String, dynamic> data)
       : _nbSomersaults = data["nb_somersaults"],
@@ -29,6 +30,7 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
         collisionConstraint = data["collision_constraint"],
         withSpine = data["with_spine"],
         dynamics = data["dynamics"],
+        dofNames = List.from(data["dof_names"]),
         super.fromJson(data, (json) => SomersaultPhase.fromJson(json),
             AcrobaticsRequestMaker());
 
@@ -69,8 +71,8 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
     notifyListeners();
   }
 
-  Future<bool> updatePosition(String value) async {
-    final response = await requestMaker.updateField("position", value);
+  Future<bool> updateFieldAndData(String field, String value) async {
+    final response = await requestMaker.updateField(field, value);
 
     if (response.statusCode != 200) {
       return Future(() => false);
@@ -95,9 +97,6 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
         break;
       case "final_time_margin":
         finalTimeMargin = double.parse(value);
-        break;
-      case "position":
-        position = value;
         break;
       case "sport_type":
         sportType = value;
@@ -153,6 +152,7 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
     collisionConstraint = newData.collisionConstraint;
     withSpine = newData.withSpine;
     dynamics = newData.dynamics;
+    dofNames = List.from(newData.dofNames);
     phasesInfo = List.from(newData.phasesInfo);
 
     notifyListeners();
