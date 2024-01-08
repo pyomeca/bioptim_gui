@@ -9,6 +9,9 @@ services:
       - DISPLAY=${DISPLAY}
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - ./output:/app/output
+      - ./models:/app/models
+      - ./Model_mesh:/app/models/Model_mesh
     network_mode: "host"
     depends_on:
       - bioptim_gui_api
