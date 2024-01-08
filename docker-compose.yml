@@ -12,6 +12,7 @@ services:
       - ./output:/app/output
       - ./models:/app/models
       - ./Model_mesh:/app/models/Model_mesh
+      - ./Model_mesh:/app/output/Model_mesh
     network_mode: "host"
     depends_on:
       - bioptim_gui_api

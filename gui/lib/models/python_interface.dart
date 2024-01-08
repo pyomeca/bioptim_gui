@@ -52,7 +52,7 @@ class PythonInterface {
       status = PythonInterfaceStatus.ready;
     }
 
-    final parentDir = File(path).absolute.parent.toString();
+    final parentDir = File(path).absolute.parent.path.toString();
 
     final pathAndArgs = multistart
         ? [

@@ -34,6 +34,8 @@ FROM ubuntu:22.04
 COPY --from=miniconda /opt/conda /opt/conda
 # Add Conda to the PATH environment variable
 ENV PATH="/opt/conda/bin:${PATH}"
+COPY libgfortran.so.4 /opt/conda/lib/libgfortran.so.4
+COPY libhsl.so /opt/conda/lib/libhsl.so
 
 # Set environment variables
 ENV FLUTTER_VERSION='3.13.5'
