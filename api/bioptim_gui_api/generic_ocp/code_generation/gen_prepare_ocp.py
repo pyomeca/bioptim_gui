@@ -53,7 +53,6 @@ def prepare_ocp()-> OptimalControlProgram:
             ret += f"""
     dynamics.add(
         DynamicsFcn.{phase["dynamics"]},
-        expand=True,
         phase={i},
     )
 """
