@@ -90,7 +90,7 @@ class BioModConverter:
             raise ValueError(f"Missing markers: {', '.join(missing_markers)}")
 
     @classmethod
-    def convert(cls, model_path: str) -> str:
+    def convert(cls, model_content: str) -> str:
         """
         'Convert' a bioptim model
 
@@ -108,7 +108,7 @@ class BioModConverter:
 
         Parameters
         ----------
-        model_path: str
+        model_content: str
             The path to the bioptim model
 
         Returns
@@ -120,8 +120,7 @@ class BioModConverter:
         ValueError
             If the model does not contain all the required markers/segments
         """
-        with open(model_path, "r") as f:
-            lines = f.readlines()
+        lines = [line + "\n" for line in model_content.split("\n")]
 
         utils = BioModConverterUtils(lines)
         cls._check_missing_segments(lines)

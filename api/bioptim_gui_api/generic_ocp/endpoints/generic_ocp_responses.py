@@ -8,7 +8,6 @@ from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
     ExpandRequest,
     DerivativeRequest,
     IntegrationRuleRequest,
-    ModelPathRequest,
     MultiThreadRequest,
     NbShootingPointsRequest,
     NbPhasesRequest,
@@ -27,8 +26,8 @@ class NbPhasesResponse(NbPhasesRequest):
     pass
 
 
-class ModelPathResponse(ModelPathRequest):
-    pass
+class ModelPathResponse(BaseModel):
+    model_path: str
 
 
 class NbShootingPointsResponse(NbShootingPointsRequest):

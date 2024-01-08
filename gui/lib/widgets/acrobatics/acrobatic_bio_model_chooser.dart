@@ -51,7 +51,8 @@ class AcrobaticBioModelChooserState extends State<AcrobaticBioModelChooser> {
                 );
                 if (results == null) return;
 
-                data.updateField("model_path", results.files.single.path!);
+                data.requestMaker.updateBioModel(
+                    results.paths.map((path) => File(path!)).toList());
 
                 setState(() {
                   modelPath = results.files.single.path!;

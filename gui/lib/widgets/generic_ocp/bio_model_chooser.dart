@@ -49,8 +49,12 @@ class BioModelChooserState extends State<BioModelChooser> {
                       );
                       if (results == null) return;
 
-                      data.updateField(
-                          "model_path", results.files.single.path!);
+                      data.requestMaker.updateBioModel(
+                          results.paths.map((path) => File(path!)).toList());
+
+                      setState(() {
+                        data.modelPath = results.files.single.path!;
+                      });
                     },
                     icon: const Icon(Icons.file_upload_outlined),
                   ),

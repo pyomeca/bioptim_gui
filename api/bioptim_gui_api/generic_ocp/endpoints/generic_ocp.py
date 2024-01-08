@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile
 
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_code_generation import (
     router as code_generation_router,
@@ -13,7 +13,6 @@ from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases_variables import (
     GenericStateVariableRouter,
 )
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
-    ModelPathRequest,
     NbPhasesRequest,
 )
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_responses import (
@@ -62,9 +61,12 @@ class GenericOCPBaseFieldRegistrar:
 
     def register_put_model_path(self) -> None:
         @self.router.put("/model_path", response_model=ModelPathResponse)
-        def put_model_path(model_path: ModelPathRequest):
-            self.data.update_data("model_path", model_path.model_path)
-            return ModelPathResponse(model_path=model_path.model_path)
+        async def put_model_path(file: UploadFile):
+            model_content = await file.read()
+            model_content_str = model_content.decode("utf-8")
+            self.data.update_data("model_path", file.filename)
+            self.data.update_data("model_content", model_content_str)
+            return ModelPathResponse(model_path=file.filename)
 
 
 router = APIRouter(

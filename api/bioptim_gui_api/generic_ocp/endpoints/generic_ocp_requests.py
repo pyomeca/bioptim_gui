@@ -10,10 +10,6 @@ class NbPhasesRequest(BaseModel):
     nb_phases: int
 
 
-class ModelPathRequest(BaseModel):
-    model_path: str
-
-
 class NbShootingPointsRequest(BaseModel):
     nb_shooting_points: int
 

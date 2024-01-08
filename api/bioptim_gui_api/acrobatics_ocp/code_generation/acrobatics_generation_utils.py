@@ -47,7 +47,7 @@ def converted_model(save_path: str, data: dict) -> list[NewGeneratedBioMod]:
     )
 
     converter = get_converter(data["position"], additional_criteria)
-    new_bio_model = converter.convert(model_path)
+    new_bio_model = converter.convert(data["model_content"])
 
     ret = [NewGeneratedBioMod(new_bio_model, str(new_model_path))]
 
@@ -59,7 +59,7 @@ def converted_model(save_path: str, data: dict) -> list[NewGeneratedBioMod]:
             without_cone=True,
         )
         converter = get_converter(data["position"], additional_criteria)
-        without_cone_model = converter.convert(model_path)
+        without_cone_model = converter.convert(data["model_content"])
         without_cone_model_path = save_folder / f"{original_filename}-{position}-without_cone.bioMod"
         ret.append(NewGeneratedBioMod(without_cone_model, str(without_cone_model_path)))
 

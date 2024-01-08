@@ -32,10 +32,11 @@ def test_good(position, with_visual_criteria, non_collision, without_cone, with_
     converter = get_converter(
         position, AdditionalCriteria(with_visual_criteria, non_collision, without_cone, with_spine)
     )
-    actual = converter.convert(f"{BIOMODS_PATH}/{folder}/{folder}_base.bioMod")
+    with open(f"{BIOMODS_PATH}/{folder}/{folder}_base.bioMod", "r") as f:
+        actual = converter.convert(f.read())
     with open(f"{BIOMODS_PATH}/{folder}/good/{position}.bioMod", "r") as f:
         expected = f.read()
-        assert actual == expected
+        assert actual.strip() == expected.strip()
 
 
 @pytest.mark.parametrize(
@@ -71,4 +72,5 @@ def test_bad(position, with_visual_criteria, non_collision, without_cone, folder
 
     if os.path.exists(filepath):
         with pytest.raises(ValueError):
-            converter.convert(filepath)
+            with open(filepath, "r") as f:
+                converter.convert(f.read())

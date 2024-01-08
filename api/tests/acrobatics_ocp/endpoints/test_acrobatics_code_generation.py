@@ -60,8 +60,10 @@ def test_generate_code_no_model():
 )
 def test_generate_code_simple_position(position, with_visual_criteria, non_collision, with_spine, folder):
     # using base data and a position model (16 degrees of freedom)
-    model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
-    response = client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
+    model_path = str(Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute())
+    with open(model_path, "rb") as f:
+        file = {"file": (model_path, f)}
+        response = client.put("/acrobatics/model_path/", files=file)
     assert response.status_code == 200, response
 
     if with_visual_criteria:
@@ -116,8 +118,10 @@ def test_generate_code_position_no_objective_no_constraint(
     position, with_visual_criteria, non_collision, with_spine, folder
 ):
     # using base data and a position model (16 degrees of freedom)
-    model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
-    response = client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
+    model_path = str(Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute())
+    with open(model_path, "rb") as f:
+        file = {"file": (model_path, f)}
+        response = client.put("/acrobatics/model_path/", files=file)
     assert response.status_code == 200, response
 
     if with_visual_criteria:
@@ -178,8 +182,11 @@ def test_generate_code_position_objective_and_constraint(
     position, with_visual_criteria, non_collision, with_spine, folder
 ):
     # using base data and a position model (16 degrees of freedom)
-    model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
-    client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
+    model_path = str(Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute())
+    with open(model_path, "rb") as f:
+        file = {"file": (model_path, f)}
+        response = client.put("/acrobatics/model_path/", files=file)
+    assert response.status_code == 200, response
 
     response = client.put("/acrobatics/position", json={"position": f"{position}"})
     assert response.status_code != 400, response
@@ -239,8 +246,11 @@ def test_generate_code_2_phase_position_objective_and_constraint(
     position, with_visual_criteria, non_collision, with_spine, folder
 ):
     # using base data and a position model (16 degrees of freedom)
-    model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
-    client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
+    model_path = str(Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute())
+    with open(model_path, "rb") as f:
+        file = {"file": (model_path, f)}
+        response = client.put("/acrobatics/model_path/", files=file)
+    assert response.status_code == 200, response
 
     if with_visual_criteria:
         response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})
@@ -304,8 +314,11 @@ def test_generate_code_modified_objective_and_constraint(
     position, with_visual_criteria, non_collision, with_spine, folder
 ):
     # using base data and a position model (16 degrees of freedom)
-    model_path = Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute()
-    client.put("/acrobatics/model_path", json={"model_path": str(model_path)})
+    model_path = str(Path(f"test_biomods/{folder}/good/{position}.bioMod").absolute())
+    with open(model_path, "rb") as f:
+        file = {"file": (model_path, f)}
+        response = client.put("/acrobatics/model_path/", files=file)
+    assert response.status_code == 200, response
 
     if with_visual_criteria:
         response = client.put("/acrobatics/with_visual_criteria", json={"with_visual_criteria": True})

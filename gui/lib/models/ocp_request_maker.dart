@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:bioptim_gui/models/api_config.dart';
 import 'package:bioptim_gui/models/decision_variables_type.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
 ///
 /// [OCPRequestMaker] is a class that contains all the methods to make requests
@@ -41,6 +43,30 @@ class OCPRequestMaker<T extends OCPData> {
       objectiveMax,
       constraints,
     );
+  }
+
+  void updateBioModel(List<File> files) async {
+    if (files.length != 1) {
+      throw Exception('Only one file can be selected');
+    }
+    final file = files[0];
+
+    final url = Uri.parse('${APIConfig.url}/$prefix/model_path');
+    final request = http.MultipartRequest('PUT', url);
+    request.files.add(MultipartFile.fromBytes(
+      'file',
+      file.readAsBytesSync(),
+      filename: file.path,
+    ));
+
+    request.send().then((response) async {
+      if (response.statusCode != 200) {
+        if (kDebugMode) {
+          throw Exception(
+              'Error while sending bioMod ${await response.stream.bytesToString()}');
+        }
+      }
+    });
   }
 
   Future<http.Response> updateField(String fieldName, String newValue) async {

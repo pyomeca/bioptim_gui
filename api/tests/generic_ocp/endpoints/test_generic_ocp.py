@@ -75,13 +75,16 @@ def test_put_nb_phase():
 
 
 def test_put_model_path():
-    response = client.put("/generic_ocp/model_path/", json={"model_path": "test/path"})
+    vanilla_path = "test_biomods/vanilla/vanilla_base.bioMod"
+    with open(vanilla_path, "rb") as f:
+        file = {"file": (vanilla_path, f)}
+        response = client.put("/generic_ocp/model_path/", files=file)
     assert response.status_code == 200, response
-    assert response.json() == {"model_path": "test/path"}
+    assert response.json() == {"model_path": vanilla_path}
 
     response = client.get("/generic_ocp/")
     assert response.status_code == 200
-    assert response.json()["model_path"] == "test/path"
+    assert response.json()["model_path"] == vanilla_path
 
 
 # effect of changing nb_phases tests
