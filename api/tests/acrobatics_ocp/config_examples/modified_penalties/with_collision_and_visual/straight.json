@@ -278,12 +278,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "RightShoulder",
+                            "value": "LeftShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "RightKnuckle",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -293,12 +293,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftShoulder",
+                            "value": "RightShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "RightKnuckle",
                             "type": "str"
                         },
                         {
@@ -690,7 +690,7 @@
                             0.0
                         ],
                         [
-                            4.9
+                            2.45
                         ],
                         [
                             -6.28
@@ -1100,12 +1100,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "RightShoulder",
+                            "value": "LeftShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "RightKnuckle",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -1115,12 +1115,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftShoulder",
+                            "value": "RightShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "RightKnuckle",
                             "type": "str"
                         },
                         {
@@ -1501,7 +1501,7 @@
                             0.0
                         ],
                         [
-                            -0.0
+                            0.0
                         ],
                         [
                             0.0

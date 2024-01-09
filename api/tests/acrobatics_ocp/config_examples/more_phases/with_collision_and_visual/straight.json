@@ -273,12 +273,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "RightShoulder",
+                            "value": "LeftShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "RightKnuckle",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -288,12 +288,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftShoulder",
+                            "value": "RightShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "RightKnuckle",
                             "type": "str"
                         },
                         {
@@ -696,7 +696,7 @@
                             0.0
                         ],
                         [
-                            4.86
+                            3.24
                         ],
                         [
                             -12.57
@@ -1063,12 +1063,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "RightShoulder",
+                            "value": "LeftShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "RightKnuckle",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -1078,12 +1078,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftShoulder",
+                            "value": "RightShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "RightKnuckle",
                             "type": "str"
                         },
                         {
@@ -1486,7 +1486,7 @@
                             0.0
                         ],
                         [
-                            -1.62
+                            1.62
                         ],
                         [
                             0.0
@@ -1896,12 +1896,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "RightShoulder",
+                            "value": "LeftShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "RightKnuckle",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -1911,12 +1911,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftShoulder",
+                            "value": "RightShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "RightKnuckle",
                             "type": "str"
                         },
                         {
@@ -2297,7 +2297,7 @@
                             0.0
                         ],
                         [
-                            -1.62
+                            1.62
                         ],
                         [
                             0.0

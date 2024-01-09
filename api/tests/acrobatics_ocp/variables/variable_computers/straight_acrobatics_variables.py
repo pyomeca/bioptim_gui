@@ -254,17 +254,18 @@ class StraightAcrobaticsVariables:
         is_forward: bool,
         nb_phases: int,
     ) -> np.ndarray:
+        g = 9.81
         forward_factor = 1 if is_forward else -1
         final_time = sum(phase_durations)
-        vzinit = 9.81 / 2 * final_time
+        vzinit = g / 2 * final_time
 
         qdot_init = np.zeros((nb_phases, cls.nb_qdot, 1))
 
         qdot_init[0][cls.Xrot] = 2 * np.pi * nb_somersaults * forward_factor
-        qdot_init[0][cls.Z] = vzinit
 
-        for i, duration in enumerate(phase_durations[:-1]):
-            qdot_init[i + 1][cls.Z] = -9.81 * (final_time / 2 - duration)
+        v = [vzinit] + [g * (final_time / 2 - duration) for duration in phase_durations]
+        for phase in range(nb_phases):
+            qdot_init[phase][cls.Z] = (v[phase] + v[phase + 1]) / 2
 
         return qdot_init
 
