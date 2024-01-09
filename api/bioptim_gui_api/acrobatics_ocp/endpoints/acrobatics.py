@@ -61,11 +61,27 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
     def register_put_final_time(self):
         @self.router.put("/final_time", response_model=FinalTimeResponse)
         def put_final_time(final_time: FinalTimeRequest):
-            new_value = final_time.final_time
+            new_value = round(final_time.final_time, 2)
             if new_value < 0:
                 raise HTTPException(status_code=400, detail="final_time must be positive")
+
+            # read data
+            nb_phases = self.data.read_data("nb_phases")
+            phases_info = self.data.read_data("phases_info")
+
+            # logic
+            new_phase_duration = round(new_value / nb_phases, 2)
+            for phase in phases_info:
+                phase["duration"] = new_phase_duration
+
+            # update
             self.data.update_data("final_time", new_value)
-            return FinalTimeResponse(final_time=new_value)
+            self.data.update_data("phases_info", phases_info)
+
+            return FinalTimeResponse(
+                final_time=new_value,
+                new_phase_duration=new_phase_duration,
+            )
 
     def register_put_final_time_margin(self):
         @self.router.put("/final_time_margin", response_model=FinalTimeMarginResponse)

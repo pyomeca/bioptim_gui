@@ -143,6 +143,9 @@ def test_put_somersault_duration():
         json={"duration": 0.6},
     )
     assert response.status_code == 200, response
+    data = response.json()
+    assert data["duration"] == 0.6
+    assert data["new_final_time"] == 1.1
 
     response = client.get("/acrobatics/phases_info/0")
     assert response.status_code == 200, response

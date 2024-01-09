@@ -8,10 +8,11 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import (
     PreferredTwistSideRequest,
     SportTypeRequest,
 )
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import PhaseDurationRequest
 
 
 class FinalTimeResponse(FinalTimeRequest):
-    pass
+    new_phase_duration: float
 
 
 class FinalTimeMarginResponse(FinalTimeMarginRequest):
@@ -24,6 +25,10 @@ class SportTypeResponse(SportTypeRequest):
 
 class PreferredTwistSideResponse(PreferredTwistSideRequest):
     pass
+
+
+class AcrobaticPhaseDurationResponse(PhaseDurationRequest):
+    new_final_time: float
 
 
 class NewGeneratedBioMod(NamedTuple):

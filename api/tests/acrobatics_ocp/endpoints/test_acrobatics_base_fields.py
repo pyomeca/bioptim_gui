@@ -88,11 +88,29 @@ def test_put_final_time_zero():
 def test_put_final_time():
     response = client.put("/acrobatics/final_time/", json={"final_time": 2})
     assert response.status_code == 200, response
-    assert response.json() == {"final_time": 2}
+    assert response.json() == {"final_time": 2, "new_phase_duration": 1}
 
     response = client.get("/acrobatics/")
     assert response.status_code == 200, response
-    assert response.json()["final_time"] == 2
+    data = response.json()
+    assert data["final_time"] == 2
+
+    for phase in data["phases_info"]:
+        assert phase["duration"] == 1
+
+
+def test_put_final_rounding():
+    response = client.put("/acrobatics/final_time/", json={"final_time": 3.111})
+    assert response.status_code == 200, response
+    assert response.json() == {"final_time": 3.11, "new_phase_duration": 1.55}
+
+    response = client.get("/acrobatics/")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["final_time"] == 3.11
+
+    for phase in data["phases_info"]:
+        assert phase["duration"] == 1.55
 
 
 def test_put_final_time_margin_negative():

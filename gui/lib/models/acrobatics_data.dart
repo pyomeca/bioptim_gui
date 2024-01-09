@@ -85,15 +85,19 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
   }
 
   @override
-  void updateField(String name, String value) {
-    requestMaker.updateField(name, value);
+  void updateField(String name, dynamic value) async {
+    final response = await requestMaker.updateField(name, value);
+    final jsonData = json.decode(response.body);
 
     switch (name) {
       case "nb_somersaults":
         nbSomersaults = int.parse(value);
         break;
       case "final_time":
-        finalTime = double.parse(value);
+        finalTime = jsonData["final_time"];
+        for (var i = 0; i < phasesInfo.length; i++) {
+          phasesInfo[i].duration = jsonData["new_phase_duration"];
+        }
         break;
       case "final_time_margin":
         finalTimeMargin = double.parse(value);
@@ -123,12 +127,14 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
   }
 
   @override
-  void updatePhaseField(int phaseIndex, String fieldName, String newValue) {
-    requestMaker.updatePhaseField(phaseIndex, fieldName, newValue);
+  void updatePhaseField(int phaseIndex, String fieldName, String newValue) async {
+    final response = await requestMaker.updatePhaseField(phaseIndex, fieldName, newValue);
+    final jsonData = json.decode(response.body);
 
     switch (fieldName) {
       case "duration":
-        phasesInfo[phaseIndex].duration = double.parse(newValue);
+        phasesInfo[phaseIndex].duration = jsonData["duration"];
+        finalTime = jsonData["new_final_time"];
         break;
       case "nb_shooting_points":
         phasesInfo[phaseIndex].nbShootingPoints = int.parse(newValue);

@@ -11,7 +11,7 @@ class GenericOcpData extends OCPData<GenericPhase> {
   /// update methods
 
   @override
-  void updateField(String name, String value) {
+  void updateField(String name, dynamic value) {
     requestMaker.updateField(name, value);
 
     switch (name) {

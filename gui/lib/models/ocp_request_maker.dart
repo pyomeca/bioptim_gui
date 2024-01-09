@@ -69,7 +69,7 @@ class OCPRequestMaker<T extends OCPData> {
     });
   }
 
-  Future<http.Response> updateField(String fieldName, String newValue) async {
+  Future<http.Response> updateField(String fieldName, dynamic newValue) async {
     final url = Uri.parse('${APIConfig.url}/$prefix/$fieldName');
     final body = json.encode({fieldName: newValue});
     final response =
