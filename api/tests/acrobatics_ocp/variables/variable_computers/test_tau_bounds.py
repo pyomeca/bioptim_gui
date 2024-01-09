@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 from bioptim_gui_api.acrobatics_ocp.variables.variable_computers.pike_acrobatics_variables import (
@@ -41,28 +42,34 @@ from tests.acrobatics_ocp.variables.variable_computers.tuck_with_visual_acrobati
 def test_tau_bounds_straight():
     expected_min = [-500.0, -500.0, -500.0, -500.0]
     expected_max = [500.0, 500.0, 500.0, 500.0]
-    actual = StraightAcrobaticsVariables.get_tau_bounds()
-    actual_min, actual_max = actual["min"], actual["max"]
-    assert actual_min == expected_min
-    assert actual_max == expected_max
+    for nb_phases in range(1, 5):
+        actual = StraightAcrobaticsVariables.get_tau_bounds(nb_phases)
+
+        for i in range(nb_phases):
+            assert np.allclose(actual[i]["min"], expected_min)
+            assert np.allclose(actual[i]["max"], expected_max)
 
 
 def test_tau_bounds_pike():
     expected_min = [-500.0] * 10
     expected_max = [500.0] * 10
-    actual = PikeAcrobaticsVariables.get_tau_bounds()
-    actual_min, actual_max = actual["min"], actual["max"]
-    assert actual_min == expected_min
-    assert actual_max == expected_max
+    for nb_phases in range(1, 5):
+        actual = PikeAcrobaticsVariables.get_tau_bounds(nb_phases)
+
+        for i in range(nb_phases):
+            assert np.allclose(actual[i]["min"], expected_min)
+            assert np.allclose(actual[i]["max"], expected_max)
 
 
 def test_tau_bounds_tuck():
     expected_min = [-500.0] * 11
     expected_max = [500.0] * 11
-    actual = TuckAcrobaticsVariables.get_tau_bounds()
-    actual_min, actual_max = actual["min"], actual["max"]
-    assert actual_min == expected_min
-    assert actual_max == expected_max
+    for nb_phases in range(1, 5):
+        actual = TuckAcrobaticsVariables.get_tau_bounds(nb_phases)
+
+        for i in range(nb_phases):
+            assert np.allclose(actual[i]["min"], expected_min)
+            assert np.allclose(actual[i]["max"], expected_max)
 
 
 @pytest.mark.parametrize(
@@ -77,6 +84,9 @@ def test_tau_bounds_tuck():
     ],
 )
 def test_tau_bounds_same_as_baseline(variable_compute, baseline):
-    expected = baseline.get_tau_bounds()
-    actual = variable_compute.get_tau_bounds()
-    assert actual == expected
+    for nb_phases in range(1, 5):
+        expected = baseline.get_tau_bounds(nb_phases)
+        actual = variable_compute.get_tau_bounds(nb_phases)
+        for i in range(nb_phases):
+            assert np.allclose(actual[i]["min"], expected[i]["min"])
+            assert np.allclose(actual[i]["max"], expected[i]["max"])

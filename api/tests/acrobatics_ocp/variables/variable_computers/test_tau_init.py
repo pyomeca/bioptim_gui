@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 from bioptim_gui_api.acrobatics_ocp.variables.variable_computers.pike_acrobatics_variables import (
@@ -40,20 +41,26 @@ from tests.acrobatics_ocp.variables.variable_computers.tuck_with_visual_acrobati
 
 def test_tau_init_straight():
     expected = [0.0, 0.0, 0.0, 0.0]
-    actual = StraightAcrobaticsVariables.get_tau_init()
-    assert actual == expected
+    for nb_phases in range(1, 5):
+        actual = StraightAcrobaticsVariables.get_tau_init(nb_phases)
+        for i in range(nb_phases):
+            assert np.allclose(actual[i], expected)
 
 
 def test_tau_init_pike():
     expected = [0.0] * 10
-    actual = PikeAcrobaticsVariables.get_tau_init()
-    assert actual == expected
+    for nb_phases in range(1, 5):
+        actual = PikeAcrobaticsVariables.get_tau_init(nb_phases)
+        for i in range(nb_phases):
+            assert np.allclose(actual[i], expected)
 
 
 def test_tau_init_tuck():
     expected = [0.0] * 11
-    actual = TuckAcrobaticsVariables.get_tau_init()
-    assert actual == expected
+    for nb_phases in range(1, 5):
+        actual = TuckAcrobaticsVariables.get_tau_init(nb_phases)
+        for i in range(nb_phases):
+            assert np.allclose(actual[i], expected)
 
 
 @pytest.mark.parametrize(
@@ -68,6 +75,7 @@ def test_tau_init_tuck():
     ],
 )
 def test_tau_init_same_as_baseline(variable_compute, baseline):
-    expected = baseline.get_tau_init()
-    actual = variable_compute.get_tau_init()
-    assert actual == expected
+    for nb_phases in range(1, 5):
+        actual = variable_compute.get_tau_init(nb_phases)
+        expected = baseline.get_tau_init(nb_phases)
+        assert np.allclose(actual, expected)

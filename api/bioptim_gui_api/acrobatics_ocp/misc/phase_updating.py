@@ -53,11 +53,11 @@ def update_state_control_variables(phases: list[dict], data: dict) -> None:
     q_bounds = model.get_q_bounds(half_twists, prefer_left)
     nb_phases = len(q_bounds)
     qdot_bounds = model.get_qdot_bounds(nb_phases, final_time, is_forward)
-    tau_bounds = model.get_tau_bounds()
+    tau_bounds = model.get_tau_bounds(nb_phases)
 
     q_init = model.get_q_init(q_bounds=q_bounds)
     qdot_init = model.get_qdot_init(nb_somersaults, phase_durations, is_forward, nb_phases)
-    tau_init = model.get_tau_init()
+    tau_init = model.get_tau_init(nb_phases)
 
     for i, phase in enumerate(phases):
         phases[i]["state_variables"] = [
@@ -90,11 +90,11 @@ def update_state_control_variables(phases: list[dict], data: dict) -> None:
                 "dimension": nb_tau,
                 "bounds_interpolation_type": "CONSTANT",
                 "bounds": {
-                    "min_bounds": np.array([tau_bounds["min"]]).T.tolist(),
-                    "max_bounds": np.array([tau_bounds["max"]]).T.tolist(),
+                    "min_bounds": np.round(tau_bounds[i]["min"], 2).tolist(),
+                    "max_bounds": np.round(tau_bounds[i]["max"], 2).tolist(),
                 },
                 "initial_guess_interpolation_type": "CONSTANT",
-                "initial_guess": np.array([tau_init]).T.tolist(),
+                "initial_guess": np.round(tau_init[i], 2).tolist(),
             },
         ]
 

@@ -72,11 +72,8 @@ class AcrobaticsGenerationBounds(BoundsGeneration):
 
     @classmethod
     def add_qdot_init(cls, data: dict) -> str:
-        phases = data["phases_info"]
-
+        nb_phases = data["nb_phases"]
         q_init = var_initial_guess_list(data, "qdot", BioptimVariable.STATE_VARIABLE)
-
-        nb_phases = len(phases)
 
         ret = ""
         for i in range(nb_phases):
@@ -92,37 +89,40 @@ class AcrobaticsGenerationBounds(BoundsGeneration):
 
     @classmethod
     def add_tau_bounds(cls, data: dict) -> str:
-        control_var = data["phases_info"][0]["control_variables"][0]
-        control_bounds = control_var["bounds"]
-        control_name = control_var["name"]
-        interpolation_type = control_var["bounds_interpolation_type"]
+        nb_phases = data["nb_phases"]
+        control_name = data["phases_info"][0]["control_variables"][0]["name"]
+        control_bounds = var_bounds_list(data, control_name, BioptimVariable.CONTROL_VARIABLE)
 
-        return f"""
-    for phase in range(nb_phases):
-        u_bounds.add(
-            "{control_name}",
-            min_bound={format_2d_array(control_bounds["min_bounds"], 12)},
-            max_bound={format_2d_array(control_bounds["max_bounds"], 12)},
-            interpolation=InterpolationType.{interpolation_type},
-            phase=phase,
-        )
+        ret = ""
+        for i in range(nb_phases):
+            ret += f"""
+    u_bounds.add(
+        "{control_name}",
+        min_bound={format_2d_array(control_bounds[i]["min"])},
+        max_bound={format_2d_array(control_bounds[i]["max"])},
+        interpolation=InterpolationType.{control_bounds[i]["interpolation_type"]},
+        phase={i},
+    )
 """
+        return ret
 
     @classmethod
     def add_tau_init(cls, data: dict) -> str:
-        control = data["phases_info"][0]["control_variables"][0]
-        control_init = control["initial_guess"]
-        interpolation_type = control["initial_guess_interpolation_type"]
-        control_name = control["name"]
+        control_name = data["phases_info"][0]["control_variables"][0]["name"]
+        nb_phases = data["nb_phases"]
+        control_init = var_initial_guess_list(data, control_name, BioptimVariable.CONTROL_VARIABLE)
 
-        return f"""
+        ret = ""
+        for i in range(nb_phases):
+            ret += f"""
     u_initial_guesses.add(
         "{control_name}",
-        initial_guess={format_2d_array(control_init)},
-        interpolation=InterpolationType.{interpolation_type},
-        phase=0,
+        initial_guess={format_2d_array(control_init[i]["initial_guess"])},
+        interpolation=InterpolationType.{control_init[i]["interpolation_type"]},
+        phase={i},
     )
 """
+        return ret
 
     @classmethod
     def bounds(cls, data: dict) -> str:

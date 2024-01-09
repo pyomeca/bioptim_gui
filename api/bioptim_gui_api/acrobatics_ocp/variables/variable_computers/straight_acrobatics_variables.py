@@ -304,12 +304,15 @@ class StraightAcrobaticsVariables:
         return qdot_init
 
     @classmethod
-    def get_tau_bounds(cls) -> dict:
-        return {
-            "min": [cls.tau_min] * cls.nb_tau,
-            "max": [cls.tau_max] * cls.nb_tau,
-        }
+    def get_tau_bounds(cls, nb_phases: int) -> list[dict[str, np.ndarray]]:
+        return [
+            {
+                "min": np.zeros((cls.nb_tau, 1)) + cls.tau_min,
+                "max": np.zeros((cls.nb_tau, 1)) + cls.tau_max,
+            }
+            for _ in range(nb_phases)
+        ]
 
     @classmethod
-    def get_tau_init(cls) -> list:
-        return [cls.tau_init] * cls.nb_tau
+    def get_tau_init(cls, nb_phases: int) -> np.ndarray:
+        return np.zeros((nb_phases, cls.nb_tau, 1)) + cls.tau_init

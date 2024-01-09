@@ -67,19 +67,22 @@ class AcrobaticsGenerationBoundsNonCollision(AcrobaticsGenerationBounds):
 
     @staticmethod
     def add_tau_bounds(data: dict, model) -> str:
-        tau_bounds = model.get_tau_bounds()
+        nb_phases = data["nb_phases"]
+        tau_bounds = model.get_tau_bounds(nb_phases)
         control = "tau" if data["dynamics"] == "torque_driven" else "qddot_joints"
 
-        return f"""
-    for phase in range(nb_phases):
-        u_bounds.add(
-            "{control}",
-            min_bound={format_2d_array(np.array([tau_bounds["min"]]).T.tolist(), 12)},
-            max_bound={format_2d_array(np.array([tau_bounds["max"]]).T.tolist(), 12)},
-            interpolation=InterpolationType.CONSTANT,
-            phase=phase,
-        )
+        ret = ""
+        for i in range(nb_phases):
+            ret += f"""
+    u_bounds.add(
+        "{control}",
+        min_bound={format_2d_array(tau_bounds[i]["min"] )},
+        max_bound={format_2d_array(tau_bounds[i]["max"])},
+        interpolation=InterpolationType.CONSTANT,
+        phase={i},
+    )
 """
+        return ret
 
     @staticmethod
     def add_q_init(data: dict, model) -> str:
@@ -130,17 +133,21 @@ class AcrobaticsGenerationBoundsNonCollision(AcrobaticsGenerationBounds):
 
     @staticmethod
     def add_tau_init(data: dict, model) -> str:
-        tau_init = model.get_tau_init()
+        nb_phases = data["nb_phases"]
+        tau_init = model.get_tau_init(nb_phases)
         control = "tau" if data["dynamics"] == "torque_driven" else "qddot_joints"
 
-        return f"""
+        ret = ""
+        for i in range(nb_phases):
+            ret += f"""
         u_initial_guesses.add(
             "{control}",
-            initial_guess={format_2d_array(np.array([tau_init]).T.tolist(), 12)},
+            initial_guess={format_2d_array(tau_init[i], 12)},
             interpolation=InterpolationType.CONSTANT,
-            phase=0,
+            phase={i},
         )
 """
+        return ret
 
     @staticmethod
     def use_solution_as_initial_guess(data: dict) -> str:
