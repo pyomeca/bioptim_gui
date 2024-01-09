@@ -142,6 +142,8 @@ class StraightAcrobaticsVariables:
         x_bounds[-1]["max"][[cls.X, cls.Y, cls.Z], 2] = [0.01, 0.01, 0.01]
 
         # Somersault
+        x_bounds[-1]["min"][cls.Xrot, 0] = x_bounds[-2]["min"][cls.Xrot, 2]
+        x_bounds[-1]["max"][cls.Xrot, 0] = x_bounds[-2]["max"][cls.Xrot, 2]
         x_bounds[-1]["min"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults - np.pi / 2 - 0.1
         x_bounds[-1]["max"][cls.Xrot, 1] = 2 * np.pi * nb_somersaults + 0.1
         define_loose_bounds(x_bounds[-1], cls.Xrot, 2, LooseValue(2 * np.pi * nb_somersaults, 0.1))
