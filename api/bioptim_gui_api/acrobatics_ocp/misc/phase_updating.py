@@ -38,7 +38,8 @@ def update_state_control_variables(phases: list[dict], data: dict) -> None:
         collision_constraint=data["collision_constraint"],
         with_spine=data["with_spine"],
     )
-    final_time = sum(s["duration"] for s in phases)
+    phase_durations = [s["duration"] for s in phases]
+    final_time = sum(phase_durations)
     is_forward = sum(half_twists) % 2 != 0
 
     model = get_variable_computer(position, additional_criteria)
@@ -54,8 +55,8 @@ def update_state_control_variables(phases: list[dict], data: dict) -> None:
     qdot_bounds = model.get_qdot_bounds(nb_phases, final_time, is_forward)
     tau_bounds = model.get_tau_bounds()
 
-    q_init = model.get_q_init(half_twists, prefer_left)
-    qdot_init = model.get_qdot_init(nb_somersaults, final_time)
+    q_init = model.get_q_init(q_bounds=q_bounds)
+    qdot_init = model.get_qdot_init(nb_somersaults, phase_durations)
     tau_init = model.get_tau_init()
 
     for i, phase in enumerate(phases):

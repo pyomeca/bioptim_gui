@@ -193,8 +193,8 @@ class StraightAcrobaticsVariables:
         return x_bounds
 
     @classmethod
-    def get_q_init(cls, half_twists: list, prefer_left: bool = True) -> list:
-        x_bounds = cls.get_q_bounds(half_twists, prefer_left)
+    def get_q_init(cls, half_twists: list = [], prefer_left: bool = True, q_bounds: np.ndarray = None) -> list:
+        x_bounds = q_bounds or cls.get_q_bounds(half_twists, prefer_left)
         nb_phases = len(x_bounds)
 
         x_inits = np.zeros((nb_phases, 2, cls.nb_q))
@@ -260,7 +260,8 @@ class StraightAcrobaticsVariables:
         return x_bounds
 
     @classmethod
-    def get_qdot_init(cls, nb_somersaults: int, final_time: float) -> list:
+    def get_qdot_init(cls, nb_somersaults: int, phase_durations: list[float]) -> list:
+        final_time = sum(phase_durations)
         vzinit = 9.81 / 2 * final_time
 
         qdot_init = [0.0] * cls.nb_qdot
