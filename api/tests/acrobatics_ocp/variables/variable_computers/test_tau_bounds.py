@@ -3,32 +3,38 @@ import pytest
 from bioptim_gui_api.acrobatics_ocp.variables.variable_computers.pike_acrobatics_variables import (
     PikeAcrobaticsVariables,
 )
+from bioptim_gui_api.acrobatics_ocp.variables.variable_computers.pike_with_visual_acrobatics_variables import (
+    PikeAcrobaticsWithVisualVariables,
+)
 from bioptim_gui_api.acrobatics_ocp.variables.variable_computers.straight_acrobatics_variables import (
     StraightAcrobaticsVariables,
 )
+from bioptim_gui_api.acrobatics_ocp.variables.variable_computers.straight_with_visual_acrobatics_variables import (
+    StraightAcrobaticsWithVisualVariables,
+)
 from bioptim_gui_api.acrobatics_ocp.variables.variable_computers.tuck_acrobatics_variables import (
     TuckAcrobaticsVariables,
+)
+from bioptim_gui_api.acrobatics_ocp.variables.variable_computers.tuck_with_visual_acrobatics_variables import (
+    TuckAcrobaticsWithVisualVariables,
 )
 from tests.acrobatics_ocp.variables.variable_computers.pike_acrobatics_variables import (
     PikeAcrobaticsVariables as BasePikeAcrobaticsVariables,
 )
 from tests.acrobatics_ocp.variables.variable_computers.pike_with_visual_acrobatics_variables import (
     PikeAcrobaticsWithVisualVariables as BasePikeAcrobaticsWithVisualVariables,
-    PikeAcrobaticsWithVisualVariables,
 )
 from tests.acrobatics_ocp.variables.variable_computers.straight_acrobatics_variables import (
     StraightAcrobaticsVariables as BaseStraightAcrobaticsVariables,
 )
 from tests.acrobatics_ocp.variables.variable_computers.straight_with_visual_acrobatics_variables import (
     StraightAcrobaticsWithVisualVariables as BaseStraightAcrobaticsWithVisualVariables,
-    StraightAcrobaticsWithVisualVariables,
 )
 from tests.acrobatics_ocp.variables.variable_computers.tuck_acrobatics_variables import (
     TuckAcrobaticsVariables as BaseTuckAcrobaticsVariables,
 )
 from tests.acrobatics_ocp.variables.variable_computers.tuck_with_visual_acrobatics_variables import (
     TuckAcrobaticsWithVisualVariables as BaseTuckAcrobaticsWithVisualVariables,
-    TuckAcrobaticsWithVisualVariables,
 )
 
 
