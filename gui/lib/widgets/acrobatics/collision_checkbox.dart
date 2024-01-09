@@ -30,16 +30,11 @@ class _CollisionCheckboxState extends State<CollisionCheckbox> {
         checkColor: Colors.white,
         value: isChecked,
         onChanged: (bool? value) async {
-          await (data as AcrobaticsData)
-              .updateFieldAndData("collision_constraint", value.toString());
+          (data as AcrobaticsData).updateField("collision_constraint", value);
 
           setState(() {
             isChecked = value!;
           });
-
-          // Alexandre: TODO find a prettier way to reset the export button
-          AcrobaticsControllers.instance.notifyListeners();
-          OptimalControlProgramControllers.instance.notifyListeners();
         },
       );
     });

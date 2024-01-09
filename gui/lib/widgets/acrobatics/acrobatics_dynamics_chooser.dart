@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:bioptim_gui/models/acrobatics_data.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
 import 'package:bioptim_gui/widgets/utils/custom_http_dropdown.dart';
 import 'package:bioptim_gui/widgets/utils/extensions.dart';
@@ -28,9 +29,10 @@ class AcrobaticsDynamicChooser extends StatelessWidget {
         putEndpoint: '/acrobatics/dynamics',
         requestKey: "dynamics",
         customStringFormatting: (s) => s.replaceAll(" ", "_").toLowerCase(),
-        customCallBack: (response) async {
-          final newPhases = (json.decode(response.body) as List<dynamic>);
-          data.updatePhaseInfo(newPhases);
+        customOnSelected: (value) async {
+          (data as AcrobaticsData).updateField(
+              "dynamics", value.replaceAll(" ", "_").toLowerCase());
+          return true;
         },
       );
     });

@@ -29,7 +29,6 @@ abstract class OCPData<T extends Phase> with ChangeNotifier {
         }).toList();
 
   OCPRequestMaker get requestMaker {
-    notifyListeners();
     return _requestMaker;
   }
 

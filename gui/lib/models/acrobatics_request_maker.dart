@@ -26,4 +26,18 @@ class AcrobaticsRequestMaker extends OCPRequestMaker<AcrobaticsData> {
 
     return acrobaticsData;
   }
+
+  Future<http.Response> updateHalfTwists(int index, int value) async {
+    final url = Uri.parse('${APIConfig.url}/$prefix/nb_half_twists/$index');
+    final body = json.encode({"nb_half_twists": value});
+    final response =
+        await http.put(url, body: body, headers: APIConfig.headers);
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update nb_half_twists $index');
+    }
+
+    if (kDebugMode) print('nb_half_twists $index updated with value: $value');
+    return response;
+  }
 }

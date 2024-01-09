@@ -30,16 +30,11 @@ class _SpineCriteriaCheckboxState extends State<SpineCriteriaCheckbox> {
         checkColor: Colors.white,
         value: isChecked,
         onChanged: (bool? value) async {
-          await (data as AcrobaticsData)
-              .updateFieldAndData("with_spine", value.toString());
+          (data as AcrobaticsData).updateField("with_spine", value);
 
           setState(() {
             isChecked = value!;
           });
-
-          // Alexandre: TODO find a prettier way to reset the export button
-          AcrobaticsControllers.instance.notifyListeners();
-          OptimalControlProgramControllers.instance.notifyListeners();
         },
       );
     });

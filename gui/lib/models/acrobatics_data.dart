@@ -5,7 +5,7 @@ import 'package:bioptim_gui/models/acrobatics_request_maker.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
 
 class AcrobaticsData extends OCPData<SomersaultPhase> {
-  int _nbSomersaults;
+  int nbSomersaults;
   List<int> halfTwists = [];
   double finalTime;
   double finalTimeMargin;
@@ -19,7 +19,7 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
   List<String> dofNames = [];
 
   AcrobaticsData.fromJson(Map<String, dynamic> data)
-      : _nbSomersaults = data["nb_somersaults"],
+      : nbSomersaults = data["nb_somersaults"],
         halfTwists = List.from(data["nb_half_twists"]),
         finalTime = data["final_time"],
         finalTimeMargin = data["final_time_margin"],
@@ -35,39 +35,18 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
             AcrobaticsRequestMaker());
 
   ///
-  /// Getters Setters
-
-  int get nbSomersaults => _nbSomersaults;
-  set nbSomersaults(int value) {
-    _nbSomersaults = value;
-    notifyListeners();
-  }
-
-  ///
   /// Update methods
 
   void updateHalfTwists(int index, int value) async {
-    final response = await requestMaker.updateHalfTwists(index, value);
+    final response = await (requestMaker as AcrobaticsRequestMaker)
+        .updateHalfTwists(index, value);
 
-    final newPhases = (json.decode(response.body) as List<dynamic>)
-        .map((p) => SomersaultPhase.fromJson(p))
-        .toList();
+    final jsonData = json.decode(response.body);
+
+    final newPhases = SomersaultPhase.convertDynamicList(jsonData);
 
     phasesInfo = newPhases;
-
     halfTwists[index] = value;
-    notifyListeners();
-  }
-
-  void updateDynamics(String value) async {
-    final response = await requestMaker.updateField("dynamics", value);
-
-    final newPhases = (json.decode(response.body) as List<dynamic>)
-        .map((p) => SomersaultPhase.fromJson(p))
-        .toList();
-
-    phasesInfo = newPhases;
-    dynamics = value;
     notifyListeners();
   }
 
@@ -87,11 +66,20 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
   @override
   void updateField(String name, dynamic value) async {
     final response = await requestMaker.updateField(name, value);
+
+    if (response.statusCode != 200) throw Exception('Failed to update $name');
+
     final jsonData = json.decode(response.body);
 
     switch (name) {
       case "nb_somersaults":
-        nbSomersaults = int.parse(value);
+      case "position":
+        nbSomersaults = jsonData["nb_somersaults"];
+        halfTwists = List.from(jsonData["nb_half_twists"]);
+        position = jsonData["position"];
+        dofNames = List.from(jsonData["dof_names"]);
+        phasesInfo =
+            SomersaultPhase.convertDynamicList(jsonData["phases_info"]);
         break;
       case "final_time":
         finalTime = jsonData["final_time"];
@@ -100,25 +88,32 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
         }
         break;
       case "final_time_margin":
-        finalTimeMargin = double.parse(value);
+        finalTimeMargin = jsonData["final_time_margin"];
         break;
       case "sport_type":
-        sportType = value;
+        sportType = jsonData["sport_type"];
         break;
       case "preferred_twist_side":
-        preferredTwistSide = value;
+        preferredTwistSide = jsonData["preferred_twist_side"];
         break;
       case "with_visual_criteria":
-        withVisualCriteria = value == "true";
+        withVisualCriteria = jsonData["with_visual_criteria"];
+        dofNames = List.from(jsonData["dof_names"]);
+        phasesInfo =
+            SomersaultPhase.convertDynamicList(jsonData["phases_info"]);
         break;
       case "collision_constraint":
-        collisionConstraint = value == "true";
+        collisionConstraint = jsonData["collision_constraint"];
+        phasesInfo =
+            SomersaultPhase.convertDynamicList(jsonData["phases_info"]);
         break;
       case "with_spine":
-        withSpine = value == "true";
-        break;
+        withSpine = jsonData["with_spine"];
+        dofNames = List.from(jsonData["dof_names"]);
       case "dynamics":
-        dynamics = value;
+        dynamics = jsonData["dynamics"];
+        phasesInfo =
+            SomersaultPhase.convertDynamicList(jsonData["phases_info"]);
         break;
       default:
         break;
@@ -127,8 +122,10 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
   }
 
   @override
-  void updatePhaseField(int phaseIndex, String fieldName, String newValue) async {
-    final response = await requestMaker.updatePhaseField(phaseIndex, fieldName, newValue);
+  void updatePhaseField(
+      int phaseIndex, String fieldName, String newValue) async {
+    final response =
+        await requestMaker.updatePhaseField(phaseIndex, fieldName, newValue);
     final jsonData = json.decode(response.body);
 
     switch (fieldName) {
@@ -137,7 +134,8 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
         finalTime = jsonData["new_final_time"];
         break;
       case "nb_shooting_points":
-        phasesInfo[phaseIndex].nbShootingPoints = int.parse(newValue);
+        phasesInfo[phaseIndex].nbShootingPoints =
+            jsonData["nb_shooting_points"];
         break;
       default:
         break;
@@ -173,4 +171,8 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
 
 class SomersaultPhase extends Phase {
   SomersaultPhase.fromJson(super.somersaultData) : super.fromJson();
+
+  static List<SomersaultPhase> convertDynamicList(List<dynamic> list) {
+    return list.map((item) => SomersaultPhase.fromJson(item)).toList();
+  }
 }

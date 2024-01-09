@@ -8,6 +8,13 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import (
     VisualCriteriaRequest,
     WithSpineRequest,
 )
+from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import (
+    NbSomersaultsResponse,
+    PositionResponse,
+    VisualCriteriaResponse,
+    CollisionConstraintResponse,
+    WithSpineResponse,
+)
 from bioptim_gui_api.acrobatics_ocp.misc.phase_updating import update_phase_info
 
 
@@ -29,7 +36,7 @@ class AcrobaticsPhaseModifiers:
         self.register_put_with_spine()
 
     def register_put_nb_somersaults(self):
-        @self.router.put("/nb_somersaults", response_model=dict)
+        @self.router.put("/nb_somersaults", response_model=NbSomersaultsResponse)
         def update_nb_somersaults(nb_somersaults: NbSomersaultsRequest):
             """
             Append or pop the half_twists list
@@ -59,7 +66,14 @@ class AcrobaticsPhaseModifiers:
                 self.data.update_data("position", "straight")
 
             update_phase_info()
-            return self.data.read_data()
+            data = self.data.read_data()
+            return NbSomersaultsResponse(
+                nb_somersaults=data["nb_somersaults"],
+                nb_half_twists=data["nb_half_twists"],
+                position=data["position"],
+                phases_info=data["phases_info"],
+                dof_names=data["dof_names"],
+            )
 
     def register_put_nb_half_twists(self):
         @self.router.put("/nb_half_twists/{somersault_index}", response_model=list)
@@ -77,7 +91,7 @@ class AcrobaticsPhaseModifiers:
             return phases
 
     def register_put_position(self):
-        @self.router.put("/position", response_model=dict)
+        @self.router.put("/position", response_model=PositionResponse)
         def put_position(position: PositionRequest):
             new_value = position.position.value
 
@@ -100,10 +114,17 @@ class AcrobaticsPhaseModifiers:
                 self.data.update_data("nb_half_twists", half_twists)
 
             update_phase_info()
-            return self.data.read_data()
+            data = self.data.read_data()
+            return PositionResponse(
+                nb_somersaults=data["nb_somersaults"],
+                nb_half_twists=data["nb_half_twists"],
+                position=data["position"],
+                phases_info=data["phases_info"],
+                dof_names=data["dof_names"],
+            )
 
     def register_put_with_visual_criteria(self):
-        @self.router.put("/with_visual_criteria", response_model=dict)
+        @self.router.put("/with_visual_criteria", response_model=VisualCriteriaResponse)
         def put_with_visual_criteria(visual_criteria: VisualCriteriaRequest):
             new_value = visual_criteria.with_visual_criteria
 
@@ -119,10 +140,15 @@ class AcrobaticsPhaseModifiers:
             self.data.update_data("with_visual_criteria", new_value)
 
             update_phase_info()
-            return self.data.read_data()
+            data = self.data.read_data()
+            return VisualCriteriaResponse(
+                with_visual_criteria=data["with_visual_criteria"],
+                phases_info=data["phases_info"],
+                dof_names=data["dof_names"],
+            )
 
     def register_put_collision_constraint(self):
-        @self.router.put("/collision_constraint", response_model=dict)
+        @self.router.put("/collision_constraint", response_model=CollisionConstraintResponse)
         def put_collision_constraint(collision_constraint: CollisionConstraintRequest):
             new_value = collision_constraint.collision_constraint
 
@@ -138,10 +164,14 @@ class AcrobaticsPhaseModifiers:
             self.data.update_data("collision_constraint", new_value)
 
             update_phase_info()
-            return self.data.read_data()
+            data = self.data.read_data()
+            return CollisionConstraintResponse(
+                collision_constraint=data["collision_constraint"],
+                phases_info=data["phases_info"],
+            )
 
     def register_put_with_spine(self):
-        @self.router.put("/with_spine", response_model=dict)
+        @self.router.put("/with_spine", response_model=WithSpineResponse)
         def put_with_spine(with_spine: WithSpineRequest):
             new_value = with_spine.with_spine
 
@@ -161,4 +191,10 @@ class AcrobaticsPhaseModifiers:
                 self.data.update_data("dynamics", "torque_driven")
 
             update_phase_info()
-            return self.data.read_data()
+            data = self.data.read_data()
+            return WithSpineResponse(
+                with_spine=data["with_spine"],
+                dynamics=data["dynamics"],
+                phases_info=data["phases_info"],
+                dof_names=data["dof_names"],
+            )

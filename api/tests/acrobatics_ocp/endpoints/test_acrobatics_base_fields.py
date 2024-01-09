@@ -312,6 +312,8 @@ def test_put_dynamics_then_add_phase():
     response = client.put("/acrobatics/nb_somersaults/", json={"nb_somersaults": 2})
     assert response.status_code == 200, response
 
+    response = client.get("/acrobatics/")
+
     data = response.json()
     assert data["dynamics"] == "joints_acceleration_driven"
     for phase in data["phases_info"]:
@@ -324,7 +326,7 @@ def test_put_dynamics_then_add_phase():
     assert response.status_code == 200, response
 
     data = response.json()
-    for phase in data:
+    for phase in data["phases_info"]:
         for i in 0, 1:
             assert (
                 phase["objectives"][i]["arguments"][0]["value"] == "tau"
@@ -344,7 +346,7 @@ def test_put_dynamics_then_add_phase():
             ), "MINIMIZE_CONTROL key should stay tau, when modifying the nb_half_twists"
 
 
-def test_get_dynamcis():
+def test_get_dynamics():
     response = client.get("/acrobatics/dynamics/")
     assert response.status_code == 200, response
     assert set(response.json()) == {"torque_driven", "joints_acceleration_driven"}

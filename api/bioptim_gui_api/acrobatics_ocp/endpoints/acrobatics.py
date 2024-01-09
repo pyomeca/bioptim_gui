@@ -18,6 +18,7 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import (
     FinalTimeResponse,
     PreferredTwistSideResponse,
     SportTypeResponse,
+    DynamicsResponse,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
 from bioptim_gui_api.acrobatics_ocp.misc.dynamics_updating import adapt_dynamics
@@ -93,12 +94,12 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
             return FinalTimeMarginResponse(final_time_margin=new_value)
 
     def register_get_positions(self):
-        @self.router.get("/position", response_model=list)
+        @self.router.get("/position", response_model=list[str])
         def get_position():
             return [side.capitalize() for side in Position]
 
     def register_get_sport_types(self):
-        @self.router.get("/sport_type", response_model=list)
+        @self.router.get("/sport_type", response_model=list[str])
         def get_sport_type():
             return [side.capitalize() for side in SportType]
 
@@ -118,7 +119,7 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
             return SportTypeResponse(sport_type=new_value)
 
     def register_get_preferred_twist_side(self):
-        @self.router.get("/preferred_twist_side", response_model=list)
+        @self.router.get("/preferred_twist_side", response_model=list[str])
         def get_preferred_twist_side():
             return [side.capitalize() for side in PreferredTwistSide]
 
@@ -137,12 +138,12 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
             return PreferredTwistSideResponse(preferred_twist_side=new_value)
 
     def register_get_dynamics(self):
-        @self.router.get("/dynamics", response_model=list)
+        @self.router.get("/dynamics", response_model=list[str])
         def get_dynamics():
             return ["torque_driven", "joints_acceleration_driven"]
 
     def register_put_dynamics(self):
-        @self.router.put("/dynamics", response_model=list)
+        @self.router.put("/dynamics", response_model=DynamicsResponse)
         def put_dynamics(dynamics: DynamicsRequest):
             new_value = dynamics.dynamics
             old_value = self.data.read_data("dynamics")
@@ -160,7 +161,7 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
                 adapt_dynamics(phase, new_value)
 
             self.data.update_data("phases_info", phases_info)
-            return phases_info
+            return DynamicsResponse(dynamics=new_value, phases_info=phases_info)
 
 
 router = APIRouter(

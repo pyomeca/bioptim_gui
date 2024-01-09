@@ -30,16 +30,11 @@ class _VisualCriteriaCheckboxState extends State<VisualCriteriaCheckbox> {
         checkColor: Colors.white,
         value: isChecked,
         onChanged: (bool? value) async {
-          await (data as AcrobaticsData)
-              .updateFieldAndData("with_visual_criteria", value.toString());
+          (data as AcrobaticsData).updateField("with_visual_criteria", value);
 
           setState(() {
             isChecked = value!;
           });
-
-          // Alexandre: TODO find a prettier way to reset the export button
-          AcrobaticsControllers.instance.notifyListeners();
-          OptimalControlProgramControllers.instance.notifyListeners();
         },
       );
     });

@@ -28,9 +28,9 @@ class AcrobaticInformation extends StatelessWidget {
               child: PositiveIntegerTextField(
                 label: 'Number of somersaults *',
                 value: acrobaticsData.nbSomersaults.toString(),
-                onSubmitted: (newValue) async {
+                onSubmitted: (newValue) {
                   if (newValue.isNotEmpty) {
-                    await data.updateFieldAndData("nb_somersaults", newValue);
+                    data.updateField("nb_somersaults", newValue);
                   }
                 },
               ),

@@ -83,20 +83,6 @@ class OCPRequestMaker<T extends OCPData> {
     return response;
   }
 
-  Future<http.Response> updateHalfTwists(int index, int value) async {
-    final url = Uri.parse('${APIConfig.url}/$prefix/nb_half_twists/$index');
-    final body = json.encode({"nb_half_twists": value});
-    final response =
-        await http.put(url, body: body, headers: APIConfig.headers);
-
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update nb_half_twists $index');
-    }
-
-    if (kDebugMode) print('nb_half_twists $index updated with value: $value');
-    return response;
-  }
-
   Future<http.Response> updatePhaseField(
       int phaseIndex, String fieldName, String newValue) async {
     final url = Uri.parse(

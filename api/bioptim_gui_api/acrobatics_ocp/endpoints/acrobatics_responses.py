@@ -7,8 +7,28 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import (
     FinalTimeRequest,
     PreferredTwistSideRequest,
     SportTypeRequest,
+    NbSomersaultsRequest,
+    PositionRequest,
+    VisualCriteriaRequest,
+    CollisionConstraintRequest,
+    WithSpineRequest,
 )
-from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import PhaseDurationRequest
+from bioptim_gui_api.acrobatics_ocp.misc.enums import Position, Dynamics
+from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import PhaseDurationRequest, DynamicsRequest
+
+
+class NbSomersaultsResponse(NbSomersaultsRequest):
+    nb_half_twists: list[int]
+    position: Position
+    phases_info: list[dict]
+    dof_names: list[str]
+
+
+class PositionResponse(PositionRequest):
+    nb_somersaults: int
+    nb_half_twists: list[int]
+    phases_info: list[dict]
+    dof_names: list[str]
 
 
 class FinalTimeResponse(FinalTimeRequest):
@@ -25,6 +45,25 @@ class SportTypeResponse(SportTypeRequest):
 
 class PreferredTwistSideResponse(PreferredTwistSideRequest):
     pass
+
+
+class VisualCriteriaResponse(VisualCriteriaRequest):
+    phases_info: list[dict]
+    dof_names: list[str]
+
+
+class CollisionConstraintResponse(CollisionConstraintRequest):
+    phases_info: list[dict]
+
+
+class DynamicsResponse(DynamicsRequest):
+    phases_info: list[dict]
+
+
+class WithSpineResponse(WithSpineRequest):
+    dynamics: Dynamics
+    phases_info: list[dict]
+    dof_names: list[str]
 
 
 class AcrobaticPhaseDurationResponse(PhaseDurationRequest):
