@@ -72,18 +72,23 @@ class AcrobaticsGenerationBounds(BoundsGeneration):
 
     @classmethod
     def add_qdot_init(cls, data: dict) -> str:
-        qdot = data["phases_info"][0]["state_variables"][1]
-        qdot_init = qdot["initial_guess"]
-        interpolation_type = qdot["initial_guess_interpolation_type"]
+        phases = data["phases_info"]
 
-        return f"""
+        q_init = var_initial_guess_list(data, "qdot", BioptimVariable.STATE_VARIABLE)
+
+        nb_phases = len(phases)
+
+        ret = ""
+        for i in range(nb_phases):
+            ret += f"""
     x_initial_guesses.add(
         "qdot",
-        initial_guess={format_2d_array(qdot_init)},
-        interpolation=InterpolationType.{interpolation_type},
-        phase=0,
+        initial_guess={format_2d_array(q_init[i]["initial_guess"])},
+        interpolation=InterpolationType.{q_init[i]["interpolation_type"]},
+        phase={i},
     )
 """
+        return ret
 
     @classmethod
     def add_tau_bounds(cls, data: dict) -> str:

@@ -247,12 +247,24 @@ class StraightAcrobaticsVariables:
         return x_bounds
 
     @classmethod
-    def get_qdot_init(cls, nb_somersaults: int, final_time: float) -> list:
+    def get_qdot_init(
+        cls,
+        nb_somersaults: int,
+        phase_durations: list[float],
+        is_forward: bool,
+        nb_phases: int,
+    ) -> np.ndarray:
+        forward_factor = 1 if is_forward else -1
+        final_time = sum(phase_durations)
         vzinit = 9.81 / 2 * final_time
 
-        qdot_init = [0.0] * cls.nb_qdot
-        qdot_init[cls.Xrot] = 2 * np.pi * nb_somersaults
-        qdot_init[cls.Z] = vzinit
+        qdot_init = np.zeros((nb_phases, cls.nb_qdot, 1))
+
+        qdot_init[0][cls.Xrot] = 2 * np.pi * nb_somersaults * forward_factor
+        qdot_init[0][cls.Z] = vzinit
+
+        for i, duration in enumerate(phase_durations[:-1]):
+            qdot_init[i + 1][cls.Z] = -9.81 * (final_time / 2 - duration)
 
         return qdot_init
 

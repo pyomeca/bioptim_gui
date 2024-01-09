@@ -90,16 +90,24 @@ class AcrobaticsGenerationBounds:
         phases = data["phases_info"]
         phase_durations = [s["duration"] for s in phases]
         nb_somersaults = data["nb_somersaults"]
-        qdot_init = np.round(model.get_qdot_init(nb_somersaults, phase_durations), 2)
+        is_forward = sum(data["nb_half_twists"]) % 2 != 0
+        nb_phases = data["nb_phases"]
+        qdot_init = np.round(
+            model.get_qdot_init(nb_somersaults, phase_durations, is_forward, nb_phases),
+            2,
+        )
 
-        return f"""
+        ret = ""
+        for i in range(nb_phases):
+            ret += f"""
     x_initial_guesses.add(
         "qdot",
-        initial_guess={format_2d_array(np.array([qdot_init]).T)},
+        initial_guess={format_2d_array(qdot_init[i])},
         interpolation=InterpolationType.CONSTANT,
-        phase=0,
+        phase={i},
     )
 """
+        return ret
 
     @staticmethod
     def add_tau_bounds(data: dict, model) -> str:

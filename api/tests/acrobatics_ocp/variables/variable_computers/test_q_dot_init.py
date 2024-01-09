@@ -1,3 +1,4 @@
+import numpy as np
 import pytest
 
 from bioptim_gui_api.acrobatics_ocp.variables.variable_computers.pike_acrobatics_variables import (
@@ -50,13 +51,17 @@ from tests.acrobatics_ocp.variables.variable_computers.tuck_with_visual_acrobati
     ],
 )
 @pytest.mark.parametrize("nb_somersaults", [2, 3, 4])
-def test_qdot_init_same_as_baseline(variable_compute, baseline, nb_somersaults):
+@pytest.mark.parametrize("is_forward", [True, False])
+def test_qdot_init_same_as_baseline(variable_compute, baseline, nb_somersaults, is_forward):
     q_bounds = variable_compute.get_q_bounds([0] * nb_somersaults, False)
     nb_phases = len(q_bounds)
 
     phase_durations = [0] * (nb_phases - 1) + [1.7]
-    final_time = sum(phase_durations)
 
-    expected = baseline.get_qdot_init(nb_somersaults, final_time)
-    actual = variable_compute.get_qdot_init(nb_somersaults, phase_durations)
-    assert actual == expected
+    expected = baseline.get_qdot_init(nb_somersaults, phase_durations, is_forward, nb_phases)
+    actual = variable_compute.get_qdot_init(nb_somersaults, phase_durations, is_forward, nb_phases)
+
+    assert len(expected) == len(actual), f"Expected length: {len(expected)}, Actual length: {len(actual)}"
+
+    for i in range(len(expected)):
+        assert np.allclose(expected[i], actual[i])
