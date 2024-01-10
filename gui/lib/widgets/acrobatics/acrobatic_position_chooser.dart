@@ -21,12 +21,14 @@ class AcrobaticPositionChooser extends StatelessWidget {
         title: "Jump position *",
         width: width,
         defaultValue: defaultValue,
-        getEndpoint: "/acrobatics/position",
+        items: ((data as AcrobaticsData).availablesValue!
+                as AcrobaticsAvailableValues)
+            .positions,
         putEndpoint: "/acrobatics/position",
         requestKey: "position",
         color: Colors.red,
         customOnSelected: (value) async {
-          (data as AcrobaticsData).updateField("position", value.toLowerCase());
+          data.updateField("position", value.toLowerCase());
           return true;
         },
       );

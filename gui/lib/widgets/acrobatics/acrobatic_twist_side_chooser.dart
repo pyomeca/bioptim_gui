@@ -1,3 +1,4 @@
+import 'package:bioptim_gui/models/acrobatics_data.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
 import 'package:bioptim_gui/widgets/utils/custom_http_dropdown.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,9 @@ class AcrobaticTwistSideChooser extends StatelessWidget {
         title: "Preferred twist side *",
         width: width,
         defaultValue: defaultValue,
-        getEndpoint: "/acrobatics/preferred_twist_side",
+        items: ((data as AcrobaticsData).availablesValue!
+                as AcrobaticsAvailableValues)
+            .preferredTwistSides,
         putEndpoint: "/acrobatics/preferred_twist_side",
         requestKey: "preferred_twist_side",
         color: Colors.red,

@@ -35,7 +35,9 @@ from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases_variables import (
     GenericStateVariableRouter,
 )
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import DynamicsRequest
+from bioptim_gui_api.penalty.endpoints.penalty import penalties_get_available_values
 from bioptim_gui_api.utils.format_utils import get_spaced_capitalized
+from bioptim_gui_api.variables.endpoints.variables import variables_get_available_values
 from bioptim_gui_api.variables.misc.enums import Dynamics
 
 
@@ -56,6 +58,18 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
         self.register_put_preferred_twist_side()
         self.register_get_dynamics()
         self.register_put_dynamics()
+
+    def register_get_available_values(self) -> None:
+        @self.router.get("/available_values", response_model=dict)
+        def get_available_values():
+            penalties_available_values = penalties_get_available_values()
+            variables_available_values = variables_get_available_values()
+            acrobatics_specific_available_values = {
+                "positions": get_spaced_capitalized(Position),
+                "sport_types": get_spaced_capitalized(SportType),
+                "preferred_twist_sides": get_spaced_capitalized(PreferredTwistSide),
+            }
+            return penalties_available_values | variables_available_values | acrobatics_specific_available_values
 
     def register_update_nb_phases(self) -> None:
         # disable the endpoint
@@ -98,12 +112,12 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
     def register_get_positions(self):
         @self.router.get("/position", response_model=list[str])
         def get_position():
-            return [side.capitalize() for side in Position]
+            return get_spaced_capitalized(Position)
 
     def register_get_sport_types(self):
         @self.router.get("/sport_type", response_model=list[str])
         def get_sport_type():
-            return [side.capitalize() for side in SportType]
+            return get_spaced_capitalized(SportType)
 
     def register_put_sport_type(self):
         @self.router.put("/sport_type", response_model=SportTypeResponse)
@@ -123,7 +137,7 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
     def register_get_preferred_twist_side(self):
         @self.router.get("/preferred_twist_side", response_model=list[str])
         def get_preferred_twist_side():
-            return [side.capitalize() for side in PreferredTwistSide]
+            return get_spaced_capitalized(PreferredTwistSide)
 
     def register_put_preferred_twist_side(self):
         @self.router.put("/preferred_twist_side", response_model=PreferredTwistSideResponse)

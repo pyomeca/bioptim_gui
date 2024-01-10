@@ -185,3 +185,22 @@ class SomersaultPhase extends Phase {
     return list.map((item) => SomersaultPhase.fromJson(item)).toList();
   }
 }
+
+class AcrobaticsAvailableValues extends OCPAvailableValues {
+  List<String> positions;
+  List<String> sportTypes;
+  List<String> preferredTwistSides;
+
+  AcrobaticsAvailableValues(
+    super.nodeValues,
+    super.integrationRules,
+    super.objectiveMin,
+    super.objectiveMax,
+    super.constraints,
+    super.interpolationTypes,
+    super.dynamics,
+    this.positions,
+    this.sportTypes,
+    this.preferredTwistSides,
+  );
+}

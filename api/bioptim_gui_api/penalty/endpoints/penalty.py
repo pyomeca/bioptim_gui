@@ -14,6 +14,7 @@ router = APIRouter(
 
 @router.get("/nodes", response_model=list[str])
 def get_nodes():
+    # not bioptim.Node because all nodes are not implemented yet
     return get_spaced_capitalized(Node)
 
 
@@ -32,6 +33,8 @@ def get_objectives():
 
 @router.get("/constraints", response_model=list[str])
 def get_constraints():
+    # TODO all constraints types are not implemented yet,
+    #  use get_spaced_capitalized when they are
     return [
         "CUSTOM",
         "PROPORTIONAL_CONTROL",
@@ -59,7 +62,7 @@ def get_constraints():
 
 
 @router.get("/available_values", response_model=dict)
-def get_available_values():
+def penalties_get_available_values():
     return {
         "nodes": get_nodes(),
         "objectives": get_objectives(),

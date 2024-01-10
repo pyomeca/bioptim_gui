@@ -24,7 +24,7 @@ class GenericDynamicsChooser extends StatelessWidget {
         width: width,
         defaultValue:
             defaultValue.toLowerCase().replaceAll("_", " ").capitalize(),
-        getEndpoint: "/variables/dynamics",
+        items: data.availablesValue!.dynamics,
         putEndpoint: '/generic_ocp/phases_info/$phaseIndex/dynamics',
         requestKey: "dynamics",
         customStringFormatting: (s) => s.replaceAll(" ", "_").toUpperCase(),

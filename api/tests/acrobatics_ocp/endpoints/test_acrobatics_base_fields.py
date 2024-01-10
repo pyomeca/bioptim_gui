@@ -350,3 +350,18 @@ def test_get_dynamics():
     response = client.get("/acrobatics/dynamics/")
     assert response.status_code == 200, response
     assert set(response.json()) == {"Torque driven", "Joints acceleration driven"}
+
+
+def test_available_values():
+    response = client.get("/acrobatics/available_values")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nodes"]
+    assert data["objectives"]
+    assert data["integration_rules"]
+    assert data["constraints"]
+    assert data["interpolation_types"] == ["Constant", "Constant with first and last different", "Linear"]
+    assert data["dynamics"] == ["Torque driven", "Joints acceleration driven"]
+    assert data["sport_types"] == ["Trampoline", "Diving"]
+    assert data["positions"] == ["Straight", "Tuck", "Pike"]
+    assert data["preferred_twist_sides"] == ["Left", "Right"]

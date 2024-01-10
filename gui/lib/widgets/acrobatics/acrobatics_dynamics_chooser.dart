@@ -23,7 +23,9 @@ class AcrobaticsDynamicChooser extends StatelessWidget {
         width: width,
         defaultValue:
             defaultValue.toLowerCase().replaceAll("_", " ").capitalize(),
-        getEndpoint: "/acrobatics/dynamics",
+        items: ((data as AcrobaticsData).availablesValue!
+                as AcrobaticsAvailableValues)
+            .dynamics,
         putEndpoint: '/acrobatics/dynamics',
         requestKey: "dynamics",
         customStringFormatting: (s) => s.replaceAll(" ", "_").toUpperCase(),

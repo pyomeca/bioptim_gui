@@ -7,6 +7,10 @@ class ObjectiveType(str, Enum):
 
 
 class Node(str, Enum):
+    """
+    Not using the Node enum from bioptim because they are not all implemented yet
+    """
+
     START = "start"
     MID = "mid"
     INTERMEDIATES = "intermediates"

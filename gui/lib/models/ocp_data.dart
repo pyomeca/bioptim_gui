@@ -212,6 +212,8 @@ class OCPAvailableValues {
   List<String> objectivesMinimize = [];
   List<String> objectivesMaximize = [];
   List<String> constraints = [];
+  List<String> interpolationTypes = [];
+  List<String> dynamics = [];
 
   OCPAvailableValues(
     this.nodes,
@@ -219,5 +221,7 @@ class OCPAvailableValues {
     this.objectivesMinimize,
     this.objectivesMaximize,
     this.constraints,
+    this.interpolationTypes,
+    this.dynamics,
   );
 }

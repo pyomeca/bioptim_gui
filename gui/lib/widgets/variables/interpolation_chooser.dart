@@ -1,7 +1,9 @@
+import 'package:bioptim_gui/models/ocp_data.dart';
 import 'package:bioptim_gui/widgets/utils/custom_http_dropdown.dart';
 import 'package:bioptim_gui/widgets/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class InterpolationChooser extends StatelessWidget {
   const InterpolationChooser({
@@ -23,16 +25,18 @@ class InterpolationChooser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomHttpDropdown(
-      title: '$titlePrefix interpolation type',
-      width: width,
-      defaultValue:
-          defaultValue.toLowerCase().replaceAll("_", " ").capitalize(),
-      getEndpoint: "/variables/interpolation_type",
-      putEndpoint: putEndpoint,
-      requestKey: requestKey,
-      customStringFormatting: (s) => s.replaceAll(" ", "_").toUpperCase(),
-      customCallBack: customCallBack,
-    );
+    return Consumer<OCPData>(builder: (context, data, child) {
+      return CustomHttpDropdown(
+        title: '$titlePrefix interpolation type',
+        width: width,
+        defaultValue:
+            defaultValue.toLowerCase().replaceAll("_", " ").capitalize(),
+        items: data.availablesValue!.interpolationTypes,
+        putEndpoint: putEndpoint,
+        requestKey: requestKey,
+        customStringFormatting: (s) => s.replaceAll(" ", "_").toUpperCase(),
+        customCallBack: customCallBack,
+      );
+    });
   }
 }

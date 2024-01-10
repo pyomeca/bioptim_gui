@@ -23,7 +23,7 @@ class OCPRequestMaker<T extends OCPData> {
   final String phaseInfoString;
 
   Future<OCPAvailableValues> getAvailableValues() async {
-    final url = Uri.parse('${APIConfig.url}/penalties/available_values');
+    final url = Uri.parse('${APIConfig.url}/$prefix/available_values');
     final response = await http.get(url);
     final jsonResponse = json.decode(response.body);
 
@@ -35,6 +35,9 @@ class OCPRequestMaker<T extends OCPData> {
     List<String> objectiveMax =
         List<String>.from(jsonResponse["objectives"]["maximize"]);
     List<String> constraints = List<String>.from(jsonResponse["constraints"]);
+    List<String> interpolationTypes =
+        List<String>.from(jsonResponse["interpolation_types"]);
+    List<String> dynamics = List<String>.from(jsonResponse["dynamics"]);
 
     return OCPAvailableValues(
       nodeValues,
@@ -42,6 +45,8 @@ class OCPRequestMaker<T extends OCPData> {
       objectiveMin,
       objectiveMax,
       constraints,
+      interpolationTypes,
+      dynamics,
     );
   }
 
