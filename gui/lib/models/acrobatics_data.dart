@@ -132,7 +132,7 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
 
   @override
   void updatePhaseField(
-      int phaseIndex, String fieldName, String newValue) async {
+      int phaseIndex, String fieldName, dynamic newValue) async {
     final response =
         await requestMaker.updatePhaseField(phaseIndex, fieldName, newValue);
     final jsonData = json.decode(response.body);

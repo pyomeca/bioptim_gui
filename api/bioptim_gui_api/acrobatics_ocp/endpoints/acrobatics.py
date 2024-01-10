@@ -18,7 +18,7 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_responses import (
     FinalTimeResponse,
     PreferredTwistSideResponse,
     SportTypeResponse,
-    DynamicsResponse,
+    AcrobaticsDynamicResponse,
 )
 from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_data import AcrobaticsOCPData
 from bioptim_gui_api.acrobatics_ocp.misc.dynamics_updating import adapt_dynamics
@@ -145,7 +145,7 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
             return get_spaced_capitalized(Dynamics)
 
     def register_put_dynamics(self):
-        @self.router.put("/dynamics", response_model=DynamicsResponse)
+        @self.router.put("/dynamics", response_model=AcrobaticsDynamicResponse)
         def put_dynamics(dynamics: DynamicsRequest):
             new_value = dynamics.dynamics
             old_value = self.data.read_data("dynamics")
@@ -163,7 +163,7 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
                 adapt_dynamics(phase, new_value)
 
             self.data.update_data("phases_info", phases_info)
-            return DynamicsResponse(
+            return AcrobaticsDynamicResponse(
                 dynamics=new_value,
                 phases_info=phases_info,
             )

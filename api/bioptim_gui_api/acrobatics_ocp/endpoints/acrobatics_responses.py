@@ -57,7 +57,7 @@ class CollisionConstraintResponse(CollisionConstraintRequest):
     phases_info: list[dict]
 
 
-class DynamicsResponse(DynamicsRequest):
+class AcrobaticsDynamicResponse(DynamicsRequest):
     phases_info: list[dict]
 
 

@@ -8,6 +8,7 @@ from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_responses import (
     NbShootingPointsResponse,
     PhaseDurationResponse,
+    DynamicsResponse,
 )
 from bioptim_gui_api.utils.format_utils import get_spaced_capitalized
 from bioptim_gui_api.variables.misc.enums import Dynamics
@@ -83,7 +84,7 @@ class GenericPhaseRouter:
             return get_spaced_capitalized(Dynamics)
 
     def register_put_phase_index_dynamics(self):
-        @self.router.put("/{phase_index}/dynamics", response_model=list)
+        @self.router.put("/{phase_index}/dynamics", response_model=DynamicsResponse)
         def put_dynamics_list(phase_index: int, dynamic_req: DynamicsRequest):
             phases_info = self.data.read_data("phases_info")
 
@@ -97,4 +98,7 @@ class GenericPhaseRouter:
             phases_info[phase_index]["control_variables"] = new_variables["control_variables"]
 
             self.data.update_data("phases_info", phases_info)
-            return phases_info
+            return DynamicsResponse(
+                dynamics=new_dynamic,
+                phase=phases_info[phase_index],
+            )

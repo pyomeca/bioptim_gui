@@ -19,6 +19,7 @@ from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
     QuadraticRequest,
     TargetRequest,
     WeightRequest,
+    DynamicsRequest,
 )
 
 
@@ -84,6 +85,10 @@ class ConstraintFcnResponse(ConstraintFcnRequest):
 
 class ObjectiveFcnResponse(ObjectiveFcnRequest):
     pass
+
+
+class DynamicsResponse(DynamicsRequest):
+    phase: dict
 
 
 class ArgumentResponse(BaseModel):

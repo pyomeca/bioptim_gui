@@ -84,7 +84,7 @@ class OCPRequestMaker<T extends OCPData> {
   }
 
   Future<http.Response> updatePhaseField(
-      int phaseIndex, String fieldName, String newValue) async {
+      int phaseIndex, String fieldName, dynamic newValue) async {
     final url = Uri.parse(
         '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/$fieldName');
     final body = json.encode({fieldName: newValue});

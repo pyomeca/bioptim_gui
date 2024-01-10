@@ -37,7 +37,7 @@ class GenericOcpData extends OCPData<GenericPhase> {
 
   @override
   void updatePhaseField(
-      int phaseIndex, String fieldName, String newValue) async {
+      int phaseIndex, String fieldName, dynamic newValue) async {
     final response =
         await requestMaker.updatePhaseField(phaseIndex, fieldName, newValue);
     if (response.statusCode != 200) {
@@ -50,6 +50,7 @@ class GenericOcpData extends OCPData<GenericPhase> {
     switch (fieldName) {
       case "dynamics":
         phasesInfo[phaseIndex].dynamics = jsonData["dynamics"];
+        phasesInfo[phaseIndex] = GenericPhase.fromJson(jsonData["phase"]);
         break;
       case "nb_shooting_points":
         phasesInfo[phaseIndex].nbShootingPoints =
@@ -83,4 +84,8 @@ class GenericPhase extends Phase {
   GenericPhase.fromJson(super.phaseData)
       : dynamics = phaseData["dynamics"],
         super.fromJson();
+
+  static List<GenericPhase> convertDynamicList(List<dynamic> list) {
+    return list.map((item) => GenericPhase.fromJson(item)).toList();
+  }
 }

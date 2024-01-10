@@ -191,9 +191,9 @@ def test_get_dynamic():
 def test_put_dynamic_joints_acceleration():
     response = client.put("/generic_ocp/phases_info/0/dynamics", json={"dynamics": "JOINTS_ACCELERATION_DRIVEN"})
     assert response.status_code == 200, response
-    data = response.json()
-    state_variables = data[0]["state_variables"]
-    control_variables = data[0]["control_variables"]
+    data = response.json()["phase"]
+    state_variables = data["state_variables"]
+    control_variables = data["control_variables"]
 
     assert {"q", "qdot"} == set([s["name"] for s in state_variables])
     assert {"qddot_joints"} == set([c["name"] for c in control_variables])
@@ -202,9 +202,9 @@ def test_put_dynamic_joints_acceleration():
 def test_put_dynamic_torque_driven():
     response = client.put("/generic_ocp/phases_info/0/dynamics", json={"dynamics": "TORQUE_DRIVEN"})
     assert response.status_code == 200, response
-    data = response.json()
-    state_variables = data[0]["state_variables"]
-    control_variables = data[0]["control_variables"]
+    data = response.json()["phase"]
+    state_variables = data["state_variables"]
+    control_variables = data["control_variables"]
 
     assert {"q", "qdot"} == set([s["name"] for s in state_variables])
     assert {"tau"} == set([c["name"] for c in control_variables])

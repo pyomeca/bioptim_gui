@@ -36,7 +36,7 @@ abstract class OCPData<T extends Phase> with ChangeNotifier {
   /// Update methods
 
   void updateField(String name, String value);
-  void updatePhaseField(int phaseIndex, String fieldName, String newValue);
+  void updatePhaseField(int phaseIndex, String fieldName, dynamic newValue);
 
   void updatePhaseInfo(List<dynamic> newData) {
     final newPhases = (newData).map((p) => phaseFromJsonFunction(p)).toList();
