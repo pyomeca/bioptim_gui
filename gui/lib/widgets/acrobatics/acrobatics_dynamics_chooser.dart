@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:bioptim_gui/models/acrobatics_data.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
 import 'package:bioptim_gui/widgets/utils/custom_http_dropdown.dart';

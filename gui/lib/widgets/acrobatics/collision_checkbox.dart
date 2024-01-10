@@ -1,7 +1,5 @@
-import 'package:bioptim_gui/models/acrobatics_controllers.dart';
 import 'package:bioptim_gui/models/acrobatics_data.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
-import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

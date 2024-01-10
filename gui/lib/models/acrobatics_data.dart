@@ -115,6 +115,10 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
         phasesInfo =
             SomersaultPhase.convertDynamicList(jsonData["phases_info"]);
         break;
+      // model_path is not updated here because it is a special case, it has to
+      // be send as a multipart file request
+      // It is currently updated using requestMaker.updateBioModel
+      case "model_path":
       default:
         break;
     }

@@ -153,9 +153,9 @@ class _DecisionVariableChooser extends StatelessWidget {
           InterpolationChooser(
             width: width,
             putEndpoint: from == DecisionVariableType.control
-                ? '/$endpointPrefix/$phaseIndex/control_variables/'
+                ? '$endpointPrefix/$phaseIndex/control_variables/'
                     '$variableIndex/initial_guess_interpolation_type'
-                : '/$endpointPrefix/$phaseIndex/state_variables/'
+                : '$endpointPrefix/$phaseIndex/state_variables/'
                     '$variableIndex/initial_guess_interpolation_type',
             requestKey: 'interpolation_type',
             titlePrefix: 'Initial guess',
