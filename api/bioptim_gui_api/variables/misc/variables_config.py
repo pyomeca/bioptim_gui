@@ -31,6 +31,9 @@ class DefaultVariablesConfig:
 
     Attributes
     ----------
+    dynamics_control: dict
+        The dynamics and the corresponding control variable name
+
     default_dummy_variables: dict
         The default dummy variables
 
@@ -39,12 +42,15 @@ class DefaultVariablesConfig:
 
     """
 
-    default_dummy_variables = {
-        "state_variables": [
-            default_bounds_initial_guess("coucou"),
-        ],
+    dynamics_control = {
+        "TORQUE_DRIVEN": "tau",
+        "JOINTS_ACCELERATION_DRIVEN": "qddot_joints",
+    }
+
+    default_joints_acceleration_driven_variables = {
+        "state_variables": [default_bounds_initial_guess("q"), default_bounds_initial_guess("qdot")],
         "control_variables": [
-            default_bounds_initial_guess("tata"),
+            default_bounds_initial_guess("qddot_joints"),
         ],
     }
 
@@ -63,7 +69,21 @@ class DefaultVariablesConfig:
         ],
         "control_variables": [
             default_bounds_initial_guess(
-                "tau", bounds_interpolation_type="CONSTANT", initial_guess_interpolation_type="CONSTANT"
+                "tau",
+                bounds_interpolation_type="CONSTANT",
+                initial_guess_interpolation_type="CONSTANT",
             ),
         ],
     }
+
+
+def get_dynamics_decision_variables(dynamics: str):
+    """
+    Return the default decision variables for a dynamics
+    """
+    dynamics_to_decision_variables = {
+        "TORQUE_DRIVEN": DefaultVariablesConfig.default_torque_driven_variables,
+        "JOINTS_ACCELERATION_DRIVEN": DefaultVariablesConfig.default_joints_acceleration_driven_variables,
+    }
+
+    return copy.deepcopy(dynamics_to_decision_variables[dynamics])

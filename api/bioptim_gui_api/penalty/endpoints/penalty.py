@@ -1,18 +1,15 @@
 from bioptim import QuadratureRule
 from fastapi import APIRouter
 
-from bioptim_gui_api.acrobatics_ocp.misc.enums import Node
+from bioptim_gui_api.penalty.misc.enums import Node
 from bioptim_gui_api.penalty.misc.penalty_config import DefaultPenaltyConfig
+from bioptim_gui_api.utils.format_utils import get_spaced_capitalized
 
 router = APIRouter(
     prefix="/penalties",
     tags=["penalties"],
     responses={404: {"description": "Not found"}},
 )
-
-
-def get_spaced_capitalized(enum) -> list:
-    return [e.value.replace("_", " ").capitalize() for e in enum]
 
 
 @router.get("/nodes", response_model=list[str])

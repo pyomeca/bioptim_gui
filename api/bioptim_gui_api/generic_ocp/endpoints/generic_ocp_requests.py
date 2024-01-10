@@ -4,6 +4,7 @@ from bioptim import QuadratureRule, Node
 from pydantic import BaseModel
 
 from bioptim_gui_api.penalty.misc.enums import ObjectiveType
+from bioptim_gui_api.variables.misc.enums import Dynamics
 
 
 class NbPhasesRequest(BaseModel):
@@ -15,7 +16,7 @@ class NbShootingPointsRequest(BaseModel):
 
 
 class DynamicsRequest(BaseModel):
-    dynamics: str
+    dynamics: Dynamics
 
 
 class PhaseDurationRequest(BaseModel):

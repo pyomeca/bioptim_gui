@@ -13,8 +13,9 @@ from bioptim_gui_api.acrobatics_ocp.endpoints.acrobatics_requests import (
     CollisionConstraintRequest,
     WithSpineRequest,
 )
-from bioptim_gui_api.acrobatics_ocp.misc.enums import Position, Dynamics
+from bioptim_gui_api.acrobatics_ocp.misc.enums import Position
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import PhaseDurationRequest, DynamicsRequest
+from bioptim_gui_api.variables.misc.enums import Dynamics
 
 
 class NbSomersaultsResponse(NbSomersaultsRequest):

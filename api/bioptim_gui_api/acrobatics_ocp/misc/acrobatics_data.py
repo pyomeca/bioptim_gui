@@ -30,7 +30,7 @@ class AcrobaticsOCPData(GenericOCPData):
         "preferred_twist_side": "left",
         "with_visual_criteria": False,
         "collision_constraint": False,
-        "dynamics": "torque_driven",
+        "dynamics": "TORQUE_DRIVEN",
         "with_spine": False,
         "dof_names": [],
         "phases_info": [

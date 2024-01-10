@@ -109,7 +109,11 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
         break;
       case "with_spine":
         withSpine = jsonData["with_spine"];
+        dynamics = jsonData["dynamics"];
         dofNames = List.from(jsonData["dof_names"]);
+        phasesInfo =
+            SomersaultPhase.convertDynamicList(jsonData["phases_info"]);
+        break;
       case "dynamics":
         dynamics = jsonData["dynamics"];
         phasesInfo =
@@ -119,6 +123,7 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
       // be send as a multipart file request
       // It is currently updated using requestMaker.updateBioModel
       case "model_path":
+        break;
       default:
         break;
     }

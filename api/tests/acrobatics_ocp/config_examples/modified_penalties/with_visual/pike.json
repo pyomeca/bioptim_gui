@@ -13,7 +13,7 @@
     "preferred_twist_side": "left",
     "with_visual_criteria": true,
     "collision_constraint": false,
-    "dynamics": "torque_driven",
+    "dynamics": "TORQUE_DRIVEN",
     "with_spine": false,
     "dof_names": [
         "X",

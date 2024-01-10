@@ -3,6 +3,7 @@ from multiprocessing import cpu_count
 from bioptim_gui_api.acrobatics_ocp.code_generation.bounds import AcrobaticsGenerationBounds
 from bioptim_gui_api.penalty.misc.constraint_printer import ConstraintPrinter
 from bioptim_gui_api.penalty.misc.objective_printer import ObjectivePrinter
+from bioptim_gui_api.variables.misc.variables_config import DefaultVariablesConfig
 
 
 class AcrobaticsGenerationPrepareOCP:
@@ -105,8 +106,7 @@ def prepare_ocp(
 
     @classmethod
     def multistart_noise(cls, data: dict) -> str:
-        dynamics = data["dynamics"]
-        control = "tau" if dynamics == "torque_driven" else "qddot_joints"
+        control = DefaultVariablesConfig.dynamics_control[data["dynamics"]]
         return f"""
     if is_multistart:
         for i in range(nb_phases):
@@ -177,7 +177,7 @@ def prepare_ocp(
 
     @classmethod
     def prepare_ocp(cls, data: dict, new_model_path: str) -> str:
-        torque_driven = data["dynamics"] == "torque_driven"
+        torque_driven = data["dynamics"] == "TORQUE_DRIVEN"
 
         ret = cls.prepare_ocp_header()
         ret += cls.generic_elements(data, new_model_path)

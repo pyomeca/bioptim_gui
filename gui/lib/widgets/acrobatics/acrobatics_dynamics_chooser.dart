@@ -26,10 +26,10 @@ class AcrobaticsDynamicChooser extends StatelessWidget {
         getEndpoint: "/acrobatics/dynamics",
         putEndpoint: '/acrobatics/dynamics',
         requestKey: "dynamics",
-        customStringFormatting: (s) => s.replaceAll(" ", "_").toLowerCase(),
+        customStringFormatting: (s) => s.replaceAll(" ", "_").toUpperCase(),
         customOnSelected: (value) async {
           (data as AcrobaticsData).updateField(
-              "dynamics", value.replaceAll(" ", "_").toLowerCase());
+              "dynamics", value.replaceAll(" ", "_").toUpperCase());
           return true;
         },
       );

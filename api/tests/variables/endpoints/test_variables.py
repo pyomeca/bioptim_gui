@@ -20,5 +20,5 @@ def test_get_dynamics():
     response = client.get("/variables/dynamics")
     assert response.status_code == 200
     data = response.json()
-    for dynamic in ["TORQUE_DRIVEN", "DUMMY"]:
+    for dynamic in ["Torque driven", "Joints acceleration driven"]:
         assert dynamic in data

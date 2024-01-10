@@ -1,5 +1,8 @@
 from fastapi import APIRouter
 
+from bioptim_gui_api.utils.format_utils import get_spaced_capitalized
+from bioptim_gui_api.variables.misc.enums import Dynamics
+
 router = APIRouter(
     prefix="/variables",
     tags=["variables"],
@@ -18,7 +21,4 @@ def get_interpolation_types():
 
 @router.get("/dynamics", response_model=list[str])
 def get_dynamics_list():
-    return [
-        "TORQUE_DRIVEN",
-        "DUMMY",
-    ]
+    return get_spaced_capitalized(Dynamics)

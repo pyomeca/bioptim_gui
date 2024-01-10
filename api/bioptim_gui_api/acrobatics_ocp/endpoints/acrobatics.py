@@ -35,6 +35,8 @@ from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_phases_variables import (
     GenericStateVariableRouter,
 )
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import DynamicsRequest
+from bioptim_gui_api.utils.format_utils import get_spaced_capitalized
+from bioptim_gui_api.variables.misc.enums import Dynamics
 
 
 class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
@@ -140,7 +142,7 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
     def register_get_dynamics(self):
         @self.router.get("/dynamics", response_model=list[str])
         def get_dynamics():
-            return ["torque_driven", "joints_acceleration_driven"]
+            return get_spaced_capitalized(Dynamics)
 
     def register_put_dynamics(self):
         @self.router.put("/dynamics", response_model=DynamicsResponse)
@@ -161,7 +163,10 @@ class AcrobaticsOCPBaseFieldRegistrar(GenericOCPBaseFieldRegistrar):
                 adapt_dynamics(phase, new_value)
 
             self.data.update_data("phases_info", phases_info)
-            return DynamicsResponse(dynamics=new_value, phases_info=phases_info)
+            return DynamicsResponse(
+                dynamics=new_value,
+                phases_info=phases_info,
+            )
 
 
 router = APIRouter(

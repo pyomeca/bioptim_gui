@@ -4,6 +4,7 @@ from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 from bioptim_gui_api.acrobatics_ocp.variables.variable_compute import get_variable_computer
 from bioptim_gui_api.penalty.misc.constraint_printer import ConstraintPrinter
 from bioptim_gui_api.penalty.misc.objective_printer import ObjectivePrinter
+from bioptim_gui_api.variables.misc.variables_config import DefaultVariablesConfig
 from tests.acrobatics_ocp.code_generation.bounds import AcrobaticsGenerationBounds
 
 
@@ -106,7 +107,7 @@ def prepare_ocp(
     @staticmethod
     def multistart_noise(data: dict) -> str:
         dynamics = data["dynamics"]
-        control = "tau" if dynamics == "torque_driven" else "qddot_joints"
+        control = DefaultVariablesConfig.dynamics_control[data["dynamics"]]
         return f"""
     if is_multistart:
         for i in range(nb_phases):
@@ -177,7 +178,7 @@ def prepare_ocp(
     @staticmethod
     def prepare_ocp(data: dict, new_model_path: str) -> str:
         position = data["position"]
-        torque_driven = data["dynamics"] == "torque_driven"
+        torque_driven = data["dynamics"] == "TORQUE_DRIVEN"
         additional_criteria = AdditionalCriteria(
             with_visual_criteria=data["with_visual_criteria"],
             collision_constraint=data["collision_constraint"],

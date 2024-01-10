@@ -8,6 +8,7 @@ from bioptim_gui_api.acrobatics_ocp.misc.acrobatics_utils import (
 from bioptim_gui_api.acrobatics_ocp.misc.dynamics_updating import adapt_dynamics
 from bioptim_gui_api.acrobatics_ocp.misc.models import AdditionalCriteria
 from bioptim_gui_api.acrobatics_ocp.variables.variable_compute import get_variable_computer
+from bioptim_gui_api.variables.misc.variables_config import DefaultVariablesConfig
 
 
 def update_state_control_variables(phases: list[dict], data: dict) -> None:
@@ -24,11 +25,6 @@ def update_state_control_variables(phases: list[dict], data: dict) -> None:
     data: dict
         The data of the acrobatics
     """
-    dynamics_control = {
-        "torque_driven": "tau",
-        "joints_acceleration_driven": "qddot_joints",
-    }
-
     nb_somersaults = data["nb_somersaults"]
     half_twists = data["nb_half_twists"]
     prefer_left = data["preferred_twist_side"] == "left"
@@ -86,7 +82,7 @@ def update_state_control_variables(phases: list[dict], data: dict) -> None:
         ]
         phases[i]["control_variables"] = [
             {
-                "name": dynamics_control[data["dynamics"]],
+                "name": DefaultVariablesConfig.dynamics_control[data["dynamics"]],
                 "dimension": nb_tau,
                 "bounds_interpolation_type": "CONSTANT",
                 "bounds": {
