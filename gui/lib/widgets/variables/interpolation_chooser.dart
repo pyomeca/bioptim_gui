@@ -1,27 +1,34 @@
+import 'package:bioptim_gui/models/decision_variables_type.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
 import 'package:bioptim_gui/widgets/utils/custom_http_dropdown.dart';
 import 'package:bioptim_gui/widgets/utils/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class InterpolationChooser extends StatelessWidget {
   const InterpolationChooser({
     super.key,
     required this.width,
-    required this.putEndpoint,
     required this.requestKey,
     this.defaultValue = "Constant with first and last different",
     this.titlePrefix = "",
-    this.customCallBack,
+    required this.endpointPrefix,
+    required this.phaseIndex,
+    required this.decisionVariableType,
+    required this.variableIndex,
+    required this.fieldName,
   });
 
   final double width;
   final String defaultValue;
-  final String putEndpoint;
   final String requestKey;
   final String titlePrefix;
-  final Function(http.Response)? customCallBack;
+
+  final String endpointPrefix;
+  final int phaseIndex;
+  final DecisionVariableType decisionVariableType;
+  final int variableIndex;
+  final String fieldName;
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +39,20 @@ class InterpolationChooser extends StatelessWidget {
         defaultValue:
             defaultValue.toLowerCase().replaceAll("_", " ").capitalize(),
         items: data.availablesValue!.interpolationTypes,
-        putEndpoint: putEndpoint,
+        putEndpoint:
+            '$endpointPrefix/$phaseIndex/${decisionVariableType.toPythonString()}/'
+            '$variableIndex/$fieldName',
         requestKey: requestKey,
         customStringFormatting: (s) => s.replaceAll(" ", "_").toUpperCase(),
-        customCallBack: customCallBack,
+        customOnSelected: (value) {
+          data.updateDecisionVariableField(
+              phaseIndex,
+              decisionVariableType,
+              variableIndex,
+              fieldName,
+              value.replaceAll(" ", "_").toUpperCase());
+          return true;
+        },
       );
     });
   }

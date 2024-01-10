@@ -50,19 +50,6 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
     notifyListeners();
   }
 
-  Future<bool> updateFieldAndData(String field, String value) async {
-    final response = await requestMaker.updateField(field, value);
-
-    if (response.statusCode != 200) {
-      return Future(() => false);
-    }
-
-    final newData = AcrobaticsData.fromJson(json.decode(response.body));
-
-    updateData(newData);
-    return Future(() => true);
-  }
-
   @override
   void updateField(String name, dynamic value) async {
     final response = await requestMaker.updateField(name, value);
@@ -121,7 +108,7 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
         break;
       // model_path is not updated here because it is a special case, it has to
       // be send as a multipart file request
-      // It is currently updated using requestMaker.updateBioModel
+      // It is currently updated using updateBioModel
       case "model_path":
         break;
       default:
@@ -149,25 +136,6 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
       default:
         break;
     }
-    notifyListeners();
-  }
-
-  void updateData(AcrobaticsData newData) {
-    nbSomersaults = newData.nbSomersaults;
-    halfTwists = List.from(newData.halfTwists);
-    modelPath = newData.modelPath;
-    finalTime = newData.finalTime;
-    finalTimeMargin = newData.finalTimeMargin;
-    position = newData.position;
-    sportType = newData.sportType;
-    preferredTwistSide = newData.preferredTwistSide;
-    withVisualCriteria = newData.withVisualCriteria;
-    collisionConstraint = newData.collisionConstraint;
-    withSpine = newData.withSpine;
-    dynamics = newData.dynamics;
-    dofNames = List.from(newData.dofNames);
-    phasesInfo = List.from(newData.phasesInfo);
-
     notifyListeners();
   }
 

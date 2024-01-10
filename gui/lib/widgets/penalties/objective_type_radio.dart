@@ -1,4 +1,5 @@
 import 'package:bioptim_gui/models/ocp_data.dart';
+import 'package:bioptim_gui/models/penalty.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -32,18 +33,6 @@ class ObjectiveTypeRadioState extends State<ObjectiveTypeRadio> {
     final valueLabel = {"mayer": "\u2133", "lagrange": "\u2112"};
 
     return Consumer<OCPData>(builder: (context, data, child) {
-      void updatePenalty(newValue) async {
-        final success = await data.updatePenaltyField(widget.phaseIndex,
-            widget.objectiveIndex, "objectives", "objective_type", newValue,
-            doUpdate: true);
-
-        if (success) {
-          setState(() {
-            _selectedValue = newValue;
-          });
-        }
-      }
-
       return Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -54,7 +43,17 @@ class ObjectiveTypeRadioState extends State<ObjectiveTypeRadio> {
                   value: pair.key,
                   groupValue: _selectedValue,
                   onChanged: (newValue) async {
-                    updatePenalty(newValue);
+                    data.updatePenaltyField(
+                      widget.phaseIndex,
+                      widget.objectiveIndex,
+                      Objective,
+                      "objective_type",
+                      newValue,
+                    );
+
+                    setState(() {
+                      _selectedValue = newValue!;
+                    });
                   },
                 ),
                 Text(pair.value),

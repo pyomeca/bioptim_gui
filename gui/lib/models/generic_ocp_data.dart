@@ -24,10 +24,11 @@ class GenericOcpData extends OCPData<GenericPhase> {
     switch (name) {
       case "nb_phases":
         nbPhases = jsonData["nb_phases"];
+        updatePhaseInfo(jsonData["phases_info"]);
         break;
       // model_path is not updated here because it is a special case, it has to
       // be send as a multipart file request
-      // It is currently updated using requestMaker.updateBioModel
+      // It is currently updated using updateBioModel
       case "model_path":
       default:
         break;
@@ -60,14 +61,6 @@ class GenericOcpData extends OCPData<GenericPhase> {
         phasesInfo[phaseIndex].duration = jsonData["duration"];
         break;
     }
-    notifyListeners();
-  }
-
-  void updateData(GenericOcpData newData) {
-    nbPhases = newData.nbPhases;
-    modelPath = newData.modelPath;
-    phasesInfo = List.from(newData.phasesInfo);
-
     notifyListeners();
   }
 

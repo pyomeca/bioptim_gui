@@ -9,8 +9,8 @@ import 'package:bioptim_gui/widgets/penalties/nodes_chooser.dart';
 import 'package:bioptim_gui/widgets/penalties/objective_type_radio.dart';
 import 'package:bioptim_gui/widgets/penalties/penalty_chooser.dart';
 import 'package:bioptim_gui/widgets/utils/animated_expanding_widget.dart';
+import 'package:bioptim_gui/widgets/utils/boolean_switch.dart';
 import 'package:bioptim_gui/widgets/utils/extensions.dart';
-import 'package:bioptim_gui/widgets/utils/remote_boolean_switch.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -142,8 +142,8 @@ class PenaltyExpanderState extends State<PenaltyExpander> {
                 : (json.decode(response.body) as List<dynamic>)
                     .map((o) => Objective.fromJson(o))
                     .toList();
-            data.updatePenalties(widget.phaseIndex,
-                _penaltyTypeToEndpoint(plural: false), newPenalties);
+            data.updatePenalties(
+                widget.phaseIndex, widget.penaltyType, newPenalties);
           },
           child: Container(
               padding:
@@ -270,23 +270,10 @@ class _PathTile extends StatelessWidget {
                       '${_penaltyTypeToString(plural: false)} ${penaltyIndex + 1} (${penalty.penaltyTypeToString()})',
                   width: width,
                   defaultValue: penalty.penaltyType,
-                  getEndpoint:
-                      '$endpointPrefix/$phaseIndex/${_penaltyTypeToEndpoint(plural: true)}/$penaltyIndex',
-                  putEndpoint:
-                      '$endpointPrefix/$phaseIndex/${_penaltyTypeToEndpoint(plural: true)}/$penaltyIndex/penalty_type',
-                  customCallBack: (response) {
-                    final Penalty newPenalty = (penaltyType == Objective)
-                        ? Objective.fromJson(
-                            json.decode(response.body) as Map<String, dynamic>)
-                        : Constraint.fromJson(
-                            json.decode(response.body) as Map<String, dynamic>);
-
-                    data.updatePenalty(
-                        phaseIndex,
-                        _penaltyTypeToEndpoint(plural: false),
-                        penaltyIndex,
-                        newPenalty);
-                  },
+                  endpointPrefix: endpointPrefix,
+                  phaseIndex: phaseIndex,
+                  penaltyType: penaltyType,
+                  penaltyIndex: penaltyIndex,
                 ),
               ),
               if (penaltyType == Objective)
@@ -319,13 +306,14 @@ class _PathTile extends StatelessWidget {
                         // inputFormatters: [FilteringTextInputFormatter.allow()],
                         onSubmitted: (value) => {
                           data.updatePenaltyArgument(
-                              phaseIndex,
-                              penaltyIndex,
-                              arguments[i].name,
-                              (value.isEmpty ? null : value),
-                              arguments[i].type,
-                              i,
-                              _penaltyTypeToEndpoint(plural: true))
+                            phaseIndex,
+                            penaltyIndex,
+                            arguments[i].name,
+                            (value.isEmpty ? null : value),
+                            arguments[i].type,
+                            i,
+                            penaltyType,
+                          )
                         },
                       ),
                     ),
@@ -337,15 +325,13 @@ class _PathTile extends StatelessWidget {
                 SizedBox(
                     width: (penaltyType == Objective) ? width / 2 - 3 : width,
                     child: NodesChooser(
-                      width: width,
-                      items: penaltyType == Objective &&
-                              (penalty as Objective).objectiveType == "lagrange"
-                          ? ["All shooting"]
-                          : data.availablesValue!.nodes,
-                      putEndpoint:
-                          '$endpointPrefix/$phaseIndex/${_penaltyTypeToEndpoint(plural: true)}/$penaltyIndex/nodes',
-                      defaultValue: penalty.nodes,
-                    )),
+                        width: width,
+                        defaultValue: penalty.nodes,
+                        endpointPrefix: endpointPrefix,
+                        phaseIndex: phaseIndex,
+                        penaltyType: penaltyType,
+                        penaltyIndex: penaltyIndex,
+                        penalty: penalty)),
                 if (penaltyType == Objective)
                   SizedBox(
                     width: width / 4 - 3,
@@ -360,12 +346,12 @@ class _PathTile extends StatelessWidget {
                       ],
                       onSubmitted: (value) => {
                         data.updatePenaltyField(
-                            phaseIndex,
-                            penaltyIndex,
-                            _penaltyTypeToEndpoint(plural: true),
-                            "weight",
-                            (double.tryParse(value) ?? 0).toString(),
-                            doUpdate: false),
+                          phaseIndex,
+                          penaltyIndex,
+                          penaltyType,
+                          "weight",
+                          (double.tryParse(value) ?? 0).toString(),
+                        ),
                       },
                     ),
                   ),
@@ -394,12 +380,8 @@ class _PathTile extends StatelessWidget {
                       FilteringTextInputFormatter.allow(RegExp(r'[0-9\.,\[\]]'))
                     ],
                     onSubmitted: (value) => {
-                      data.updatePenaltyField(
-                          phaseIndex,
-                          penaltyIndex,
-                          _penaltyTypeToEndpoint(plural: true),
-                          "target",
-                          value.tryParseDoubleList())
+                      data.updatePenaltyField(phaseIndex, penaltyIndex,
+                          penaltyType, "target", value.tryParseDoubleList())
                     },
                   ),
                 ),
@@ -417,10 +399,11 @@ class _PathTile extends StatelessWidget {
                     width: width,
                     child: IntegrationRuleChooser(
                       width: width,
-                      items: data.availablesValue!.integrationRules,
-                      putEndpoint:
-                          '$endpointPrefix/$phaseIndex/${_penaltyTypeToEndpoint(plural: true)}/$penaltyIndex/integration_rule',
                       defaultValue: penalty.integrationRule,
+                      endpointPrefix: endpointPrefix,
+                      phaseIndex: phaseIndex,
+                      penaltyType: penaltyType,
+                      penaltyIndex: penaltyIndex,
                     ),
                   ),
                 ],
@@ -428,41 +411,49 @@ class _PathTile extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                RemoteBooleanSwitch(
-                    endpoint:
-                        '$endpointPrefix/$phaseIndex/${_penaltyTypeToEndpoint(plural: true)}/$penaltyIndex/quadratic',
-                    defaultValue: penalty.quadratic,
-                    leftText: "Quadratic",
-                    width: width / 2 - 6,
-                    requestKey: "quadratic"),
+                BooleanSwitch(
+                  initialValue: penalty.quadratic,
+                  leftText: "Quadratic",
+                  width: width / 2 - 6,
+                  customOnChanged: (value) => {
+                    data.updatePenaltyField(phaseIndex, penaltyIndex,
+                        penaltyType, "quadratic", value)
+                  },
+                ),
                 const SizedBox(width: 12),
-                RemoteBooleanSwitch(
-                    endpoint:
-                        '$endpointPrefix/$phaseIndex/${_penaltyTypeToEndpoint(plural: true)}/$penaltyIndex/expand',
-                    defaultValue: penalty.expand,
-                    leftText: "Expand",
-                    width: width / 2 - 6,
-                    requestKey: "expand"),
+                BooleanSwitch(
+                  initialValue: penalty.expand,
+                  leftText: "Expand",
+                  width: width / 2 - 6,
+                  customOnChanged: (value) => {
+                    data.updatePenaltyField(
+                        phaseIndex, penaltyIndex, penaltyType, "expand", value)
+                  },
+                )
               ],
             ),
             const SizedBox(height: 12),
             Row(
               children: [
-                RemoteBooleanSwitch(
-                    endpoint:
-                        '$endpointPrefix/$phaseIndex/${_penaltyTypeToEndpoint(plural: true)}/$penaltyIndex/multi_thread',
-                    defaultValue: penalty.multiThread,
-                    leftText: "MultiThread",
-                    width: width / 2 - 6,
-                    requestKey: "multi_thread"),
+                BooleanSwitch(
+                  initialValue: penalty.multiThread,
+                  leftText: "Multithread",
+                  width: width / 2 - 6,
+                  customOnChanged: (value) => {
+                    data.updatePenaltyField(phaseIndex, penaltyIndex,
+                        penaltyType, "multi_thread", value)
+                  },
+                ),
                 const SizedBox(width: 12),
-                RemoteBooleanSwitch(
-                    endpoint:
-                        '$endpointPrefix/$phaseIndex/${_penaltyTypeToEndpoint(plural: true)}/$penaltyIndex/derivative',
-                    defaultValue: penalty.derivative,
-                    leftText: "Derivative",
-                    width: width / 2 - 6,
-                    requestKey: "derivative"),
+                BooleanSwitch(
+                  initialValue: penalty.derivative,
+                  leftText: "Derivative",
+                  width: width / 2 - 6,
+                  customOnChanged: (value) => {
+                    data.updatePenaltyField(phaseIndex, penaltyIndex,
+                        penaltyType, "derivative", value)
+                  },
+                )
               ],
             ),
             Align(
@@ -477,8 +468,7 @@ class _PathTile extends StatelessWidget {
                       : (json.decode(response.body) as List<dynamic>)
                           .map((o) => Objective.fromJson(o))
                           .toList();
-                  data.updatePenalties(phaseIndex,
-                      _penaltyTypeToEndpoint(plural: false), newPenalties);
+                  data.updatePenalties(phaseIndex, penaltyType, newPenalties);
                 },
                 borderRadius: BorderRadius.circular(25),
                 child: Padding(

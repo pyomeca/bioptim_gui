@@ -1,7 +1,3 @@
-import 'dart:convert';
-
-import 'package:bioptim_gui/models/generic_ocp_data.dart';
-import 'package:bioptim_gui/models/generic_ocp_request_maker.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
 import 'package:bioptim_gui/widgets/utils/positive_integer_text_field.dart';
 import 'package:flutter/material.dart';
@@ -26,13 +22,7 @@ class NumberOfPhasesChooser extends StatelessWidget {
           enabled: true,
           onSubmitted: (newValue) async {
             if (newValue.isNotEmpty) {
-              final response = await GenericOCPRequestMaker()
-                  .updateField("nb_phases", newValue);
-
-              final updatedData =
-                  GenericOcpData.fromJson(json.decode(response.body));
-
-              (data as GenericOcpData).updateData(updatedData);
+              data.updateField("nb_phases", newValue);
             }
           },
         ),

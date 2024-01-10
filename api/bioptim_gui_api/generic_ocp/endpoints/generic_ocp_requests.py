@@ -4,7 +4,7 @@ from bioptim import QuadratureRule, Node
 from pydantic import BaseModel
 
 from bioptim_gui_api.penalty.misc.enums import ObjectiveType
-from bioptim_gui_api.variables.misc.enums import Dynamics
+from bioptim_gui_api.variables.misc.enums import Dynamics, InterpolationType
 
 
 class NbPhasesRequest(BaseModel):
@@ -77,8 +77,12 @@ class ObjectiveFcnRequest(BaseModel):
     penalty_type: str
 
 
-class InterpolationTypeRequest(BaseModel):
-    interpolation_type: str
+class BoundsInterpolationTypeRequest(BaseModel):
+    bounds_interpolation_type: InterpolationType
+
+
+class InitialGuessInterpolationTypeRequest(BaseModel):
+    initial_guess_interpolation_type: InterpolationType
 
 
 class DimensionRequest(BaseModel):

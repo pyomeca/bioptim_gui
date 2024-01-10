@@ -16,14 +16,14 @@ import 'package:http/http.dart' as http;
 class DecisionVariableExpander extends StatelessWidget {
   const DecisionVariableExpander({
     super.key,
-    required this.from,
+    required this.decisionVariableType,
     required this.phaseIndex,
     required this.width,
     required this.endpointPrefix,
     this.enableDimension = true,
   });
 
-  final DecisionVariableType from;
+  final DecisionVariableType decisionVariableType;
   final int phaseIndex;
   final double width;
   final String endpointPrefix;
@@ -32,9 +32,10 @@ class DecisionVariableExpander extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<OCPData>(builder: (context, data, child) {
-      List<Variable> variables = from == DecisionVariableType.control
-          ? data.phasesInfo[phaseIndex].controlVariables
-          : data.phasesInfo[phaseIndex].stateVariables;
+      List<Variable> variables =
+          decisionVariableType == DecisionVariableType.control
+              ? data.phasesInfo[phaseIndex].controlVariables
+              : data.phasesInfo[phaseIndex].stateVariables;
 
       return AnimatedExpandingWidget(
         header: SizedBox(
@@ -43,7 +44,7 @@ class DecisionVariableExpander extends StatelessWidget {
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              '$from variables',
+              '$decisionVariableType variables',
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
@@ -54,7 +55,7 @@ class DecisionVariableExpander extends StatelessWidget {
               name: variables[i].name,
               phaseIndex: phaseIndex,
               variableIndex: i,
-              from: from,
+              decisionVariableType: decisionVariableType,
               width: width,
               endpointPrefix: endpointPrefix,
               enableDimension: enableDimension,
@@ -68,7 +69,7 @@ class DecisionVariableExpander extends StatelessWidget {
 class _DecisionVariableChooser extends StatelessWidget {
   const _DecisionVariableChooser({
     required this.name,
-    required this.from,
+    required this.decisionVariableType,
     required this.phaseIndex,
     required this.variableIndex,
     required this.width,
@@ -79,7 +80,7 @@ class _DecisionVariableChooser extends StatelessWidget {
   final String name;
   final int phaseIndex;
   final int variableIndex;
-  final DecisionVariableType from;
+  final DecisionVariableType decisionVariableType;
   final double width;
   final String endpointPrefix;
   final bool enableDimension;
@@ -87,7 +88,7 @@ class _DecisionVariableChooser extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<OCPData>(builder: (context, data, child) {
-      final variable = from == DecisionVariableType.control
+      final variable = decisionVariableType == DecisionVariableType.control
           ? data.phasesInfo[phaseIndex].controlVariables[variableIndex]
           : data.phasesInfo[phaseIndex].stateVariables[variableIndex];
 
@@ -118,14 +119,12 @@ class _DecisionVariableChooser extends StatelessWidget {
                   value: variable.dimension.toString(),
                   onSubmitted: (value) async {
                     if (value.isNotEmpty) {
-                      final response = await data.requestMaker
-                          .updateDecisionVariableField("dimension", phaseIndex,
-                              from, variableIndex, value);
-
-                      final newPhases =
-                          (json.decode(response.body) as List<dynamic>);
-
-                      data.updatePhaseInfo(newPhases);
+                      data.updateDecisionVariableField(
+                          phaseIndex,
+                          decisionVariableType,
+                          variableIndex,
+                          "dimension",
+                          value);
                     }
                   },
                 ),
@@ -135,42 +134,32 @@ class _DecisionVariableChooser extends StatelessWidget {
           const SizedBox(height: 12),
           InterpolationChooser(
             width: width,
-            putEndpoint: from == DecisionVariableType.control
-                ? '$endpointPrefix/$phaseIndex/control_variables/'
-                    '$variableIndex/bounds_interpolation_type'
-                : '$endpointPrefix/$phaseIndex/state_variables/'
-                    '$variableIndex/bounds_interpolation_type',
+            endpointPrefix: endpointPrefix,
+            phaseIndex: phaseIndex,
+            decisionVariableType: decisionVariableType,
+            variableIndex: variableIndex,
+            fieldName: "bounds_interpolation_type",
             requestKey: 'interpolation_type',
             titlePrefix: 'Bounds',
             defaultValue: variable.boundsInterpolationType,
-            customCallBack: (response) {
-              final newPhases = (json.decode(response.body) as List<dynamic>);
-
-              data.updatePhaseInfo(newPhases);
-            },
           ),
           const SizedBox(height: 12),
           InterpolationChooser(
             width: width,
-            putEndpoint: from == DecisionVariableType.control
-                ? '$endpointPrefix/$phaseIndex/control_variables/'
-                    '$variableIndex/initial_guess_interpolation_type'
-                : '$endpointPrefix/$phaseIndex/state_variables/'
-                    '$variableIndex/initial_guess_interpolation_type',
+            endpointPrefix: endpointPrefix,
+            phaseIndex: phaseIndex,
+            decisionVariableType: decisionVariableType,
+            variableIndex: variableIndex,
+            fieldName: "initial_guess_interpolation_type",
             requestKey: 'interpolation_type',
             titlePrefix: 'Initial guess',
             defaultValue: variable.initialGuessInterpolationType,
-            customCallBack: (response) {
-              final newPhases = (json.decode(response.body) as List<dynamic>);
-
-              data.updatePhaseInfo(newPhases);
-            },
           ),
           const SizedBox(height: 32),
           _DataFiller(
             title: 'Min bounds',
             boxWidth: width * 7 / 8 / 3,
-            from: from,
+            decisionVariableType: decisionVariableType,
             phaseIndex: phaseIndex,
             variableIndex: variableIndex,
             endpointPrefix: endpointPrefix,
@@ -179,7 +168,7 @@ class _DecisionVariableChooser extends StatelessWidget {
           _DataFiller(
             title: 'Max bounds',
             boxWidth: width * 7 / 8 / 3,
-            from: from,
+            decisionVariableType: decisionVariableType,
             phaseIndex: phaseIndex,
             variableIndex: variableIndex,
             endpointPrefix: endpointPrefix,
@@ -188,7 +177,7 @@ class _DecisionVariableChooser extends StatelessWidget {
           _DataFiller(
             title: 'Initial guess',
             boxWidth: width * 7 / 8 / 3,
-            from: from,
+            decisionVariableType: decisionVariableType,
             phaseIndex: phaseIndex,
             variableIndex: variableIndex,
             endpointPrefix: endpointPrefix,
@@ -204,7 +193,7 @@ class _DataFiller extends StatelessWidget {
   const _DataFiller({
     required this.title,
     required this.boxWidth,
-    required this.from,
+    required this.decisionVariableType,
     required this.phaseIndex,
     required this.variableIndex,
     required this.endpointPrefix,
@@ -212,7 +201,7 @@ class _DataFiller extends StatelessWidget {
 
   final String title;
   final double boxWidth;
-  final DecisionVariableType from;
+  final DecisionVariableType decisionVariableType;
   final int phaseIndex;
   final int variableIndex;
   final String endpointPrefix;
@@ -225,11 +214,9 @@ class _DataFiller extends StatelessWidget {
             ? 'max_bounds'
             : 'initial_guess';
 
-    final url = from == DecisionVariableType.control
-        ? '${APIConfig.url}/$endpointPrefix/$phaseIndex/control_variables/'
-            '$variableIndex/$fieldName'
-        : '${APIConfig.url}/$endpointPrefix/$phaseIndex/state_variables/'
-            '$variableIndex/$fieldName';
+    final url =
+        '${APIConfig.url}/$endpointPrefix/$phaseIndex/${decisionVariableType.toPythonString()}/'
+        '$variableIndex/$fieldName';
 
     final headers = {'Content-Type': 'application/json'};
     final body = json.encode({"x": i, "y": j, "value": newValue});
@@ -263,7 +250,7 @@ class _DataFiller extends StatelessWidget {
     }
 
     return Consumer<OCPData>(builder: (context, data, child) {
-      final variable = from == DecisionVariableType.control
+      final variable = decisionVariableType == DecisionVariableType.control
           ? data.phasesInfo[phaseIndex].controlVariables[variableIndex]
           : data.phasesInfo[phaseIndex].stateVariables[variableIndex];
 

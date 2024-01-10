@@ -85,7 +85,7 @@ def test_correct_state_variable_dimension():
 def test_put_state_variable_bounds_interpolation_type():
     response = client.put(
         "/acrobatics/phases_info/0/state_variables/0/bounds_interpolation_type",
-        json={"interpolation_type": "LINEAR"},
+        json={"bounds_interpolation_type": "LINEAR"},
     )
     assert response.status_code == 200, response
 
@@ -141,7 +141,7 @@ def test_put_state_variable_initial_guess():
 def test_put_state_variable_initial_guess_interpolation_type():
     response = client.put(
         "/acrobatics/phases_info/0/state_variables/0/initial_guess_interpolation_type",
-        json={"interpolation_type": "LINEAR"},
+        json={"initial_guess_interpolation_type": "LINEAR"},
     )
     assert response.status_code == 200, response
 
