@@ -212,3 +212,15 @@ def test_add_and_remove_multiple_phase():
     assert data["phases_info"][0]["duration"] == 1
     assert len(data["phases_info"][0]["objectives"]) == 0
     assert len(data["phases_info"][0]["constraints"]) == 0
+
+
+def test_available_values():
+    response = client.get("/generic_ocp/available_values")
+    assert response.status_code == 200, response
+    data = response.json()
+    assert data["nodes"]
+    assert data["objectives"]
+    assert data["integration_rules"]
+    assert data["constraints"]
+    assert data["interpolation_types"] == ["Constant", "Constant with first and last different", "Linear"]
+    assert data["dynamics"] == ["Torque driven", "Joints acceleration driven"]

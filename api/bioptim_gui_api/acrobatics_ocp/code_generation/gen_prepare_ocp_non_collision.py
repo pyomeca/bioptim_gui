@@ -7,6 +7,7 @@ from bioptim_gui_api.acrobatics_ocp.code_generation.gen_prepare_ocp import Acrob
 from bioptim_gui_api.penalty.misc.constraint_printer import ConstraintPrinter
 from bioptim_gui_api.penalty.misc.objective_printer import ObjectivePrinter
 from bioptim_gui_api.penalty.misc.penalty_utils import penalty_str_to_non_collision_penalty
+from bioptim_gui_api.variables.misc.variables_config import DefaultVariablesConfig
 
 
 class AcrobaticsGenerationPrepareOCPNonCollision(AcrobaticsGenerationPrepareOCP):
@@ -83,8 +84,7 @@ def prepare_ocp(
 
     @classmethod
     def multistart_noise(cls, data: dict) -> str:
-        dynamics = data["dynamics"]
-        control = "tau" if dynamics == "torque_driven" else "qddot_joints"
+        control = DefaultVariablesConfig.dynamics_control[data["dynamics"]]
         return f"""
     if warming_up:
         for i in range(nb_phases):

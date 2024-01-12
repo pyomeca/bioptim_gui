@@ -1,5 +1,6 @@
 from bioptim_gui_api.acrobatics_ocp.code_generation.bounds import AcrobaticsGenerationBounds
 from bioptim_gui_api.utils.format_utils import indent_lines
+from bioptim_gui_api.variables.misc.variables_config import DefaultVariablesConfig
 
 
 class AcrobaticsGenerationBoundsNonCollision(AcrobaticsGenerationBounds):
@@ -25,7 +26,7 @@ class AcrobaticsGenerationBoundsNonCollision(AcrobaticsGenerationBounds):
 
     @classmethod
     def use_solution_as_initial_guess(cls, data: dict) -> str:
-        control = "tau" if data["dynamics"] == "torque_driven" else "qddot_joints"
+        control = DefaultVariablesConfig.dynamics_control[data["dynamics"]]
         return f"""
     if not warming_up:
         # use the solution of the warm up as initial guess

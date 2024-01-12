@@ -50,19 +50,6 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
     notifyListeners();
   }
 
-  Future<bool> updateFieldAndData(String field, String value) async {
-    final response = await requestMaker.updateField(field, value);
-
-    if (response.statusCode != 200) {
-      return Future(() => false);
-    }
-
-    final newData = AcrobaticsData.fromJson(json.decode(response.body));
-
-    updateData(newData);
-    return Future(() => true);
-  }
-
   @override
   void updateField(String name, dynamic value) async {
     final response = await requestMaker.updateField(name, value);
@@ -109,11 +96,20 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
         break;
       case "with_spine":
         withSpine = jsonData["with_spine"];
+        dynamics = jsonData["dynamics"];
         dofNames = List.from(jsonData["dof_names"]);
+        phasesInfo =
+            SomersaultPhase.convertDynamicList(jsonData["phases_info"]);
+        break;
       case "dynamics":
         dynamics = jsonData["dynamics"];
         phasesInfo =
             SomersaultPhase.convertDynamicList(jsonData["phases_info"]);
+        break;
+      // model_path is not updated here because it is a special case, it has to
+      // be send as a multipart file request
+      // It is currently updated using updateBioModel
+      case "model_path":
         break;
       default:
         break;
@@ -123,7 +119,7 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
 
   @override
   void updatePhaseField(
-      int phaseIndex, String fieldName, String newValue) async {
+      int phaseIndex, String fieldName, dynamic newValue) async {
     final response =
         await requestMaker.updatePhaseField(phaseIndex, fieldName, newValue);
     final jsonData = json.decode(response.body);
@@ -143,25 +139,6 @@ class AcrobaticsData extends OCPData<SomersaultPhase> {
     notifyListeners();
   }
 
-  void updateData(AcrobaticsData newData) {
-    nbSomersaults = newData.nbSomersaults;
-    halfTwists = List.from(newData.halfTwists);
-    modelPath = newData.modelPath;
-    finalTime = newData.finalTime;
-    finalTimeMargin = newData.finalTimeMargin;
-    position = newData.position;
-    sportType = newData.sportType;
-    preferredTwistSide = newData.preferredTwistSide;
-    withVisualCriteria = newData.withVisualCriteria;
-    collisionConstraint = newData.collisionConstraint;
-    withSpine = newData.withSpine;
-    dynamics = newData.dynamics;
-    dofNames = List.from(newData.dofNames);
-    phasesInfo = List.from(newData.phasesInfo);
-
-    notifyListeners();
-  }
-
   @override
   void notifyListeners() {
     AcrobaticsControllers.instance.notifyListeners();
@@ -175,4 +152,23 @@ class SomersaultPhase extends Phase {
   static List<SomersaultPhase> convertDynamicList(List<dynamic> list) {
     return list.map((item) => SomersaultPhase.fromJson(item)).toList();
   }
+}
+
+class AcrobaticsAvailableValues extends OCPAvailableValues {
+  List<String> positions;
+  List<String> sportTypes;
+  List<String> preferredTwistSides;
+
+  AcrobaticsAvailableValues(
+    super.nodeValues,
+    super.integrationRules,
+    super.objectiveMin,
+    super.objectiveMax,
+    super.constraints,
+    super.interpolationTypes,
+    super.dynamics,
+    this.positions,
+    this.sportTypes,
+    this.preferredTwistSides,
+  );
 }

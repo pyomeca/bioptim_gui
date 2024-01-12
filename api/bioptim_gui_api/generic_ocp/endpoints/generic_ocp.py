@@ -20,6 +20,8 @@ from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_responses import (
 )
 from bioptim_gui_api.generic_ocp.misc.generic_ocp_data import GenericOCPData
 from bioptim_gui_api.generic_ocp.misc.generic_ocp_utils import add_phase_info, remove_phase_info
+from bioptim_gui_api.penalty.endpoints.penalty import penalties_get_available_values
+from bioptim_gui_api.variables.endpoints.variables import variables_get_available_values
 
 
 class GenericOCPBaseFieldRegistrar:
@@ -32,6 +34,7 @@ class GenericOCPBaseFieldRegistrar:
 
         # register all endpoints
         self.register_get_ocp_data()
+        self.register_get_available_values()
         self.register_update_nb_phases()
         self.register_put_model_path()
 
@@ -40,6 +43,13 @@ class GenericOCPBaseFieldRegistrar:
         def get_ocp_data():
             data = self.data.read_data()
             return data
+
+    def register_get_available_values(self) -> None:
+        @self.router.get("/available_values", response_model=dict)
+        def get_available_values():
+            penalties_available_values = penalties_get_available_values()
+            variables_available_values = variables_get_available_values()
+            return penalties_available_values | variables_available_values
 
     def register_update_nb_phases(self) -> None:
         @self.router.put("/nb_phases", response_model=dict)

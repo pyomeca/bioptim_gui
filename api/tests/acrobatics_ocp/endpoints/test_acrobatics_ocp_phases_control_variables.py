@@ -57,7 +57,7 @@ def test_exists_tau():
 
 def test_exists_qddot_joints():
     # modify dynamics
-    response = client.put("/acrobatics/dynamics", json={"dynamics": "joints_acceleration_driven"})
+    response = client.put("/acrobatics/dynamics", json={"dynamics": "JOINTS_ACCELERATION_DRIVEN"})
     assert response.status_code == 200, response
 
     response = client.get("/acrobatics/phases_info")
@@ -98,7 +98,7 @@ def test_put_control_variable_dimension():
 def test_put_control_variable_bounds_interpolation_type():
     response = client.put(
         "/acrobatics/phases_info/0/control_variables/0/bounds_interpolation_type",
-        json={"interpolation_type": "LINEAR"},
+        json={"bounds_interpolation_type": "LINEAR"},
     )
     assert response.status_code == 200, response
 
@@ -144,7 +144,7 @@ def test_put_control_variable_initial_guess():
 def test_put_control_variable_initial_guess_interpolation_type():
     response = client.put(
         "/acrobatics/phases_info/0/control_variables/0/initial_guess_interpolation_type",
-        json={"interpolation_type": "LINEAR"},
+        json={"initial_guess_interpolation_type": "LINEAR"},
     )
     assert response.status_code == 200, response
 

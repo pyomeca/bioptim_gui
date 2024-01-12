@@ -1,6 +1,7 @@
 import numpy as np
 
 from bioptim_gui_api.utils.format_utils import format_2d_array
+from bioptim_gui_api.variables.misc.variables_config import DefaultVariablesConfig
 
 
 class AcrobaticsGenerationBounds:
@@ -113,7 +114,7 @@ class AcrobaticsGenerationBounds:
     def add_tau_bounds(data: dict, model) -> str:
         nb_phases = data["nb_phases"]
         tau_bounds = model.get_tau_bounds(nb_phases)
-        control = "tau" if data["dynamics"] == "torque_driven" else "qddot_joints"
+        control = DefaultVariablesConfig.dynamics_control[data["dynamics"]]
 
         ret = ""
         for i in range(nb_phases):
@@ -132,7 +133,7 @@ class AcrobaticsGenerationBounds:
     def add_tau_init(data: dict, model) -> str:
         nb_phases = data["nb_phases"]
         tau_init = model.get_tau_init(nb_phases)
-        control = "tau" if data["dynamics"] == "torque_driven" else "qddot_joints"
+        control = DefaultVariablesConfig.dynamics_control[data["dynamics"]]
 
         ret = ""
         for i in range(nb_phases):

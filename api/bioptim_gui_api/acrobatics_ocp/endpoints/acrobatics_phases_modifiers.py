@@ -186,9 +186,9 @@ class AcrobaticsPhaseModifiers:
             # updating data
             self.data.update_data("with_spine", new_value)
             if new_value:
-                self.data.update_data("dynamics", "joints_acceleration_driven")
+                self.data.update_data("dynamics", "JOINTS_ACCELERATION_DRIVEN")
             else:
-                self.data.update_data("dynamics", "torque_driven")
+                self.data.update_data("dynamics", "TORQUE_DRIVEN")
 
             update_phase_info()
             data = self.data.read_data()

@@ -1,9 +1,6 @@
-import 'package:bioptim_gui/models/acrobatics_controllers.dart';
 import 'package:bioptim_gui/models/api_config.dart';
-import 'package:bioptim_gui/models/optimal_control_program_controllers.dart';
 import 'package:bioptim_gui/widgets/utils/custom_dropdown_button.dart';
 import 'package:bioptim_gui/widgets/utils/extensions.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -16,7 +13,7 @@ class CustomHttpDropdown extends StatefulWidget {
     required this.defaultValue,
     this.getEndpoint,
     this.putEndpoint,
-    required this.requestKey,
+    this.requestKey,
     this.color = Colors.black,
     this.customStringFormatting = _defaultToString,
     this.customCallBack,
@@ -30,7 +27,7 @@ class CustomHttpDropdown extends StatefulWidget {
   final String? getEndpoint;
   final String? putEndpoint;
   // the key used in the request of the put method
-  final String requestKey;
+  final String? requestKey;
   final Color color;
   final List<String>? items;
 
@@ -76,32 +73,6 @@ class CustomHttpDropdownState extends State<CustomHttpDropdown> {
     }
   }
 
-  Future<void> _updateValue(String value) async {
-    final requestValue = widget.customStringFormatting(value);
-    final url = Uri.parse('${APIConfig.url}${widget.putEndpoint}');
-    final headers = {'Content-Type': 'application/json'};
-    final body = json.encode({widget.requestKey: requestValue});
-
-    final response = await http.put(url, headers: headers, body: body);
-
-    if (response.statusCode != 200) {
-      throw Exception(
-          'Error while changing ${widget.title} to value $requestValue');
-    }
-
-    setState(() {
-      _selectedValue = value;
-    });
-
-    if (kDebugMode) print('${widget.title} changed to value $requestValue');
-
-    // Alexandre: TODO find a prettier way to reset the export button
-    AcrobaticsControllers.instance.notifyListeners();
-    OptimalControlProgramControllers.instance.notifyListeners();
-
-    if (widget.customCallBack != null) widget.customCallBack!(response);
-  }
-
   Future<void> _selectUpdate(String value) async {
     if (widget.customOnSelected != null) {
       final success = await widget.customOnSelected!(value);
@@ -125,12 +96,8 @@ class CustomHttpDropdownState extends State<CustomHttpDropdown> {
         value: _selectedValue,
         items: _availableValues,
         title: widget.title,
-        onSelected: (value) => {
-          if (widget.customOnSelected != null)
-            _selectUpdate(value)
-          else
-            _updateValue(value)
-        },
+        onSelected: (value) =>
+            {if (widget.customOnSelected != null) _selectUpdate(value)},
         color: widget.color,
       ),
     );

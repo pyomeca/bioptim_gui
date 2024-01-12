@@ -1,10 +1,9 @@
+from bioptim_gui_api.variables.misc.variables_config import DefaultVariablesConfig
+
+
 def adapt_dynamics(phase: dict, dynamics: str) -> None:
-    dynamics_control = {
-        "torque_driven": "tau",
-        "joints_acceleration_driven": "qddot_joints",
-    }
-    control_names = dynamics_control.values()
-    control = dynamics_control[dynamics]
+    control_names = DefaultVariablesConfig.dynamics_control.values()
+    control = DefaultVariablesConfig.dynamics_control[dynamics]
 
     for argument in objective_key_arguments_iterator(phase):
         if argument["value"] in control_names:

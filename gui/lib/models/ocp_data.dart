@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:bioptim_gui/models/decision_variables_type.dart';
 import 'package:bioptim_gui/models/ocp_request_maker.dart';
 import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/models/variables.dart';
@@ -10,6 +12,8 @@ import 'package:flutter/material.dart';
 /// by "generic OCP" [GenericOcpData] and "acrobatics data" [AcrobaticsData].
 /// It will be used in [Consumer] to provide the data to the widgets that
 /// display the data that can be common to both OCPs. (penalties for now)
+/// requestMaker MUST NOT be access by other classes than [OCPData] and its
+/// children.
 abstract class OCPData<T extends Phase> with ChangeNotifier {
   int nbPhases;
   String modelPath;
@@ -36,19 +40,21 @@ abstract class OCPData<T extends Phase> with ChangeNotifier {
   /// Update methods
 
   void updateField(String name, String value);
-  void updatePhaseField(int phaseIndex, String fieldName, String newValue);
+  void updatePhaseField(int phaseIndex, String fieldName, dynamic newValue);
 
   void updatePhaseInfo(List<dynamic> newData) {
     final newPhases = (newData).map((p) => phaseFromJsonFunction(p)).toList();
-
     phasesInfo = newPhases;
+  }
 
+  void updateBioModel(List<File> files) {
+    requestMaker.updateBioModel(files);
     notifyListeners();
   }
 
   void updatePenalties(
-      int phaseIndex, String penaltyType, List<Penalty> penalties) {
-    if (penaltyType == "objective") {
+      int phaseIndex, Type penaltyType, List<Penalty> penalties) {
+    if (penaltyType == Objective) {
       phasesInfo[phaseIndex].objectives = penalties as List<Objective>;
     } else {
       phasesInfo[phaseIndex].constraints = penalties as List<Constraint>;
@@ -56,112 +62,150 @@ abstract class OCPData<T extends Phase> with ChangeNotifier {
     notifyListeners();
   }
 
-  void updatePenalty(
-      int phaseIndex, String penaltyType, int penaltyIndex, Penalty penalty) {
-    final oldPenalty = penaltyType == "objective"
-        ? phasesInfo[phaseIndex].objectives[penaltyIndex]
-        : phasesInfo[phaseIndex].constraints[penaltyIndex];
-
-    final newPenaltyType = penalty.penaltyType;
-    final oldPenaltyType = oldPenalty.penaltyType;
-    final penaltyTypeChanged = newPenaltyType != oldPenaltyType;
-
-    final objectiveTypeChanged = penaltyType == "objective"
-        ? (penalty as Objective).objectiveType !=
-            (oldPenalty as Objective).objectiveType
-        : false;
-
-    final minMaxChanged = penaltyType == "objective"
-        ? (penalty as Objective).weight * (oldPenalty as Objective).weight > 0
-        : false;
-
-    // keep expanded value
-    penalty.expanded = penaltyType == "objective"
-        ? phasesInfo[phaseIndex].objectives[penaltyIndex].expanded
-        : phasesInfo[phaseIndex].constraints[penaltyIndex].expanded;
-
-    if (penaltyType == "objective") {
-      phasesInfo[phaseIndex].objectives[penaltyIndex] = penalty as Objective;
-    } else {
-      phasesInfo[phaseIndex].constraints[penaltyIndex] = penalty as Constraint;
-    }
-
-    // force redraw only if the penalty type or objective type if it's an objective
-    // changes (to update arguments and other fields)
-    if (penaltyTypeChanged || objectiveTypeChanged || minMaxChanged) {
-      notifyListeners();
-    }
-  }
-
-  Future<bool> updatePenaltyField(int phaseIndex, int penaltyIndex,
-      String penaltyType, String fieldName, dynamic newValue,
-      {bool? doUpdate}) async {
+  void updatePenaltyField(
+    int phaseIndex,
+    int penaltyIndex,
+    Type penaltyType,
+    String fieldName,
+    dynamic newValue,
+  ) async {
     final response = await requestMaker.updatePenaltyField(
         phaseIndex, penaltyType, penaltyIndex, fieldName, newValue);
 
     if (response.statusCode != 200) {
-      return Future(() => false);
+      throw Exception("Failed to update penalty field $fieldName");
     }
 
-    final isObjective = penaltyType == "objectives";
+    final jsonData = json.decode(response.body);
+    final isObjective = penaltyType == Objective;
+    final penalty = isObjective
+        ? phasesInfo[phaseIndex].objectives[penaltyIndex]
+        : phasesInfo[phaseIndex].constraints[penaltyIndex];
 
     switch (fieldName) {
-      // All fields aren't necessarily updated because they are handled by the state of their parent widget
-      // (for dropdown menu(node, integration rule), boolean switches (derivative, multi_thread, expand, quadratic))
       case "target":
-        if (isObjective) {
-          phasesInfo[phaseIndex].objectives[penaltyIndex].target = newValue;
-        } else {
-          phasesInfo[phaseIndex].constraints[penaltyIndex].target = newValue;
-        }
+        penalty.target = newValue;
         break;
       case "weight":
-        phasesInfo[phaseIndex].objectives[penaltyIndex].weight =
-            double.tryParse(newValue!) ?? 0.0;
+        (penalty as Objective).weight = jsonData["weight"];
+        break;
+      case "quadratic":
+        penalty.quadratic = jsonData["quadratic"];
+        break;
+      case "expand":
+        penalty.expand = jsonData["expand"];
+        break;
+      case "multi_thread":
+        penalty.multiThread = jsonData["multi_thread"];
+        break;
+      case "derivative":
+        penalty.derivative = jsonData["derivative"];
+        break;
+      case "integration_rule":
+        penalty.integrationRule = jsonData["integration_rule"];
+        break;
+      case "objective_type" || "penalty_type":
+        final Penalty newPenalty = isObjective
+            ? Objective.fromJson(jsonData as Map<String, dynamic>)
+            : Constraint.fromJson(jsonData as Map<String, dynamic>);
+        // keep expanded value
+        newPenalty.expanded = penalty.expanded;
+        if (isObjective) {
+          phasesInfo[phaseIndex].objectives[penaltyIndex] =
+              newPenalty as Objective;
+        } else {
+          phasesInfo[phaseIndex].constraints[penaltyIndex] =
+              newPenalty as Constraint;
+        }
         break;
       default:
         break;
     }
 
-    if (doUpdate != null && doUpdate) {
-      final Penalty newPenalties = isObjective
-          ? Objective.fromJson(
-              json.decode(response.body) as Map<String, dynamic>)
-          : Constraint.fromJson(
-              json.decode(response.body) as Map<String, dynamic>);
-
-      // keep expanded value
-      newPenalties.expand = penaltyType == "objectives"
-          ? phasesInfo[phaseIndex].objectives[penaltyIndex].expanded
-          : phasesInfo[phaseIndex].constraints[penaltyIndex].expanded;
-
-      if (isObjective) {
-        updatePenalty(phaseIndex, "objective", penaltyIndex, newPenalties);
-      } else {
-        updatePenalty(phaseIndex, "constraint", penaltyIndex, newPenalties);
-      }
-    } else {
-      notifyListeners();
-    }
-
-    return Future(() => true);
+    notifyListeners();
   }
 
   void updatePenaltyArgument(
       int phaseIndex,
       int penaltyIndex,
       String argumentName,
-      String? newValue,
+      dynamic newValue,
       String argumentType,
       int argumentIndex,
-      String penaltyType) {
-    requestMaker.updatePenaltyArgument(phaseIndex, penaltyIndex, argumentName,
-        newValue, argumentType, penaltyType);
+      Type penaltyType) async {
+    final response = await requestMaker.updatePenaltyArgument(phaseIndex,
+        penaltyIndex, argumentName, newValue, argumentType, penaltyType);
 
-    phasesInfo[phaseIndex]
-        .objectives[penaltyIndex]
-        .arguments[argumentIndex]
-        .value = newValue;
+    if (response.statusCode != 200) {
+      throw Exception("Failed to update penalty argument $argumentName");
+    }
+
+    final jsonData = json.decode(response.body);
+
+    if (penaltyType == Objective) {
+      phasesInfo[phaseIndex]
+          .objectives[penaltyIndex]
+          .arguments[argumentIndex]
+          .value = jsonData["value"];
+    } else {
+      phasesInfo[phaseIndex]
+          .constraints[penaltyIndex]
+          .arguments[argumentIndex]
+          .value = jsonData["value"];
+    }
+
+    notifyListeners();
+  }
+
+  void updateMaximizeMinimize(
+      int phaseIndex, int penaltyIndex, String newValue) async {
+    final response = await requestMaker.updateMaximizeMinimize(
+        phaseIndex, penaltyIndex, newValue);
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to update maximize/minimize");
+    }
+
+    final jsonData = json.decode(response.body);
+
+    final Objective newObjective =
+        Objective.fromJson(jsonData as Map<String, dynamic>);
+
+    // keep expanded value
+    newObjective.expanded =
+        phasesInfo[phaseIndex].objectives[penaltyIndex].expanded;
+
+    phasesInfo[phaseIndex].objectives[penaltyIndex] = newObjective;
+
+    notifyListeners();
+  }
+
+  void updateDecisionVariableField(
+      int phaseIndex,
+      DecisionVariableType decisionVariableType,
+      int variableIndex,
+      String fieldName,
+      dynamic newValue) async {
+    final response = await requestMaker.updateDecisionVariableField(
+        phaseIndex, decisionVariableType, variableIndex, fieldName, newValue);
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to update $fieldName to value $newValue");
+    }
+
+    final jsonData = json.decode(response.body);
+
+    switch (fieldName) {
+      case "bounds_interpolation_type":
+        updatePhaseInfo(jsonData as List<dynamic>);
+        break;
+      case "initial_guess_interpolation_type":
+        updatePhaseInfo(jsonData as List<dynamic>);
+        break;
+      case "dimension":
+        updatePhaseInfo(jsonData as List<dynamic>);
+        break;
+    }
 
     notifyListeners();
   }
@@ -212,6 +256,8 @@ class OCPAvailableValues {
   List<String> objectivesMinimize = [];
   List<String> objectivesMaximize = [];
   List<String> constraints = [];
+  List<String> interpolationTypes = [];
+  List<String> dynamics = [];
 
   OCPAvailableValues(
     this.nodes,
@@ -219,5 +265,7 @@ class OCPAvailableValues {
     this.objectivesMinimize,
     this.objectivesMaximize,
     this.constraints,
+    this.interpolationTypes,
+    this.dynamics,
   );
 }

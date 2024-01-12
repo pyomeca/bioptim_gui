@@ -15,9 +15,9 @@ enum DecisionVariableType {
   String toPythonString() {
     switch (this) {
       case state:
-        return 'x';
+        return 'state_variables';
       case control:
-        return 'u';
+        return 'control_variables';
     }
   }
 }

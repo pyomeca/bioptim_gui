@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:bioptim_gui/models/ocp_data.dart';
-import 'package:bioptim_gui/models/penalty.dart';
 import 'package:bioptim_gui/widgets/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -37,18 +34,12 @@ class MinMaxRadioState extends State<MinMaxRadio> {
 
     return Consumer<OCPData>(builder: (context, data, child) {
       void updatePenalty(String newValue) async {
-        final response = await data.requestMaker.updateMaximizeMinimize(
+        data.updateMaximizeMinimize(
             widget.phaseIndex, widget.objectiveIndex, newValue);
 
         setState(() {
           _selectedValue = newValue;
         });
-
-        final Penalty newObjective = Objective.fromJson(
-            json.decode(response.body) as Map<String, dynamic>);
-
-        data.updatePenalty(widget.phaseIndex, "objective",
-            widget.objectiveIndex, newObjective);
       }
 
       return Column(

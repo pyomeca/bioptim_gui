@@ -4,13 +4,14 @@ import 'dart:io';
 import 'package:bioptim_gui/models/api_config.dart';
 import 'package:bioptim_gui/models/decision_variables_type.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
+import 'package:bioptim_gui/models/penalty.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
 ///
 /// [OCPRequestMaker] is a class that contains all the methods to make requests
-/// for the different OCPs.
+/// for the different OCPs. (All request should be made through this class)
 /// As the OCPs endpoints are all very similar, this class is used as a parent
 /// class to reduce code duplication.
 /// example: the only thing that differs between the "generic OCP" and the
@@ -23,7 +24,7 @@ class OCPRequestMaker<T extends OCPData> {
   final String phaseInfoString;
 
   Future<OCPAvailableValues> getAvailableValues() async {
-    final url = Uri.parse('${APIConfig.url}/penalties/available_values');
+    final url = Uri.parse('${APIConfig.url}/$prefix/available_values');
     final response = await http.get(url);
     final jsonResponse = json.decode(response.body);
 
@@ -35,6 +36,9 @@ class OCPRequestMaker<T extends OCPData> {
     List<String> objectiveMax =
         List<String>.from(jsonResponse["objectives"]["maximize"]);
     List<String> constraints = List<String>.from(jsonResponse["constraints"]);
+    List<String> interpolationTypes =
+        List<String>.from(jsonResponse["interpolation_types"]);
+    List<String> dynamics = List<String>.from(jsonResponse["dynamics"]);
 
     return OCPAvailableValues(
       nodeValues,
@@ -42,6 +46,8 @@ class OCPRequestMaker<T extends OCPData> {
       objectiveMin,
       objectiveMax,
       constraints,
+      interpolationTypes,
+      dynamics,
     );
   }
 
@@ -67,6 +73,8 @@ class OCPRequestMaker<T extends OCPData> {
         }
       }
     });
+
+    if (kDebugMode) print("Updating bioMod");
   }
 
   Future<http.Response> updateField(String fieldName, dynamic newValue) async {
@@ -84,7 +92,7 @@ class OCPRequestMaker<T extends OCPData> {
   }
 
   Future<http.Response> updatePhaseField(
-      int phaseIndex, String fieldName, String newValue) async {
+      int phaseIndex, String fieldName, dynamic newValue) async {
     final url = Uri.parse(
         '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/$fieldName');
     final body = json.encode({fieldName: newValue});
@@ -123,10 +131,12 @@ class OCPRequestMaker<T extends OCPData> {
     return response;
   }
 
-  Future<http.Response> updatePenaltyField(int phaseIndex, String penaltyType,
+  Future<http.Response> updatePenaltyField(int phaseIndex, Type penaltyType,
       int penaltyIndex, String fieldName, dynamic value) async {
+    final penaltyTypeString =
+        penaltyType == Objective ? "objectives" : "constraints";
     final url = Uri.parse(
-        '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/$penaltyType/$penaltyIndex/$fieldName');
+        '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/$penaltyTypeString/$penaltyIndex/$fieldName');
     final body = json.encode({fieldName: value});
 
     final response =
@@ -134,12 +144,12 @@ class OCPRequestMaker<T extends OCPData> {
 
     if (response.statusCode != 200) {
       throw Exception(
-          'Error while changing $phaseInfoString $phaseIndex}\'s $penaltyType $penaltyIndex} $fieldName to value $value');
+          'Error while changing $phaseInfoString $phaseIndex}\'s $penaltyTypeString $penaltyIndex} $fieldName to value $value');
     }
 
     if (kDebugMode) {
       print(
-          '$phaseInfoString $phaseIndex\'s $penaltyType $penaltyIndex $fieldName changed to value $value');
+          '$phaseInfoString $phaseIndex\'s $penaltyTypeString $penaltyIndex $fieldName changed to value $value');
     }
 
     return response;
@@ -151,9 +161,12 @@ class OCPRequestMaker<T extends OCPData> {
       String argumentName,
       String? newValue,
       String argumentType,
-      String penaltyType) async {
+      Type penaltyType) async {
+    final penaltyTypeString =
+        penaltyType == Objective ? "objectives" : "constraints";
+
     final url = Uri.parse(
-        '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/$penaltyType/$penaltyIndex/arguments/$argumentName');
+        '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/$penaltyTypeString/$penaltyIndex/arguments/$argumentName');
     final body = json.encode({
       "name": argumentName,
       "value": newValue,
@@ -165,27 +178,25 @@ class OCPRequestMaker<T extends OCPData> {
 
     if (response.statusCode != 200) {
       throw Exception(
-          'Error while changing $phaseInfoString $phaseIndex\'s $penaltyType $penaltyIndex $argumentName to value $newValue');
+          'Error while changing $phaseInfoString $phaseIndex\'s $penaltyTypeString $penaltyIndex $argumentName to value $newValue');
     }
 
     if (kDebugMode) {
       print(
-          '$phaseInfoString $phaseIndex\'s $penaltyType $penaltyIndex $argumentName changed to value $newValue');
+          '$phaseInfoString $phaseIndex\'s $penaltyTypeString $penaltyIndex $argumentName changed to value $newValue');
     }
     return response;
   }
 
   Future<http.Response> updateDecisionVariableField(
-      String fieldName,
       int phaseIndex,
-      DecisionVariableType from,
+      DecisionVariableType decisionVariableType,
       int variableIndex,
-      String newValue) async {
-    final url = from == DecisionVariableType.control
-        ? '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/control_variables/'
-            '$variableIndex/$fieldName'
-        : '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/state_variables/'
-            '$variableIndex/$fieldName';
+      String fieldName,
+      dynamic newValue) async {
+    final url =
+        '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/${decisionVariableType.toPythonString()}/'
+        '$variableIndex/$fieldName';
 
     final headers = {'Content-Type': 'application/json'};
     final body = json.encode({fieldName: newValue});
@@ -193,8 +204,9 @@ class OCPRequestMaker<T extends OCPData> {
         await http.put(Uri.parse(url), body: body, headers: headers);
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to update $fieldName');
+      throw Exception('Failed to update $fieldName to $newValue');
     }
+
     if (kDebugMode) print('$fieldName updated with value: $newValue');
 
     return response;

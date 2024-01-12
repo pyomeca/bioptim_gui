@@ -1,3 +1,6 @@
+from enum import Enum
+
+
 def arg_to_string(argument: dict) -> str:
     """
     Stringify an objective/constraint argument to go into the generated code.
@@ -96,3 +99,21 @@ def indent_lines(text: str, indent: int = 4) -> str:
     res = res[:-1]
 
     return res
+
+
+def get_spaced_capitalized(enum: Enum) -> list:
+    """
+    Return the enum values replacing underscores _ by spaces and capitalizing it.
+
+    Parameters
+    ----------
+    enum: Enum
+        The string enum to format.
+
+    Returns
+    -------
+    list
+        The formatted enum.
+
+    """
+    return [e.value.replace("_", " ").capitalize() for e in enum]

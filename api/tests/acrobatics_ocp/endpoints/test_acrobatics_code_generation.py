@@ -15,6 +15,11 @@ client = TestClient(test_app)
 
 
 def save_config(top_folder, folder, position):
+    """
+    Save the configuration of the test in a json file
+    COMMENT THE LINES IF YOU DON'T TO GENERATE THE FILES
+    Used in acrobatics_ocp/code_generation/acrobatics_generation_utils.py code_stay same test
+    """
     # data = AcrobaticsOCPData.read_data()
     # with open(f"acrobatics_ocp/config_examples/{top_folder}/{folder}/{position}.json", "w") as f:
     #     json.dump(data, f, indent=4)

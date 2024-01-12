@@ -49,7 +49,7 @@ class BioModelChooserState extends State<BioModelChooser> {
                       );
                       if (results == null) return;
 
-                      data.requestMaker.updateBioModel(
+                      data.updateBioModel(
                           results.paths.map((path) => File(path!)).toList());
 
                       setState(() {

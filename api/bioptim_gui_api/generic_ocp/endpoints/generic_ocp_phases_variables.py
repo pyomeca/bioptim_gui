@@ -5,8 +5,9 @@ from fastapi import APIRouter
 
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
     DimensionRequest,
-    InterpolationTypeRequest,
     VariableUpdateRequest,
+    BoundsInterpolationTypeRequest,
+    InitialGuessInterpolationTypeRequest,
 )
 from bioptim_gui_api.variables.misc.variables_utils import variables_zeros
 
@@ -56,11 +57,11 @@ class GenericVariableRouter(ABC):
     def register_put_variable_bounds_interpolation_type(self):
         @self.router.put(f"/{{phase_index}}/{self.variable_type}/{{variable_index}}/bounds_interpolation_type")
         def put_variables_bounds_interpolation_type(
-            phase_index: int, variable_index: int, interpolation: InterpolationTypeRequest
+            phase_index: int, variable_index: int, interpolation: BoundsInterpolationTypeRequest
         ):
             phases_info = self.data.read_data("phases_info")
 
-            new_interpolation = interpolation.interpolation_type
+            new_interpolation = interpolation.bounds_interpolation_type
 
             variable = phases_info[phase_index][self.variable_type][variable_index]
 
@@ -79,11 +80,11 @@ class GenericVariableRouter(ABC):
     def register_put_variable_initial_guess_interpolation_type(self):
         @self.router.put(f"/{{phase_index}}/{self.variable_type}/{{variable_index}}/initial_guess_interpolation_type")
         def put_variables_initial_guess_interpolation_type(
-            phase_index: int, variable_index: int, interpolation: InterpolationTypeRequest
+            phase_index: int, variable_index: int, interpolation: InitialGuessInterpolationTypeRequest
         ):
             phases_info = self.data.read_data("phases_info")
 
-            new_interpolation = interpolation.interpolation_type
+            new_interpolation = interpolation.initial_guess_interpolation_type
 
             variable = phases_info[phase_index][self.variable_type][variable_index]
 
