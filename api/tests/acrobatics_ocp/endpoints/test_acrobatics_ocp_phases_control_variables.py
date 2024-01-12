@@ -104,8 +104,8 @@ def test_put_control_variable_bounds_interpolation_type():
 
     response = client.get("/acrobatics/phases_info/")
     phase_info = response.json()[0]
-    assert phase_info["control_variables"][0]["bounds"]["min_bounds"] == [[0.0] * 2 for _ in range(4)]
-    assert phase_info["control_variables"][0]["bounds"]["max_bounds"] == [[0.0] * 2 for _ in range(4)]
+    assert phase_info["control_variables"][0]["bounds"]["min_bounds"] == [[-500.0] * 2 for _ in range(4)]
+    assert phase_info["control_variables"][0]["bounds"]["max_bounds"] == [[500.0] * 2 for _ in range(4)]
 
 
 @pytest.mark.parametrize("bounds", ["min_bounds", "max_bounds"])

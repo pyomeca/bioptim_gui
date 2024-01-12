@@ -9,7 +9,10 @@ from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
     BoundsInterpolationTypeRequest,
     InitialGuessInterpolationTypeRequest,
 )
-from bioptim_gui_api.variables.misc.variables_utils import variables_zeros
+from bioptim_gui_api.variables.misc.variables_utils import (
+    init_guess_after_interpolation_type_change,
+    bounds_after_interpolation_type_change,
+)
 
 
 def new_shape(array: list, new_dimension: int) -> tuple:
@@ -65,11 +68,7 @@ class GenericVariableRouter(ABC):
 
             variable = phases_info[phase_index][self.variable_type][variable_index]
 
-            variable["bounds_interpolation_type"] = new_interpolation
-            dimension = variable["dimension"]
-
-            variable["bounds"]["min_bounds"] = variables_zeros(dimension, new_interpolation)
-            variable["bounds"]["max_bounds"] = variables_zeros(dimension, new_interpolation)
+            bounds_after_interpolation_type_change(variable, new_interpolation)
 
             phases_info[phase_index][self.variable_type][variable_index] = variable
 
@@ -88,9 +87,7 @@ class GenericVariableRouter(ABC):
 
             variable = phases_info[phase_index][self.variable_type][variable_index]
 
-            variable["initial_guess_interpolation_type"] = new_interpolation
-            dimension = variable["dimension"]
-            variable["initial_guess"] = variables_zeros(dimension, new_interpolation)
+            init_guess_after_interpolation_type_change(variable, new_interpolation)
 
             phases_info[phase_index][self.variable_type][variable_index] = variable
 

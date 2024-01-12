@@ -27,6 +27,90 @@ def variables_zeros(dimension: int, interpolation_type: str) -> list:
     raise ValueError(f"Interpolation type {interpolation_type} not implemented")
 
 
+def bounds_after_interpolation_type_change(old_variable: dict, interpolation_type: str) -> None:
+    """
+    If the old and new interpolation type are the same, do nothing
+
+    Any -> constant : use the average as new value
+    Any -> linear: use first and last value as new value (the same if it was constant)
+    Any -> constant_with_first_and_last_different:
+        use first and last value as new value (the same if it was constant)
+        use min(first, last) as intermediate value for min_bounds
+        use max(first, last) as intermediate value for max_bounds
+
+    Parameters
+    ----------
+    old_variable: dict
+        The variable to modify
+    new_interpolation_type: str
+        The new interpolation type
+    Returns
+    -------
+    None
+    """
+    if interpolation_type == old_variable["bounds_interpolation_type"]:
+        return
+
+    min_bound = np.array(old_variable["bounds"]["min_bounds"])
+    max_bound = np.array(old_variable["bounds"]["max_bounds"])
+
+    if interpolation_type == "CONSTANT":
+        new_min_bounds = np.array([(min_bound[:, 0] + min_bound[:, -1]) / 2]).T
+        new_max_bounds = np.array([(max_bound[:, 0] + max_bound[:, -1]) / 2]).T
+        old_variable["bounds"]["min_bounds"] = np.round(new_min_bounds, 2).tolist()
+        old_variable["bounds"]["max_bounds"] = np.round(new_max_bounds, 2).tolist()
+    if interpolation_type == "LINEAR":
+        old_variable["bounds"]["min_bounds"] = np.round(min_bound[:, [0, -1]], 2).tolist()
+        old_variable["bounds"]["max_bounds"] = np.round(max_bound[:, [0, -1]], 2).tolist()
+    if interpolation_type == "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT":
+        min_bound_middle = np.minimum(min_bound[:, 0], min_bound[:, -1])
+        new_min = np.column_stack((min_bound[:, 0], min_bound_middle, min_bound[:, -1]))
+        old_variable["bounds"]["min_bounds"] = np.round(new_min, 2).tolist()
+
+        max_bound_middle = np.maximum(max_bound[:, 0], max_bound[:, -1])
+        new_max = np.column_stack((max_bound[:, 0], max_bound_middle, max_bound[:, -1]))
+        old_variable["bounds"]["max_bounds"] = np.round(new_max, 2).tolist()
+
+    old_variable["bounds_interpolation_type"] = interpolation_type
+
+
+def init_guess_after_interpolation_type_change(old_variable: dict, interpolation_type: str) -> None:
+    """
+    Any -> constant : use the average as new value
+    Any -> linear: use first and last value as new value (the same if it was constant)
+    Any -> constant_with_first_and_last_different:
+        use first[0] and last[-1] value as new value (the same if it was constant)
+        use average as intermediate value
+
+    Parameters
+    ----------
+    old_variable: dict
+        The variable to modify
+    new_interpolation_type: str
+        The new interpolation type
+
+    Returns
+    -------
+    None
+    """
+    if interpolation_type == old_variable["initial_guess_interpolation_type"]:
+        return
+
+    old_init_guess = np.array(old_variable["initial_guess"])
+
+    if interpolation_type == "CONSTANT":
+        new_init_guess = np.array([(old_init_guess[:, 0] + old_init_guess[:, -1]) / 2]).T
+        old_variable["initial_guess"] = np.round(new_init_guess, 2).tolist()
+    if interpolation_type == "LINEAR":
+        old_variable["initial_guess"] = np.round(old_init_guess[:, [0, -1]], 2).tolist()
+    if interpolation_type == "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT":
+        middle_col = np.array([(old_init_guess[:, 0] + old_init_guess[:, -1]) / 2]).T
+        new_init = np.column_stack((old_init_guess[:, 0], middle_col, old_init_guess[:, -1]))
+        old_variable["initial_guess"] = np.round(new_init, 2).tolist()
+
+    old_variable["initial_guess_interpolation_type"] = interpolation_type
+
+
 class LooseValue(NamedTuple):
     """
     A value with a looseness

@@ -91,10 +91,15 @@ def test_put_state_variable_bounds_interpolation_type():
 
     response = client.get("/acrobatics/phases_info/")
     phases_info = response.json()
-    assert phases_info[0]["state_variables"][0]["bounds"]["min_bounds"] == np.zeros((10, 2)).tolist()
-    assert phases_info[0]["state_variables"][0]["bounds"]["max_bounds"] == np.zeros((10, 2)).tolist()
+
+    state_variable_0 = phases_info[0]["state_variables"][0]
+    assert np.array(state_variable_0["bounds"]["min_bounds"]).shape == (10, 2)
+    assert state_variable_0["bounds"]["min_bounds"] != np.zeros((10, 2)).tolist()
+    assert np.array(state_variable_0["bounds"]["max_bounds"]).shape == (10, 2)
+    assert state_variable_0["bounds"]["max_bounds"] != np.zeros((10, 2)).tolist()
     # init guess unchanged
-    assert phases_info[0]["state_variables"][0]["initial_guess"] != np.zeros((10, 1)).tolist()
+
+    assert np.array(state_variable_0["initial_guess"]).shape == (10, 2)
 
     # qdot unchanged
     assert phases_info[0]["state_variables"][1]["bounds"]["min_bounds"] != np.zeros((10, 2)).tolist()
