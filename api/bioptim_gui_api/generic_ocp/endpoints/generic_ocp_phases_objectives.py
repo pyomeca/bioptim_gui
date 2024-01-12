@@ -1,5 +1,5 @@
 from bioptim import ObjectiveFcn
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_penalties import GenericOCPPenaltyRouter
 from bioptim_gui_api.generic_ocp.endpoints.generic_ocp_requests import (
@@ -96,7 +96,13 @@ class GenericOCPObjectiveRouter(GenericOCPPenaltyRouter):
             else:
                 penalty_type = DefaultPenaltyConfig.max_to_original_dict[penalty_type]
 
-            arguments = obj_arguments(objective_type_value, penalty_type)
+            try:
+                arguments = obj_arguments(objective_type_value, penalty_type)
+            except AttributeError:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Objective {objective_type_value} with penalty {penalty_type} is not available",
+                )
 
             objective["arguments"] = arguments
 
