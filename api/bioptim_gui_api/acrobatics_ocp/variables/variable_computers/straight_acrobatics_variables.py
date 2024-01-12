@@ -18,16 +18,16 @@ class StraightAcrobaticsVariables:
     YrotLeftUpperArm = 9
 
     dofs = [
-        "X",
-        "Y",
-        "Z",
-        "Xrot",
-        "Yrot",
-        "Zrot",
-        "ZrotRightUpperArm",
-        "YrotRightUpperArm",
-        "ZrotLeftUpperArm",
-        "YrotLeftUpperArm",
+        "Pelvis translation X",
+        "Pelvis translation Y",
+        "Pelvis translation Z",
+        "Pelvis rotation X",
+        "Pelvis rotation Y",
+        "Pelvis rotation Z",
+        "Right upper arm rotation Z",
+        "Right upper arm rotation Y",
+        "Left upper arm rotation Z",
+        "Left upper arm rotation Y",
     ]
 
     nb_q, nb_qdot, nb_tau = 10, 10, 4

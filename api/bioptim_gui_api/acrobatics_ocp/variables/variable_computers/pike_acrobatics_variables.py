@@ -26,22 +26,22 @@ class PikeAcrobaticsVariables(StraightAcrobaticsVariables):
     YrotUpperLegs = 15
 
     dofs = [
-        "X",
-        "Y",
-        "Z",
-        "Xrot",
-        "Yrot",
-        "Zrot",
-        "ZrotRightUpperArm",
-        "YrotRightUpperArm",
-        "ZrotRightLowerArm",
-        "XrotRightLowerArm",
-        "ZrotLeftUpperArm",
-        "YrotLeftUpperArm",
-        "ZrotLeftLowerArm",
-        "XrotLeftLowerArm",
-        "XrotUpperLegs",
-        "YrotUpperLegs",
+        "Pelvis translation X",
+        "Pelvis translation Y",
+        "Pelvis translation Z",
+        "Pelvis rotation X",
+        "Pelvis rotation Y",
+        "Pelvis rotation Z",
+        "Right upper arm rotation Z",
+        "Right upper arm rotation Y",
+        "Right lower arm rotation Z",
+        "Right lower arm rotation X",
+        "Left upper arm rotation Z",
+        "Left upper arm rotation Y",
+        "Left lower arm rotation Z",
+        "Left lower arm rotation X",
+        "Upper legs rotation X",
+        "Upper legs rotation Y",
     ]
 
     nb_q, nb_qdot, nb_tau = 16, 16, 10
