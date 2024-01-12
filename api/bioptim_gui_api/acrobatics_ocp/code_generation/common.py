@@ -111,7 +111,7 @@ def get_solver():
 def prepare_multi_start(
     combinatorial_parameters: dict,
     save_folder: str = None,
-    n_pools: int = 1,
+    n_pools: int = 2,
 ) -> MultiStart:
     \"""
     The initialization of the multi-start

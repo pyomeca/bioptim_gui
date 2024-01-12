@@ -113,7 +113,7 @@ def get_solver(warming_up: bool = False):
 def prepare_multi_start(
     combinatorial_parameters: dict,
     save_folder: str = None,
-    n_pools: int = 1,
+    n_pools: int = 2,
     warming_up: bool = False,
 ) -> MultiStart:
     \"""

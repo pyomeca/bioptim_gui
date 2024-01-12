@@ -95,21 +95,21 @@ def prepare_ocp(
                 magnitude_type=MagnitudeType.RELATIVE,
                 seed=seed,
             )
-        x_initial_guesses[0]["qdot"].add_noise(
-            bounds=x_bounds[0]["qdot"],
-            n_shooting=np.array(n_shooting[0])+1,
-            magnitude=0.2,
-            magnitude_type=MagnitudeType.RELATIVE,
-            seed=seed,
-        )
-
-        u_initial_guesses[0]["{control}"].add_noise(
-            bounds=u_bounds[0]["{control}"],
-            magnitude=0.2,
-            magnitude_type=MagnitudeType.RELATIVE,
-            n_shooting=n_shooting[0],
-            seed=seed,
-        )
+            x_initial_guesses[i]["qdot"].add_noise(
+                bounds=x_bounds[i]["qdot"],
+                n_shooting=np.array(n_shooting[i])+1,
+                magnitude=0.2,
+                magnitude_type=MagnitudeType.RELATIVE,
+                seed=seed,
+            )
+    
+            u_initial_guesses[i]["{control}"].add_noise(
+                bounds=u_bounds[i]["{control}"],
+                n_shooting=np.array(n_shooting[i]),
+                magnitude=0.2,
+                magnitude_type=MagnitudeType.RELATIVE,
+                seed=seed,
+            )
 """
 
     @classmethod
