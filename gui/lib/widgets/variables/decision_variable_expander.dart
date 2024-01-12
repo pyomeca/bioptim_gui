@@ -239,7 +239,7 @@ class _DataFiller extends StatelessWidget {
     List<String> getColNames(String interpolationType) {
       switch (interpolationType) {
         case 'CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT':
-          return ['Start', 'Intermediate', 'Last'];
+          return ['First', 'Intermediate', 'Last'];
         case 'CONSTANT':
           return ['All'];
         case 'LINEAR':
