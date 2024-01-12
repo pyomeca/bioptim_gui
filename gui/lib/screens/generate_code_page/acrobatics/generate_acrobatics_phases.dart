@@ -62,7 +62,7 @@ class SomersaultGenerationMenu extends StatelessWidget {
             const Divider(),
             // begin remove, decision variables are not necessary for somersault for now
             // DecisionVariableExpander(
-            //   from: DecisionVariableType.state,
+            //   decisionVariableType: DecisionVariableType.state,
             //   phaseIndex: somersaultIndex,
             //   width: width,
             //   endpointPrefix: 'acrobatics/phases_info',
@@ -71,7 +71,7 @@ class SomersaultGenerationMenu extends StatelessWidget {
             // const SizedBox(height: 12),
             // const Divider(),
             // DecisionVariableExpander(
-            //   from: DecisionVariableType.control,
+            //   decisionVariableType: DecisionVariableType.control,
             //   phaseIndex: somersaultIndex,
             //   width: width,
             //   endpointPrefix: 'acrobatics/phases_info',
