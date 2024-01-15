@@ -205,6 +205,7 @@ def test_stringify_for_non_collision_constraint():
         radius_2=0.05,
         node=Node.ALL_SHOOTING,
         quadratic=True,
+        phase=0,
     )"""
     )
 
@@ -248,5 +249,6 @@ def test_stringify_for_non_collision_obj():
         radius_2=0.05,
         node=Node.ALL_SHOOTING,
         quadratic=True,
+        phase=0,
     )"""
     )

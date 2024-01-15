@@ -491,32 +491,33 @@ def test_put_objective_type_maximize():
     assert response.status_code == 200, response
 
 
-def test_changing_penalty_not_exist():
-    # MINIMIZE_CONTROL -> only exists in Lagrange, not in Mayer
-    response = client.put(
-        "/acrobatics/phases_info/0/objectives/0/penalty_type",
-        json={"penalty_type": "MINIMIZE_TIME"},
-    )
-    assert response.status_code == 200, response
-
-    response = client.put(
-        "/acrobatics/phases_info/0/objectives/0/objective_type",
-        json={"objective_type": "mayer"},
-    )
-    assert response.status_code == 200, response
-
-    data = response.json()
-    assert data["objective_type"] == "mayer"
-
-    response = client.put(
-        "/acrobatics/phases_info/0/objectives/0/penalty_type",
-        json={"penalty_type": "MINIMIZE_CONTROL"},
-    )
-    assert response.status_code == 200, response
-
-    data = response.json()
-    assert data["penalty_type"] == "MINIMIZE_CONTROL"
-    assert data["objective_type"] == "lagrange"
+# TODO readd this tests when an objective exist in either mayer or lagrange
+# def test_changing_penalty_not_exist():
+#     # MINIMIZE_CONTROL -> only exists in Lagrange, not in Mayer
+#     response = client.put(
+#         "/acrobatics/phases_info/0/objectives/0/penalty_type",
+#         json={"penalty_type": "MINIMIZE_TIME"},
+#     )
+#     assert response.status_code == 200, response
+#
+#     response = client.put(
+#         "/acrobatics/phases_info/0/objectives/0/objective_type",
+#         json={"objective_type": "mayer"},
+#     )
+#     assert response.status_code == 200, response
+#
+#     data = response.json()
+#     assert data["objective_type"] == "mayer"
+#
+#     response = client.put(
+#         "/acrobatics/phases_info/0/objectives/0/penalty_type",
+#         json={"penalty_type": "MINIMIZE_CONTROL"},
+#     )
+#     assert response.status_code == 200, response
+#
+#     data = response.json()
+#     assert data["penalty_type"] == "MINIMIZE_CONTROL"
+#     assert data["objective_type"] == "lagrange"
 
 
 def test_switch_to_lagrange_all_shooting():

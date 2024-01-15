@@ -19,6 +19,7 @@ def test_regular_str_simple():
         == """constraint=ConstraintFcn.TIME_CONSTRAINT,
         node=Node.ALL,
         quadratic=False,
+        phase=0,
 """
     )
 
@@ -66,6 +67,7 @@ def test_regular_str_indent_8():
         == """constraint=ConstraintFcn.TIME_CONSTRAINT,
             node=Node.ALL,
             quadratic=False,
+            phase=0,
 """
     )
 

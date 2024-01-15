@@ -151,9 +151,7 @@ class PenaltyPrinter(ABC):
         """
         Phase argument is added to the string only if it not the default value (0).
         """
-        ret = ""
-        if self.phase > 0:
-            ret += f"phase={self.phase},\n"
+        ret = f"phase={self.phase},\n"
         return ret
 
     def _node_str(self) -> str:

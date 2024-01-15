@@ -27,6 +27,7 @@ def test_regular_str_simple():
         index=[1, 2],
         node=Node.ALL,
         quadratic=False,
+        phase=0,
 """
     )
 
@@ -57,6 +58,7 @@ def test_mayer_no_integration_rule():
         index=[1, 2],
         node=Node.ALL,
         quadratic=False,
+        phase=0,
 """
     )
 
@@ -118,6 +120,7 @@ def test_regular_str_indent_8():
             index=[1, 2],
             node=Node.ALL,
             quadratic=False,
+            phase=0,
 """
     )
 

@@ -25,6 +25,7 @@ def test_custom_str_simple():
         weight=1.0,
         node=Node.ALL,
         quadratic=False,
+        phase=0,
 """
     )
 
@@ -78,6 +79,7 @@ def test_custom_str_indent_8():
             weight=1.0,
             node=Node.ALL,
             quadratic=False,
+            phase=0,
 """
     )
 

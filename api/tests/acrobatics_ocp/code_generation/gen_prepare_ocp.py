@@ -92,6 +92,7 @@ def prepare_ocp(
         phases = data["phases_info"]
         nb_phases = len(phases)
         total_time = sum(s["duration"] for s in phases)
+        final_time_margin = data["final_time_margin"]
 
         return f"""
     multinode_constraints = MultinodeConstraintList()
@@ -99,8 +100,8 @@ def prepare_ocp(
         MultinodeConstraintFcn.TRACK_TOTAL_TIME,
         nodes_phase=({", ".join([str(i) for i in range(nb_phases)])}),
         nodes=({", ".join(["Node.END" for _ in range(nb_phases)])}),
-        min_bound={total_time} - 0.02,
-        max_bound={total_time} + 0.02,
+        min_bound={total_time} - {final_time_margin},
+        max_bound={total_time} + {final_time_margin},
     )
 """
 

@@ -21,6 +21,7 @@ def test_custom_str_simple():
         == """my_func,
         node=Node.ALL,
         quadratic=False,
+        phase=0,
 """
     )
 
@@ -66,6 +67,7 @@ def test_custom_str_indent_8():
         == """my_func,
             node=Node.ALL,
             quadratic=False,
+            phase=0,
 """
     )
 
