@@ -1,4 +1,5 @@
 import 'package:bioptim_gui/models/python_interface.dart';
+import 'package:bioptim_gui/screens/edit_bounds.dart';
 import 'package:bioptim_gui/screens/generate_code_page/generate_code_page.dart';
 import 'package:bioptim_gui/screens/generate_model.dart';
 import 'package:bioptim_gui/screens/load_existing_page.dart';
@@ -49,18 +50,23 @@ class _SideMenuNavigationState extends State<SideMenuNavigation> {
     const GenerateCode(),
     const GenerateModel(),
     const LoadExisting(),
+    const EditBounds(
+      endpointPrefix: 'acrobatics',
+    ),
   ];
 
   final List<String> _pageTitles = [
     'Bioptim Generate Code',
     'Generate Model',
     'Load existing solution',
+    'Edit bounds',
   ];
 
   final List<String> _drawerItemTitles = [
     'Generate Code',
     'Generate Model',
     'Load existing solution',
+    'Edit bounds',
   ];
 
   void _onMenuItemSelected(int index) {

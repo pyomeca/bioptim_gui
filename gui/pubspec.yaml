@@ -16,6 +16,7 @@ dependencies:
   path: ^1.8.3
   http: ^1.1.0
   provider: ^6.0.5
+  fl_chart: ^0.65.0
 
 dev_dependencies:
   flutter_test:
