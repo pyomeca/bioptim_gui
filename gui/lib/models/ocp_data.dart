@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bioptim_gui/models/decision_variable_value_type.dart';
 import 'package:bioptim_gui/models/decision_variables_type.dart';
 import 'package:bioptim_gui/models/ocp_request_maker.dart';
 import 'package:bioptim_gui/models/penalty.dart';
@@ -204,6 +205,74 @@ abstract class OCPData<T extends Phase> with ChangeNotifier {
         break;
       case "dimension":
         updatePhaseInfo(jsonData as List<dynamic>);
+        break;
+    }
+
+    notifyListeners();
+  }
+
+  void updateDecisionVariableValue(
+    int phaseIndex,
+    DecisionVariableType decisionVariableType,
+    DecisionVariableValueType decisionVariableValueType,
+    int variableIndex,
+    int dofIndex,
+    int nodeIndex,
+    double newValue,
+  ) async {
+    newValue = double.parse(newValue.toStringAsFixed(2));
+
+    requestMaker.updateDecisionVariableValue(
+        phaseIndex,
+        decisionVariableType,
+        decisionVariableValueType,
+        variableIndex,
+        dofIndex,
+        nodeIndex,
+        newValue);
+
+    switch (decisionVariableType) {
+      case DecisionVariableType.state:
+        switch (decisionVariableValueType) {
+          case DecisionVariableValueType.minBound:
+            phasesInfo[phaseIndex]
+                .stateVariables[variableIndex]
+                .bounds
+                .minBounds[dofIndex][nodeIndex] = newValue;
+            break;
+          case DecisionVariableValueType.maxBound:
+            phasesInfo[phaseIndex]
+                .stateVariables[variableIndex]
+                .bounds
+                .maxBounds[dofIndex][nodeIndex] = newValue;
+            break;
+          case DecisionVariableValueType.initGuess:
+            phasesInfo[phaseIndex]
+                .stateVariables[variableIndex]
+                .initialGuess[dofIndex][nodeIndex] = newValue;
+            break;
+        }
+        break;
+      case DecisionVariableType.control:
+        switch (decisionVariableValueType) {
+          case DecisionVariableValueType.minBound:
+            phasesInfo[phaseIndex]
+                .controlVariables[variableIndex]
+                .bounds
+                .minBounds[dofIndex][nodeIndex] = newValue;
+            break;
+          case DecisionVariableValueType.maxBound:
+            phasesInfo[phaseIndex]
+                .controlVariables[variableIndex]
+                .bounds
+                .maxBounds[dofIndex][nodeIndex] = newValue;
+            break;
+          case DecisionVariableValueType.initGuess:
+            phasesInfo[phaseIndex]
+                .controlVariables[variableIndex]
+                .initialGuess[dofIndex][nodeIndex] = newValue;
+            break;
+        }
         break;
     }
 

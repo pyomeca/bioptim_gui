@@ -41,8 +41,11 @@ class _GenerateCodeState extends State<GenerateCode> {
   }
 
   void forceRedraw() {
-    _trailingKey.currentState?.setState(() {});
-    setState(() {});
+    // mounted check required to avoid memory leaks
+    if (mounted) {
+      _trailingKey.currentState?.setState(() {});
+      setState(() {});
+    }
   }
 
   final controllers = OptimalControlProgramControllers.instance;

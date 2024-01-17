@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bioptim_gui/models/api_config.dart';
+import 'package:bioptim_gui/models/decision_variable_value_type.dart';
 import 'package:bioptim_gui/models/decision_variables_type.dart';
 import 'package:bioptim_gui/models/ocp_data.dart';
 import 'package:bioptim_gui/models/penalty.dart';
@@ -208,6 +209,37 @@ class OCPRequestMaker<T extends OCPData> {
     }
 
     if (kDebugMode) print('$fieldName updated with value: $newValue');
+
+    return response;
+  }
+
+  Future<http.Response> updateDecisionVariableValue(
+    int phaseIndex,
+    DecisionVariableType decisionVariableType,
+    DecisionVariableValueType decisionVariableValueType,
+    int variableIndex,
+    int dofIndex,
+    int nodeIndex,
+    double newValue,
+  ) async {
+    final url =
+        '${APIConfig.url}/$prefix/$phaseInfoString/$phaseIndex/${decisionVariableType.toPythonString()}/'
+        '$variableIndex/${decisionVariableValueType.toPythonString()}';
+
+    final headers = {'Content-Type': 'application/json'};
+    final body = json.encode({
+      "x": dofIndex,
+      "y": nodeIndex,
+      "value": newValue,
+    });
+
+    final response =
+        await http.put(Uri.parse(url), body: body, headers: headers);
+
+    if (response.statusCode != 200) {
+      throw Exception(
+          'Error while changing $phaseIndex, ${decisionVariableType.toString()}, ${decisionVariableValueType.toString()}, $variableIndex, $dofIndex, $nodeIndex to value $newValue');
+    }
 
     return response;
   }

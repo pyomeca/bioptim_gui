@@ -53,8 +53,8 @@ class BoundChart extends StatelessWidget {
         children: [
           Text(variable.name),
           Container(
-            height: 200,
-            width: 400,
+            height: 250,
+            width: 500,
             padding: const EdgeInsets.all(16.0),
             child: LineChart(
               LineChartData(
