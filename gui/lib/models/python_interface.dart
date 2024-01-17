@@ -57,13 +57,11 @@ class PythonInterface {
     final pathAndArgs = multistart
         ? [
             path,
-            parentDir,
             '-m',
             nbSeeds.toString(),
           ]
         : [
             path,
-            parentDir,
           ];
 
     final process = await Process.start(

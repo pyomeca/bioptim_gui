@@ -17,7 +17,7 @@ def get_acrobatics_generated_code(req: CodeGenerationRequest):
     if not model_path:
         raise HTTPException(status_code=400, detail="No model path provided")
 
-    new_models = converted_model(req.save_path, data)
+    new_models = converted_model(data)
 
     generated = generated_code(
         data,

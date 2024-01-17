@@ -31,7 +31,9 @@ def save_results(sol: Solution, *combinatorial_parameters, **extra_parameters) -
         All the non-combinatorial parameters sent by the user
     \"""
 
-    save_folder = extra_parameters["save_folder"]
+    save_folder = (Path(extra_parameters["save_folder"]) / "results")
+    save_folder.mkdir(parents=True, exist_ok=True)
+    save_folder = str(save_folder)
     warming_up = extra_parameters["warming_up"]
 
     seed, warming_up, pkl_path = combinatorial_parameters
@@ -192,14 +194,13 @@ def main(nb_seeds: int = 1, save_folder: str = "save"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    # Required argument for save folder path
-    parser.add_argument('save_folder_path', type=str, help='Path to the save folder')
-
     parser.add_argument('-m', '--multistart', type=int, help='Number of seeds for multistart', default=1)
 
     args = parser.parse_args()
 
-    save_folder_path = args.save_folder_path
+    save_folder_path = (Path("output/") / Path(sys.argv[0]).stem)
+    save_folder_path.mkdir(parents=True, exist_ok=True)
+    save_folder_path = str(save_folder_path)
     nb_seeds = args.multistart
 
     main(nb_seeds, save_folder_path)

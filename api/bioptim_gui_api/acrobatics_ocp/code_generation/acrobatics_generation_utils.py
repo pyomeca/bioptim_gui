@@ -32,11 +32,11 @@ def generated_code(data: dict, new_model_path: str) -> str:
     return ret
 
 
-def converted_model(save_path: str, data: dict) -> list[NewGeneratedBioMod]:
+def converted_model(data: dict) -> list[NewGeneratedBioMod]:
     model_path = data["model_path"]
     position = data["position"]
 
-    save_folder = Path(save_path).parent
+    save_folder = Path("models/")
     original_filename = Path(model_path).name.split(".")[0]
     new_model_path = save_folder / f"{original_filename}-{position}.bioMod"
 

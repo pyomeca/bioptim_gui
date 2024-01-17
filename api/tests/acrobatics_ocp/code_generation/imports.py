@@ -11,8 +11,10 @@ import argparse
 import biorbd
 import casadi as cas
 import os
+from pathlib import Path
 import pickle as pkl
 import time
+import sys
 
 import numpy as np
 from bioptim import (

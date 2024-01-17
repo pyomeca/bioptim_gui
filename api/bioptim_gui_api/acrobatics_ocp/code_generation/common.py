@@ -39,7 +39,9 @@ def save_results(sol: Solution, *combinatorial_parameters, **extra_parameters) -
     except:
         seed, is_multistart = 0, False
 
-    save_folder = extra_parameters["save_folder"]
+    save_folder = (Path(extra_parameters["save_folder"]) / "results")
+    save_folder.mkdir(parents=True, exist_ok=True)
+    save_folder = str(save_folder)
     if not os.path.exists(save_folder):
         os.mkdir(save_folder)
 
@@ -177,15 +179,14 @@ def main(is_multistart: bool = False, nb_seeds: int = 1, save_folder: str = "sav
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
-    # Required argument for save folder path
-    parser.add_argument('save_folder_path', type=str, help='Path to the save folder')
-
     # Optional argument for multistart
     parser.add_argument('-m', '--multistart', type=int, help='Number of seeds for multistart')
 
     args = parser.parse_args()
 
-    save_folder_path = args.save_folder_path
+    save_folder_path = (Path("output/") / Path(sys.argv[0]).stem)
+    save_folder_path.mkdir(parents=True, exist_ok=True)
+    save_folder_path = str(save_folder_path)
     nb_seeds = args.multistart or 1
     is_multi = args.multistart is not None
 

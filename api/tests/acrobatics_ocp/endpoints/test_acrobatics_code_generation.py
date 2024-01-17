@@ -48,7 +48,7 @@ def run_for_all():
 
 
 def test_generate_code_no_model():
-    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
+    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "models/cheh.py"})
     assert response.status_code == 400
 
 
@@ -89,10 +89,10 @@ def test_generate_code_simple_position(position, with_visual_criteria, non_colli
     with open(f"acrobatics_ocp/generated_examples/{position}/base_{position}.txt", "r") as f:
         base_position_content = f.read()
 
-    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
+    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "models/cheh.py"})
     assert response.status_code == 200, response
     data = response.json()
-    assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
+    assert data["new_models"][0][1] == f"models/{position}-{position}.bioMod"
     assert data["new_models"][0][1] in data["generated_code"]
 
     save_config("simple", folder, position)
@@ -153,10 +153,10 @@ def test_generate_code_position_no_objective_no_constraint(
     ) as f:
         base_position_content = f.read()
 
-    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
+    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "models/cheh.py"})
     assert response.status_code == 200, response
     data = response.json()
-    assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
+    assert data["new_models"][0][1] == f"models/{position}-{position}.bioMod"
     assert data["new_models"][0][1] in data["generated_code"]
 
     save_config("no_penalties", folder, position)
@@ -217,10 +217,10 @@ def test_generate_code_position_objective_and_constraint(
     ) as f:
         base_position_content = f.read()
 
-    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
+    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "models/cheh.py"})
     assert response.status_code == 200, response
     data = response.json()
-    assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
+    assert data["new_models"][0][1] == f"models/{position}-{position}.bioMod"
     assert data["new_models"][0][1] in data["generated_code"]
 
     save_config("penalties", folder, position)
@@ -285,10 +285,10 @@ def test_generate_code_2_phase_position_objective_and_constraint(
     ) as f:
         base_position_content = f.read()
 
-    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
+    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "models/cheh.py"})
     assert response.status_code == 200, response
     data = response.json()
-    assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
+    assert data["new_models"][0][1] == f"models/{position}-{position}.bioMod"
     assert data["new_models"][0][1] in data["generated_code"]
 
     save_config("more_phases", folder, position)
@@ -397,10 +397,10 @@ def test_generate_code_modified_objective_and_constraint(
     ) as f:
         base_position_content = f.read()
 
-    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "saver/cheh.py"})
+    response = client.post("/acrobatics/generate_code", json={"model_path": "", "save_path": "models/cheh.py"})
     assert response.status_code == 200, response
     data = response.json()
-    assert data["new_models"][0][1] == f"saver/{position}-{position}.bioMod"
+    assert data["new_models"][0][1] == f"models/{position}-{position}.bioMod"
     assert data["new_models"][0][1] in data["generated_code"]
 
     save_config("modified_penalties", folder, position)
