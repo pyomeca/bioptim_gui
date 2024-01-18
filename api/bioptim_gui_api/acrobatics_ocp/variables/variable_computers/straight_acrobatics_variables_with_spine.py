@@ -109,3 +109,10 @@ class StraightAcrobaticsVariablesWithSpine(StraightAcrobaticsVariables):
             [0.05] * 3,
         ]
     )
+
+    @classmethod
+    def _fill_landing_phase(cls, x_bounds, half_twists: list) -> dict:
+        super()._fill_landing_phase(x_bounds, half_twists)
+
+        x_bounds[-1]["min"][cls.XrotStomach : cls.ZrotShoulder, 2] = -0.01
+        x_bounds[-1]["max"][cls.XrotStomach : cls.ZrotShoulder, 2] = 0.01

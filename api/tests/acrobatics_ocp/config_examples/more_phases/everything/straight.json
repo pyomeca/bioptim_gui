@@ -5,7 +5,7 @@
         0,
         0
     ],
-    "model_path": "/home/aweng/afs/bioptim_gui/api/tests/test_biomods/everything/good/straight.bioMod",
+    "model_path": "/home/kaelfacon/afs/bioptim_gui/api/tests/test_biomods/everything/good/straight.bioMod",
     "final_time": 1.0,
     "final_time_margin": 0.1,
     "position": "straight",
@@ -16,32 +16,32 @@
     "dynamics": "JOINTS_ACCELERATION_DRIVEN",
     "with_spine": true,
     "dof_names": [
-        "X",
-        "Y",
-        "Z",
-        "Xrot",
-        "Yrot",
-        "Zrot",
-        "XrotStomach",
-        "YrotStomach",
-        "ZrotStomach",
-        "XrotRib",
-        "YrotRib",
-        "ZrotRib",
-        "XrotNipple",
-        "YrotNipple",
-        "ZrotNipple",
-        "XrotShoulder",
-        "YrotShoulder",
-        "ZrotShoulder",
-        "ZrotHead",
-        "XrotHead",
-        "ZrotEyes",
-        "XrotEyes",
-        "ZrotRightUpperArm",
-        "YrotRightUpperArm",
-        "ZrotLeftUpperArm",
-        "YrotLeftUpperArm"
+        "Pelvis translation X",
+        "Pelvis translation Y",
+        "Pelvis translation Z",
+        "Pelvis rotation X",
+        "Pelvis rotation Y",
+        "Pelvis rotation Z",
+        "Stomach rotation X",
+        "Stomach rotation Y",
+        "Stomach rotation Z",
+        "Rib rotation X",
+        "Rib rotation Y",
+        "Rib rotation Z",
+        "Nipple rotation X",
+        "Nipple rotation Y",
+        "Nipple rotation Z",
+        "Shoulder rotation X",
+        "Shoulder rotation Y",
+        "Shoulder rotation Z",
+        "Head rotation Z",
+        "Head rotation X",
+        "Eyes rotation Z",
+        "Eyes rotation X",
+        "Right upper arm rotation Z",
+        "Right upper arm rotation Y",
+        "Left upper arm rotation Z",
+        "Left upper arm rotation Y"
     ],
     "phases_info": [
         {
@@ -571,6 +571,43 @@
                             "type": "float"
                         }
                     ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 50000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                6,
+                                9,
+                                12,
+                                15,
+                                7,
+                                10,
+                                13,
+                                16,
+                                8,
+                                11,
+                                14,
+                                17
+                            ],
+                            "type": "list"
+                        }
+                    ]
                 }
             ],
             "constraints": [
@@ -591,12 +628,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "RightShoulder",
+                            "value": "LeftShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "RightKnuckle",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -606,12 +643,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftShoulder",
+                            "value": "RightShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "RightKnuckle",
                             "type": "str"
                         },
                         {
@@ -2099,6 +2136,43 @@
                             "type": "float"
                         }
                     ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 50000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                6,
+                                9,
+                                12,
+                                15,
+                                7,
+                                10,
+                                13,
+                                16,
+                                8,
+                                11,
+                                14,
+                                17
+                            ],
+                            "type": "list"
+                        }
+                    ]
                 }
             ],
             "constraints": [
@@ -2119,12 +2193,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "RightShoulder",
+                            "value": "LeftShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "RightKnuckle",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -2134,12 +2208,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftShoulder",
+                            "value": "RightShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "RightKnuckle",
                             "type": "str"
                         },
                         {
@@ -3690,12 +3764,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "RightShoulder",
+                            "value": "LeftShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "RightKnuckle",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -3705,12 +3779,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftShoulder",
+                            "value": "RightShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "RightKnuckle",
                             "type": "str"
                         },
                         {
@@ -3761,57 +3835,57 @@
                             [
                                 -0.26,
                                 -0.26,
-                                -0.26
+                                -0.01
                             ],
                             [
                                 -0.26,
                                 -0.26,
-                                -0.26
+                                -0.01
                             ],
                             [
                                 -0.26,
                                 -0.26,
-                                -0.26
+                                -0.01
                             ],
                             [
                                 -0.26,
                                 -0.26,
-                                -0.26
+                                -0.01
                             ],
                             [
                                 -0.26,
                                 -0.26,
-                                -0.26
+                                -0.01
                             ],
                             [
                                 -0.26,
                                 -0.26,
-                                -0.26
+                                -0.01
                             ],
                             [
                                 -0.26,
                                 -0.26,
-                                -0.26
+                                -0.01
                             ],
                             [
                                 -0.26,
                                 -0.26,
-                                -0.26
+                                -0.01
                             ],
                             [
                                 -0.26,
                                 -0.26,
-                                -0.26
+                                -0.01
                             ],
                             [
                                 -0.26,
                                 -0.26,
-                                -0.26
+                                -0.01
                             ],
                             [
                                 -0.26,
                                 -0.26,
-                                -0.26
+                                -0.01
                             ],
                             [
                                 -0.26,
@@ -3893,57 +3967,57 @@
                             [
                                 0.26,
                                 0.26,
-                                0.26
+                                0.01
                             ],
                             [
                                 0.26,
                                 0.26,
-                                0.26
+                                0.01
                             ],
                             [
                                 0.26,
                                 0.26,
-                                0.26
+                                0.01
                             ],
                             [
                                 0.26,
                                 0.26,
-                                0.26
+                                0.01
                             ],
                             [
                                 0.26,
                                 0.26,
-                                0.26
+                                0.01
                             ],
                             [
                                 0.26,
                                 0.26,
-                                0.26
+                                0.01
                             ],
                             [
                                 0.26,
                                 0.26,
-                                0.26
+                                0.01
                             ],
                             [
                                 0.26,
                                 0.26,
-                                0.26
+                                0.01
                             ],
                             [
                                 0.26,
                                 0.26,
-                                0.26
+                                0.01
                             ],
                             [
                                 0.26,
                                 0.26,
-                                0.26
+                                0.01
                             ],
                             [
                                 0.26,
                                 0.26,
-                                0.26
+                                0.01
                             ],
                             [
                                 0.26,

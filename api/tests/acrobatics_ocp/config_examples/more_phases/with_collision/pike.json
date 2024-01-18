@@ -5,7 +5,7 @@
         0,
         0
     ],
-    "model_path": "/home/aweng/afs/bioptim_gui/api/tests/test_biomods/with_collision/good/pike.bioMod",
+    "model_path": "/home/kaelfacon/afs/bioptim_gui/api/tests/test_biomods/with_collision/good/pike.bioMod",
     "final_time": 1.0,
     "final_time_margin": 0.1,
     "position": "pike",
@@ -16,22 +16,22 @@
     "dynamics": "TORQUE_DRIVEN",
     "with_spine": false,
     "dof_names": [
-        "X",
-        "Y",
-        "Z",
-        "Xrot",
-        "Yrot",
-        "Zrot",
-        "ZrotRightUpperArm",
-        "YrotRightUpperArm",
-        "ZrotRightLowerArm",
-        "XrotRightLowerArm",
-        "ZrotLeftUpperArm",
-        "YrotLeftUpperArm",
-        "ZrotLeftLowerArm",
-        "XrotLeftLowerArm",
-        "XrotUpperLegs",
-        "YrotUpperLegs"
+        "Pelvis translation X",
+        "Pelvis translation Y",
+        "Pelvis translation Z",
+        "Pelvis rotation X",
+        "Pelvis rotation Y",
+        "Pelvis rotation Z",
+        "Right upper arm rotation Z",
+        "Right upper arm rotation Y",
+        "Right lower arm rotation Z",
+        "Right lower arm rotation X",
+        "Left upper arm rotation Z",
+        "Left upper arm rotation Y",
+        "Left lower arm rotation Z",
+        "Left lower arm rotation X",
+        "Upper legs rotation X",
+        "Upper legs rotation Y"
     ],
     "phases_info": [
         {
@@ -197,12 +197,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "RightElbow",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "RightKnuckle",
+                            "value": "Ankle",
                             "type": "str"
                         },
                         {
@@ -212,200 +212,153 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftElbow",
+                            "value": "RightElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
+                            "value": "RightKnuckle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all[3:]",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "LeftShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "LeftElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "RightShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "RightElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all[3:]",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "PelvisBase",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "Ankle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "RightShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "RightElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all[3:]",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "LeftElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
                             "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all[3:]",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
-                            "value": "PelvisBase",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_2",
-                            "value": "Ankle",
-                            "type": "str"
-                        },
-                        {
                             "name": "radius_1",
                             "value": 0.05,
                             "type": "float"
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftShoulder",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_4",
-                            "value": "LeftElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all[3:]",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
-                            "value": "PelvisBase",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_2",
-                            "value": "Ankle",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_1",
-                            "value": 0.05,
-                            "type": "float"
-                        },
-                        {
-                            "name": "marker_3",
-                            "value": "RightElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_4",
-                            "value": "RightKnuckle",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all[3:]",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
-                            "value": "RightElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_2",
-                            "value": "RightKnuckle",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_1",
-                            "value": 0.05,
-                            "type": "float"
-                        },
-                        {
-                            "name": "marker_3",
-                            "value": "LeftShoulder",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_4",
-                            "value": "LeftElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all[3:]",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
                             "value": "HeadTop",
                             "type": "str"
                         },
                         {
-                            "name": "marker_2",
-                            "value": "PelvisBase",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_1",
-                            "value": 0.05,
-                            "type": "float"
-                        },
-                        {
-                            "name": "marker_3",
-                            "value": "LeftElbow",
-                            "type": "str"
-                        },
-                        {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
@@ -447,12 +400,59 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "RightShoulder",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
+                            "value": "Ankle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all[3:]",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
                             "value": "RightElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "RightKnuckle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "HeadTop",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
@@ -494,12 +494,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "RightShoulder",
+                            "value": "LeftShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "RightElbow",
+                            "value": "LeftElbow",
                             "type": "str"
                         },
                         {
@@ -541,12 +541,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "RightShoulder",
+                            "value": "RightElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "RightElbow",
+                            "value": "RightKnuckle",
                             "type": "str"
                         },
                         {
@@ -573,12 +573,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "HeadTop",
+                            "value": "LeftElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "PelvisBase",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -620,12 +620,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "PelvisBase",
+                            "value": "LeftElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "Ankle",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -635,12 +635,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftElbow",
+                            "value": "RightShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "RightElbow",
                             "type": "str"
                         },
                         {
@@ -2163,12 +2163,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "RightElbow",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "RightKnuckle",
+                            "value": "Ankle",
                             "type": "str"
                         },
                         {
@@ -2178,200 +2178,153 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftElbow",
+                            "value": "RightElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
+                            "value": "RightKnuckle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all[:-3]",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "LeftShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "LeftElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "RightShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "RightElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all[:-3]",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "PelvisBase",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "Ankle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "RightShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "RightElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all[:-3]",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "LeftElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
                             "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all[:-3]",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
-                            "value": "PelvisBase",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_2",
-                            "value": "Ankle",
-                            "type": "str"
-                        },
-                        {
                             "name": "radius_1",
                             "value": 0.05,
                             "type": "float"
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftShoulder",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_4",
-                            "value": "LeftElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all[:-3]",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
-                            "value": "PelvisBase",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_2",
-                            "value": "Ankle",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_1",
-                            "value": 0.05,
-                            "type": "float"
-                        },
-                        {
-                            "name": "marker_3",
-                            "value": "RightElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_4",
-                            "value": "RightKnuckle",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all[:-3]",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
-                            "value": "RightElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_2",
-                            "value": "RightKnuckle",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_1",
-                            "value": 0.05,
-                            "type": "float"
-                        },
-                        {
-                            "name": "marker_3",
-                            "value": "LeftShoulder",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_4",
-                            "value": "LeftElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all[:-3]",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
                             "value": "HeadTop",
                             "type": "str"
                         },
                         {
-                            "name": "marker_2",
-                            "value": "PelvisBase",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_1",
-                            "value": 0.05,
-                            "type": "float"
-                        },
-                        {
-                            "name": "marker_3",
-                            "value": "LeftElbow",
-                            "type": "str"
-                        },
-                        {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
@@ -2413,12 +2366,59 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "RightShoulder",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
+                            "value": "Ankle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all[:-3]",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
                             "value": "RightElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "RightKnuckle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "HeadTop",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
@@ -2460,12 +2460,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "RightShoulder",
+                            "value": "LeftShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "RightElbow",
+                            "value": "LeftElbow",
                             "type": "str"
                         },
                         {
@@ -2507,12 +2507,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "RightShoulder",
+                            "value": "RightElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "RightElbow",
+                            "value": "RightKnuckle",
                             "type": "str"
                         },
                         {
@@ -2539,12 +2539,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "HeadTop",
+                            "value": "LeftElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "PelvisBase",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -2586,12 +2586,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "PelvisBase",
+                            "value": "LeftElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "Ankle",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -2601,12 +2601,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftElbow",
+                            "value": "RightShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "RightElbow",
                             "type": "str"
                         },
                         {
@@ -3356,12 +3356,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "RightElbow",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "RightKnuckle",
+                            "value": "Ankle",
                             "type": "str"
                         },
                         {
@@ -3371,200 +3371,153 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftElbow",
+                            "value": "RightElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
+                            "value": "RightKnuckle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "LeftShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "LeftElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "RightShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "RightElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "PelvisBase",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "Ankle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "RightShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "RightElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "LeftElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
                             "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all_shooting",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
-                            "value": "PelvisBase",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_2",
-                            "value": "Ankle",
-                            "type": "str"
-                        },
-                        {
                             "name": "radius_1",
                             "value": 0.05,
                             "type": "float"
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftShoulder",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_4",
-                            "value": "LeftElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all_shooting",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
-                            "value": "PelvisBase",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_2",
-                            "value": "Ankle",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_1",
-                            "value": 0.05,
-                            "type": "float"
-                        },
-                        {
-                            "name": "marker_3",
-                            "value": "RightElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_4",
-                            "value": "RightKnuckle",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all_shooting",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
-                            "value": "RightElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_2",
-                            "value": "RightKnuckle",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_1",
-                            "value": 0.05,
-                            "type": "float"
-                        },
-                        {
-                            "name": "marker_3",
-                            "value": "LeftShoulder",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_4",
-                            "value": "LeftElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all_shooting",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
                             "value": "HeadTop",
                             "type": "str"
                         },
                         {
-                            "name": "marker_2",
-                            "value": "PelvisBase",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_1",
-                            "value": 0.05,
-                            "type": "float"
-                        },
-                        {
-                            "name": "marker_3",
-                            "value": "LeftElbow",
-                            "type": "str"
-                        },
-                        {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
@@ -3606,12 +3559,59 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "RightShoulder",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
+                            "value": "Ankle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
                             "value": "RightElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "RightKnuckle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "HeadTop",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
@@ -3653,12 +3653,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "RightShoulder",
+                            "value": "LeftShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "RightElbow",
+                            "value": "LeftElbow",
                             "type": "str"
                         },
                         {
@@ -3700,12 +3700,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "RightShoulder",
+                            "value": "RightElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "RightElbow",
+                            "value": "RightKnuckle",
                             "type": "str"
                         },
                         {
@@ -3732,12 +3732,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "HeadTop",
+                            "value": "LeftElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "PelvisBase",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -3779,12 +3779,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "PelvisBase",
+                            "value": "LeftElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "Ankle",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -3794,12 +3794,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftElbow",
+                            "value": "RightShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "RightElbow",
                             "type": "str"
                         },
                         {
@@ -4546,12 +4546,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "RightElbow",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "RightKnuckle",
+                            "value": "Ankle",
                             "type": "str"
                         },
                         {
@@ -4561,200 +4561,153 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftElbow",
+                            "value": "RightElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
+                            "value": "RightKnuckle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "LeftShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "LeftElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "RightShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "RightElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "PelvisBase",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "Ankle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "RightShoulder",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "RightElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
+                            "value": "LeftElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
                             "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all_shooting",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
-                            "value": "PelvisBase",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_2",
-                            "value": "Ankle",
-                            "type": "str"
-                        },
-                        {
                             "name": "radius_1",
                             "value": 0.05,
                             "type": "float"
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftShoulder",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_4",
-                            "value": "LeftElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all_shooting",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
-                            "value": "PelvisBase",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_2",
-                            "value": "Ankle",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_1",
-                            "value": 0.05,
-                            "type": "float"
-                        },
-                        {
-                            "name": "marker_3",
-                            "value": "RightElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_4",
-                            "value": "RightKnuckle",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all_shooting",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
-                            "value": "RightElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_2",
-                            "value": "RightKnuckle",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_1",
-                            "value": 0.05,
-                            "type": "float"
-                        },
-                        {
-                            "name": "marker_3",
-                            "value": "LeftShoulder",
-                            "type": "str"
-                        },
-                        {
-                            "name": "marker_4",
-                            "value": "LeftElbow",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_2",
-                            "value": 0.05,
-                            "type": "float"
-                        }
-                    ]
-                },
-                {
-                    "penalty_type": "CUSTOM",
-                    "nodes": "all_shooting",
-                    "quadratic": true,
-                    "expand": true,
-                    "target": null,
-                    "derivative": false,
-                    "integration_rule": "rectangle_left",
-                    "multi_thread": false,
-                    "arguments": [
-                        {
-                            "name": "function",
-                            "value": "custom_noncrossing_const",
-                            "type": "function"
-                        },
-                        {
-                            "name": "marker_1",
                             "value": "HeadTop",
                             "type": "str"
                         },
                         {
-                            "name": "marker_2",
-                            "value": "PelvisBase",
-                            "type": "str"
-                        },
-                        {
-                            "name": "radius_1",
-                            "value": 0.05,
-                            "type": "float"
-                        },
-                        {
-                            "name": "marker_3",
-                            "value": "LeftElbow",
-                            "type": "str"
-                        },
-                        {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
@@ -4796,12 +4749,59 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "RightShoulder",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
+                            "value": "Ankle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_2",
+                            "value": 0.05,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "CUSTOM",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "function",
+                            "value": "custom_noncrossing_const",
+                            "type": "function"
+                        },
+                        {
+                            "name": "marker_1",
                             "value": "RightElbow",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_2",
+                            "value": "RightKnuckle",
+                            "type": "str"
+                        },
+                        {
+                            "name": "radius_1",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "marker_3",
+                            "value": "HeadTop",
+                            "type": "str"
+                        },
+                        {
+                            "name": "marker_4",
+                            "value": "PelvisBase",
                             "type": "str"
                         },
                         {
@@ -4843,12 +4843,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "RightShoulder",
+                            "value": "LeftShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "RightElbow",
+                            "value": "LeftElbow",
                             "type": "str"
                         },
                         {
@@ -4890,12 +4890,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "RightShoulder",
+                            "value": "RightElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "RightElbow",
+                            "value": "RightKnuckle",
                             "type": "str"
                         },
                         {
@@ -4922,12 +4922,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "HeadTop",
+                            "value": "LeftElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "PelvisBase",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -4969,12 +4969,12 @@
                         },
                         {
                             "name": "marker_1",
-                            "value": "PelvisBase",
+                            "value": "LeftElbow",
                             "type": "str"
                         },
                         {
                             "name": "marker_2",
-                            "value": "Ankle",
+                            "value": "LeftKnuckle",
                             "type": "str"
                         },
                         {
@@ -4984,12 +4984,12 @@
                         },
                         {
                             "name": "marker_3",
-                            "value": "LeftElbow",
+                            "value": "RightShoulder",
                             "type": "str"
                         },
                         {
                             "name": "marker_4",
-                            "value": "LeftKnuckle",
+                            "value": "RightElbow",
                             "type": "str"
                         },
                         {

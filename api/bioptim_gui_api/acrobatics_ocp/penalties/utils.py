@@ -56,7 +56,7 @@ def get_phase_objectives(
         objectives += with_visual_criteria_objectives(phase_names, phase_index, model)
 
     if with_spine:
-        objectives += with_spine_objectives(model)
+        objectives += with_spine_objectives(phase_name, model)
 
     return objectives
 

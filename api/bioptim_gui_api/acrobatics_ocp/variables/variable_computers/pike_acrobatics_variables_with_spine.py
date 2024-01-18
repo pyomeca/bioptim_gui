@@ -3,6 +3,7 @@ import numpy as np
 from bioptim_gui_api.acrobatics_ocp.variables.variable_computers.pike_acrobatics_variables import (
     PikeAcrobaticsVariables,
 )
+from bioptim_gui_api.variables.misc.variables_utils import LooseValue, define_loose_bounds
 
 
 class PikeAcrobaticsVariablesWithSpine(PikeAcrobaticsVariables):
@@ -133,3 +134,10 @@ class PikeAcrobaticsVariablesWithSpine(PikeAcrobaticsVariables):
             [0.1] * 3,
         ]
     )
+
+    @classmethod
+    def _fill_landing_phase(cls, x_bounds, half_twists: list) -> dict:
+        super()._fill_landing_phase(x_bounds, half_twists)
+
+        x_bounds[-1]["min"][cls.XrotStomach : cls.ZrotShoulder, 2] = -0.01
+        x_bounds[-1]["max"][cls.XrotStomach : cls.ZrotShoulder, 2] = 0.01

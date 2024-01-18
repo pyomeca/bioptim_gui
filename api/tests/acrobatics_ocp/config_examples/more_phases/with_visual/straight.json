@@ -5,7 +5,7 @@
         0,
         0
     ],
-    "model_path": "/home/aweng/afs/bioptim_gui/api/tests/test_biomods/with_visual/good/straight.bioMod",
+    "model_path": "/home/kaelfacon/afs/bioptim_gui/api/tests/test_biomods/with_visual/good/straight.bioMod",
     "final_time": 1.0,
     "final_time_margin": 0.1,
     "position": "straight",
@@ -16,20 +16,20 @@
     "dynamics": "TORQUE_DRIVEN",
     "with_spine": false,
     "dof_names": [
-        "X",
-        "Y",
-        "Z",
-        "Xrot",
-        "Yrot",
-        "Zrot",
-        "ZrotHead",
-        "XrotHead",
-        "ZrotEyes",
-        "XrotEyes",
-        "ZrotRightUpperArm",
-        "YrotRightUpperArm",
-        "ZrotLeftUpperArm",
-        "YrotLeftUpperArm"
+        "Pelvis translation X",
+        "Pelvis translation Y",
+        "Pelvis translation Z",
+        "Pelvis rotation X",
+        "Pelvis rotation Y",
+        "Pelvis rotation Z",
+        "Head rotation Z",
+        "Head rotation X",
+        "Eyes rotation Z",
+        "Eyes rotation X",
+        "Right upper arm rotation Z",
+        "Right upper arm rotation Y",
+        "Left upper arm rotation Z",
+        "Left upper arm rotation Y"
     ],
     "phases_info": [
         {
