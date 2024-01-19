@@ -70,6 +70,31 @@ class TuckAcrobaticsVariablesWithSpine(TuckAcrobaticsVariables):
 
     nb_q, nb_qdot, nb_tau = 29, 29, 23
 
+    arm_dofs = [
+        ZrotRightUpperArm,
+        YrotRightUpperArm,
+        ZrotRightLowerArm,
+        XrotRightLowerArm,
+        ZrotLeftUpperArm,
+        YrotLeftUpperArm,
+        ZrotLeftLowerArm,
+        XrotLeftLowerArm,
+    ]
+    shoulder_dofs = [
+        ZrotRightUpperArm,
+        YrotRightUpperArm,
+        ZrotLeftUpperArm,
+        YrotLeftUpperArm,
+    ]
+    elbow_dofs = [
+        ZrotRightLowerArm,
+        XrotRightLowerArm,
+        ZrotLeftLowerArm,
+        XrotLeftLowerArm,
+    ]
+
+    legs_xdofs = [XrotUpperLegs, XrotLowerLegs]
+
     q_min_bounds = np.array(
         [
             [-1] * 3,
