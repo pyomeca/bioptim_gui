@@ -64,6 +64,20 @@ class StraightAcrobaticsWithVisualVariablesWithSpine(StraightAcrobaticsWithVisua
 
     nb_q, nb_qdot, nb_tau = 26, 26, 22
 
+    arm_dofs = [
+        ZrotRightUpperArm,
+        YrotRightUpperArm,
+        ZrotLeftUpperArm,
+        YrotLeftUpperArm,
+    ]
+
+    shoulder_dofs = [
+        ZrotRightUpperArm,
+        YrotRightUpperArm,
+        ZrotLeftUpperArm,
+        YrotLeftUpperArm,
+    ]
+
     q_min_bounds = np.array(
         [
             [-1] * 3,

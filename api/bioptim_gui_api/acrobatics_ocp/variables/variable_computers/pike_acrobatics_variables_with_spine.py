@@ -3,7 +3,6 @@ import numpy as np
 from bioptim_gui_api.acrobatics_ocp.variables.variable_computers.pike_acrobatics_variables import (
     PikeAcrobaticsVariables,
 )
-from bioptim_gui_api.variables.misc.variables_utils import LooseValue, define_loose_bounds
 
 
 class PikeAcrobaticsVariablesWithSpine(PikeAcrobaticsVariables):
@@ -68,6 +67,31 @@ class PikeAcrobaticsVariablesWithSpine(PikeAcrobaticsVariables):
     ]
 
     nb_q, nb_qdot, nb_tau = 28, 28, 22
+
+    arm_dofs = [
+        ZrotRightUpperArm,
+        YrotRightUpperArm,
+        ZrotRightLowerArm,
+        XrotRightLowerArm,
+        ZrotLeftUpperArm,
+        YrotLeftUpperArm,
+        ZrotLeftLowerArm,
+        XrotLeftLowerArm,
+    ]
+    shoulder_dofs = [
+        ZrotRightUpperArm,
+        YrotRightUpperArm,
+        ZrotLeftUpperArm,
+        YrotLeftUpperArm,
+    ]
+    elbow_dofs = [
+        ZrotRightLowerArm,
+        XrotRightLowerArm,
+        ZrotLeftLowerArm,
+        XrotLeftLowerArm,
+    ]
+
+    legs_xdofs = [XrotUpperLegs]
 
     q_min_bounds = np.array(
         [

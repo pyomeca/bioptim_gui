@@ -40,6 +40,20 @@ class StraightAcrobaticsWithVisualVariables(StraightAcrobaticsVariables):
 
     nb_q, nb_qdot, nb_tau = 14, 14, 10
 
+    arm_dofs = [
+        ZrotRightUpperArm,
+        YrotRightUpperArm,
+        ZrotLeftUpperArm,
+        YrotLeftUpperArm,
+    ]
+
+    shoulder_dofs = [
+        ZrotRightUpperArm,
+        YrotRightUpperArm,
+        ZrotLeftUpperArm,
+        YrotLeftUpperArm,
+    ]
+
     q_min_bounds = np.array(
         [
             [-1] * 3,
