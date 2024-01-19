@@ -13,6 +13,8 @@ def with_spine_proportional_control(model) -> list[dict]:
     y_pairs = [model.YrotStomach, model.YrotRib, model.YrotNipple, model.YrotShoulder]
     z_pairs = [model.ZrotStomach, model.ZrotRib, model.ZrotNipple, model.ZrotShoulder]
 
+    nb_root = 6
+
     for pairs in [x_pairs, y_pairs, z_pairs]:
         for i, j in ((0, 1), (1, 2), (2, 3)):
             objectives.append(
@@ -23,8 +25,8 @@ def with_spine_proportional_control(model) -> list[dict]:
                     weight=10.0,
                     arguments=[
                         {"name": "key", "value": "qddot_joints", "type": "str"},
-                        {"name": "first_dof", "value": pairs[i], "type": "int"},
-                        {"name": "second_dof", "value": pairs[j], "type": "int"},
+                        {"name": "first_dof", "value": pairs[i] - nb_root, "type": "int"},
+                        {"name": "second_dof", "value": pairs[j] - nb_root, "type": "int"},
                         {"name": "coef", "value": 1.0, "type": "float"},
                     ],
                 )
