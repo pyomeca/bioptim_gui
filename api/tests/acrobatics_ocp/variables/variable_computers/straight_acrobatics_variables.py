@@ -145,11 +145,15 @@ class StraightAcrobaticsVariables:
         # Right arm
         x_bounds[-1]["min"][cls.YrotRightUpperArm, 0] = 0
         x_bounds[-1]["max"][cls.YrotRightUpperArm, 0] = max_angle
+        x_bounds[-2]["min"][cls.YrotRightUpperArm, 2] = 0
+        x_bounds[-2]["max"][cls.YrotRightUpperArm, 2] = max_angle
         define_loose_bounds(x_bounds[-1], cls.YrotRightUpperArm, 2, LooseValue(2.9, 0.1))
         define_loose_bounds(x_bounds[-1], cls.ZrotRightUpperArm, 2, LooseValue(0.0, 0.1))
         # Left arm
         x_bounds[-1]["min"][cls.YrotLeftUpperArm, 0] = -max_angle
         x_bounds[-1]["max"][cls.YrotLeftUpperArm, 0] = 0
+        x_bounds[-2]["min"][cls.YrotLeftUpperArm, 2] = -max_angle
+        x_bounds[-2]["max"][cls.YrotLeftUpperArm, 2] = 0
         define_loose_bounds(x_bounds[-1], cls.YrotLeftUpperArm, 2, LooseValue(-2.9, 0.1))
         define_loose_bounds(x_bounds[-1], cls.ZrotLeftUpperArm, 2, LooseValue(0.0, 0.1))
 
@@ -202,14 +206,15 @@ class StraightAcrobaticsVariables:
         x_bounds[0]["min"][: cls.Z, 0] = -0.5
         x_bounds[0]["max"][: cls.Z, 0] = 0.5
 
-        x_bounds[0]["min"][cls.Z, 0] = vzinit - 2
-        x_bounds[0]["max"][cls.Z, 0] = vzinit + 2
+        x_bounds[0]["min"][cls.Z, 0] = vzinit - 5
+        x_bounds[0]["max"][cls.Z, 0] = vzinit + 5
 
         x_bounds[0]["min"][cls.Xrot, 0] = 0.5
-        x_bounds[0]["max"][cls.Xrot, 0] = 200.0
+        x_bounds[0]["max"][cls.Xrot, 0] = 50.0
 
     @classmethod
-    def _fill_qdot_intermediary(cls, x_bounds: np.ndarray) -> None:
+    def _fill_qdot_intermediary(cls, x_bounds: np.ndarray, final_time) -> None:
+        vzinit = 9.81 / 2 * final_time
         nb_phases = len(x_bounds)
         for phase in range(nb_phases):
             if phase != 0:
@@ -223,8 +228,11 @@ class StraightAcrobaticsVariables:
             x_bounds[phase]["min"][: cls.Z, 1:] = -10
             x_bounds[phase]["max"][: cls.Z, 1:] = 10
 
+            x_bounds[phase]["min"][cls.Z, 1:] = -vzinit - 10
+            x_bounds[phase]["max"][cls.Z, 1:] = vzinit + 10
+
             x_bounds[phase]["min"][cls.Xrot, 1:] = 0.5
-            x_bounds[phase]["max"][cls.Xrot, 1:] = 200.0
+            x_bounds[phase]["max"][cls.Xrot, 1:] = 50.0
 
     @classmethod
     def get_qdot_bounds(cls, nb_phases: int, final_time: float, is_forward: bool) -> dict:
@@ -239,7 +247,7 @@ class StraightAcrobaticsVariables:
         # Initial bounds
         cls._fill_qdot_initial(x_bounds, final_time)
 
-        cls._fill_qdot_intermediary(x_bounds)
+        cls._fill_qdot_intermediary(x_bounds, final_time)
 
         if not is_forward:
             invert_min_max(x_bounds, cls.Xrot)
@@ -261,11 +269,10 @@ class StraightAcrobaticsVariables:
 
         qdot_init = np.zeros((nb_phases, cls.nb_qdot, 1))
 
-        qdot_init[0][cls.Xrot] = 2 * np.pi * nb_somersaults * forward_factor
+        qdot_init[:, cls.Xrot] = 2.5 * np.pi * nb_somersaults * forward_factor
 
-        v = [vzinit] + [g * (final_time / 2 - duration) for duration in phase_durations]
         for phase in range(nb_phases):
-            qdot_init[phase][cls.Z] = (v[phase] + v[phase + 1]) / 2
+            qdot_init[phase][cls.Z] = vzinit
 
         return qdot_init
 
