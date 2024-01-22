@@ -60,10 +60,12 @@ def save_results(sol: Solution, *combinatorial_parameters, **extra_parameters) -
     interpolated_states = sol.interpolate(n_frames).states
 
     to_save = {
+            "biomodel_path": BIOMODEL_PATH,
             "solution": sol,
             "integrated_states": integrated_states,
             "time_vector": time_vector,
             "interpolated_states": interpolated_states,
+            "seed": seed if warming_up else None,
     }
     del sol.ocp
 
