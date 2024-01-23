@@ -37,6 +37,33 @@ class PythonInterface {
     }
   }
 
+  Future<Process?> runAnimateSolution(
+    String picklePath, {
+    String? overrideWorkingDirectory,
+  }) async {
+    if (status != PythonInterfaceStatus.ready) return null;
+    status = PythonInterfaceStatus.isRunning;
+
+    Future<void> changeStatusWhenDone(Process process) async {
+      await process.exitCode;
+      status = PythonInterfaceStatus.ready;
+    }
+
+    final pathAndArgs = [
+      'animate.py',
+      picklePath,
+    ];
+
+    final process = await Process.start(
+        '${_skipEnvironmentLoading ? '' : _loadEnvironmentCommand}python',
+        pathAndArgs,
+        runInShell: true,
+        workingDirectory: overrideWorkingDirectory ?? _workingDirectory);
+
+    changeStatusWhenDone(process);
+    return process;
+  }
+
   Future<Process?> runFile(
     String path, {
     bool multistart = false,
@@ -51,8 +78,6 @@ class PythonInterface {
       await process.exitCode;
       status = PythonInterfaceStatus.ready;
     }
-
-    final parentDir = File(path).absolute.parent.path.toString();
 
     final pathAndArgs = multistart
         ? [

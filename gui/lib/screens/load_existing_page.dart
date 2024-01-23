@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bioptim_gui/models/api_config.dart';
+import 'package:bioptim_gui/models/python_interface.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,11 @@ class _LoadExistingState extends State<LoadExisting> {
           filename: file.path,
         )));
 
+    setState(() {
+      bestFile = '';
+      toDiscard = [];
+    });
+
     request.send().then((response) async {
       if (response.statusCode != 200) {
         if (kDebugMode) {
@@ -42,7 +48,7 @@ class _LoadExistingState extends State<LoadExisting> {
       final jsonData = jsonDecode(jsonResponse);
 
       setState(() {
-        bestFile = jsonData['best'];
+        bestFile = jsonData['best'] ?? '';
         toDiscard = List<String>.from(jsonData['to_discard']);
       });
     });
@@ -61,8 +67,6 @@ class _LoadExistingState extends State<LoadExisting> {
     });
 
     requestBestAndDiscard();
-
-    // TODO delete files in toDiscard
   }
 
   @override
@@ -95,19 +99,74 @@ class _LoadExistingState extends State<LoadExisting> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Loaded files:'),
+                        const Text(
+                          'Loaded files:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         const SizedBox(height: 12),
-                        for (final file in pickedFiles) Text(file.path),
+                        for (final file in pickedFiles)
+                          Text(file.path.split('/').last),
                         const SizedBox(height: 12),
                         // Best
-                        const Text('Best solution:'),
+                        const Text(
+                          'Best solution:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         const SizedBox(height: 12),
-                        Text(bestFile),
+                        if (bestFile.isNotEmpty)
+                          ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            trailing: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('Save video'),
+                                Icon(Icons.video_file),
+                              ],
+                            ),
+                            title: Text(
+                              bestFile.split('/').last,
+                            ),
+                            onTap: () async {
+                              final process = await PythonInterface.instance
+                                  .runAnimateSolution(bestFile);
+
+                              if (process == null) {
+                                if (kDebugMode) {
+                                  print('Failed to run animate solution');
+                                }
+                              }
+                            },
+                          ),
                         const SizedBox(height: 12),
                         // To discard
-                        const Text('To discard:'),
+                        const Text(
+                          'To discard:',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                         const SizedBox(height: 12),
-                        for (final file in toDiscard) Text(file),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (final file in toDiscard)
+                              ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                trailing: const Icon(Icons.delete),
+                                title: Text(
+                                  file.split('/').last,
+                                ),
+                                onTap: () {
+                                  File fileToDelete = File(file);
+                                  fileToDelete.deleteSync();
+
+                                  setState(() {
+                                    toDiscard.remove(file);
+                                  });
+                                },
+                              ),
+                          ],
+                        )
                       ],
                     ),
                 ],

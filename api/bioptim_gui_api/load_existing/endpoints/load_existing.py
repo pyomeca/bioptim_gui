@@ -1,4 +1,5 @@
 import pickle as pkl
+from enum import Enum, auto
 from typing import List
 
 import numpy as np
@@ -11,6 +12,16 @@ router = APIRouter(
     tags=["load_existing"],
     responses={404: {"description": "Not found"}},
 )
+
+
+class DiscardState(str, Enum):
+    """
+    Enum used to describe the state of a pickle file
+    """
+
+    HARD_DISCARD = auto()  # the pickle is not even a solution
+    KEEP = auto()  # the pickle is a solution and can be kept
+    SOFT_DISCARD = auto()  # the solution diverges too much from the integrated states
 
 
 async def handle_pkl(file: UploadFile) -> (bool, float):
@@ -48,14 +59,14 @@ async def handle_pkl(file: UploadFile) -> (bool, float):
     try:
         integrated_state = loaded_data["integrated_states"][-1]["q"][:, -1]
         sol_states = loaded_data["solution"].states[-1]["q"][:, -1]
-    except KeyError as e:
-        raise HTTPException(400, f"Pickle doesn't contain the right data from {e}") from e
+    except KeyError:
+        return DiscardState.HARD_DISCARD, -1
 
-    to_discard = False
-    cost = loaded_data["solution"].cost
+    to_discard = DiscardState.KEEP
+    cost = float(loaded_data["solution"].cost)
 
     if np.any(abs(integrated_state - sol_states) > np.deg2rad(1)):
-        to_discard = True
+        to_discard = DiscardState.SOFT_DISCARD
 
     return to_discard, cost
 
@@ -78,15 +89,16 @@ async def load_pickle(files: List[UploadFile] = None):
         The best (lowest) cost pickle file to use and the one to discard
     """
     min_cost = float("inf")
-    to_discard = []
+    to_discard_list = []
     best = None
 
     for file in files:
         discard, cost = await handle_pkl(file)
-        if discard:
-            to_discard.append(file.filename)
-        elif cost < min_cost:
+        if discard != DiscardState.KEEP:
+            to_discard_list.append(file.filename)
+
+        if discard != DiscardState.HARD_DISCARD and cost < min_cost:
             min_cost = cost
             best = file.filename
 
-    return LoadExistingResponse(to_discard=to_discard, best=best)
+    return LoadExistingResponse(to_discard=to_discard_list, best=best)

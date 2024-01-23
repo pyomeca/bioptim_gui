@@ -55,12 +55,13 @@ def save_results(sol: Solution, *combinatorial_parameters, **extra_parameters) -
     integrated_states, time_vector = integrated._states["unscaled"], integrated._time_vector
 
     time_parameters = sol.parameters["time"]
-    fps = 25
+    fps = 60
     n_frames = [round(time_parameters[i][0] * fps) for i in range(len(time_parameters))]
     interpolated_states = sol.interpolate(n_frames).states
 
     to_save = {
             "biomodel_path": BIOMODEL_PATH,
+            "coneless_model": CONELESS_MODEL,
             "solution": sol,
             "integrated_states": integrated_states,
             "time_vector": time_vector,

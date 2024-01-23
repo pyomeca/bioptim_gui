@@ -27,7 +27,8 @@ class FakeSolution:
 @pytest.fixture(autouse=True)
 def run_for_all():
     # before test: create pickles
-    os.mkdir(path_to_tests_pkl)
+    if not os.path.exists(path_to_tests_pkl):
+        os.mkdir(path_to_tests_pkl)
 
     int_states = np.zeros((17, 241))
     int_states[:, -1] = np.array(
@@ -194,7 +195,7 @@ def test_load_single_to_discard():
         files = [("files", f)]
         response = client.post("/load_existing/load", files=files)
         assert response.status_code == 200
-        assert response.json() == {"to_discard": ["test_to_discard.pkl"], "best": None}
+        assert response.json() == {"to_discard": ["test_to_discard.pkl"], "best": "test_to_discard.pkl"}
 
 
 def test_load_not_pkl():
@@ -213,8 +214,11 @@ def test_load_missing_field():
     with open(pkl_path, "rb") as f:
         files = [("files", f)]
         response = client.post("/load_existing/load", files=files)
-        assert response.status_code == 400
-        assert response.json() == {"detail": "Pickle doesn't contain the right data from 'integrated_states'"}
+        assert response.status_code == 200
+        assert response.json() == {
+            "to_discard": ["bad_pickle.pkl"],
+            "best": None,
+        }, "Bad file must be discarded"
 
 
 def test_load_best_pkl():

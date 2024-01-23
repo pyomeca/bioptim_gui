@@ -92,8 +92,3 @@ class DimensionRequest(BaseModel):
 class ArgumentRequest(BaseModel):
     type: str
     value: Union[float | int | str | list | None]
-
-
-class CodeGenerationRequest(BaseModel):
-    model_path: str
-    save_path: str

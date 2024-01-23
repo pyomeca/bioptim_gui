@@ -18,13 +18,7 @@ class AcrobaticsOCPProgram {
 
     Future<String> getGeneratedContent() async {
       final url = Uri.parse('${APIConfig.url}/acrobatics/generate_code');
-      final body = json.encode({
-        "model_path":
-            "", // TODO useless for now but might be used in the future
-        "save_path": path,
-      });
-      final response =
-          await http.post(url, body: body, headers: APIConfig.headers);
+      final response = await http.post(url, headers: APIConfig.headers);
       if (response.statusCode == 200) {
         return response.body;
       } else {
