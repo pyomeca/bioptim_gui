@@ -85,12 +85,53 @@ To stop the application, press `Ctrl + C` in the terminal where `docker-compose 
 ## Prerequisites
 
 - [Flutter](https://docs.flutter.dev/get-started/install) installed.
-- Python environment with [bioptim](https://github.com/pyomeca/bioptim) installed.
+- Python >=3.11.5 environment (using [Anaconda3](https://docs.anaconda.com/free/anaconda/install/index.html) or [Miniconda3](https://docs.conda.io/projects/miniconda/en/latest/miniconda-install.html)) with [bioptim 3.1.0](https://github.com/pyomeca/bioptim) installed.
 
-- Clone the repository:
+To create a bioptim environment:
+
+Optional, use libmamba solver to quicken the process:
+
+```bash
+conda install -n base conda-libmamba-solver
+conda config --set solver libmamba
+```
+
+```bash
+git clone https://github.com/pyomeca/bioptim.git
+cd bioptim
+git checkout a3ede0e7921df909fcdf1fb92d536628594dba04
+conda env create -f environment.yml
+conda activate bioptim
+python setup install
+```
+
+#### Downloading 'ma57' solver
+
+[The linear solvers from the HSL Mathematical Software Library](http://www.hsl.rl.ac.uk/index.html) with install instructions [here](https://github.com/casadi/casadi/wiki/Obtaining-HSL). The solvers will be needed in order to run the generated code.
+
+Copy libgfortran.so.4 and libhsl.so in your bioptim env:
+
+For anaconda3, it should be:
+
+```bash
+cp libfortran.so.4 ~/anaconda3/envs/bioptim/lib/
+cp libhsl.so ~/anaconda3/envs/bioptim/lib/
+```
+
+If this didn't work, find your bioptim env path:
+
+```bash
+conda activate bioptim
+which python
+```
+
+## Clone the repo
+
+- Clone the bioptim GUI repository:
 
 ```bash
 git clone https://github.com/Erdnaxela3/bioptim_gui.git
+cd bioptim_gui
 ```
 
 ## Running the API
@@ -116,5 +157,6 @@ Documentation on API is available  at <http://localhost:8000/docs>
 - In another terminal
 
 ```bash
-cd gui && flutter run
+cd gui
+flutter run
 ```

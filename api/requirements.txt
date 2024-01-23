@@ -1,6 +1,7 @@
-pytest
-fastapi
-httpx
-uvicorn
-black
-python-multipart
+pytest==7.4.4 # testing
+fastapi==0.109.0 # api
+httpx==0.26.0 # unit testing the api
+uvicorn==0.26.0 # running the server hosting the api
+black==23.12.1 # code formatting -l120
+python-multipart==0.0.6 # to accept UploadFile in API
+opencv-python==4.9.0.80 # create video from solution
