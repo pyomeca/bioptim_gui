@@ -38,6 +38,7 @@ def save_results(sol: Solution, *combinatorial_parameters, **extra_parameters) -
     save_folder.mkdir(parents=True, exist_ok=True)
     save_folder = str(save_folder)
     warming_up = extra_parameters["warming_up"]
+    x_bounds = extra_parameters["x_bounds"]
 
     seed, warming_up, pkl_path = combinatorial_parameters
     if not warming_up:
@@ -70,6 +71,7 @@ def save_results(sol: Solution, *combinatorial_parameters, **extra_parameters) -
             "time_vector": time_vector,
             "interpolated_states": interpolated_states,
             "seed": seed if warming_up else None,
+            "x_bounds": x_bounds,
     }
     del sol.ocp
 
@@ -120,6 +122,7 @@ def prepare_multi_start(
     save_folder: str = None,
     n_pools: int = 2,
     warming_up: bool = False,
+    x_bounds: BoundsList = None,
 ) -> MultiStart:
     \"""
     The initialization of the multi-start
@@ -129,7 +132,7 @@ def prepare_multi_start(
         combinatorial_parameters=combinatorial_parameters,
         prepare_ocp_callback=prepare_ocp,
         should_solve_callback=(should_solve, {"save_folder": save_folder, "warming_up": warming_up}),
-        post_optimization_callback=(save_results, {"save_folder": save_folder, "warming_up": warming_up}),
+        post_optimization_callback=(save_results, {"save_folder": save_folder, "warming_up": warming_up, "x_bounds": x_bounds}),
         solver=get_solver(warming_up),  # You cannot use show_online_optim with multi-start
         n_pools=n_pools,
     )
@@ -145,6 +148,10 @@ def prepare_multi_start(
 def main(nb_seeds: int = 1, save_folder: str = "save"):
     if not os.path.exists(save_folder):
         os.mkdir(save_folder)
+    
+    ocp = prepare_ocp()
+    nb_phases = len(ocp.nlp)
+    x_bounds = [ocp.nlp[phase].x_bounds for phase in range(nb_phases)]
 
     # --- Prepare the multi-start and run it --- #
 

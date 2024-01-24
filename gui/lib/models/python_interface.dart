@@ -37,6 +37,36 @@ class PythonInterface {
     }
   }
 
+  Future<Process?> runCreateGraph(
+    List<String> picklePaths, {
+    String? overrideWorkingDirectory,
+  }) async {
+    if (status != PythonInterfaceStatus.ready) return null;
+    status = PythonInterfaceStatus.isRunning;
+
+    Future<void> changeStatusWhenDone(Process process) async {
+      await process.exitCode;
+      status = PythonInterfaceStatus.ready;
+    }
+
+    List<String> pathAndArgs = [
+      'graph_multiple_sols.py',
+    ];
+
+    for (final picklePath in picklePaths) {
+      pathAndArgs.add(picklePath);
+    }
+
+    final process = await Process.start(
+        '${_skipEnvironmentLoading ? '' : _loadEnvironmentCommand}python',
+        pathAndArgs,
+        runInShell: true,
+        workingDirectory: overrideWorkingDirectory ?? _workingDirectory);
+
+    changeStatusWhenDone(process);
+    return process;
+  }
+
   Future<Process?> runAnimateSolution(
     String picklePath, {
     String? overrideWorkingDirectory,

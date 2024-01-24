@@ -104,8 +104,32 @@ class _LoadExistingState extends State<LoadExisting> {
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 12),
-                        for (final file in pickedFiles)
-                          Text(file.path.split('/').last),
+                        ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          trailing: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('Create graph'),
+                              Icon(Icons.bar_chart),
+                            ],
+                          ),
+                          title: Column(children: [
+                            for (final file in pickedFiles)
+                              Text(file.path.split('/').last),
+                          ]),
+                          onTap: () async {
+                            final process = await PythonInterface.instance
+                                .runCreateGraph(
+                                    pickedFiles.map((e) => e.path).toList());
+
+                            if (process == null) {
+                              if (kDebugMode) {
+                                print('Failed to run create graph');
+                              }
+                            }
+                          },
+                        ),
                         const SizedBox(height: 12),
                         // Best
                         const Text(
