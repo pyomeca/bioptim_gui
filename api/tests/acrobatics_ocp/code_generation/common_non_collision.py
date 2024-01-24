@@ -162,6 +162,7 @@ def main(nb_seeds: int = 1, save_folder: str = "save"):
         save_folder=save_folder,
         n_pools=2,
         warming_up=True,
+        x_bounds=x_bounds,
     )
 
     start_time = time.time()
@@ -190,6 +191,7 @@ def main(nb_seeds: int = 1, save_folder: str = "save"):
         combinatorial_parameters=combinatorial_parameters,
         save_folder=save_folder,
         n_pools=2,
+        x_bounds=x_bounds,
     )
 
     start_time = time.time()

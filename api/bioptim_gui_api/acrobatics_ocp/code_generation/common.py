@@ -165,6 +165,7 @@ def main(is_multistart: bool = False, nb_seeds: int = 1, save_folder: str = "sav
             combinatorial_parameters=combinatorial_parameters,
             save_folder=save_folder,
             n_pools=2,
+            x_bounds=x_bounds,
         )
 
         start_time = time.time()
@@ -181,7 +182,7 @@ def main(is_multistart: bool = False, nb_seeds: int = 1, save_folder: str = "sav
         with open(f"{{save_folder}}/timelog.txt", "a") as f:
             f.write(f"acrobatics_{file_addon}: {{time.time() - start_time}}\\n")
 
-        save_results(sol, save_folder=save_folder)
+        save_results(sol, save_folder=save_folder, x_bounds=x_bounds)
 """
 
     @classmethod
