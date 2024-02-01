@@ -1,0 +1,50 @@
+name: Bioptim GUI FastAPI Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - ci-test-branch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    container:
+      image: continuumio/miniconda3:23.10.0-1
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install system dependencies
+      run: |
+        apt-get update && apt-get install -y git libtiff5
+
+    - name: Install Conda dependencies
+      run: |
+        conda install -c conda-forge conda-libmamba-solver
+        conda install biorbd bioviz python-graphviz -c conda-forge --solver=libmamba -y
+
+    - name: Clone bioptim repository, checkout specific commit and install bioptim
+      run: |
+        git clone https://github.com/pyomeca/bioptim.git
+        cd bioptim
+        git checkout a3ede0e7921df909fcdf1fb92d536628594dba04
+        python setup.py install
+
+    - name: Install bioptim_gui_api requirements
+      run: |
+        pip install -r api/requirements.txt
+
+    - name: Run pytest
+      run: |
+        pip install pytest-cov
+        cd api/tests
+        pytest --cov=../ --cov-report xml:../coverage.xml .
+    
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

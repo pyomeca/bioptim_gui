@@ -1,0 +1,247 @@
+"""This file was automatically generated using BioptimGUI version 0.0.1"""
+
+import pickle as pkl
+
+import numpy as np
+from bioptim import (
+    Axis,
+    BiorbdModel,
+    ConstraintFcn,
+    OptimalControlProgram,
+    DynamicsList,
+    DynamicsFcn,
+    BoundsList,
+    InitialGuessList,
+    ObjectiveList,
+    ObjectiveFcn,
+    InterpolationType,
+    BiMappingList,
+    Solver,
+    Node,
+    QuadratureRule,
+    ConstraintList,
+)
+
+
+def prepare_ocp():
+    """
+    This function build an optimal control program and instantiate it.
+    It can be seen as a factory for the OptimalControlProgram class.
+
+    Parameters
+    ----------
+    # TODO fill this section
+
+    Returns
+    -------
+    The OptimalControlProgram ready to be solved
+    """
+
+
+    # Declaration of generic elements
+    n_shooting = [24]
+    phase_time = [1.0]
+    n_somersault = 1
+
+    bio_model = [BiorbdModel(r"/home/aweng/afs/trampoOCP/models/AdChPike.bioMod") for _ in range(n_somersault)]
+    # can't use * to have multiple, needs duplication
+
+
+    # Declaration of the constraints and objectives of the ocp
+    constraints = ConstraintList()
+    objective_functions = ObjectiveList()
+
+    # Declaration of the dynamics function used during integration
+    dynamics = DynamicsList()
+
+    dynamics.add(
+        DynamicsFcn.TORQUE_DRIVEN,
+        expand=True,
+    )
+
+    # Declaration of optimization variables bounds and initial guesses
+    # Path constraint
+    x_bounds = BoundsList()
+    x_initial_guesses = InitialGuessList()
+
+    u_bounds = BoundsList()
+    u_initial_guesses = InitialGuessList()
+
+    x_bounds.add(
+        "q",
+        min_bound= [
+            [-0.0, -1.0, -1.0],
+            [-0.0, -1.0, -1.0],
+            [-0.0, -0.1, -0.1],
+            [0.0, -6.28, -6.38],
+            [0.0, -0.79, -0.1],
+            [0.0, -0.2, -0.1],
+            [0.0, -0.65, -0.1],
+            [2.9, -0.05, 2.8],
+            [0.0, -1.8, -0.1],
+            [0.0, -2.65, -0.1],
+            [0.0, -2.0, -0.1],
+            [-2.9, -3.0, -3.0],
+            [0.0, -1.1, -0.1],
+            [0.0, -2.65, -0.1],
+            [0.0, -2.7, -0.1],
+            [0.0, -0.1, -0.1],
+        ],
+        max_bound= [
+            [0.0, 1.0, 1.0],
+            [0.0, 1.0, 1.0],
+            [0.0, 10.0, 0.1],
+            [-0.0, -0.0, -6.18],
+            [-0.0, 0.79, 0.1],
+            [-0.0, 0.2, 0.1],
+            [-0.0, 2.0, 0.1],
+            [2.9, 3.0, 3.0],
+            [-0.0, 1.1, 0.1],
+            [-0.0, 0.0, 0.1],
+            [-0.0, 0.65, 0.1],
+            [-2.9, 0.05, -2.8],
+            [-0.0, 1.8, 0.1],
+            [-0.0, 0.0, 0.1],
+            [-0.0, 0.3, 0.1],
+            [-0.0, 0.1, 0.1],
+        ],
+        interpolation=InterpolationType.CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT,
+        phase=0,
+    )
+
+    x_bounds.add(
+        "qdot",
+        min_bound= [
+            [-0.5, -10.0, -10.0],
+            [-0.5, -10.0, -10.0],
+            [2.9, -100.0, -100.0],
+            [-20.0, -20.0, -20.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+            [0.0, -100.0, -100.0],
+        ],
+        max_bound= [
+            [0.5, 10.0, 10.0],
+            [0.5, 10.0, 10.0],
+            [6.9, 100.0, 100.0],
+            [-0.5, -0.5, -0.5],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+            [-0.0, 100.0, 100.0],
+        ],
+        interpolation=InterpolationType.CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT,
+        phase=0,
+    )
+
+    x_initial_guesses.add(
+        "q",
+        initial_guess= [
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, -6.28],
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [2.9, 2.9],
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [-2.9, -2.9],
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.0],
+            [0.0, 0.0],
+        ],
+        interpolation=InterpolationType.LINEAR,
+        phase=0,
+    )
+
+    x_initial_guesses.add(
+        "qdot",
+        initial_guess=[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+        interpolation=InterpolationType.CONSTANT,
+    )
+
+    u_bounds.add(
+        "tau",
+        min_bound=[-500, -500, -500, -500, -500, -500, -500, -500, -500, -500],
+        max_bound=[500, 500, 500, 500, 500, 500, 500, 500, 500, 500],
+        interpolation=InterpolationType.CONSTANT,
+        phase=0,
+    )
+
+    u_initial_guesses.add(
+        "tau",
+        initial_guess=[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        interpolation=InterpolationType.CONSTANT,
+    )
+
+    mapping = BiMappingList()
+    mapping.add(
+        "tau",
+        to_second=[None, None, None, None, None, None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        to_first=[6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+    )
+
+    # Construct and return the optimal control program (OCP)
+    return OptimalControlProgram(
+        bio_model=bio_model,
+        n_shooting=n_shooting,
+        phase_time=phase_time,
+        dynamics=dynamics,
+        x_bounds=x_bounds,
+        u_bounds=u_bounds,
+        x_init=x_initial_guesses,
+        u_init=u_initial_guesses,
+        objective_functions=objective_functions,
+        variable_mappings=mapping,
+        use_sx=False,
+        assume_phase_dynamics=True,
+        constraints=constraints,
+    )
+
+
+if __name__ == "__main__":
+    """
+    If this file is run, then it will perform the optimization
+
+    """
+
+    # --- Prepare the ocp --- #
+    ocp = prepare_ocp()
+
+    solver = Solver.IPOPT()
+    # --- Solve the ocp --- #
+    sol = ocp.solve(solver=solver)
+
+    out = sol.integrate(merge_phases=True)
+    state, time_vector = out._states["unscaled"], out._time_vector
+
+    save = {
+        "solution": sol,
+        "unscaled_state": state,
+        "time_vector": time_vector,
+    }
+
+    del sol.ocp
+    with open(f"somersault.pkl", "wb") as f:
+        pkl.dump(save, f)

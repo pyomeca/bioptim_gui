@@ -1,0 +1,3664 @@
+{
+    "nb_phases": 5,
+    "nb_somersaults": 2,
+    "nb_half_twists": [
+        0,
+        0
+    ],
+    "model_path": "/home/aweng/afs/bioptim_gui/api/tests/test_biomods/vanilla/good/pike.bioMod",
+    "final_time": 1.0,
+    "final_time_margin": 0.1,
+    "position": "pike",
+    "sport_type": "trampoline",
+    "preferred_twist_side": "left",
+    "with_visual_criteria": false,
+    "collision_constraint": false,
+    "dynamics": "TORQUE_DRIVEN",
+    "with_spine": false,
+    "dof_names": [
+        "Pelvis translation X",
+        "Pelvis translation Y",
+        "Pelvis translation Z",
+        "Pelvis rotation X",
+        "Pelvis rotation Y",
+        "Pelvis rotation Z",
+        "Right upper arm rotation Z",
+        "Right upper arm rotation Y",
+        "Right lower arm rotation Z",
+        "Right lower arm rotation X",
+        "Left upper arm rotation Z",
+        "Left upper arm rotation Y",
+        "Left lower arm rotation Z",
+        "Left lower arm rotation X",
+        "Upper legs rotation X",
+        "Upper legs rotation Y"
+    ],
+    "phases_info": [
+        {
+            "phase_name": "Pike",
+            "nb_shooting_points": 40,
+            "duration": 0.2,
+            "objectives": [
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": false,
+                    "expand": false,
+                    "target": [
+                        1.0,
+                        0.0
+                    ],
+                    "derivative": true,
+                    "integration_rule": "midpoint",
+                    "multi_thread": true,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": true,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MINIMIZE_TIME",
+                    "nodes": "end",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 100000.0,
+                    "arguments": [
+                        {
+                            "name": "min_bound",
+                            "value": 0.1,
+                            "type": "float"
+                        },
+                        {
+                            "name": "max_bound",
+                            "value": 2.0,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MINIMIZE_MARKER_DISTANCE",
+                    "nodes": "end",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "first_marker",
+                            "value": "MiddleRightHand",
+                            "type": "string"
+                        },
+                        {
+                            "name": "second_marker",
+                            "value": "PikeTargetRightHand",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MINIMIZE_MARKER_DISTANCE",
+                    "nodes": "end",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "first_marker",
+                            "value": "MiddleLeftHand",
+                            "type": "string"
+                        },
+                        {
+                            "name": "second_marker",
+                            "value": "PikeTargetLeftHand",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 50000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                8,
+                                9,
+                                12,
+                                13
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                }
+            ],
+            "constraints": [
+                {
+                    "penalty_type": "TIME_CONSTRAINT",
+                    "nodes": "end",
+                    "quadratic": false,
+                    "expand": false,
+                    "target": [
+                        5.5,
+                        3.14
+                    ],
+                    "derivative": true,
+                    "integration_rule": "approximate_trapezoidal",
+                    "multi_thread": true,
+                    "arguments": []
+                }
+            ],
+            "state_variables": [
+                {
+                    "name": "q",
+                    "dimension": 16,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -0.0,
+                                -1.0,
+                                -1.0
+                            ],
+                            [
+                                -0.0,
+                                -1.0,
+                                -1.0
+                            ],
+                            [
+                                -0.0,
+                                -0.1,
+                                -0.1
+                            ],
+                            [
+                                -0.0,
+                                -2.36,
+                                -2.36
+                            ],
+                            [
+                                0.0,
+                                -0.79,
+                                -0.79
+                            ],
+                            [
+                                0.0,
+                                -0.2,
+                                -0.2
+                            ],
+                            [
+                                0.0,
+                                -0.65,
+                                -0.65
+                            ],
+                            [
+                                2.9,
+                                -0.05,
+                                -0.05
+                            ],
+                            [
+                                0.0,
+                                -1.8,
+                                -1.8
+                            ],
+                            [
+                                0.0,
+                                -2.65,
+                                -2.65
+                            ],
+                            [
+                                0.0,
+                                -2.0,
+                                -2.0
+                            ],
+                            [
+                                -2.9,
+                                -3.0,
+                                -3.0
+                            ],
+                            [
+                                0.0,
+                                -1.1,
+                                -1.1
+                            ],
+                            [
+                                0.0,
+                                -2.65,
+                                -2.65
+                            ],
+                            [
+                                0.0,
+                                -2.6,
+                                -2.6
+                            ],
+                            [
+                                0.0,
+                                -0.1,
+                                -0.1
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                0.0,
+                                1.0,
+                                1.0
+                            ],
+                            [
+                                0.0,
+                                1.0,
+                                1.0
+                            ],
+                            [
+                                0.0,
+                                15.0,
+                                15.0
+                            ],
+                            [
+                                -0.0,
+                                0.1,
+                                -0.69
+                            ],
+                            [
+                                0.0,
+                                0.79,
+                                0.79
+                            ],
+                            [
+                                0.0,
+                                0.2,
+                                0.2
+                            ],
+                            [
+                                0.0,
+                                2.0,
+                                2.0
+                            ],
+                            [
+                                2.9,
+                                3.0,
+                                3.0
+                            ],
+                            [
+                                0.0,
+                                1.1,
+                                1.1
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.65,
+                                0.65
+                            ],
+                            [
+                                -2.9,
+                                0.05,
+                                0.05
+                            ],
+                            [
+                                0.0,
+                                1.8,
+                                1.8
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.0,
+                                0.2,
+                                -2.2
+                            ],
+                            [
+                                0.0,
+                                0.1,
+                                0.1
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "LINEAR",
+                    "initial_guess": [
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            7.45
+                        ],
+                        [
+                            -0.0,
+                            -1.52
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.68
+                        ],
+                        [
+                            2.9,
+                            1.48
+                        ],
+                        [
+                            0.0,
+                            -0.35
+                        ],
+                        [
+                            0.0,
+                            -1.32
+                        ],
+                        [
+                            0.0,
+                            -0.68
+                        ],
+                        [
+                            -2.9,
+                            -1.48
+                        ],
+                        [
+                            0.0,
+                            0.35
+                        ],
+                        [
+                            0.0,
+                            -1.32
+                        ],
+                        [
+                            0.0,
+                            -2.4
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ]
+                    ]
+                },
+                {
+                    "name": "qdot",
+                    "dimension": 16,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -0.5,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -0.5,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -0.09,
+                                -14.9,
+                                -14.9
+                            ],
+                            [
+                                -50.0,
+                                -50.0,
+                                -50.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                0.0,
+                                -100.0,
+                                -100.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                0.5,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                0.5,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                9.91,
+                                14.9,
+                                14.9
+                            ],
+                            [
+                                -0.5,
+                                -0.5,
+                                -0.5
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                0.0,
+                                100.0,
+                                100.0
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            4.9
+                        ],
+                        [
+                            -15.71
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
+                    ]
+                }
+            ],
+            "control_variables": [
+                {
+                    "name": "tau",
+                    "dimension": 10,
+                    "bounds_interpolation_type": "CONSTANT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "phase_name": "Somersault",
+            "nb_shooting_points": 40,
+            "duration": 0.2,
+            "objectives": [
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": true,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MAXIMIZE_TIME",
+                    "nodes": "end",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": -100.0,
+                    "arguments": [
+                        {
+                            "name": "min_bound",
+                            "value": 0.1,
+                            "type": "float"
+                        },
+                        {
+                            "name": "max_bound",
+                            "value": 2.0,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 50000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                6,
+                                7,
+                                10,
+                                11
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 100.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                4
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                }
+            ],
+            "constraints": [
+                {
+                    "penalty_type": "SUPERIMPOSE_MARKERS",
+                    "nodes": "all_shooting",
+                    "quadratic": false,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "min_bound",
+                            "value": -0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "max_bound",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "first_marker",
+                            "value": "MiddleRightHand",
+                            "type": "str"
+                        },
+                        {
+                            "name": "second_marker",
+                            "value": "PikeTargetRightHand",
+                            "type": "str"
+                        }
+                    ]
+                },
+                {
+                    "penalty_type": "SUPERIMPOSE_MARKERS",
+                    "nodes": "all_shooting",
+                    "quadratic": false,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "arguments": [
+                        {
+                            "name": "min_bound",
+                            "value": -0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "max_bound",
+                            "value": 0.05,
+                            "type": "float"
+                        },
+                        {
+                            "name": "first_marker",
+                            "value": "MiddleLeftHand",
+                            "type": "str"
+                        },
+                        {
+                            "name": "second_marker",
+                            "value": "PikeTargetLeftHand",
+                            "type": "str"
+                        }
+                    ]
+                }
+            ],
+            "state_variables": [
+                {
+                    "name": "q",
+                    "dimension": 16,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -1.0,
+                                -1.0,
+                                -1.0
+                            ],
+                            [
+                                -1.0,
+                                -1.0,
+                                -1.0
+                            ],
+                            [
+                                -0.1,
+                                -0.1,
+                                -0.1
+                            ],
+                            [
+                                -2.36,
+                                -9.62,
+                                -9.62
+                            ],
+                            [
+                                -0.39,
+                                -0.39,
+                                -0.39
+                            ],
+                            [
+                                -0.2,
+                                -0.2,
+                                -0.2
+                            ],
+                            [
+                                -0.65,
+                                -0.65,
+                                -0.65
+                            ],
+                            [
+                                -0.05,
+                                -0.05,
+                                -0.05
+                            ],
+                            [
+                                -1.8,
+                                -1.8,
+                                -1.8
+                            ],
+                            [
+                                -2.65,
+                                -2.65,
+                                -2.65
+                            ],
+                            [
+                                -2.0,
+                                -2.0,
+                                -2.0
+                            ],
+                            [
+                                -3.0,
+                                -3.0,
+                                -3.0
+                            ],
+                            [
+                                -1.1,
+                                -1.1,
+                                -1.1
+                            ],
+                            [
+                                -2.65,
+                                -2.65,
+                                -2.65
+                            ],
+                            [
+                                -2.6,
+                                -2.6,
+                                -2.6
+                            ],
+                            [
+                                -0.1,
+                                -0.1,
+                                -0.1
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            [
+                                15.0,
+                                15.0,
+                                15.0
+                            ],
+                            [
+                                -0.69,
+                                -0.69,
+                                -6.08
+                            ],
+                            [
+                                0.39,
+                                0.39,
+                                0.39
+                            ],
+                            [
+                                0.2,
+                                0.2,
+                                0.2
+                            ],
+                            [
+                                2.0,
+                                2.0,
+                                2.0
+                            ],
+                            [
+                                3.0,
+                                3.0,
+                                3.0
+                            ],
+                            [
+                                1.1,
+                                1.1,
+                                1.1
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.65,
+                                0.65,
+                                0.65
+                            ],
+                            [
+                                0.05,
+                                0.05,
+                                0.05
+                            ],
+                            [
+                                1.8,
+                                1.8,
+                                1.8
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                -2.2,
+                                -2.2,
+                                -2.2
+                            ],
+                            [
+                                0.1,
+                                0.1,
+                                0.1
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "LINEAR",
+                    "initial_guess": [
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            7.45,
+                            7.45
+                        ],
+                        [
+                            -1.52,
+                            -7.85
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.68,
+                            0.68
+                        ],
+                        [
+                            1.48,
+                            1.48
+                        ],
+                        [
+                            -0.35,
+                            -0.35
+                        ],
+                        [
+                            -1.32,
+                            -1.32
+                        ],
+                        [
+                            -0.68,
+                            -0.68
+                        ],
+                        [
+                            -1.48,
+                            -1.48
+                        ],
+                        [
+                            0.35,
+                            0.35
+                        ],
+                        [
+                            -1.32,
+                            -1.32
+                        ],
+                        [
+                            -2.4,
+                            -2.4
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ]
+                    ]
+                },
+                {
+                    "name": "qdot",
+                    "dimension": 16,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -10.0,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -10.0,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -14.9,
+                                -14.9,
+                                -14.9
+                            ],
+                            [
+                                -50.0,
+                                -50.0,
+                                -50.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                14.9,
+                                14.9,
+                                14.9
+                            ],
+                            [
+                                -0.5,
+                                -0.5,
+                                -0.5
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            4.9
+                        ],
+                        [
+                            -15.71
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
+                    ]
+                }
+            ],
+            "control_variables": [
+                {
+                    "name": "tau",
+                    "dimension": 10,
+                    "bounds_interpolation_type": "CONSTANT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "phase_name": "Kick out",
+            "nb_shooting_points": 40,
+            "duration": 0.2,
+            "objectives": [
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": true,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MINIMIZE_TIME",
+                    "nodes": "end",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 100000.0,
+                    "arguments": [
+                        {
+                            "name": "min_bound",
+                            "value": 0.1,
+                            "type": "float"
+                        },
+                        {
+                            "name": "max_bound",
+                            "value": 2.0,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 50000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                14
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 50000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                8,
+                                9,
+                                12,
+                                13
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                }
+            ],
+            "constraints": [],
+            "state_variables": [
+                {
+                    "name": "q",
+                    "dimension": 16,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -1.0,
+                                -1.0,
+                                -1.0
+                            ],
+                            [
+                                -1.0,
+                                -1.0,
+                                -1.0
+                            ],
+                            [
+                                -0.1,
+                                -0.1,
+                                -0.1
+                            ],
+                            [
+                                -9.62,
+                                -9.62,
+                                -9.62
+                            ],
+                            [
+                                -0.79,
+                                -0.79,
+                                -0.79
+                            ],
+                            [
+                                -0.2,
+                                -0.2,
+                                -0.2
+                            ],
+                            [
+                                -0.65,
+                                -0.65,
+                                -0.65
+                            ],
+                            [
+                                -0.05,
+                                -0.05,
+                                -0.05
+                            ],
+                            [
+                                -1.8,
+                                -1.8,
+                                -1.8
+                            ],
+                            [
+                                -2.65,
+                                -2.65,
+                                -2.65
+                            ],
+                            [
+                                -2.0,
+                                -2.0,
+                                -2.0
+                            ],
+                            [
+                                -3.0,
+                                -3.0,
+                                -3.0
+                            ],
+                            [
+                                -1.1,
+                                -1.1,
+                                -1.1
+                            ],
+                            [
+                                -2.65,
+                                -2.65,
+                                -2.65
+                            ],
+                            [
+                                -2.61,
+                                -2.61,
+                                -0.35
+                            ],
+                            [
+                                -0.1,
+                                -0.1,
+                                -0.1
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            [
+                                15.0,
+                                15.0,
+                                15.0
+                            ],
+                            [
+                                -6.08,
+                                -6.08,
+                                -6.08
+                            ],
+                            [
+                                0.79,
+                                0.79,
+                                0.79
+                            ],
+                            [
+                                0.2,
+                                0.2,
+                                0.2
+                            ],
+                            [
+                                2.0,
+                                2.0,
+                                2.0
+                            ],
+                            [
+                                3.0,
+                                3.0,
+                                3.0
+                            ],
+                            [
+                                1.1,
+                                1.1,
+                                1.1
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.65,
+                                0.65,
+                                0.65
+                            ],
+                            [
+                                0.05,
+                                0.05,
+                                0.05
+                            ],
+                            [
+                                1.8,
+                                1.8,
+                                1.8
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                -2.19,
+                                0.35,
+                                0.35
+                            ],
+                            [
+                                0.1,
+                                0.1,
+                                0.1
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "LINEAR",
+                    "initial_guess": [
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            7.45,
+                            7.45
+                        ],
+                        [
+                            -7.85,
+                            -7.85
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.68,
+                            0.68
+                        ],
+                        [
+                            1.48,
+                            1.48
+                        ],
+                        [
+                            -0.35,
+                            -0.35
+                        ],
+                        [
+                            -1.32,
+                            -1.32
+                        ],
+                        [
+                            -0.68,
+                            -0.68
+                        ],
+                        [
+                            -1.48,
+                            -1.48
+                        ],
+                        [
+                            0.35,
+                            0.35
+                        ],
+                        [
+                            -1.32,
+                            -1.32
+                        ],
+                        [
+                            -2.4,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ]
+                    ]
+                },
+                {
+                    "name": "qdot",
+                    "dimension": 16,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -10.0,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -10.0,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -14.9,
+                                -14.9,
+                                -14.9
+                            ],
+                            [
+                                -50.0,
+                                -50.0,
+                                -50.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                14.9,
+                                14.9,
+                                14.9
+                            ],
+                            [
+                                -0.5,
+                                -0.5,
+                                -0.5
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            4.9
+                        ],
+                        [
+                            -15.71
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
+                    ]
+                }
+            ],
+            "control_variables": [
+                {
+                    "name": "tau",
+                    "dimension": 10,
+                    "bounds_interpolation_type": "CONSTANT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "phase_name": "Waiting",
+            "nb_shooting_points": 40,
+            "duration": 0.2,
+            "objectives": [
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": true,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MAXIMIZE_TIME",
+                    "nodes": "end",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": -0.01,
+                    "arguments": [
+                        {
+                            "name": "min_bound",
+                            "value": 0.1,
+                            "type": "float"
+                        },
+                        {
+                            "name": "max_bound",
+                            "value": 2.0,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 50000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                6,
+                                7,
+                                10,
+                                11
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 50000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                8,
+                                9,
+                                12,
+                                13
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 50000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                14
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                }
+            ],
+            "constraints": [],
+            "state_variables": [
+                {
+                    "name": "q",
+                    "dimension": 16,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -1.0,
+                                -1.0,
+                                -1.0
+                            ],
+                            [
+                                -1.0,
+                                -1.0,
+                                -1.0
+                            ],
+                            [
+                                -0.1,
+                                -0.1,
+                                -0.1
+                            ],
+                            [
+                                -9.62,
+                                -11.2,
+                                -11.2
+                            ],
+                            [
+                                -0.79,
+                                -0.79,
+                                -0.79
+                            ],
+                            [
+                                -0.2,
+                                -0.2,
+                                -0.2
+                            ],
+                            [
+                                -0.65,
+                                -0.79,
+                                -0.65
+                            ],
+                            [
+                                -0.05,
+                                -0.05,
+                                0.0
+                            ],
+                            [
+                                -1.8,
+                                -1.8,
+                                -1.8
+                            ],
+                            [
+                                -2.65,
+                                -2.65,
+                                -2.65
+                            ],
+                            [
+                                -2.0,
+                                -0.79,
+                                -2.0
+                            ],
+                            [
+                                -3.0,
+                                -0.79,
+                                -0.79
+                            ],
+                            [
+                                -1.1,
+                                -1.1,
+                                -1.1
+                            ],
+                            [
+                                -2.65,
+                                -2.65,
+                                -2.65
+                            ],
+                            [
+                                -0.35,
+                                -0.35,
+                                -0.35
+                            ],
+                            [
+                                -0.1,
+                                -0.1,
+                                -0.1
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            [
+                                15.0,
+                                15.0,
+                                15.0
+                            ],
+                            [
+                                -6.08,
+                                -6.08,
+                                -10.8
+                            ],
+                            [
+                                0.79,
+                                0.79,
+                                0.79
+                            ],
+                            [
+                                0.2,
+                                0.2,
+                                0.2
+                            ],
+                            [
+                                2.0,
+                                0.79,
+                                2.0
+                            ],
+                            [
+                                3.0,
+                                0.79,
+                                0.79
+                            ],
+                            [
+                                1.1,
+                                1.1,
+                                1.1
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.65,
+                                0.79,
+                                0.65
+                            ],
+                            [
+                                0.05,
+                                0.05,
+                                0.0
+                            ],
+                            [
+                                1.8,
+                                1.8,
+                                1.8
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            [
+                                0.35,
+                                0.35,
+                                0.35
+                            ],
+                            [
+                                0.1,
+                                0.1,
+                                0.1
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "LINEAR",
+                    "initial_guess": [
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            7.45,
+                            7.45
+                        ],
+                        [
+                            -7.85,
+                            -11.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.68,
+                            0.68
+                        ],
+                        [
+                            1.48,
+                            0.39
+                        ],
+                        [
+                            -0.35,
+                            -0.35
+                        ],
+                        [
+                            -1.32,
+                            -1.32
+                        ],
+                        [
+                            -0.68,
+                            -0.68
+                        ],
+                        [
+                            -1.48,
+                            -0.39
+                        ],
+                        [
+                            0.35,
+                            0.35
+                        ],
+                        [
+                            -1.32,
+                            -1.32
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ]
+                    ]
+                },
+                {
+                    "name": "qdot",
+                    "dimension": 16,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -10.0,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -10.0,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -14.9,
+                                -14.9,
+                                -14.9
+                            ],
+                            [
+                                -50.0,
+                                -50.0,
+                                -50.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                14.9,
+                                14.9,
+                                14.9
+                            ],
+                            [
+                                -0.5,
+                                -0.5,
+                                -0.5
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            4.9
+                        ],
+                        [
+                            -15.71
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
+                    ]
+                }
+            ],
+            "control_variables": [
+                {
+                    "name": "tau",
+                    "dimension": 10,
+                    "bounds_interpolation_type": "CONSTANT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "phase_name": "Landing",
+            "nb_shooting_points": 40,
+            "duration": 0.2,
+            "objectives": [
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_CONTROL",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": true,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "tau",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MAXIMIZE_TIME",
+                    "nodes": "end",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": -0.01,
+                    "arguments": [
+                        {
+                            "name": "min_bound",
+                            "value": 0.1,
+                            "type": "float"
+                        },
+                        {
+                            "name": "max_bound",
+                            "value": 2.0,
+                            "type": "float"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 50000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                8,
+                                9,
+                                12,
+                                13
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "lagrange",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "all_shooting",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 50000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                14
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "objective_type": "mayer",
+                    "penalty_type": "MINIMIZE_STATE",
+                    "nodes": "end",
+                    "quadratic": true,
+                    "expand": true,
+                    "target": null,
+                    "derivative": false,
+                    "integration_rule": "rectangle_left",
+                    "multi_thread": false,
+                    "weight": 1000.0,
+                    "arguments": [
+                        {
+                            "name": "key",
+                            "value": "q",
+                            "type": "str"
+                        },
+                        {
+                            "name": "index",
+                            "value": [
+                                4
+                            ],
+                            "type": "list"
+                        }
+                    ]
+                }
+            ],
+            "constraints": [],
+            "state_variables": [
+                {
+                    "name": "q",
+                    "dimension": 16,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -1.0,
+                                -1.0,
+                                -0.01
+                            ],
+                            [
+                                -1.0,
+                                -1.0,
+                                -0.01
+                            ],
+                            [
+                                -0.1,
+                                -0.1,
+                                0.0
+                            ],
+                            [
+                                -11.2,
+                                -12.67,
+                                -12.12
+                            ],
+                            [
+                                -0.2,
+                                -0.2,
+                                -0.2
+                            ],
+                            [
+                                -0.1,
+                                -0.1,
+                                -0.1
+                            ],
+                            [
+                                -0.65,
+                                -0.65,
+                                -0.1
+                            ],
+                            [
+                                0.0,
+                                -0.05,
+                                2.8
+                            ],
+                            [
+                                -1.8,
+                                -1.8,
+                                -0.1
+                            ],
+                            [
+                                -2.65,
+                                -2.65,
+                                -0.1
+                            ],
+                            [
+                                -2.0,
+                                -2.0,
+                                -0.1
+                            ],
+                            [
+                                -0.79,
+                                -3.0,
+                                -3.0
+                            ],
+                            [
+                                -1.1,
+                                -1.1,
+                                -0.1
+                            ],
+                            [
+                                -2.65,
+                                -2.65,
+                                -0.1
+                            ],
+                            [
+                                0.0,
+                                -0.6,
+                                -0.55
+                            ],
+                            [
+                                -0.1,
+                                -0.1,
+                                -0.1
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                1.0,
+                                1.0,
+                                0.01
+                            ],
+                            [
+                                1.0,
+                                1.0,
+                                0.01
+                            ],
+                            [
+                                15.0,
+                                15.0,
+                                0.01
+                            ],
+                            [
+                                -10.8,
+                                -10.9,
+                                -12.02
+                            ],
+                            [
+                                0.2,
+                                0.2,
+                                0.2
+                            ],
+                            [
+                                0.1,
+                                0.1,
+                                0.1
+                            ],
+                            [
+                                2.0,
+                                2.0,
+                                0.1
+                            ],
+                            [
+                                0.79,
+                                3.0,
+                                3.0
+                            ],
+                            [
+                                1.1,
+                                1.1,
+                                0.1
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.1
+                            ],
+                            [
+                                0.65,
+                                0.65,
+                                0.1
+                            ],
+                            [
+                                0.0,
+                                0.05,
+                                -2.8
+                            ],
+                            [
+                                1.8,
+                                1.8,
+                                0.1
+                            ],
+                            [
+                                0.0,
+                                0.0,
+                                0.1
+                            ],
+                            [
+                                0.35,
+                                0.35,
+                                -0.45
+                            ],
+                            [
+                                0.1,
+                                0.1,
+                                0.1
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "LINEAR",
+                    "initial_guess": [
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            7.45,
+                            0.0
+                        ],
+                        [
+                            -11.0,
+                            -12.07
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ],
+                        [
+                            0.68,
+                            0.0
+                        ],
+                        [
+                            0.39,
+                            2.9
+                        ],
+                        [
+                            -0.35,
+                            0.0
+                        ],
+                        [
+                            -1.32,
+                            0.0
+                        ],
+                        [
+                            -0.68,
+                            0.0
+                        ],
+                        [
+                            -0.39,
+                            -2.9
+                        ],
+                        [
+                            0.35,
+                            0.0
+                        ],
+                        [
+                            -1.32,
+                            0.0
+                        ],
+                        [
+                            0.18,
+                            -0.5
+                        ],
+                        [
+                            0.0,
+                            0.0
+                        ]
+                    ]
+                },
+                {
+                    "name": "qdot",
+                    "dimension": 16,
+                    "bounds_interpolation_type": "CONSTANT_WITH_FIRST_AND_LAST_DIFFERENT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -10.0,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -10.0,
+                                -10.0,
+                                -10.0
+                            ],
+                            [
+                                -14.9,
+                                -14.9,
+                                -14.9
+                            ],
+                            [
+                                -50.0,
+                                -50.0,
+                                -50.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ],
+                            [
+                                -100.0,
+                                -100.0,
+                                -100.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            [
+                                14.9,
+                                14.9,
+                                14.9
+                            ],
+                            [
+                                -0.5,
+                                -0.5,
+                                -0.5
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            [
+                                100.0,
+                                100.0,
+                                100.0
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            4.9
+                        ],
+                        [
+                            -15.71
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
+                    ]
+                }
+            ],
+            "control_variables": [
+                {
+                    "name": "tau",
+                    "dimension": 10,
+                    "bounds_interpolation_type": "CONSTANT",
+                    "bounds": {
+                        "min_bounds": [
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ],
+                            [
+                                -500.0
+                            ]
+                        ],
+                        "max_bounds": [
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ],
+                            [
+                                500.0
+                            ]
+                        ]
+                    },
+                    "initial_guess_interpolation_type": "CONSTANT",
+                    "initial_guess": [
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ],
+                        [
+                            0.0
+                        ]
+                    ]
+                }
+            ]
+        }
+    ],
+    "model_content": "version 4\n\nroot_actuated 0\nexternal_forces 0\n\ngravity 0 0 -9.81\n\n\nsegment Pelvis\n\trt 0.0 0.0 0.0 xyz 0.0 0.0 0.0\n\ttranslations xyz\n\trotations xyz\n\tcom 0.0 0.0 0.0\n\tmass 7.675025110374424\n\tinertia\n\t\t0.03779648711896561 0.0 0.0\n\t\t0.0 0.07082405858190183 0.0\n\t\t0.0 0.0 0.06049873913533803\n\tmeshfile Model_mesh/pelvis.stl\n\tmeshrt -0.175 0 0 xyz 0 0 0\nendsegment\n\nsegment Thorax\n\tparent Pelvis\n\trt 0.0 0.0 0.0 xyz 0.0 0.0 0.10691934707592193\n\tcom 0.0 0.0 0.16964581895320646\n\tmass 16.761753111614897\n\tinertia\n\t\t0.1695723294081144 0.0 0.0\n\t\t0.0 0.24777379453235931 0.0\n\t\t0.0 0.0 0.16817009906757605\n\tmeshfile Model_mesh/thorax.stl\n\tmeshrt -0.15 0 0 xyz 0 -0.025 0\n\tmeshscale 1.1 1 1\nendsegment\n\nsegment Head\n\tparent Thorax\n\trt 0.0 0.0 0.0 xyz 0.0 0.0 0.322\n\tcom 0.0 0.0 0.1169371541218166\n\tmass 3.9436452215486697\n\tinertia\n\t\t0.019654858975982244 0.0 0.0\n\t\t0.0 0.019654858975982244 0.0\n\t\t0.0 0.0 0.01093028555984711\n\tmeshfile Model_mesh/tete.stl\n\tmeshrt 0 0 pi xyz 0 0 0\nendsegment\n\nsegment RightUpperArm\n\tparent Thorax\n\trt 0 0.17 0.1 xyz -0.18 0.0 0.25999999999999995\n\trotations zy\n\tcom 0.0 0.0 -0.11579539469552311\n\tmass 1.569290839009084\n\tinertia\n\t\t0.008572587015903282 0.0 0.0\n\t\t0.0 0.008572587015903282 0.0\n\t\t0.0 0.0 0.0015458844507023558\n\tmeshfile Model_mesh/bras.stl\nendsegment\n\nsegment RightForearm\n\tparent RightUpperArm\n\trt 0.0 0.0 0.0 xyz 0.0 0.0 -0.24350000000000002\n\trotations zx\n\tcom 0.0 0.0 -0.09478305833450895\n\tmass 0.8754802725163806\n\tinertia\n\t\t0.0034417004296885077 0.0 0.0\n\t\t0.0 0.0034850839826728753 0.0\n\t\t0.0 0.0 0.0005205672999114934\n\tmeshfile Model_mesh/avantbras.stl\nendsegment\n\nsegment RightHand\n\tparent RightForearm\n\trt 0.0 0.0 0.0 xyz 0.0 0.0 -0.22349999999999998\n\tcom 0.0 0.0 -0.06033342208442053\n\tmass 0.2444923481642268\n\tinertia\n\t\t0.00038077991636840285 0.0 0.0\n\t\t0.0 0.00043171611747488926 0.0\n\t\t0.0 0.0 0.00010085370145929663\n\tmeshfile Model_mesh/main.stl\nendsegment\n\n\tmarker MiddleRightHand\n\t\tparent RightHand\n\t\tposition 0 0 -0.1\n\tendmarker\n\nsegment LeftUpperArm\n\tparent Thorax\n\trt 0 -0.17 -0.1 xyz 0.18 0.0 0.25999999999999995\n\trotations zy\n\tcom 0.0 0.0 -0.11579539469552311\n\tmass 1.569290839009084\n\tinertia\n\t\t0.008572587015903282 0.0 0.0\n\t\t0.0 0.008572587015903282 0.0\n\t\t0.0 0.0 0.0015458844507023558\n\tmeshfile Model_mesh/bras.stl\nendsegment\n\nsegment LeftForearm\n\tparent LeftUpperArm\n\trt 0.0 0.0 0.0 xyz 0.0 0.0 -0.24350000000000002\n\trotations zx\n\tcom 0.0 0.0 -0.09478305833450895\n\tmass 0.8754802725163806\n\tinertia\n\t\t0.0034417004296885077 0.0 0.0\n\t\t0.0 0.0034850839826728753 0.0\n\t\t0.0 0.0 0.0005205672999114934\n\tmeshfile Model_mesh/avantbras.stl\nendsegment\n\nsegment LeftHand\n\tparent LeftForearm\n\trt 0.0 0.0 0.0 xyz 0.0 0.0 -0.22349999999999998\n\tcom 0.0 0.0 -0.06033342208442053\n\tmass 0.2444923481642268\n\tinertia\n\t\t0.00038077991636840285 0.0 0.0\n\t\t0.0 0.00043171611747488926 0.0\n\t\t0.0 0.0 0.00010085370145929663\n\tmeshfile Model_mesh/main.stl\nendsegment\n\n\tmarker MiddleLeftHand\n\t\tparent LeftHand\n\t\tposition 0 0 -0.1\n\tendmarker\n\nsegment UpperLegs\n\tparent Pelvis\n\trt 0.0 0.0 0.0 xyz 0.0 0.0 -0.08608065292407807\n\trotations xy\n\tcom 0.0 0.0 -0.17089938491274764\n\tmass 16.759868032417362\n\tinertia\n\t\t0.22636667008666034 0.0 0.0\n\t\t0.0 0.32703062745636713 0.0\n\t\t0.0 0.0 0.1605173999990793\n\tmeshfile Model_mesh/cuisse.stl\nendsegment\n\nsegment LowerLegs\n\tparent UpperLegs\n\trt 0.0 0.0 0.0 xyz 0.0 0.0 -0.3775\n\tcom 0.0 0.0 -0.17877624969815803\n\tmass 6.025039072122063\n\tinertia\n\t\t0.08169790576444133 0.0 0.0\n\t\t0.0 0.11788579669137447 0.0\n\t\t0.0 0.0 0.04385448191981976\n\tmeshfile Model_mesh/jambe.stl\n\tmeshrt pi 0 0 xyz 0 0 0\nendsegment\n\n\tmarker PikeTargetRightHand\n\t\tparent LowerLegs\n\t\tposition -0.1 0 -0.22\n\tendmarker\n\n\tmarker PikeTargetLeftHand\n\t\tparent LowerLegs\n\t\tposition 0.1 0 -0.22\n\tendmarker\n\n\n\nsegment Feet\n\tparent LowerLegs\n\trt -0.35 0 0 xyz 0.0 0.0 -0.36400000000000005\n\tcom 3.6956449538576916e-18 0.0 -0.06243250494552888\n\tmass 1.0561425325432152\n\tinertia\n\t\t0.002054330685841803 1.4423761698259375e-20 -5.421010862427522e-20\n\t\t1.4423761698259372e-20 0.008273648337148215 0.0\n\t\t-5.421010862427522e-20 0.0 0.007111905908612709\n\tmeshfile Model_mesh/pied.stl\n\tmeshrt 0 0 pi xyz 0 0 0\nendsegment"
+}
